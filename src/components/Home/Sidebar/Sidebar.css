@@ -1,0 +1,154 @@
+.sidebar {
+  width: 22%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    padding: 0;
+  }
+
+  .profileCard,
+  .analyticsCard,
+  .companyCard,
+  .quickLinksCard {
+    width: 100%;
+  }
+
+  .btn,
+  .btnOutline {
+    width: 100%;
+  }
+}
+
+/* Profile */
+
+.profileCard {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.cover {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+.avatar {
+  width: 72px;
+  border-radius: 50%;
+  margin-top: -36px;
+  border: 3px solid white;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: 16px;
+}
+
+.profile-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 10px;
+}
+
+.verified-icon {
+  color: #0a66c2;
+  margin-left: 4px;
+  font-size: 16px;
+}
+
+.profileCard p {
+  font-size: 13px;
+  color: #555;
+}
+
+.profileCard .description {
+  font-style: italic;
+}
+
+.profileCard .location {
+  font-size: 12px;
+  color: #777;
+}
+
+.profileCard .organization {
+  font-weight: bold;
+}
+
+.profile-text-container {
+  text-align: left;
+}
+
+/* Analytics */
+
+.analyticsCard .stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+/* Company */
+
+.companyLogo {
+  width: 50px;
+}
+
+.companyCard h4 {
+  margin-top: 10px;
+}
+
+.companyStats {
+  margin-top: 10px;
+}
+
+.companyStats div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.btn {
+  width: 100%;
+  margin-top: 10px;
+  background: #f3f2ef;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btnOutline {
+  width: 100%;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #0a66c2;
+  color: #0a66c2;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Quick links */
+
+.linkItem {
+  padding: 10px;
+  border-top: 1px solid #eee;
+  cursor: pointer;
+  font-size: 14px;
+}

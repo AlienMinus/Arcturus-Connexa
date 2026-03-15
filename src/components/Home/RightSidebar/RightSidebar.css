@@ -1,0 +1,110 @@
+.rightSidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* common card */
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+/* news */
+
+.newsCard h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.subTitle {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.newsCard ul {
+  list-style: none;
+}
+
+.newsCard li {
+  padding: 6px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.showMore {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #0a66c2;
+  cursor: pointer;
+}
+
+/* puzzles */
+
+.puzzleItem {
+  padding: 6px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* subtle puzzle icons */
+.puzzleItem svg {
+  color: #666;
+}
+
+/* ad */
+
+.adCard {
+  text-align: center;
+}
+
+.adLogo {
+  width: 50px;
+}
+
+.followBtn {
+  margin-top: 10px;
+  background: #0a66c2;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+}
+
+/* footer */
+
+.footerLinks {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+.linksRow {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.linksRow span {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* subtle footer icons */
+.linksRow span svg {
+  color: #888;
+}
+
+.copyright {
+  margin-top: 8px;
+}

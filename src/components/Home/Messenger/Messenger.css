@@ -1,0 +1,137 @@
+.messenger {
+  position: fixed;
+
+  bottom: 0;
+
+  right: 20px;
+
+  width: 320px;
+
+  height: 420px;
+
+  background: white;
+
+  border-radius: 10px 10px 0 0;
+
+  border: 1px solid #ddd;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.messenger.closed {
+  height: 50px;
+}
+
+/* HEADER */
+
+.messengerHeader {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 10px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.headerLeft {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.profileImg {
+  width: 32px;
+
+  border-radius: 50%;
+}
+
+.headerIcons span {
+  margin-left: 10px;
+
+  cursor: pointer;
+}
+
+/* SEARCH */
+
+.messageSearch {
+  padding: 8px;
+}
+
+.messageSearch input {
+  width: 100%;
+
+  padding: 8px;
+
+  border-radius: 20px;
+
+  border: 1px solid #ddd;
+}
+
+/* TABS */
+
+.messageTabs {
+  display: flex;
+
+  border-bottom: 1px solid #eee;
+}
+
+.messageTabs span {
+  flex: 1;
+
+  text-align: center;
+
+  padding: 8px;
+
+  cursor: pointer;
+}
+
+.activeTab {
+  border-bottom: 2px solid #0a66c2;
+
+  font-weight: bold;
+}
+
+/* CONVERSATIONS */
+
+.conversationList {
+  overflow-y: auto;
+
+  flex: 1;
+}
+
+.conversationItem {
+  display: flex;
+
+  gap: 10px;
+
+  padding: 10px;
+
+  cursor: pointer;
+}
+
+.conversationItem:hover {
+  background: #f3f2ef;
+}
+
+.chatAvatar {
+  width: 40px;
+
+  border-radius: 50%;
+}
+
+.chatText h4 {
+  font-size: 14px;
+}
+
+.chatText p {
+  font-size: 12px;
+
+  color: #666;
+}

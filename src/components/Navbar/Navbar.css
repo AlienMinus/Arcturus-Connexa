@@ -1,0 +1,306 @@
+﻿.navbar {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  height: 60px;
+
+  background: white;
+
+  border-bottom: 1px solid #ddd;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 0 20px;
+}
+
+/* LEFT */
+
+.navLeft {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.arcturusLogo {
+  width: 34px;
+  border-radius: 10%;
+}
+
+.searchBox {
+  display: flex;
+
+  align-items: center;
+
+  background: #eef3f8;
+
+  padding: 6px 10px;
+
+  border-radius: 6px;
+}
+
+.searchBox input {
+  border: none;
+
+  background: transparent;
+
+  outline: none;
+
+  margin-left: 5px;
+}
+
+/* CENTER */
+
+.navCenter {
+  display: flex;
+
+  gap: 28px;
+}
+
+/* NAV ITEM */
+
+.navItem {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  color: #666;
+}
+
+.navIcon {
+  font-size: 18px;
+}
+
+.active {
+  border-bottom: 2px solid black;
+}
+
+.iconWrapper {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+
+  top: -4px;
+
+  right: -6px;
+
+  background: #cc0000;
+
+  color: white;
+
+  font-size: 10px;
+
+  padding: 2px 5px;
+
+  border-radius: 50%;
+}
+
+/* RIGHT */
+
+.navRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+.profileMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.profile-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.profileAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.businessMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.business-icon {
+  display: flex;
+  justify-content: center;
+}
+
+.business-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.advertise {
+  color: #666;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.navRightContainer {
+  position: relative;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-dropdown-header .avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.profile-dropdown-header .user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-dropdown-header .user-info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.profile-dropdown-header .user-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.25;
+}
+
+.profile-dropdown-body {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-dropdown-body .view-profile-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 4px 12px;
+  padding: 6px 12px;
+  text-align: center;
+  border: 1px solid #0a66c2;
+  color: #0a66c2;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.profile-dropdown-body .view-profile-btn:hover {
+  background-color: #eef3f8;
+  border-color: #004182;
+}
+
+.profile-dropdown-section {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-dropdown-section:last-of-type {
+  border-bottom: none;
+}
+
+.profile-dropdown-section h5 {
+  margin: 4px 12px;
+  padding: 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-dropdown-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-dropdown-section ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+}
+
+.profile-dropdown-section ul li:hover {
+  background-color: #f3f3f3;
+}
+
+.profile-dropdown-footer {
+  padding: 8px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-dropdown-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-dropdown-footer ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+}
+
+.profile-dropdown-footer ul li:hover {
+  background-color: #f3f3f3;
+}

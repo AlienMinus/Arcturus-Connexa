@@ -1,0 +1,97 @@
+.newMessageModal {
+  position: fixed;
+
+  bottom: 0;
+
+  right: 360px;
+
+  width: 360px;
+
+  height: 420px;
+
+  background: white;
+
+  border-radius: 10px 10px 0 0;
+
+  border: 1px solid #ddd;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+/* HEADER */
+
+.newMessageHeader {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 10px;
+
+  border-bottom: 1px solid #eee;
+
+  font-weight: bold;
+}
+
+.headerBtns span {
+  margin-left: 10px;
+
+  cursor: pointer;
+}
+
+/* INPUT */
+
+.receiverInput {
+  padding: 10px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.receiverInput input {
+  width: 100%;
+
+  padding: 8px;
+
+  border-radius: 20px;
+
+  border: 1px solid #ccc;
+}
+
+/* SUGGESTED */
+
+.suggestedTitle {
+  padding: 8px 12px;
+
+  font-size: 13px;
+
+  color: #666;
+}
+
+.suggestedList {
+  overflow-y: auto;
+
+  flex: 1;
+}
+
+.suggestedUser {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px;
+
+  cursor: pointer;
+}
+
+.suggestedUser:hover {
+  background: #f3f2ef;
+}
+
+.suggestedUser img {
+  width: 40px;
+
+  border-radius: 50%;
+}
