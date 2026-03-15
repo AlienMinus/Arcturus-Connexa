@@ -50,7 +50,7 @@ const NewMessageModal = ({ closeModal }) => {
           <div key={i} className="suggestedUser">
 
             <img
-              src="https://i.pravatar.cc/40"
+              src={`https://i.pravatar.cc/40?u=${name}`}
               alt=""
             />
 

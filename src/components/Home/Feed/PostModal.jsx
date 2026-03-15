@@ -31,7 +31,7 @@ const PostModal = ({ closeModal }) => {
         <div className="postHeader">
           <div className="postUser">
             <img
-              src="https://i.pravatar.cc/100?u=fake@example.com"
+              src="https://i.pravatar.cc/150?u=123"
               alt=""
               className="postAvatar"
             />
