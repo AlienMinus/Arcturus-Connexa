@@ -44,7 +44,7 @@ const NavRight = () => {
               className="avatar"
             />
             <div className="user-info">
-              <h4>John Doe</h4>
+              <h4>Manas R. Das</h4>
               <p>Student</p>
             </div>
           </div>
