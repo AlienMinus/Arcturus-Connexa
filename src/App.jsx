@@ -3,7 +3,7 @@ import './App.css';
 import NotFound from './NotFound';
 import Home from './pages/HomePage/Home';
 import Navbar from './components/Navbar/Navbar';
-import ProfilePage from './components/Profile/ProfilePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AuthPage from './pages/AuthPage/AuthPage';
 import { ProfileProvider } from './context/ProfileContext';
 import { AuthProvider } from './context/AuthContext';
@@ -25,7 +25,8 @@ function App() {
                   <Navbar />
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/profile/*" element={<ProfilePage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile/:username" element={<ProfilePage />} />
                     <Route path="/*" element={<NotFound />} />
                   </Routes>
                 </>

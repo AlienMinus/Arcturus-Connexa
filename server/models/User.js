@@ -20,6 +20,12 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
+    username: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      sparse: true,
+    },
     password: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
     profilePicture: {

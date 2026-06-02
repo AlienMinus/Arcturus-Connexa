@@ -50,7 +50,7 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
     await post.save();
 
     // Populate user data for response
-    const postWithUser = await post.populate('userId', 'firstName lastName profilePicture');
+    const postWithUser = await post.populate('userId', 'firstName lastName profilePicture username headline');
 
     res.status(201).json(postWithUser);
   } catch (err) {
@@ -63,7 +63,7 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('userId', 'firstName lastName profilePicture')
+      .populate('userId', 'firstName lastName profilePicture username headline')
       .sort({ createdAt: -1 })
       .limit(50);
 

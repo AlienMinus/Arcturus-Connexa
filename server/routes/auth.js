@@ -26,12 +26,22 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await hashPassword(password);
 
+    const baseUsername = email.toLowerCase().split('@')[0].replace(/[^a-z0-9]+/g, '');
+    let username = baseUsername || `${firstName}${lastName}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    let usernameCandidate = username;
+    let usernameCounter = 1;
+    while (await User.findOne({ username: usernameCandidate })) {
+      usernameCandidate = `${username}${usernameCounter++}`;
+    }
+    username = usernameCandidate;
+
     // Create user
     const user = new User({
       firstName,
       middleName: middleName || '',
       lastName,
       email: email.toLowerCase(),
+      username,
       password: hashedPassword,
       dateOfBirth,
       phoneNumber: phoneNumber || '',
@@ -76,6 +86,7 @@ router.post('/register', async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        username: user.username,
       },
     });
   } catch (error) {
@@ -117,6 +128,7 @@ router.post('/login', async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        username: user.username,
         headline: user.headline,
       },
     });

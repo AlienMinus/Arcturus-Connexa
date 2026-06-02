@@ -99,10 +99,7 @@ const Registration = ({ onSuccess }) => {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Store token and user in localStorage
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
+      // Redirect to login so the user can sign in with their new account
       onSuccess(data);
     } catch (err) {
       setError(err.message);

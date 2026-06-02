@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext(null);
 
 export const ProfileProvider = ({ children }) => {
+  const { token } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,8 +13,6 @@ export const ProfileProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('authToken');
-      
       if (!token) {
         setProfile(null);
         setLoading(false);
@@ -21,13 +21,12 @@ export const ProfileProvider = ({ children }) => {
 
       const response = await fetch('/api/profile', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       
       if (!response.ok) {
         if (response.status === 401) {
-          // Token expired or invalid
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
           setProfile(null);
@@ -47,7 +46,7 @@ export const ProfileProvider = ({ children }) => {
 
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [token]);
 
   return (
     <ProfileContext.Provider value={{ profile, loading, error, refreshProfile: loadProfile }}>

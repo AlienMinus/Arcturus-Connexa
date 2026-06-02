@@ -16,8 +16,8 @@ const AuthPage = ({ mode = 'login' }) => {
   };
 
   const handleRegisterSuccess = (data) => {
-    // Token is already stored in localStorage by the Registration component
-    navigate('/');
+    // Redirect new users to login after signup
+    navigate('/login');
   };
 
   const handleForgotPasswordSuccess = (data) => {

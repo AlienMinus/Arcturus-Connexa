@@ -376,17 +376,36 @@
 
 .postTools {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding-bottom: 16px;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.postTools span,
+.mediaInputLabel,
+.aiButton {
+  flex: 0 0 auto;
 }
 
 .postTools span {
   font-size: 24px;
   color: #666;
   cursor: pointer;
+}
+
+.mediaInputLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #666;
+}
+
+.mediaInputLabel input {
+  display: none;
 }
 
 .postFooter {

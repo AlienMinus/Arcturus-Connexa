@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaCaretDown, FaTh } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfile } from "../../context/ProfileContext";
@@ -19,6 +19,18 @@ const NavRight = () => {
   const { profile } = useProfile();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
@@ -26,11 +38,12 @@ const NavRight = () => {
 
   const handleSignOut = () => {
     logout();
-    navigate("/login");
+    setDropdownOpen(false);
+    navigate('/login', { replace: true });
   };
 
   return (
-    <div className="navRightContainer">
+    <div className="navRightContainer" ref={containerRef}>
       <div className="navRight">
         <div className="profileMenu" onClick={toggleDropdown}>
           {profile?.avatar?.url ? (

@@ -28,6 +28,26 @@ const parseJSONField = (value) => {
   }
 };
 
+const normalizeHonors = (value) => {
+  const parsed = parseJSONField(value);
+  if (!parsed) return [];
+
+  if (Array.isArray(parsed)) {
+    return parsed.map((item) => {
+      if (typeof item === 'string') {
+        return { title: item };
+      }
+      return item;
+    });
+  }
+
+  if (typeof parsed === 'string') {
+    return parsed.split(',').map((item) => ({ title: item.trim() })).filter((item) => item.title);
+  }
+
+  return [];
+};
+
 // Get authenticated user's profile
 router.get('/', authMiddleware, async (req, res) => {
   try {
@@ -63,9 +83,57 @@ router.get('/', authMiddleware, async (req, res) => {
     const profileData = profile.toObject();
     profileData.name = `${user.firstName} ${user.lastName}`;
     profileData.email = user.email;
+    profileData.username = user.username;
     profileData.phoneNumber = user.phoneNumber;
     profileData.dateOfBirth = user.dateOfBirth;
     // Only include avatar if user has one
+    if (user.profilePicture?.url) {
+      profileData.avatar = user.profilePicture;
+    }
+
+    res.json(profileData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// Get profile by username
+router.get('/:username', authMiddleware, async (req, res) => {
+  try {
+    const username = req.params.username.toLowerCase();
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    let profile = await Profile.findOne({ userId: user._id });
+    if (!profile) {
+      profile = new Profile({
+        userId: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        headline: '',
+        location: user.location || '',
+        summary: '',
+        featured: [],
+        activity: [],
+        experience: [],
+        education: [],
+        certifications: [],
+        projects: [],
+        skills: [],
+        honors: [],
+        interests: [],
+      });
+      await profile.save();
+    }
+
+    const profileData = profile.toObject();
+    profileData.name = `${user.firstName} ${user.lastName}`;
+    profileData.email = user.email;
+    profileData.username = user.username;
+    profileData.phoneNumber = user.phoneNumber;
+    profileData.dateOfBirth = user.dateOfBirth;
     if (user.profilePicture?.url) {
       profileData.avatar = user.profilePicture;
     }
@@ -143,7 +211,7 @@ router.post(
         certifications: parseJSONField(certifications) || [],
         projects: parseJSONField(projects) || [],
         skills: parseJSONField(skills) || [],
-        honors: parseJSONField(honors) || [],
+        honors: normalizeHonors(honors) || [],
         interests: parseJSONField(interests) || [],
       };
 

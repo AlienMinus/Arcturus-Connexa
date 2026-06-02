@@ -25,6 +25,7 @@ const Feed = () => {
         data.map((post) => ({
           id: post._id,
           authorName: post.author || 'Anonymous',
+          authorUsername: post.userId?.username || '',
           authorHeadline: post.userId?.headline || 'Member',
           time: (
             <>

@@ -41,9 +41,11 @@ const ProfileHeader = ({ profile, onEdit }) => {
               <p className="profileHeadline">{profile.headline}</p>
               <p className="profileLocation">{profile.location}</p>
             </div>
-            <button className="editProfileButton" type="button" onClick={onEdit}>
-              Edit profile
-            </button>
+            {onEdit && (
+              <button className="editProfileButton" type="button" onClick={onEdit}>
+                Edit profile
+              </button>
+            )}
           </div>
           <div className="profileStats">
             <span>45 profile views</span>

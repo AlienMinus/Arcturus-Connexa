@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import { 
   FaThumbsUp, 
   FaCommentDots, 
@@ -57,21 +58,42 @@ const PostCard = ({ post }) => {
   const activeLabel = currentReaction ? currentReaction.name : "Like";
   const activeColor = currentReaction ? currentReaction.icon.props.color : "#666";
 
+  const profileUrl = post.authorUsername ? `/profile/${encodeURIComponent(post.authorUsername)}` : null;
+
   return (
     <div className="card postCard">
       <div className="postHeader">
-        {post.avatar ? (
-          <img src={post.avatar} alt={post.authorName} className="postAvatar" />
+        {profileUrl ? (
+          <Link to={profileUrl} className="postHeaderLink">
+            {post.avatar ? (
+              <img src={post.avatar} alt={post.authorName} className="postAvatar" />
+            ) : (
+              <div className="postAvatar postAvatarFallback">
+                {getInitials(post.authorName)}
+              </div>
+            )}
+            <div className="postInfo">
+              <h2>{post.authorName}</h2>
+              <p>{post.authorHeadline}</p>
+              <p>{post.time}</p>
+            </div>
+          </Link>
         ) : (
-          <div className="postAvatar postAvatarFallback">
-            {getInitials(post.authorName)}
+          <div className="postHeaderLink">
+            {post.avatar ? (
+              <img src={post.avatar} alt={post.authorName} className="postAvatar" />
+            ) : (
+              <div className="postAvatar postAvatarFallback">
+                {getInitials(post.authorName)}
+              </div>
+            )}
+            <div className="postInfo">
+              <h2>{post.authorName}</h2>
+              <p>{post.authorHeadline}</p>
+              <p>{post.time}</p>
+            </div>
           </div>
         )}
-        <div className="postInfo">
-          <h2>{post.authorName}</h2>
-          <p>{post.authorHeadline}</p>
-          <p>{post.time}</p>
-        </div>
         <FaEllipsisH className="moreIcon" />
       </div>
       <div className="postBody">
