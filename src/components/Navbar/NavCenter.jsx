@@ -6,15 +6,15 @@ const NavCenter = () => {
   return (
     <div className="navCenter">
 
-      <NavItem icon={<FaHome size={24} />} label="Home" active />
+      <NavItem to="/" icon={<FaHome size={24} />} label="Home" />
 
-      <NavItem icon={<FaUserFriends size={24} />} label="My Network" />
+      <NavItem to="/network" icon={<FaUserFriends size={24} />} label="My Network" />
 
-      <NavItem icon={<FaBriefcase size={24} />} label="Jobs" />
+      <NavItem to="/jobs" icon={<FaBriefcase size={24} />} label="Jobs" />
 
-      <NavItem icon={<FaCommentDots size={24} />} label="Messaging" />
+      <NavItem to="/messaging" icon={<FaCommentDots size={24} />} label="Messaging" />
 
-      <NavItem icon={<FaBell size={24} />} label="Notifications" badge="8" />
+      <NavItem to="/notifications" icon={<FaBell size={24} />} label="Notifications" badge="8" />
 
     </div>
   );

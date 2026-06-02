@@ -1,15 +1,18 @@
 import React from "react";
 import { FaSearch } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const NavLeft = () => {
   return (
     <div className="navLeft">
 
-      <img
-        src="/logo.png"
-        className="arcturusLogo"
-        alt=""
-      />
+      <Link to="/">
+        <img
+          src="/logo.png"
+          className="arcturusLogo"
+          alt=""
+        />
+      </Link>
 
       <div className="searchBox">
 

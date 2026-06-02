@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaCaretDown, FaTh } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 const NavRight = () => {
@@ -49,23 +50,23 @@ const NavRight = () => {
             </div>
           </div>
           <div className="profile-dropdown-body">
-            <a href="#" className="view-profile-btn">
+            <Link to="/profile" className="view-profile-btn">
               View Profile
-            </a>
+            </Link>
           </div>
           <div className="profile-dropdown-section">
             <h5>Account</h5>
             <ul>
-              <li>Settings & Privacy</li>
-              <li>Help</li>
-              <li>Language</li>
+              <Link to="/settings"><li>Settings & Privacy</li></Link>
+              <Link to="/help"><li>Help</li></Link>
+              <Link to="/settings/language"><li>Language</li></Link>
             </ul>
           </div>
           <div className="profile-dropdown-section">
             <h5>Manage</h5>
             <ul>
-              <li>Posts & Activity</li>
-              <li>Job Posting Account</li>
+              <Link to="/profile/activity"><li>Posts & Activity</li></Link>
+              <Link to="/jobs/manage"><li>Job Posting Account</li></Link>
             </ul>
           </div>
           <div className="profile-dropdown-footer">

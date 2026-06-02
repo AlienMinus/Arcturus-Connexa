@@ -1,8 +1,9 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
-const NavItem = ({ icon, label, badge, active }) => {
+const NavItem = ({ icon, label, badge, to }) => {
   return (
-    <div className={`navItem ${active ? "active" : ""}`}>
+    <NavLink to={to} className={({ isActive }) => `navItem ${isActive ? "active" : ""}`}>
 
       <div className="iconWrapper">
 
@@ -14,7 +15,7 @@ const NavItem = ({ icon, label, badge, active }) => {
 
       <span className="navLabel">{label}</span>
 
-    </div>
+    </NavLink>
   );
 };
 

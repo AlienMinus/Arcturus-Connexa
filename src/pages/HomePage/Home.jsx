@@ -1,8 +1,8 @@
 ﻿import React from "react";
-import Sidebar from "../components/Home/Sidebar/Sidebar";
-import Feed from "../components/Home/Feed/Feed";
-import RightSidebar from "../components/Home/RightSidebar/RightSidebar";
-import Messenger from "../components/Home/Messenger/Messenger";
+import Sidebar from "../../components/Home/Sidebar/Sidebar";
+import Feed from "../../components/Home/Feed/Feed";
+import RightSidebar from "../../components/Home/RightSidebar/RightSidebar";
+import Messenger from "../../components/Home/Messenger/Messenger";
 import "./Home.css";
 
 const Home = () => {

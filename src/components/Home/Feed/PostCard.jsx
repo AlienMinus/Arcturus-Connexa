@@ -13,6 +13,7 @@ import {
 
 const PostCard = ({ post }) => {
   const [showReactions, setShowReactions] = useState(false);
+  const [hideReactionsTimer, setHideReactionsTimer] = useState(null);
   const [currentReaction, setCurrentReaction] = useState(null);
 
   const reactions = [
@@ -27,6 +28,19 @@ const PostCard = ({ post }) => {
     e.stopPropagation();
     setCurrentReaction(currentReaction?.name === reaction.name ? null : reaction);
     setShowReactions(false);
+    clearTimeout(hideReactionsTimer);
+  };
+
+  const showReactionsPopup = () => {
+    clearTimeout(hideReactionsTimer);
+    setShowReactions(true);
+  };
+
+  const hideReactionsPopup = () => {
+    const timer = setTimeout(() => {
+      setShowReactions(false);
+    }, 500);
+    setHideReactionsTimer(timer);
   };
 
   const handleDefaultLike = () => setCurrentReaction(currentReaction ? null : reactions[0]);
@@ -62,13 +76,17 @@ const PostCard = ({ post }) => {
       <div className="postActionOptions">
         <div 
           className="actionOption likeContainer"
-          onMouseEnter={() => setShowReactions(true)}
-          onMouseLeave={() => setShowReactions(false)}
+          onMouseEnter={showReactionsPopup}
+          onMouseLeave={hideReactionsPopup}
           onClick={handleDefaultLike}
           style={{ color: activeColor }}
         >
           {showReactions && (
-            <div className="reactionsPopup">
+            <div 
+              className="reactionsPopup"
+              onMouseEnter={showReactionsPopup}
+              onMouseLeave={hideReactionsPopup}
+            >
               {reactions.map((r, idx) => (
                 <span key={idx} className="reactionIcon" onClick={(e) => handleReactionClick(e, r)} title={r.name}>
                   {r.icon}
