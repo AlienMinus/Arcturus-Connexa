@@ -16,6 +16,15 @@ const PostCard = ({ post }) => {
   const [hideReactionsTimer, setHideReactionsTimer] = useState(null);
   const [currentReaction, setCurrentReaction] = useState(null);
 
+  const getInitials = (name) =>
+    name
+      ?.split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || '';
+
   const reactions = [
     { name: "Like", icon: <FaThumbsUp color="#0a66c2" /> },
     { name: "Love", icon: <FaHeart color="#df704d" /> },
@@ -51,7 +60,13 @@ const PostCard = ({ post }) => {
   return (
     <div className="card postCard">
       <div className="postHeader">
-        <img src={post.avatar} alt="Avatar" className="postAvatar" />
+        {post.avatar ? (
+          <img src={post.avatar} alt={post.authorName} className="postAvatar" />
+        ) : (
+          <div className="postAvatar postAvatarFallback">
+            {getInitials(post.authorName)}
+          </div>
+        )}
         <div className="postInfo">
           <h2>{post.authorName}</h2>
           <p>{post.authorHeadline}</p>

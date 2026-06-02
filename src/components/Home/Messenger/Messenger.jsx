@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useProfile } from "../../../context/ProfileContext";
 import MessengerHeader from "./MessengerHeader";
 import MessageSearch from "./MessageSearch";
 import MessageTabs from "./MessageTabs";
@@ -9,6 +10,7 @@ import "./Messenger.css";
 const Messenger = () => {
   const [showNewMessage, setShowNewMessage] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const { profile } = useProfile();
 
   const toggle = () => {
     setIsOpen(!isOpen);
@@ -18,6 +20,7 @@ const Messenger = () => {
     <>
       <div className={`messenger ${!isOpen ? "closed" : ""}`}>
         <MessengerHeader
+          profile={profile}
           openNewMessage={() => setShowNewMessage(true)}
           toggle={toggle}
           isOpen={isOpen}

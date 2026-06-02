@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { FaImage, FaVideo, FaCalendarAlt, FaNewspaper } from "react-icons/fa";
+import { useProfile } from "../../../context/ProfileContext";
 import PostModal from "./PostModal";
 
-const CreatePost = () => {
+const CreatePost = ({ onPostCreated }) => {
+  const { profile } = useProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -12,17 +14,27 @@ const CreatePost = () => {
     <>
       <div className="card createPostCard">
         <div className="createPostTop" onClick={openModal}>
-          <img src="https://i.pravatar.cc/150?u=123" alt="Avatar" className="postAvatar" />
+          {profile?.avatar?.url ? (
+            <img
+              src={profile.avatar.url}
+              alt={profile?.name || "Avatar"}
+              className="postAvatar"
+            />
+          ) : (
+            <div className="postAvatar postAvatarFallback">
+              {profile?.name?.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()}
+            </div>
+          )}
           <input type="text" placeholder="Start a post" className="postInput" readOnly />
         </div>
         <div className="createPostBottom">
-          <div className="postOption"><FaImage color="#70b5f9" /> <span>Media</span></div>
-          <div className="postOption"><FaVideo color="#7fc15e" /> <span>Video</span></div>
-          <div className="postOption"><FaCalendarAlt color="#e7a33e" /> <span>Event</span></div>
-          <div className="postOption"><FaNewspaper color="#fc9295" /> <span>Write article</span></div>
+          <div className="postOption" onClick={openModal}><FaImage color="#70b5f9" /> <span>Media</span></div>
+          <div className="postOption" onClick={openModal}><FaVideo color="#7fc15e" /> <span>Video</span></div>
+          <div className="postOption" onClick={openModal}><FaCalendarAlt color="#e7a33e" /> <span>Event</span></div>
+          <div className="postOption" onClick={openModal}><FaNewspaper color="#fc9295" /> <span>Write article</span></div>
         </div>
       </div>
-      {isModalOpen && <PostModal closeModal={closeModal} />}
+      {isModalOpen && <PostModal closeModal={closeModal} onPostCreated={onPostCreated} profile={profile} />}
     </>
   );
 };

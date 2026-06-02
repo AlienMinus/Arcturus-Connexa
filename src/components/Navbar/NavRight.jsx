@@ -1,26 +1,51 @@
 import React, { useState } from "react";
 import { FaCaretDown, FaTh } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useProfile } from "../../context/ProfileContext";
+import { useAuth } from "../../context/AuthContext";
 import "./Navbar.css";
+
+const getInitials = (name) =>
+  name
+    ?.split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || '';
 
 const NavRight = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const { profile } = useProfile();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
     <div className="navRightContainer">
       <div className="navRight">
         <div className="profileMenu" onClick={toggleDropdown}>
-          <img
-            src="https://i.pravatar.cc/150?u=123"
-            alt=""
-            className="profileAvatar"
-          />
+          {profile?.avatar?.url ? (
+            <img
+              src={profile.avatar.url}
+              alt={profile?.name || "Profile"}
+              className="profileAvatar"
+            />
+          ) : (
+            <div className="profileAvatar profileAvatarFallback">
+              {getInitials(profile?.name)}
+            </div>
+          )}
           <span className="profile-text">
-            Me <FaCaretDown />
+            {profile?.name ? `${profile.name.split(' ')[0]}` : ''} <FaCaretDown />
           </span>
         </div>
 
@@ -39,14 +64,20 @@ const NavRight = () => {
       {isDropdownOpen && (
         <div className="profile-dropdown">
           <div className="profile-dropdown-header">
-            <img
-              src="https://i.pravatar.cc/150?u=123"
-              alt=""
-              className="avatar"
-            />
+            {profile?.avatar?.url ? (
+              <img
+                src={profile.avatar.url}
+                alt={profile?.name || "Profile"}
+                className="avatar"
+              />
+            ) : (
+              <div className="avatar avatarFallback">
+                {getInitials(profile?.name)}
+              </div>
+            )}
             <div className="user-info">
-              <h4>Manas R. Das</h4>
-              <p>Student</p>
+              <h4>{profile?.name || ''}</h4>
+              <p>{profile?.headline || ''}</p>
             </div>
           </div>
           <div className="profile-dropdown-body">
@@ -71,7 +102,9 @@ const NavRight = () => {
           </div>
           <div className="profile-dropdown-footer">
             <ul>
-              <li>Sign Out</li>
+              <li onClick={handleSignOut} style={{ cursor: "pointer" }}>
+                Sign Out
+              </li>
             </ul>
           </div>
         </div>

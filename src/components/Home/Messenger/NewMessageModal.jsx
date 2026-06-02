@@ -4,13 +4,22 @@ import "./NewMessageModal.css";
 
 const NewMessageModal = ({ closeModal }) => {
 
+  const getInitials = (name) =>
+    name
+      ?.split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || '';
+
   const suggested = [
-    "Barsa Priyadarshini Parida",
-    "Suman Barik",
-    "Ipsita Priyadarsani",
-    "Chimgozirim Akagha",
-    "Vamsi Krishna Sanaka",
-    "Smrutiranjan Mahanta"
+    { id: 'suggested-01', name: 'Barsa Priyadarshini Parida' },
+    { id: 'suggested-02', name: 'Suman Barik' },
+    { id: 'suggested-03', name: 'Ipsita Priyadarsani' },
+    { id: 'suggested-04', name: 'Chimgozirim Akagha' },
+    { id: 'suggested-05', name: 'Vamsi Krishna Sanaka' },
+    { id: 'suggested-06', name: 'Smrutiranjan Mahanta' },
   ];
 
   return (
@@ -46,16 +55,12 @@ const NewMessageModal = ({ closeModal }) => {
 
       <div className="suggestedList">
 
-        {suggested.map((name, i) => (
-          <div key={i} className="suggestedUser">
-
-            <img
-              src={`https://i.pravatar.cc/40?u=${name}`}
-              alt=""
-            />
-
-            <span>{name}</span>
-
+        {suggested.map((item) => (
+          <div key={item.id} className="suggestedUser">
+            <div className="suggestedAvatar suggestedAvatarFallback">
+              {getInitials(item.name)}
+            </div>
+            <span>{item.name}</span>
           </div>
         ))}
 
