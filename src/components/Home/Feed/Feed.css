@@ -143,6 +143,20 @@
   gap: 10px;
 }
 
+.postHeaderLink {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+}
+
+.postHeaderLink:hover .postInfo h2 {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
 .postInfo {
   flex: 1;
 }
