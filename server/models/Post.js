@@ -16,6 +16,16 @@ const PostSchema = new mongoose.Schema(
     author: { type: String, default: 'Anonymous' },
     content: { type: String, default: '' },
     media: [MediaSchema],
+    likes: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      reactionType: { type: String, default: 'Like' }
+    }],
+    comments: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      content: String,
+      createdAt: { type: Date, default: Date.now }
+    }],
+    repostedFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' }
   },
   { timestamps: true }
 );
