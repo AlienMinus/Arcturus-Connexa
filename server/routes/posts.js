@@ -50,6 +50,13 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
     });
     await post.save();
 
+    // UPDATE: Find the user and push the new post ID into their posts array
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { posts: post._id } },
+      { new: true }
+    );
+
     // Populate user data for response
     const postWithUser = await post.populate('userId', 'firstName lastName name profilePicture username headline');
 
@@ -83,19 +90,63 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get a single post by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate('userId', 'firstName lastName name profilePicture username headline')
+      .populate('likes.userId', 'firstName lastName name username')
+      .populate({
+        path: 'repostedFrom',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName name profilePicture username headline',
+        },
+      })
+      .populate({
+        path: 'comments.userId',
+        select: 'firstName lastName name profilePicture username headline',
+      });
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.json(post);
+  } catch (err) {
+    console.error(err);
+    if (err.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid post ID' });
+    }
+    res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
 // POST /api/posts/:id/like - Toggle like on
 router.post('/:id/like', authMiddleware, async (req, res) => {
   try {
     const { reactionType = 'Like' } = req.body || {};
-    const post = await Post.findById(req.params.id);
-    
-    // Remove existing reaction if any so we can toggle/change reaction types easily
-    post.likes = post.likes.filter(like => String(like.userId?._id || like.userId || like) !== String(req.userId));
-    
-    post.likes.push({ userId: req.userId, reactionType });
-    await post.save();
+    const postId = req.params.id;
+    const userId = req.userId;
+
+    // Try to update an existing reaction for this user
+    const result = await Post.updateOne(
+      { _id: postId, 'likes.userId': userId },
+      { $set: { 'likes.$.reactionType': reactionType } }
+    );
+
+    // If no document was found to update, it means the user hasn't liked the post yet.
+    if (result.matchedCount === 0) {
+      // So, add a new like.
+      await Post.updateOne(
+        { _id: postId },
+        { $addToSet: { likes: { userId, reactionType } } }
+      );
+    }
+
     res.status(200).json({ success: true });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Like failed' });
   }
 });
@@ -103,11 +154,17 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
 // DELETE /api/posts/:id/like - Toggle like off
 router.delete('/:id/like', authMiddleware, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    post.likes = post.likes.filter(like => String(like.userId?._id || like.userId || like) !== String(req.userId));
-    await post.save();
+    const postId = req.params.id;
+    const userId = req.userId;
+
+    await Post.updateOne(
+      { _id: postId },
+      { $pull: { likes: { userId: userId } } }
+    );
+
     res.status(200).json({ success: true });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Unlike failed' });
   }
 });

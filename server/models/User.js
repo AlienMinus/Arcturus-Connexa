@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: { type: String, default: '' },
     location: { type: String, default: '' },
     headline: { type: String, default: '' },
+    posts: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }],
     passwordHistory: [PasswordHistorySchema],
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
