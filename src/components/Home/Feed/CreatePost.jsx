@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaImage, FaVideo, FaCalendarAlt, FaNewspaper } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../../context/ProfileContext";
 import PostModal from "./PostModal";
 
@@ -21,9 +22,7 @@ const CreatePost = ({ onPostCreated }) => {
               className="postAvatar"
             />
           ) : (
-            <div className="postAvatar postAvatarFallback">
-              {profile?.name?.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()}
-            </div>
+            <CgProfile className="postAvatar postAvatarFallback" />
           )}
           <input type="text" placeholder="Start a post" className="postInput" readOnly />
         </div>

@@ -3,6 +3,7 @@ import posts from './posts.js';
 import profile from './profile.js';
 import auth from './auth.js';
 import users from './users.js';
+import messages from './messages.js';
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use('/posts', posts);
 router.use('/profile', profile);
 router.use('/auth', auth);
 router.use('/users', users);
+router.use('/messages', messages);
 
 export default router;

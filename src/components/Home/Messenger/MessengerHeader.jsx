@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaEllipsisH, FaEdit, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 
 const getInitials = (name) =>
   name
@@ -11,6 +12,30 @@ const getInitials = (name) =>
     .toUpperCase() || '';
 
 const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+        const res = await fetch('/api/messages/unread', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadCount(data.unread || 0);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="messengerHeader">
 
@@ -23,9 +48,7 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
             className="profileImg"
           />
         ) : (
-          <div className="profileImg profileImgFallback">
-            {getInitials(profile?.name)}
-          </div>
+          <CgProfile className="profileImg profileImgFallback" />
         )}
 
         <span>Messaging</span>
@@ -38,19 +61,21 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
 
         <span onClick={openNewMessage} style={{ cursor: "pointer", position: "relative" }}>
           <FaEdit />
-          <span style={{
-            position: "absolute",
-            top: "-6px",
-            right: "-6px",
-            backgroundColor: "#cc0000",
-            color: "white",
-            fontSize: "10px",
-            fontWeight: "bold",
-            padding: "1px 4px",
-            borderRadius: "10px"
-          }}>
-            2
-          </span>
+          {unreadCount > 0 && (
+            <span style={{
+              position: "absolute",
+              top: "-6px",
+              right: "-6px",
+              backgroundColor: "#cc0000",
+              color: "white",
+              fontSize: "10px",
+              fontWeight: "bold",
+              padding: "1px 4px",
+              borderRadius: "10px"
+            }}>
+              {unreadCount}
+            </span>
+          )}
         </span>
 
         <span style={{ cursor: "pointer" }} onClick={toggle}>

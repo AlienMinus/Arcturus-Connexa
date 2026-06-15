@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.js';
+import Message from '../models/Message.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -12,11 +13,29 @@ router.get('/', authMiddleware, async (req, res) => {
       .limit(50)
       .lean();
 
-    const contacts = users.map((user) => ({
-      id: user._id,
-      name: `${user.firstName} ${user.lastName}`,
-      headline: user.headline || user.email,
-      avatar: user.profilePicture || null,
+    const contacts = await Promise.all(users.map(async (user) => {
+      const lastMessage = await Message.findOne({
+        $or: [
+          { senderId: req.userId, receiverId: user._id },
+          { senderId: user._id, receiverId: req.userId }
+        ]
+      }).sort({ createdAt: -1 });
+
+      const unreadCount = await Message.countDocuments({
+        senderId: user._id,
+        receiverId: req.userId,
+        read: false
+      });
+
+      return {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        headline: user.headline || user.email,
+        avatar: user.profilePicture || null,
+        lastMessage: lastMessage ? lastMessage.content : null,
+        lastMessageTimestamp: lastMessage ? lastMessage.createdAt : null,
+        unreadCount
+      };
     }));
 
     res.json({ contacts });

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaCaretDown, FaTh } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../context/ProfileContext";
 import { useAuth } from "../../context/AuthContext";
 import "./Navbar.css";
@@ -53,9 +54,7 @@ const NavRight = () => {
               className="profileAvatar"
             />
           ) : (
-            <div className="profileAvatar profileAvatarFallback">
-              {getInitials(profile?.name)}
-            </div>
+            <CgProfile className="profileAvatar profileAvatarFallback" />
           )}
           <span className="profile-text">
             {profile?.name ? `${profile.name.split(' ')[0]}` : ''} <FaCaretDown />
@@ -84,9 +83,7 @@ const NavRight = () => {
                 className="avatar"
               />
             ) : (
-              <div className="avatar avatarFallback">
-                {getInitials(profile?.name)}
-              </div>
+              <CgProfile className="avatar avatarFallback" />
             )}
             <div className="user-info">
               <h4>{profile?.name || ''}</h4>

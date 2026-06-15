@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import ConversationItem from "./ConversationItem";
 
-const ConversationList = () => {
+const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let interval;
     const loadContacts = async () => {
-      setLoading(true);
-      setError(null);
 
       try {
         const token = localStorage.getItem('authToken');
@@ -26,6 +25,7 @@ const ConversationList = () => {
 
         const data = await response.json();
         setContacts(data.contacts || []);
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -33,7 +33,10 @@ const ConversationList = () => {
       }
     };
 
+    setLoading(true);
     loadContacts();
+    interval = setInterval(loadContacts, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
@@ -44,17 +47,25 @@ const ConversationList = () => {
     return <div className="conversationList">{error}</div>;
   }
 
+  const filteredContacts = contacts.filter(contact => 
+    contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contact.lastMessage?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="conversationList">
-      {contacts.map((contact) => (
+      {filteredContacts.map((contact) => (
         <ConversationItem
           key={contact.id}
           data={{
             id: contact.id,
             name: contact.name,
-            msg: contact.headline || 'Say hello',
+            msg: contact.lastMessage || contact.headline || 'Say hello',
+            timestamp: contact.lastMessageTimestamp,
+            unreadCount: contact.unreadCount,
             avatar: contact.avatar,
           }}
+          onClick={() => onSelectChat(contact)}
         />
       ))}
     </div>

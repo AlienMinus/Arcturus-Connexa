@@ -1,7 +1,7 @@
 import React from "react";
 import { FaSearch, FaSlidersH } from "react-icons/fa";
 
-const MessageSearch = () => {
+const MessageSearch = ({ searchTerm, setSearchTerm }) => {
   return (
     <div className="messageSearch" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "0 12px" }}>
 
@@ -10,6 +10,8 @@ const MessageSearch = () => {
       <input
         type="text"
         placeholder="Search messages"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
         style={{ border: "none", outline: "none", flex: 1, background: "transparent", padding: "8px 0" }}
       />
 

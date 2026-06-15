@@ -1,4 +1,5 @@
 import React from 'react';
+import { CgProfile } from "react-icons/cg";
 
 const getInitials = (name) =>
   name
@@ -30,9 +31,7 @@ const ProfileHeader = ({ profile, onEdit }) => {
             alt={profile.name}
           />
         ) : (
-          <div className="profileAvatarLarge profileAvatarLargeFallback">
-            {getInitials(profile?.name)}
-          </div>
+          <CgProfile className="profileAvatarLarge profileAvatarLargeFallback" />
         )}
         <div className="profileIntroText">
           <div className="profileIntroTop">

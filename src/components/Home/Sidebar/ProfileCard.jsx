@@ -1,6 +1,7 @@
 import React from "react";
 import { FaMapMarkerAlt, FaUniversity } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
 
 import { useProfile } from '../../../context/ProfileContext';
 
@@ -34,7 +35,7 @@ const ProfileCard = () => {
           alt={profile?.name || "Profile avatar"}
         />
       ) : (
-        <div className="avatar avatarFallback">{getInitials(profile?.name)}</div>
+        <CgProfile className="avatar avatarFallback" />
       )}
       <div className="profile-text-container">
         <div className="profile-name-container">

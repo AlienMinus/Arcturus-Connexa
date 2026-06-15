@@ -95,3 +95,10 @@
 
   border-radius: 50%;
 }
+
+/* COMPOSER */
+.messageComposer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}

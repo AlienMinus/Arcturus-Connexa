@@ -12,7 +12,7 @@ const AuthPage = ({ mode = 'login' }) => {
 
   const handleLoginSuccess = (data) => {
     // Token is already stored in localStorage by the Login component
-    navigate('/');
+    window.location.href = '/';
   };
 
   const handleRegisterSuccess = (data) => {

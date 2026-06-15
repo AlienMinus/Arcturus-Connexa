@@ -11,6 +11,7 @@ import {
   FaLightbulb,
   FaLaugh
 } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 
 const PostCard = ({ post }) => {
   const [showReactions, setShowReactions] = useState(false);
@@ -68,9 +69,7 @@ const PostCard = ({ post }) => {
             {post.avatar ? (
               <img src={post.avatar} alt={post.authorName} className="postAvatar" />
             ) : (
-              <div className="postAvatar postAvatarFallback">
-                {getInitials(post.authorName)}
-              </div>
+              <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div className="postInfo">
               <h2>{post.authorName}</h2>
@@ -83,9 +82,7 @@ const PostCard = ({ post }) => {
             {post.avatar ? (
               <img src={post.avatar} alt={post.authorName} className="postAvatar" />
             ) : (
-              <div className="postAvatar postAvatarFallback">
-                {getInitials(post.authorName)}
-              </div>
+              <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div className="postInfo">
               <h2>{post.authorName}</h2>

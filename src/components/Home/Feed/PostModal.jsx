@@ -11,6 +11,7 @@ import {
   FaCaretDown,
 } from "react-icons/fa";
 import { BsEmojiSmile, BsClockHistory } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
 import { useAuth } from "../../../context/AuthContext";
 import "./Feed.css";
 
@@ -97,9 +98,7 @@ const PostModal = ({ closeModal, onPostCreated, profile }) => {
                 className="postAvatar"
               />
             ) : (
-              <div className="postAvatar postAvatarFallback">
-                {profile?.name?.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()}
-              </div>
+              <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div>
               <h4>{profile?.name || ''}</h4>
