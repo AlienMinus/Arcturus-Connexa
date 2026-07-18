@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaPaperPlane } from "react-icons/fa";
+import { FaTimes, FaPaperPlane, FaLock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import "./ChatWindow.css";
 
@@ -75,6 +75,29 @@ const ChatWindow = ({ contact, closeChat }) => {
     }
   };
 
+  const renderMessageContent = (content) => {
+    if (!content) return null;
+    const urlRegex = /((?:https?:\/\/|www\.)[^\s]+)/gi;
+    const parts = content.split(urlRegex);
+    return parts.map((part, i) => {
+      if (part.match(urlRegex)) {
+        const href = part.startsWith('www.') ? `https://${part}` : part;
+        return (
+          <a
+            key={i}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'inherit', textDecoration: 'underline', fontWeight: '500' }}
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   if (!contact) return null;
 
   return (
@@ -94,6 +117,10 @@ const ChatWindow = ({ contact, closeChat }) => {
       </div>
 
       <div className="chatMessages">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '7px', color: '#666', padding: '12px 10px', textAlign: 'center' }}>
+          <FaLock size={6} />
+          <span>Messages are end-to-end encrypted. No one outside of this chat can read them.</span>
+        </div>
         {loading ? (
           <div className="loadingMessages">Loading messages...</div>
         ) : messages.length === 0 ? (
@@ -103,7 +130,7 @@ const ChatWindow = ({ contact, closeChat }) => {
             const isMe = msg.senderId !== (contact.id || contact._id);
             return (
               <div key={msg._id || msg.id || idx} className={`messageBubble ${isMe ? 'sent' : 'received'}`}>
-                <p>{msg.content}</p>
+                <p>{renderMessageContent(msg.content)}</p>
                 <span className="messageTime">
                   {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>

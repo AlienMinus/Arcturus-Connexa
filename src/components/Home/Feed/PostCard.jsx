@@ -14,6 +14,7 @@ import {
 import { BiRepost } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../../context/ProfileContext";
+import { useReactions } from "../../../context/ReactionContext";
 
 const reactions = [
   { name: "Like", icon: <FaThumbsUp color="#0a66c2" /> },
@@ -26,14 +27,51 @@ const reactions = [
 
 const PostCard = ({ post }) => {
   const { profile } = useProfile();
+  const { reactionsState, setReactionState } = useReactions();
   const navigate = useNavigate();
   const [showReactions, setShowReactions] = useState(false);
   const [hideReactionsTimer, setHideReactionsTimer] = useState(null);
-  const [currentReaction, setCurrentReaction] = useState(post.hasLiked ? { name: "Like", icon: <FaThumbsUp color="#0a66c2" /> } : null);
-  const [likesCount, setLikesCount] = useState(post.likesCount || 0);
-  const [hasLiked, setHasLiked] = useState(post.hasLiked || false);
-  const [likers, setLikers] = useState(post.likers || []);
+  
   const myName = profile?.name || (profile?.firstName ? `${profile.firstName} ${profile.lastName}` : "You");
+
+  useEffect(() => {
+    let matchedReaction = null;
+    if (post.hasLiked) {
+      matchedReaction = reactions.find(r => r.name === post.userReactionType) || reactions[0];
+    }
+    setReactionState(post.id, {
+      likesCount: post.likesCount || 0,
+      hasLiked: post.hasLiked || false,
+      likers: post.likers || [],
+      currentReaction: matchedReaction
+    });
+  }, [post.id, post.likesCount, post.hasLiked, post.likers, post.userReactionType, setReactionState]);
+
+  const reactionData = reactionsState[post.id] || {
+    likesCount: post.likesCount || 0,
+    hasLiked: post.hasLiked || false,
+    likers: post.likers || [],
+    currentReaction: post.hasLiked ? (reactions.find(r => r.name === post.userReactionType) || reactions[0]) : null
+  };
+
+  const { likesCount, hasLiked, likers, currentReaction } = reactionData;
+
+  const trackActivity = async (activityType) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      await fetch('/api/users/activity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ activityType, postId: post.id || post._id })
+      });
+    } catch (err) {
+      console.error('Failed to track activity', err);
+    }
+  };
 
   const getInitials = (name) =>
     name
@@ -43,18 +81,6 @@ const PostCard = ({ post }) => {
       .map((part) => part[0])
       .join('')
       .toUpperCase() || '';
-
-  useEffect(() => {
-    setHasLiked(post.hasLiked || false);
-    setLikesCount(post.likesCount || 0);
-    setLikers(post.likers || []);
-    if (post.hasLiked) {
-      const matched = reactions.find(r => r.name === post.userReactionType) || reactions[0];
-      setCurrentReaction(matched);
-    } else {
-      setCurrentReaction(null);
-    }
-  }, [post.hasLiked, post.likesCount, post.likers, post.userReactionType]);
 
   const handleReactionClick = async (e, reaction) => {
     e.stopPropagation();
@@ -66,18 +92,30 @@ const PostCard = ({ post }) => {
     const prevReaction = currentReaction;
     const prevHasLiked = hasLiked;
     const prevLikesCount = likesCount;
-    const prevLikers = likers;
+    const prevLikers = [...likers];
 
-    setCurrentReaction(isRemoving ? null : reaction);
-    if (!hasLiked && !isRemoving) {
-      setLikesCount(prev => prev + 1);
-      if (!likers.includes(myName)) setLikers(prev => [...prev, myName]);
-    }
-    if (hasLiked && isRemoving) {
-      setLikesCount(prev => prev - 1);
-      setLikers(prev => prev.filter(n => n !== myName));
-    }
-    setHasLiked(!isRemoving);
+    setReactionState(post.id, (curr) => {
+      const newHasLiked = !isRemoving;
+      let newLikesCount = curr.likesCount;
+      let newLikers = [...curr.likers];
+
+      if (!curr.hasLiked && !isRemoving) {
+        newLikesCount += 1;
+        if (!newLikers.includes(myName)) newLikers.push(myName);
+      }
+      if (curr.hasLiked && isRemoving) {
+        newLikesCount -= 1;
+        newLikers = newLikers.filter(n => n !== myName);
+      }
+
+      return {
+        ...curr,
+        currentReaction: isRemoving ? null : reaction,
+        hasLiked: newHasLiked,
+        likesCount: newLikesCount,
+        likers: newLikers
+      };
+    });
 
     try {
       const token = localStorage.getItem('authToken');
@@ -92,12 +130,18 @@ const PostCard = ({ post }) => {
       });
       
       if (!response.ok) throw new Error('Reaction failed');
+      
+      if (!isRemoving) {
+        trackActivity('reaction');
+      }
     } catch (err) {
       console.error('Reaction failed', err);
-      setCurrentReaction(prevReaction);
-      setHasLiked(prevHasLiked);
-      setLikesCount(prevLikesCount);
-      setLikers(prevLikers);
+      setReactionState(post.id, {
+        currentReaction: prevReaction,
+        hasLiked: prevHasLiked,
+        likesCount: prevLikesCount,
+        likers: prevLikers
+      });
     }
   };
 
@@ -121,17 +165,24 @@ const PostCard = ({ post }) => {
     const prevReaction = currentReaction;
     const prevHasLiked = hasLiked;
     const prevLikesCount = likesCount;
-    const prevLikers = likers;
+    const prevLikers = [...likers];
 
-    setHasLiked(!isRemoving);
-    setLikesCount(prev => isRemoving ? prev - 1 : prev + 1);
-    setCurrentReaction(reactionToSet);
+    setReactionState(post.id, (curr) => {
+      let newLikers = [...curr.likers];
+      if (!isRemoving && !newLikers.includes(myName)) {
+        newLikers.push(myName);
+      } else if (isRemoving) {
+        newLikers = newLikers.filter(n => n !== myName);
+      }
 
-    if (!isRemoving && !likers.includes(myName)) {
-      setLikers(prev => [...prev, myName]);
-    } else if (isRemoving) {
-      setLikers(prev => prev.filter(n => n !== myName));
-    }
+      return {
+        ...curr,
+        currentReaction: reactionToSet,
+        hasLiked: !isRemoving,
+        likesCount: isRemoving ? curr.likesCount - 1 : curr.likesCount + 1,
+        likers: newLikers
+      };
+    });
 
     try {
       const token = localStorage.getItem('authToken');
@@ -145,12 +196,18 @@ const PostCard = ({ post }) => {
         body: isRemoving ? null : JSON.stringify({ reactionType: 'Like' })
       });
       if (!response.ok) throw new Error('Like failed');
+      
+      if (!isRemoving) {
+        trackActivity('reaction');
+      }
     } catch (err) {
       console.error('Like failed', err);
-      setCurrentReaction(prevReaction);
-      setHasLiked(prevHasLiked);
-      setLikesCount(prevLikesCount);
-      setLikers(prevLikers);
+      setReactionState(post.id, {
+        currentReaction: prevReaction,
+        hasLiked: prevHasLiked,
+        likesCount: prevLikesCount,
+        likers: prevLikers
+      });
     }
   };
 
@@ -186,6 +243,7 @@ const PostCard = ({ post }) => {
   const displayImage = isRepost ? post.repostedFrom.image : post.image;
 
   const handlePostBodyClick = () => {
+    trackActivity('view');
     const username = displayUsername || 'user';
     navigate(`/${username}/posts/${post.id}`);
   };
@@ -258,6 +316,18 @@ const PostCard = ({ post }) => {
       )}
       <div className="postStats" style={{ padding: "0 16px 8px", fontSize: "12px", color: "#666", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #ebebeb" }}>
         <div className="likesDisplay" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          {likesCount > 0 && (
+            <div style={{ display: "flex", alignItems: "center", marginRight: "4px", background: "#fff", borderRadius: "10px", padding: "2px" }}>
+              {currentReaction ? (
+                 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "16px", height: "16px", borderRadius: "50%", background: "#ebf4fd", border: "1px solid #fff", zIndex: 2 }}>{React.cloneElement(currentReaction.icon, { size: 10 })}</span>
+              ) : (
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "16px", height: "16px", borderRadius: "50%", background: "#ebf4fd", border: "1px solid #fff", zIndex: 2 }}><FaThumbsUp color="#0a66c2" size={10} /></span>
+              )}
+              {likesCount > 1 && (
+                 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "16px", height: "16px", borderRadius: "50%", background: "#fdeced", border: "1px solid #fff", marginLeft: "-6px", zIndex: 1 }}><FaHeart color="#df704d" size={10} /></span>
+              )}
+            </div>
+          )}
           <span>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
           {likers.length > 0 && (
             <span style={{ fontSize: "11px", color: "#888" }}>

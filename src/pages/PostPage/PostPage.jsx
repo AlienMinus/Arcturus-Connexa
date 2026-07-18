@@ -5,6 +5,7 @@ import PostCard from "../../components/Home/Feed/PostCard";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 import { CgProfile } from "react-icons/cg";
+import "./PostPage.css";
 
 const PostPage = () => {
   const { username, postId } = useParams();
@@ -107,47 +108,47 @@ const PostPage = () => {
     }
   };
 
-  if (loading) return <div style={{ textAlign: "center", padding: "20px" }}>Loading...</div>;
-  if (error) return <div style={{ textAlign: "center", padding: "20px", color: "red" }}>{error}</div>;
-  if (!post) return <div style={{ textAlign: "center", padding: "20px" }}>Post not found</div>;
+  if (loading) return <div className="post-page-loading">Loading...</div>;
+  if (error) return <div className="post-page-error">{error}</div>;
+  if (!post) return <div className="post-page-not-found">Post not found</div>;
 
   return (
-    <div className="post-page-container" style={{ maxWidth: "600px", margin: "20px auto" }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom: "16px", cursor: "pointer", background: "none", border: "none", color: "#0a66c2", fontWeight: "bold" }}>
+    <div className="post-page-container">
+      <button onClick={() => navigate(-1)} className="post-page-back-btn">
         &larr; Back
       </button>
       <PostCard post={post} />
-      <div className="commentsSection" style={{ padding: "16px", borderTop: "1px solid #ebebeb", background: "#f9fafb", marginTop: "16px", borderRadius: "8px", border: "1px solid #ebebeb" }}>
-        <form onSubmit={submitComment} style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+      <div className="post-page-comments-section">
+        <form onSubmit={submitComment} className="post-page-comment-form">
           <input 
             type="text" 
             placeholder="Add a comment..." 
             value={newComment} 
             onChange={(e) => setNewComment(e.target.value)} 
-            style={{ flex: 1, padding: "8px 12px", borderRadius: "20px", border: "1px solid #ccc", outline: "none" }}
+            className="post-page-comment-input"
           />
-          <button type="submit" disabled={!newComment.trim()} style={{ background: newComment.trim() ? "#0a66c2" : "#ebebeb", color: newComment.trim() ? "white" : "#a8a8a8", border: "none", padding: "0 16px", borderRadius: "20px", fontWeight: "bold", cursor: newComment.trim() ? "pointer" : "not-allowed" }}>Post</button>
+          <button type="submit" disabled={!newComment.trim()} className="post-page-comment-submit">Post</button>
         </form>
-        <div className="commentsList" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div className="post-page-comments-list">
           {comments.map((c, idx) => (
-            <div key={idx} className="commentItem" style={{ display: "flex", gap: "8px" }}>
+            <div key={idx} className="post-page-comment-item">
               {c.authorAvatar?.url ? (
-                <img src={c.authorAvatar.url} alt={c.authorName} style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover" }} />
+                <img src={c.authorAvatar.url} alt={c.authorName} className="post-page-comment-avatar" />
               ) : (
-                <CgProfile style={{ fontSize: "32px", color: "#666" }} />
+                <CgProfile className="post-page-comment-avatar-fallback" />
               )}
-              <div className="commentContent" style={{ background: "#ebebeb", padding: "8px 12px", borderRadius: "0 8px 8px 8px", flex: 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <strong style={{ fontSize: "14px" }}>{c.authorName}</strong>
-                  <span style={{ fontSize: "10px", color: "#666" }}>
+              <div className="post-page-comment-content">
+                <div className="post-page-comment-header">
+                  <strong className="post-page-comment-author">{c.authorName}</strong>
+                  <span className="post-page-comment-time">
                     {new Date(c.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                   </span>
                 </div>
-                <p style={{ margin: "4px 0 0 0", fontSize: "14px" }}>{c.content}</p>
+                <p className="post-page-comment-text">{c.content}</p>
               </div>
             </div>
           ))}
-          {comments.length === 0 && <div style={{ fontSize: "12px", color: "#666", textAlign: "center" }}>No comments yet. Be the first to comment!</div>}
+          {comments.length === 0 && <div className="post-page-no-comments">No comments yet. Be the first to comment!</div>}
         </div>
       </div>
     </div>

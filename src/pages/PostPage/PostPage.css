@@ -1,0 +1,129 @@
+.post-page-container {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.post-page-back-btn {
+  margin-bottom: 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #0a66c2;
+  font-weight: bold;
+}
+
+.post-page-back-btn:hover {
+  text-decoration: underline;
+}
+
+.post-page-loading,
+.post-page-error,
+.post-page-not-found {
+  text-align: center;
+  padding: 20px;
+}
+
+.post-page-error {
+  color: red;
+}
+
+.post-page-comments-section {
+  padding: 16px;
+  background: #f9fafb;
+  margin-top: 16px;
+  border-radius: 8px;
+  border: 1px solid #ebebeb;
+}
+
+.post-page-comment-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.post-page-comment-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.post-page-comment-input:focus {
+  border-color: #0a66c2;
+}
+
+.post-page-comment-submit {
+  border: none;
+  padding: 0 16px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.post-page-comment-submit:not(:disabled) {
+  background: #0a66c2;
+  color: white;
+  cursor: pointer;
+}
+
+.post-page-comment-submit:disabled {
+  background: #ebebeb;
+  color: #a8a8a8;
+  cursor: not-allowed;
+}
+
+.post-page-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-page-comment-item {
+  display: flex;
+  gap: 8px;
+}
+
+.post-page-comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-page-comment-avatar-fallback {
+  font-size: 32px;
+  color: #666;
+}
+
+.post-page-comment-content {
+  background: #ebebeb;
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 8px;
+  flex: 1;
+}
+
+.post-page-comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.post-page-comment-author {
+  font-size: 14px;
+}
+
+.post-page-comment-time {
+  font-size: 10px;
+  color: #666;
+}
+
+.post-page-comment-text {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+
+.post-page-no-comments {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}

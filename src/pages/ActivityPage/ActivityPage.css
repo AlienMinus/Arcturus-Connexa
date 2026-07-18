@@ -1,0 +1,93 @@
+.activity-page {
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+}
+
+.activity-header {
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #0a66c2;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.activity-header h2 {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.activity-tabs {
+  display: flex;
+  gap: 15px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  background-color: #f3f2ef;
+  border-radius: 4px 4px 0 0;
+}
+
+.tab-btn.active {
+  color: #01754f;
+  border-bottom-color: #01754f;
+}
+
+.activity-content {
+  margin-top: 20px;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+.activities-list .activity-item {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.activity-meta {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+  padding-left: 8px;
+}
+
+.activity-page.loading,
+.activity-page.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.activity-page.error {
+  color: #d11124;
+}

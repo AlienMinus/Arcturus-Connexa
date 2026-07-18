@@ -39,6 +39,11 @@ const UserSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Post'
     }],
+    activities: [{
+      activityType: { type: String, enum: ['reaction', 'view'] },
+      postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+      createdAt: { type: Date, default: Date.now }
+    }],
     passwordHistory: [PasswordHistorySchema],
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },

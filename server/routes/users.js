@@ -45,4 +45,52 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// Track user activity
+router.post('/activity', authMiddleware, async (req, res) => {
+  try {
+    const { activityType, postId } = req.body;
+    if (!activityType || !postId) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    await User.findByIdAndUpdate(req.userId, {
+      $push: { activities: { activityType, postId } }
+    });
+    
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Failed to track activity:', err);
+    res.status(500).json({ error: 'Failed to track activity' });
+  }
+});
+
+// Get user activity
+router.get('/activity/:username', authMiddleware, async (req, res) => {
+  try {
+    const username = req.params.username.toLowerCase();
+    const user = await User.findOne({ username })
+      .populate({
+        path: 'activities.postId',
+        populate: { path: 'userId', select: 'firstName lastName profilePicture username headline' }
+      })
+      .populate({
+        path: 'posts',
+        populate: { path: 'userId', select: 'firstName lastName profilePicture username headline' }
+      })
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      activities: user.activities || [],
+      posts: user.posts || []
+    });
+  } catch (err) {
+    console.error('Failed to fetch activity:', err);
+    res.status(500).json({ error: 'Failed to fetch activity' });
+  }
+});
+
 export default router;

@@ -1,13 +1,16 @@
 import './App.css';
 import { ProfileProvider } from './context/ProfileContext';
 import { AuthProvider } from './context/AuthContext';
+import { ReactionProvider } from './context/ReactionContext';
 import AppRouter from './Router';
 
 function App() {
   return (
     <AuthProvider>
       <ProfileProvider>
-        <AppRouter />
+        <ReactionProvider>
+          <AppRouter />
+        </ReactionProvider>
       </ProfileProvider>
     </AuthProvider>
   );
