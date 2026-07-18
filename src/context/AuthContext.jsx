@@ -36,10 +36,15 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data?.error || response.statusText || 'Registration failed');
       }
 
       setToken(data.token);
@@ -66,10 +71,15 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data?.error || response.statusText || 'Login failed');
       }
 
       setToken(data.token);
@@ -104,10 +114,15 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to process forgot password');
+        throw new Error(data?.error || response.statusText || 'Failed to process forgot password');
       }
 
       return data;
@@ -129,10 +144,15 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ resetToken, newPassword, confirmPassword }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to reset password');
+        throw new Error(data?.error || response.statusText || 'Failed to reset password');
       }
 
       return data;
