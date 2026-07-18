@@ -10,7 +10,49 @@ const getInitials = (name) =>
     .join('')
     .toUpperCase() || '';
 
-const ProfileHeader = ({ profile, onEdit }) => {
+const ProfileHeader = ({
+  profile,
+  onEdit,
+  onFollow,
+  onConnectRequest,
+  onAcceptConnection,
+  onDeclineConnection,
+  actionState = {},
+}) => {
+  const {
+    isFollowing,
+    isConnected,
+    hasOutgoingConnectionRequest,
+    hasIncomingConnectionRequest,
+    loading: actionLoading,
+  } = actionState;
+
+  const renderConnectionButton = () => {
+    if (profile?.isConnected) {
+      return <button className="connectedButton" type="button">Connected</button>;
+    }
+    if (hasIncomingConnectionRequest) {
+      return (
+        <div className="connectionActions">
+          <button className="acceptConnectionButton" type="button" onClick={onAcceptConnection} disabled={actionLoading}>
+            Accept
+          </button>
+          <button className="declineConnectionButton" type="button" onClick={onDeclineConnection} disabled={actionLoading}>
+            Decline
+          </button>
+        </div>
+      );
+    }
+    if (hasOutgoingConnectionRequest) {
+      return <button className="pendingButton" type="button" disabled>Request Sent</button>;
+    }
+    return (
+      <button className="connectButton" type="button" onClick={onConnectRequest} disabled={actionLoading}>
+        Connect
+      </button>
+    );
+  };
+
   return (
     <div className="profileHeaderCard">
       <div
@@ -47,9 +89,25 @@ const ProfileHeader = ({ profile, onEdit }) => {
             )}
           </div>
           <div className="profileStats">
-            <span>45 profile views</span>
-            <span>10 post impressions</span>
+            <span>{profile.followersCount || 0} followers</span>
+            <span>{profile.followingCount || 0} following</span>
+            <span>{profile.connectionsCount || 0} connections</span>
           </div>
+          {onFollow || onConnectRequest ? (
+            <div className="actionButtons">
+              {onFollow && (
+                <button
+                  className={`followButton ${isFollowing ? 'following' : ''}`}
+                  type="button"
+                  onClick={onFollow}
+                  disabled={actionLoading}
+                >
+                  {isFollowing ? 'Following' : 'Follow'}
+                </button>
+              )}
+              {onConnectRequest && renderConnectionButton()}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

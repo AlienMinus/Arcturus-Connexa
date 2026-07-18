@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl } from '../../utils/api';
 import './Profile.css';
 
 const ProfileEditForm = ({ profile, onSaved }) => {

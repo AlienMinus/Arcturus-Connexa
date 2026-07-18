@@ -4,6 +4,7 @@ import profile from './profile.js';
 import auth from './auth.js';
 import users from './users.js';
 import messages from './messages.js';
+import notifications from './notifications.js';
 
 const router = express.Router();
 

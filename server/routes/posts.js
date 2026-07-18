@@ -20,6 +20,14 @@ const streamUpload = (buffer, options = {}) =>
     stream.end(buffer);
   });
 
+const notifyUsers = async (userIds, notification) => {
+  if (!Array.isArray(userIds) || userIds.length === 0) return;
+  await User.updateMany(
+    { _id: { $in: userIds } },
+    { $push: { notifications: notification } }
+  );
+};
+
 // Create post (requires authentication)
 router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
   try {
@@ -50,12 +58,29 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
     });
     await post.save();
 
-    // UPDATE: Find the user and push the new post ID into their posts array
+    // Update the user's post list
     await User.findByIdAndUpdate(
       userId,
       { $push: { posts: post._id } },
       { new: true }
     );
+
+    // Notify followers and connections about the new post
+    const author = await User.findById(userId).select('followers connections firstName lastName');
+    const recipientIds = [
+      ...(author.followers || []),
+      ...(author.connections || []),
+    ]
+      .map((id) => id.toString())
+      .filter((id, index, arr) => id !== userId && arr.indexOf(id) === index);
+
+    await notifyUsers(recipientIds, {
+      type: 'post',
+      message: `${author.firstName} ${author.lastName} shared a new post.`,
+      fromUserId: author._id,
+      postId: post._id,
+      read: false,
+    });
 
     // Populate user data for response
     const postWithUser = await post.populate('userId', 'firstName lastName name profilePicture username headline');
@@ -136,12 +161,28 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
     );
 
     // If no document was found to update, it means the user hasn't liked the post yet.
+    let post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
     if (result.matchedCount === 0) {
       // So, add a new like.
       await Post.updateOne(
         { _id: postId },
         { $addToSet: { likes: { userId, reactionType } } }
       );
+    }
+
+    const postOwner = await User.findById(post.userId).select('firstName lastName');
+    if (postOwner && postOwner._id.toString() !== userId) {
+      await notifyUsers([postOwner._id], {
+        type: 'reaction',
+        message: `${user.firstName} ${user.lastName} reacted to your post.`,
+        fromUserId: user._id,
+        postId,
+        read: false,
+      });
     }
 
     res.status(200).json({ success: true });
@@ -214,12 +255,39 @@ router.post('/:id/repost', authMiddleware, async (req, res) => {
   try {
     const originalPost = await Post.findById(req.params.id);
     if (!originalPost) return res.status(404).json({ error: 'Post not found' });
-    
+
     const repost = new Post({
       userId: req.userId,
-      repostedFrom: req.params.id
+      repostedFrom: req.params.id,
     });
     await repost.save();
+
+    const repostingUser = await User.findById(req.userId).select('followers connections firstName lastName');
+    const recipientIds = [
+      ...(repostingUser.followers || []),
+      ...(repostingUser.connections || []),
+    ]
+      .map((id) => id.toString())
+      .filter((id, index, arr) => id !== req.userId && arr.indexOf(id) === index);
+
+    await notifyUsers(recipientIds, {
+      type: 'repost',
+      message: `${repostingUser.firstName} ${repostingUser.lastName} reposted a post.`,
+      fromUserId: repostingUser._id,
+      postId: repost._id,
+      read: false,
+    });
+
+    if (originalPost.userId && originalPost.userId.toString() !== req.userId) {
+      await notifyUsers([originalPost.userId], {
+        type: 'post',
+        message: `${repostingUser.firstName} ${repostingUser.lastName} reposted your post.`,
+        fromUserId: repostingUser._id,
+        postId: repost._id,
+        read: false,
+      });
+    }
+
     res.status(201).json({ post: repost });
   } catch (err) {
     res.status(500).json({ error: 'Failed to repost' });

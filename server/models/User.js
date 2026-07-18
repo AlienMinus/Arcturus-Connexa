@@ -50,6 +50,25 @@ const UserSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
     lastLogin: { type: Date },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    pendingConnectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    sentConnectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    notifications: [
+      {
+        type: {
+          type: String,
+          enum: ['post', 'repost', 'reaction', 'follow', 'connection', 'request', 'other'],
+          default: 'other',
+        },
+        message: { type: String, required: true },
+        fromUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+        read: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

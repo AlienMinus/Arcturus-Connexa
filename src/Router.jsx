@@ -7,6 +7,8 @@ import ActivityPage from './pages/ActivityPage/ActivityPage';
 import PostPage from './pages/PostPage/PostPage';
 import AuthPage from './pages/AuthPage/AuthPage';
 import MessegingPage from './pages/MessegingPage/MessegingPage';
+import NetworkPage from './pages/NetworkPage/NetworkPage';
+import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
 
 function AppRouter() {
   return (
@@ -27,6 +29,8 @@ function AppRouter() {
                 <Route path="/profile/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username" element={<ProfilePage />} />
+                <Route path="/network" element={<NetworkPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/:username/posts/:postId" element={<PostPage />} />
                 <Route path="/messaging" element={<MessegingPage />} />
                 <Route path="/*" element={<NotFound />} />

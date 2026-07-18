@@ -48,49 +48,101 @@ const normalizeHonors = (value) => {
   return [];
 };
 
+const simplifyUser = (user) => ({
+  id: user._id,
+  username: user.username,
+  name: `${user.firstName} ${user.lastName}`,
+  headline: user.headline || user.email,
+  avatar: user.profilePicture || null,
+});
+
+const buildProfileResponse = (targetUser, profile, currentUser) => {
+  const currentUserId = currentUser?._id?.toString();
+  const targetId = targetUser._id.toString();
+
+  const isFollowing = currentUser
+    ? currentUser.following?.some((id) => id.toString() === targetId)
+    : false;
+  const isConnected = currentUser
+    ? currentUser.connections?.some((id) => id.toString() === targetId)
+    : false;
+  const hasOutgoingConnectionRequest = currentUser
+    ? currentUser.sentConnectionRequests?.some((id) => id.toString() === targetId)
+    : false;
+  const hasIncomingConnectionRequest = currentUser
+    ? currentUser.pendingConnectionRequests?.some((id) => id.toString() === targetId)
+    : false;
+
+  const profileData = profile.toObject();
+
+  profileData.name = `${targetUser.firstName} ${targetUser.lastName}`;
+  profileData.email = targetUser.email;
+  profileData.username = targetUser.username;
+  profileData.phoneNumber = targetUser.phoneNumber;
+  profileData.dateOfBirth = targetUser.dateOfBirth;
+  profileData.followersCount = targetUser.followers?.length || 0;
+  profileData.followingCount = targetUser.following?.length || 0;
+  profileData.connectionsCount = targetUser.connections?.length || 0;
+  profileData.followers = (targetUser.followers || []).map(simplifyUser);
+  profileData.following = (targetUser.following || []).map(simplifyUser);
+  profileData.connections = (targetUser.connections || []).map(simplifyUser);
+  profileData.isFollowing = isFollowing;
+  profileData.isConnected = isConnected;
+  profileData.hasOutgoingConnectionRequest = hasOutgoingConnectionRequest;
+  profileData.hasIncomingConnectionRequest = hasIncomingConnectionRequest;
+  profileData.userId = targetUser._id;
+
+  if (targetUser.profilePicture?.url) {
+    profileData.avatar = targetUser.profilePicture;
+  }
+
+  return profileData;
+};
+
+const populateProfileUser = async (userId) =>
+  User.findById(userId)
+    .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
+    .populate('followers', 'firstName lastName username headline profilePicture')
+    .populate('following', 'firstName lastName username headline profilePicture')
+    .populate('connections', 'firstName lastName username headline profilePicture')
+    .populate('pendingConnectionRequests', 'firstName lastName username headline profilePicture')
+    .populate('sentConnectionRequests', 'firstName lastName username headline profilePicture');
+
+const createDefaultProfileForUser = async (user) => {
+  const profile = new Profile({
+    userId: user._id,
+    name: `${user.firstName} ${user.lastName}`,
+    headline: '',
+    location: user.location || '',
+    summary: '',
+    featured: [],
+    activity: [],
+    experience: [],
+    education: [],
+    certifications: [],
+    projects: [],
+    skills: [],
+    honors: [],
+    interests: [],
+  });
+  await profile.save();
+  return profile;
+};
+
 // Get authenticated user's profile
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
-    if (!user) {
+    const targetUser = await populateProfileUser(req.userId);
+    if (!targetUser) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     let profile = await Profile.findOne({ userId: req.userId });
-
     if (!profile) {
-      // Create default profile for new user
-      profile = new Profile({
-        userId: req.userId,
-        name: `${user.firstName} ${user.lastName}`,
-        headline: '',
-        location: user.location || '',
-        summary: '',
-        featured: [],
-        activity: [],
-        experience: [],
-        education: [],
-        certifications: [],
-        projects: [],
-        skills: [],
-        honors: [],
-        interests: [],
-      });
-      await profile.save();
+      profile = await createDefaultProfileForUser(targetUser);
     }
 
-    // Merge user data with profile
-    const profileData = profile.toObject();
-    profileData.name = `${user.firstName} ${user.lastName}`;
-    profileData.email = user.email;
-    profileData.username = user.username;
-    profileData.phoneNumber = user.phoneNumber;
-    profileData.dateOfBirth = user.dateOfBirth;
-    // Only include avatar if user has one
-    if (user.profilePicture?.url) {
-      profileData.avatar = user.profilePicture;
-    }
-
+    const profileData = buildProfileResponse(targetUser, profile, targetUser);
     res.json(profileData);
   } catch (err) {
     console.error(err);
@@ -102,41 +154,23 @@ router.get('/', authMiddleware, async (req, res) => {
 router.get('/:username', authMiddleware, async (req, res) => {
   try {
     const username = req.params.username.toLowerCase();
-    const user = await User.findOne({ username });
-    if (!user) {
+    const targetUser = await User.findOne({ username })
+      .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
+      .populate('followers', 'firstName lastName username headline profilePicture')
+      .populate('following', 'firstName lastName username headline profilePicture')
+      .populate('connections', 'firstName lastName username headline profilePicture');
+
+    if (!targetUser) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    let profile = await Profile.findOne({ userId: user._id });
+    let profile = await Profile.findOne({ userId: targetUser._id });
     if (!profile) {
-      profile = new Profile({
-        userId: user._id,
-        name: `${user.firstName} ${user.lastName}`,
-        headline: '',
-        location: user.location || '',
-        summary: '',
-        featured: [],
-        activity: [],
-        experience: [],
-        education: [],
-        certifications: [],
-        projects: [],
-        skills: [],
-        honors: [],
-        interests: [],
-      });
-      await profile.save();
+      profile = await createDefaultProfileForUser(targetUser);
     }
 
-    const profileData = profile.toObject();
-    profileData.name = `${user.firstName} ${user.lastName}`;
-    profileData.email = user.email;
-    profileData.username = user.username;
-    profileData.phoneNumber = user.phoneNumber;
-    profileData.dateOfBirth = user.dateOfBirth;
-    if (user.profilePicture?.url) {
-      profileData.avatar = user.profilePicture;
-    }
+    const currentUser = await populateProfileUser(req.userId);
+    const profileData = buildProfileResponse(targetUser, profile, currentUser);
 
     res.json(profileData);
   } catch (err) {
@@ -230,14 +264,7 @@ router.post(
 
       await profile.save();
 
-      // Return merged profile data
-      const profileData = profile.toObject();
-      profileData.name = `${user.firstName} ${user.lastName}`;
-      profileData.email = user.email;
-      if (user.profilePicture?.url) {
-        profileData.avatar = user.profilePicture;
-      }
-
+      const profileData = buildProfileResponse(user, profile, user);
       res.json(profileData);
     } catch (err) {
       console.error(err);
