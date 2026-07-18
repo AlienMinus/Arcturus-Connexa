@@ -1,0 +1,46 @@
+.notificationsPage {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 0 24px 24px;
+  color: #111;
+}
+
+.notificationsPage h1 {
+  margin-bottom: 20px;
+}
+
+.notificationsList {
+  display: grid;
+  gap: 14px;
+}
+
+.notificationItem {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 18px;
+}
+
+.notificationItem.unread {
+  border: 1px solid #2563eb;
+}
+
+.notificationMessage {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.notificationMeta {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.notificationsEmpty,
+.loading,
+.error {
+  margin-top: 24px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}

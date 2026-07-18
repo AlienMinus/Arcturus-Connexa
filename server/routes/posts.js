@@ -160,8 +160,7 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
       { $set: { 'likes.$.reactionType': reactionType } }
     );
 
-    // If no document was found to update, it means the user hasn't liked the post yet.
-    let post = await Post.findById(postId);
+    const post = await Post.findById(postId);
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
@@ -174,12 +173,14 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
       );
     }
 
+    const currentUser = await User.findById(userId).select('firstName lastName');
     const postOwner = await User.findById(post.userId).select('firstName lastName');
+
     if (postOwner && postOwner._id.toString() !== userId) {
       await notifyUsers([postOwner._id], {
         type: 'reaction',
-        message: `${user.firstName} ${user.lastName} reacted to your post.`,
-        fromUserId: user._id,
+        message: `${currentUser.firstName} ${currentUser.lastName} reacted to your post.`,
+        fromUserId: currentUser._id,
         postId,
         read: false,
       });

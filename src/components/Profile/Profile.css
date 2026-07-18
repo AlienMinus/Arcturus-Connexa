@@ -70,6 +70,55 @@
   flex-wrap: wrap;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.actionButtons button,
+.connectionActions button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.followButton {
+  background: #2563eb;
+  color: #fff;
+}
+
+.followButton.following {
+  background: #f3f4f6;
+  color: #111;
+}
+
+.connectButton,
+.acceptConnectionButton {
+  background: #0f766e;
+  color: #fff;
+}
+
+.pendingButton,
+.declineConnectionButton {
+  background: #e2e8f0;
+  color: #111;
+}
+
+.connectedButton {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.connectionActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .profileMainColumn,
 .profileSidebarColumn {
   display: flex;

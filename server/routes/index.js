@@ -17,5 +17,6 @@ router.use('/profile', profile);
 router.use('/auth', auth);
 router.use('/users', users);
 router.use('/messages', messages);
+router.use('/notifications', notifications);
 
 export default router;

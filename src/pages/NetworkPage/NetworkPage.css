@@ -1,0 +1,83 @@
+.networkPage {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 24px 24px;
+  color: #111;
+}
+
+.networkPage h1 {
+  margin-bottom: 20px;
+}
+
+.networkGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.networkCard {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  align-items: center;
+}
+
+.networkAvatar,
+.networkAvatarFallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.networkDetails h3 {
+  margin: 0 0 6px;
+}
+
+.networkDetails p {
+  margin: 0;
+  color: #51606a;
+  font-size: 0.95rem;
+}
+
+.networkBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.networkBadge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.networkBadge.connected {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.networkBadge.following {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.networkBadge.pending {
+  background: #fef9c3;
+  color: #b45309;
+}
+
+.networkBadge.incoming {
+  background: #ede9fe;
+  color: #7c3aed;
+}

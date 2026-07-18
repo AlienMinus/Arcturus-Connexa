@@ -32,6 +32,9 @@ const NetworkPage = () => {
 
     if (token) {
       loadNetwork();
+    } else {
+      setLoading(false);
+      setNetwork([]);
     }
   }, [token]);
 
