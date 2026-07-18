@@ -217,11 +217,12 @@ const PostCard = ({ post }) => {
   const handleCommentClick = () => {
     const username = post.repostedFrom?.authorUsername || post.repostedFrom?.userId?.username || post.authorUsername || post.userId?.username || '';
     if (!username) return;
-    navigate(`/${username}/posts/${postId}`);
+    navigate(`/${encodeURIComponent(username)}/posts/${postId}`);
   };
 
-  const handlePostHeaderClick = () => {
+  const handlePostHeaderClick = (e) => {
     if (!displayUsername) return;
+    e.stopPropagation();
     navigate(`/profile/${encodeURIComponent(displayUsername)}`);
   };
 
@@ -247,7 +248,7 @@ const PostCard = ({ post }) => {
   const authorSource = isRepost ? post.repostedFrom : post;
   const displayAvatar = authorSource?.authorAvatar || authorSource?.avatar || authorSource?.userId?.profilePicture?.url || null;
   const displayName = authorSource?.authorName || (authorSource?.userId?.firstName ? `${authorSource.userId.firstName} ${authorSource.userId.lastName}` : (authorSource?.userId?.name || authorSource?.userId?.username || authorSource?.author || 'Anonymous'));
-  const displayUsername = authorSource?.authorUsername || authorSource?.userId?.username || authorSource?.username || '';
+  const displayUsername = authorSource?.authorUsername || authorSource?.userId?.username || authorSource?.userId?.name || '';
   const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
   const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";
   const displayImage = isRepost ? post.repostedFrom.image : post.image;
@@ -295,7 +296,6 @@ const PostCard = ({ post }) => {
     setShowOptions(false);
   };
 
-  const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : null;
   const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : 'View profile';
   const hasProfileLink = Boolean(displayUsername);
 
@@ -308,7 +308,7 @@ const PostCard = ({ post }) => {
       )}
       <div className="postHeader">
         {hasProfileLink ? (
-          <div className="postHeaderLink" title={profileLinkTitle} onClick={handlePostHeaderClick} style={{ cursor: 'pointer' }}>
+          <Link to={`/profile/${encodeURIComponent(displayUsername)}`} className="postHeaderLink" title={profileLinkTitle}>
             {displayAvatar ? (
               <img src={displayAvatar} alt={displayName} className="postAvatar" />
             ) : (
@@ -319,7 +319,7 @@ const PostCard = ({ post }) => {
               <p>{displayHeadline}</p>
               <p>{post.time}</p>
             </div>
-          </div>
+          </Link>
         ) : (
           <div className="postHeaderLink">
             {displayAvatar ? (

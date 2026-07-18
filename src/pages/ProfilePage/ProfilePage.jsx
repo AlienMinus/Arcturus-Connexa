@@ -8,11 +8,18 @@ import ProfileSection from '../../components/Profile/ProfileSection';
 import ProfileListSection from '../../components/Profile/ProfileListSection';
 import ProfileConnectionList from '../../components/Profile/ProfileConnectionList';
 import ProfileEditForm from '../../components/Profile/ProfileEditForm';
+import PostCard from '../../components/Home/Feed/PostCard';
 import '../../components/Profile/Profile.css';
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const { profile: currentProfile, loading: currentLoading, error: currentError, refreshProfile } = useProfile();
+  const {
+    profile: currentProfile,
+    loading: currentLoading,
+    error: currentError,
+    refreshProfile,
+    getProfileByUsername,
+  } = useProfile();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,43 +29,25 @@ const ProfilePage = () => {
   const isOwnProfile = !username || username === currentProfile?.username;
 
   useEffect(() => {
-    if (!username) {
-      setProfile(currentProfile);
-      setLoading(currentLoading);
-      setError(currentError);
-      return;
-    }
-
-    if (currentProfile && username === currentProfile.username) {
-      setProfile(currentProfile);
-      setLoading(currentLoading);
-      setError(currentError);
-      return;
-    }
-
-    const loadProfileByUsername = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(buildApiUrl(`/profile/${encodeURIComponent(username)}`), {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (!response.ok) {
-          const json = await response.json().catch(() => null);
-          throw new Error(json?.error || 'Failed to load profile');
+    const loadProfile = async () => {
+      if (!username || username === currentProfile?.username) {
+        setProfile(currentProfile);
+        setLoading(currentLoading);
+        setError(currentError);
+      } else {
+        setLoading(true);
+        setError(null);
+        const data = await getProfileByUsername(username);
+        if (data) {
+          setProfile(data);
+        } else {
+          setError('Failed to load profile');
         }
-        const data = await response.json();
-        setProfile(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
         setLoading(false);
       }
     };
-
-    loadProfileByUsername();
-  }, [username, currentProfile, currentLoading, currentError]);
+    loadProfile();
+  }, [username, currentProfile, currentLoading, currentError, getProfileByUsername]);
 
   const updateProfileField = (changes) => {
     setProfile((current) => ({ ...current, ...changes }));
@@ -160,6 +149,14 @@ const ProfilePage = () => {
         <main className="profileMainColumn">
           <ProfileSummary summary={profile.summary} />
           <ProfileSection title="Featured" items={profile.featured} type="featured" />
+          {profile.posts && profile.posts.length > 0 && (
+            <div className="profile-posts">
+              <h3>Posts</h3>
+              {profile.posts.map((post) => (
+                <PostCard post={post} key={post.id} />
+              ))}
+            </div>
+          )}
           <ProfileSection title="Activity" items={profile.activity} type="activity" />
           <ProfileListSection title="Experience" items={profile.experience} />
           <ProfileListSection title="Education" items={profile.education} />

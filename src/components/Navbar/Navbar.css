@@ -57,6 +57,55 @@
   margin-left: 5px;
 }
 
+.searchResults {
+  position: absolute;
+  top: 50px;
+  left: 60px;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 101;
+}
+
+.searchResults ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.searchResults li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.searchResults li:hover {
+  background-color: #f0f0f0;
+}
+
+.searchResultImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.searchResultInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchResultInfo span {
+  font-weight: bold;
+}
+
+.searchResultInfo small {
+  color: #666;
+}
+
 /* CENTER */
 
 .navCenter {

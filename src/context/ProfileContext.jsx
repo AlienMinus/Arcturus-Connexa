@@ -45,12 +45,56 @@ export const ProfileProvider = ({ children }) => {
     }
   };
 
+  const getProfileByUsername = async (username) => {
+    try {
+      const response = await fetch(buildApiUrl(`/profile/${username}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Unable to load profile');
+      }
+      return await response.json();
+    } catch (err) {
+      console.error(err.message);
+      return null;
+    }
+  };
+
+  const searchUsers = async (query) => {
+    if (!query) return [];
+    try {
+      const response = await fetch(buildApiUrl(`/users/search?q=${query}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to search users');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     loadProfile();
   }, [token]);
 
   return (
-    <ProfileContext.Provider value={{ profile, loading, error, refreshProfile: loadProfile }}>
+    <ProfileContext.Provider
+      value={{
+        profile,
+        loading,
+        error,
+        refreshProfile: loadProfile,
+        getProfileByUsername,
+        searchUsers,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   );

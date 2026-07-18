@@ -77,16 +77,17 @@ router.post('/register', async (req, res) => {
 
     // Generate token
     const token = generateAccessToken(user._id);
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        username: user.username,
+res.status(201).json({
+  message: 'User registered successfully',
+  token,
+  user: {
+    id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    username: user.username,
+  },
+});
       },
     });
   } catch (error) {

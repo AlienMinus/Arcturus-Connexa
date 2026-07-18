@@ -318,4 +318,34 @@ router.get('/activity/:username', authMiddleware, async (req, res) => {
   }
 });
 
+// Search for users
+router.get('/search', authMiddleware, async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) {
+      return res.json([]);
+    }
+
+    const users = await User.find({
+      $or: [
+        { firstName: { $regex: query, $options: 'i' } },
+        { lastName: { $regex: query, $options: 'i' } },
+        { username: { $regex: query, $options: 'i' } },
+      ],
+      _id: { $ne: req.userId }, // Exclude current user from results
+    }).limit(10);
+
+    res.json(users.map(user => ({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      headline: user.headline,
+      profilePicture: user.profilePicture
+    })));
+  } catch (err) {
+    console.error('User search failed:', err);
+    res.status(500).json({ error: 'Failed to search for users' });
+  }
+});
+
 export default router;

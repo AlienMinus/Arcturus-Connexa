@@ -153,6 +153,9 @@
   width: 100%;
   cursor: pointer;
 }
+.postHeaderLink:hover {
+  color: inherit;
+}
 
 .postHeaderLink:hover .postInfo h2 {
   color: #0a66c2;

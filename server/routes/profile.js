@@ -169,8 +169,32 @@ router.get('/:username', authMiddleware, async (req, res) => {
       profile = await createDefaultProfileForUser(targetUser);
     }
 
+    const posts = await Post.find({ userId: targetUser._id })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'firstName lastName username headline profilePicture');
+
     const currentUser = await populateProfileUser(req.userId);
     const profileData = buildProfileResponse(targetUser, profile, currentUser);
+
+    const currentUserId = req.userId;
+    profileData.posts = posts.map((post) => {
+      const userLike = post.likes.find((like) => like.userId.toString() === currentUserId);
+      return {
+        id: post._id,
+        content: post.content,
+        media: post.media,
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        createdAt: post.createdAt,
+        repostedFrom: post.repostedFrom,
+        authorName: `${post.userId.firstName} ${post.userId.lastName}`,
+        authorUsername: post.userId.username,
+        authorHeadline: post.userId.headline,
+        authorAvatar: post.userId.profilePicture?.url,
+        hasLiked: !!userLike,
+        userReactionType: userLike ? userLike.reactionType : null,
+      };
+    });
 
     res.json(profileData);
   } catch (err) {

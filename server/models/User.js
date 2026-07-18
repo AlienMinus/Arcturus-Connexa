@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 const PasswordHistorySchema = new mongoose.Schema(
   {
@@ -72,6 +73,43 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+function generateRandomAlphaNumeric(length) {
+  return crypto.randomBytes(Math.ceil(length / 2))
+    .toString('hex')
+    .slice(0, length);
+}
+
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('firstName') && !this.isModified('middleName') && !this.isModified('lastName') && this.username) {
+    return next();
+  }
+
+  try {
+    let baseUsername = this.firstName.toLowerCase();
+    if (this.middleName) {
+      baseUsername += `_${this.middleName.toLowerCase()}`;
+    }
+    baseUsername += `_${this.lastName.toLowerCase()}`;
+    
+    baseUsername = baseUsername.replace(/[^a-z0-9_]+/g, '').replace(/_{2,}/g, '_');
+
+    let username = baseUsername;
+    let userWithUsername = await mongoose.models.User.findOne({ username });
+
+    while (userWithUsername && userWithUsername._id.toString() !== this._id.toString()) {
+      const randomSuffix = generateRandomAlphaNumeric(4);
+      username = `${baseUsername}_${randomSuffix}`;
+      userWithUsername = await mongoose.models.User.findOne({ username });
+    }
+
+    this.username = username;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 const User = mongoose.model('User', UserSchema);
 
