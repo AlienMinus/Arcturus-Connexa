@@ -3,6 +3,7 @@ import multer from 'multer';
 import cloudinary from '../utils/cloudinary.js';
 import Profile from '../models/Profile.js';
 import User from '../models/User.js';
+import Post from '../models/Post.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
