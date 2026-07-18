@@ -262,15 +262,8 @@ const PostCard = ({ post }) => {
     }
   };
 
-  const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : null;
-  const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : undefined;
-
-  const handleProfileHeaderClick = (e) => {
-    if (!profileUrl) return;
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(profileUrl);
-  };
+  const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : '/profile';
+  const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : 'View profile';
 
   return (
     <div className="card postCard">
@@ -280,33 +273,18 @@ const PostCard = ({ post }) => {
         </div>
       )}
       <div className="postHeader">
-        {profileUrl ? (
-          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle} onClick={handleProfileHeaderClick}>
-            {displayAvatar ? (
-              <img src={displayAvatar} alt={displayName} className="postAvatar" />
-            ) : (
-              <CgProfile className="postAvatar postAvatarFallback" />
-            )}
-            <div className="postInfo">
-              <h2>{displayName}</h2>
-              <p>{displayHeadline}</p>
-              <p>{post.time}</p>
-            </div>
-          </Link>
-        ) : (
-          <div className="postHeaderLink">
-            {displayAvatar ? (
-              <img src={displayAvatar} alt={displayName} className="postAvatar" />
-            ) : (
-              <CgProfile className="postAvatar postAvatarFallback" />
-            )}
-            <div className="postInfo">
-              <h2>{displayName}</h2>
-              <p>{displayHeadline}</p>
-              <p>{post.time}</p>
-            </div>
+        <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
+          {displayAvatar ? (
+            <img src={displayAvatar} alt={displayName} className="postAvatar" />
+          ) : (
+            <CgProfile className="postAvatar postAvatarFallback" />
+          )}
+          <div className="postInfo">
+            <h2>{displayName}</h2>
+            <p>{displayHeadline}</p>
+            <p>{post.time}</p>
           </div>
-        )}
+        </Link>
         <FaEllipsisH className="moreIcon" />
       </div>
       <div className="postBody" onClick={handlePostBodyClick} style={{ cursor: "pointer" }}>
