@@ -170,11 +170,11 @@ router.post('/:id/connect/request', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (currentUser.connections.includes(targetId)) {
+    if (currentUser.connections?.some((id) => id.toString() === targetId)) {
       return res.status(400).json({ error: 'Already connected' });
     }
 
-    if (currentUser.sentConnectionRequests.includes(targetId)) {
+    if (currentUser.sentConnectionRequests?.some((id) => id.toString() === targetId)) {
       return res.status(400).json({ error: 'Connection request already sent' });
     }
 
@@ -214,7 +214,7 @@ router.post('/:id/connect/accept', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (!currentUser.pendingConnectionRequests.includes(targetId)) {
+    if (!currentUser.pendingConnectionRequests?.some((id) => id.toString() === targetId)) {
       return res.status(400).json({ error: 'No pending connection request from this user' });
     }
 
