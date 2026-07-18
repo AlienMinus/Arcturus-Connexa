@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { buildApiUrl } from "../../../utils/api";
 import ConversationItem from "./ConversationItem";
 
 const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
@@ -12,7 +13,7 @@ const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
 
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('/api/users', {
+        const response = await fetch(buildApiUrl('/users'), {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
           },

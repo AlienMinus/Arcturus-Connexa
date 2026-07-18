@@ -38,7 +38,7 @@ const ProfilePage = () => {
       setError(null);
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/profile/${encodeURIComponent(username)}`, {
+        const response = await fetch(buildApiUrl(`/profile/${encodeURIComponent(username)}`), {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!response.ok) {

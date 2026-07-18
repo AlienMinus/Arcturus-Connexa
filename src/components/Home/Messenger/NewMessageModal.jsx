@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaExternalLinkAlt, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { buildApiUrl } from "../../../utils/api";
 import "./NewMessageModal.css";
 
 const NewMessageModal = ({ closeModal }) => {
@@ -26,7 +27,7 @@ const NewMessageModal = ({ closeModal }) => {
       setLoading(true);
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('/api/users', {
+        const response = await fetch(buildApiUrl('/users'), {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
           },
@@ -50,7 +51,7 @@ const NewMessageModal = ({ closeModal }) => {
     setSending(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('/api/messages', {
+      const response = await fetch(buildApiUrl('/messages'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

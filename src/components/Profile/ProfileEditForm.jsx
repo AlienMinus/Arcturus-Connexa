@@ -42,7 +42,7 @@ const ProfileEditForm = ({ profile, onSaved }) => {
         formData.append('backgroundImage', backgroundFile);
       }
 
-      const response = await fetch('/api/profile', {
+      const response = await fetch(buildApiUrl('/profile'), {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

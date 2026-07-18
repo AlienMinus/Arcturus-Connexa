@@ -11,6 +11,7 @@ import {
   FaLaugh,
   FaHandHoldingHeart
 } from "react-icons/fa";
+import { buildApiUrl } from "../../../utils/api";
 import { BiRepost } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../../context/ProfileContext";
@@ -60,7 +61,7 @@ const PostCard = ({ post }) => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) return;
-      await fetch('/api/users/activity', {
+      await fetch(buildApiUrl('/users/activity'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ const PostCard = ({ post }) => {
     try {
       const token = localStorage.getItem('authToken');
       const method = isRemoving ? 'DELETE' : 'POST';
-      const response = await fetch(`/api/posts/${post.id}/like`, {
+      const response = await fetch(buildApiUrl(`/posts/${post.id}/like`), {
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -187,7 +188,7 @@ const PostCard = ({ post }) => {
     try {
       const token = localStorage.getItem('authToken');
       const method = isRemoving ? 'DELETE' : 'POST';
-      const response = await fetch(`/api/posts/${post.id}/like`, {
+      const response = await fetch(buildApiUrl(`/posts/${post.id}/like`), {
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -219,7 +220,7 @@ const PostCard = ({ post }) => {
   const handleRepost = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const res = await fetch(`/api/posts/${post.id}/repost`, {
+      const res = await fetch(buildApiUrl(`/posts/${post.id}/repost`), {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

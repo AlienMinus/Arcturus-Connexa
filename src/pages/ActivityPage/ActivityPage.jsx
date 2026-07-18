@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { buildApiUrl } from '../../utils/api';
 import { useProfile } from '../../context/ProfileContext';
 import PostCard from '../../components/Home/Feed/PostCard';
 import './ActivityPage.css';
@@ -22,7 +23,7 @@ const ActivityPage = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`/api/users/activity/${encodeURIComponent(targetUsername)}`, {
+        const response = await fetch(buildApiUrl(`/users/activity/${encodeURIComponent(targetUsername)}`), {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!response.ok) {

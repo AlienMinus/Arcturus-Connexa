@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaPaperPlane, FaLock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { buildApiUrl } from "../../../utils/api";
 import "./ChatWindow.css";
 
 const ChatWindow = ({ contact, closeChat }) => {
@@ -17,7 +18,7 @@ const ChatWindow = ({ contact, closeChat }) => {
         const token = localStorage.getItem('authToken');
         const contactId = contact.id || contact._id;
         // Assuming your API supports fetching conversation with a user by ID
-        const response = await fetch(`/api/messages/${contactId}`, {
+        const response = await fetch(buildApiUrl(`/messages/${contactId}`), {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
           },
@@ -53,7 +54,7 @@ const ChatWindow = ({ contact, closeChat }) => {
 
     try {
       const contactId = contact.id || contact._id;
-      const response = await fetch('/api/messages', {
+      const response = await fetch(buildApiUrl('/messages'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

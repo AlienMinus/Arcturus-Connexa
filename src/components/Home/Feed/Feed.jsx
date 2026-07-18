@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { GiEarthAsiaOceania } from "react-icons/gi";
 import { useProfile } from "../../../context/ProfileContext";
 import { useAuth } from "../../../context/AuthContext";
+import { buildApiUrl } from "../../../utils/api";
 import CreatePost from "./CreatePost";
 import PostCard from "./PostCard";
 import FeedSort from "./FeedSort";
@@ -19,7 +20,7 @@ const Feed = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('/api/posts', { headers });
+      const response = await fetch(buildApiUrl('/posts'), { headers });
       const data = await response.json();
       setPosts(
         data.map((post) => {

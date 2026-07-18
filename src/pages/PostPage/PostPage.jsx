@@ -4,6 +4,7 @@ import { GiEarthAsiaOceania } from "react-icons/gi";
 import PostCard from "../../components/Home/Feed/PostCard";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
+import { buildApiUrl } from '../../utils/api';
 import { CgProfile } from "react-icons/cg";
 import "./PostPage.css";
 
@@ -27,7 +28,7 @@ const PostPage = () => {
           headers['Authorization'] = `Bearer ${token}`;
         }
         
-        const response = await fetch(`/api/posts/${postId}`, { headers });
+        const response = await fetch(buildApiUrl(`/posts/${postId}`), { headers });
         if (!response.ok) {
           throw new Error("Post not found");
         }
@@ -68,7 +69,7 @@ const PostPage = () => {
           } : null
         });
 
-        const commentsRes = await fetch(`/api/posts/${postId}/comments`, { headers });
+        const commentsRes = await fetch(buildApiUrl(`/posts/${postId}/comments`), { headers });
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
           setComments(commentsData.comments || []);
@@ -89,7 +90,7 @@ const PostPage = () => {
     if (!newComment.trim()) return;
     try {
       const authToken = token || localStorage.getItem('authToken');
-      const res = await fetch(`/api/posts/${postId}/comments`, {
+      const res = await fetch(buildApiUrl(`/posts/${postId}/comments`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

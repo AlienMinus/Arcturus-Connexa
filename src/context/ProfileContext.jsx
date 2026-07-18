@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { buildApiUrl } from '../utils/api';
 
 const ProfileContext = createContext(null);
 
@@ -19,7 +20,7 @@ export const ProfileProvider = ({ children }) => {
         return;
       }
 
-      const response = await fetch('/api/profile', {
+      const response = await fetch(buildApiUrl('/profile'), {
         headers: {
           Authorization: `Bearer ${token}`,
         },

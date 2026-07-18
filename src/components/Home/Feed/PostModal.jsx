@@ -13,6 +13,7 @@ import {
 import { BsEmojiSmile, BsClockHistory } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { useAuth } from "../../../context/AuthContext";
+import { buildApiUrl } from "../../../utils/api";
 import "./Feed.css";
 
 const PostModal = ({ closeModal, onPostCreated, profile }) => {
@@ -62,7 +63,7 @@ const PostModal = ({ closeModal, onPostCreated, profile }) => {
         formData.append("media", mediaFile);
       }
 
-      const response = await fetch("/api/posts", {
+      const response = await fetch(buildApiUrl('/posts'), {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`,

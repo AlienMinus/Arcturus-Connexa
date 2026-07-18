@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEllipsisH, FaEdit, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { buildApiUrl } from "../../../utils/api";
 
 const getInitials = (name) =>
   name
@@ -19,7 +20,7 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
       try {
         const token = localStorage.getItem('authToken');
         if (!token) return;
-        const res = await fetch('/api/messages/unread', {
+        const res = await fetch(buildApiUrl('/messages/unread'), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
