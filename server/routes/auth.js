@@ -88,8 +88,6 @@ res.status(201).json({
     username: user.username,
   },
 });
-      },
-    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: error.message || 'Registration failed' });
