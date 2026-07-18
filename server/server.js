@@ -5,7 +5,8 @@ import routes from './routes/index.js';
 import connectDB from './db.js';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
+const host = '0.0.0.0';
 
 app.use(cors());
 app.use(express.json());
@@ -27,8 +28,8 @@ app.get('/health', (req, res) => {
 });
 
 if (!process.env.VERCEL) {
-  app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}`);
+  app.listen(port, host, () => {
+    console.log(`Server listening on http://${host}:${port}`);
   });
 }
 
