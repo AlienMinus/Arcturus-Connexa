@@ -80,9 +80,14 @@ function generateRandomAlphaNumeric(length) {
     .slice(0, length);
 }
 
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('firstName') && !this.isModified('middleName') && !this.isModified('lastName') && this.username) {
-    return next();
+UserSchema.pre('save', async function () {
+  if (
+    !this.isModified('firstName') &&
+    !this.isModified('middleName') &&
+    !this.isModified('lastName') &&
+    this.username
+  ) {
+    return;
   }
 
   try {
@@ -91,22 +96,26 @@ UserSchema.pre('save', async function (next) {
       baseUsername += `_${this.middleName.toLowerCase()}`;
     }
     baseUsername += `_${this.lastName.toLowerCase()}`;
-    
-    baseUsername = baseUsername.replace(/[^a-z0-9_]+/g, '').replace(/_{2,}/g, '_');
+
+    baseUsername = baseUsername
+      .replace(/[^a-z0-9_]+/g, '')
+      .replace(/_{2,}/g, '_');
 
     let username = baseUsername;
     let userWithUsername = await mongoose.models.User.findOne({ username });
 
-    while (userWithUsername && userWithUsername._id.toString() !== this._id.toString()) {
+    while (
+      userWithUsername &&
+      userWithUsername._id.toString() !== this._id.toString()
+    ) {
       const randomSuffix = generateRandomAlphaNumeric(4);
       username = `${baseUsername}_${randomSuffix}`;
       userWithUsername = await mongoose.models.User.findOne({ username });
     }
 
     this.username = username;
-    next();
   } catch (error) {
-    next(error);
+    throw error;
   }
 });
 

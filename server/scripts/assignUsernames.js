@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import User from '../models/User.js';
 import connectDB from '../db.js';
 
-dotenv.config({ path: './.env' }); // Assuming the script is run from project root.
+dotenv.config({ path: '../.env' }); // Assuming the script is run from project root.
 
 // Helper function to generate a random alphanumeric string
 function generateRandomAlphaNumeric(length) {
