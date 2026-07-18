@@ -28,6 +28,15 @@ const notifyUsers = async (userIds, notification) => {
   );
 };
 
+const normalizePostResponse = (post) => {
+  const result = post.toObject ? post.toObject() : post;
+  result.authorUsername = result.userId?.username || result.userId?.name || result.authorUsername || '';
+  if (result.repostedFrom) {
+    result.repostedFrom.authorUsername = result.repostedFrom.userId?.username || result.repostedFrom.userId?.name || result.repostedFrom.authorUsername || '';
+  }
+  return result;
+};
+
 // Create post (requires authentication)
 router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
   try {
@@ -84,8 +93,7 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
 
     // Populate user data for response
     const postWithUser = await post.populate('userId', 'firstName lastName name profilePicture username headline');
-
-    res.status(201).json(postWithUser);
+    res.status(201).json(normalizePostResponse(postWithUser));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create post' });
@@ -108,7 +116,7 @@ router.get('/', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(50);
 
-    res.json(posts);
+    res.json(posts.map(normalizePostResponse));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch posts' });
@@ -137,7 +145,7 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    res.json(post);
+    res.json(normalizePostResponse(post));
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {
@@ -289,7 +297,7 @@ router.post('/:id/repost', authMiddleware, async (req, res) => {
       });
     }
 
-    res.status(201).json({ post: repost });
+    res.status(201).json({ post: normalizePostResponse(repost) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to repost' });
   }

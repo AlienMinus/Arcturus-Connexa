@@ -40,7 +40,7 @@ const PostPage = () => {
         setPost({
           id: data._id,
           authorName: data.userId?.firstName ? `${data.userId.firstName} ${data.userId.lastName}` : (data.userId?.name || data.userId?.username || data.author || 'Anonymous'),
-          authorUsername: data.userId?.username || '',
+          authorUsername: data.authorUsername || data.userId?.username || data.userId?.name || '',
           authorHeadline: data.userId?.headline || 'Member',
           time: (
             <>
@@ -61,7 +61,7 @@ const PostPage = () => {
           repostedFrom: data.repostedFrom ? {
             id: data.repostedFrom._id,
             authorName: data.repostedFrom.userId?.firstName ? `${data.repostedFrom.userId.firstName} ${data.repostedFrom.userId.lastName}` : (data.repostedFrom.userId?.name || data.repostedFrom.userId?.username || data.repostedFrom.author || 'Anonymous'),
-            authorUsername: data.repostedFrom.userId?.username || '',
+            authorUsername: data.repostedFrom.authorUsername || data.repostedFrom.userId?.username || data.repostedFrom.userId?.name || '',
             authorHeadline: data.repostedFrom.userId?.headline || 'Member',
             content: data.repostedFrom.content || '',
             image: data.repostedFrom.media?.[0]?.url,

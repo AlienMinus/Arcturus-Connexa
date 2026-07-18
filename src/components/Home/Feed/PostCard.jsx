@@ -32,7 +32,9 @@ const PostCard = ({ post }) => {
   const navigate = useNavigate();
   const [showReactions, setShowReactions] = useState(false);
   const [hideReactionsTimer, setHideReactionsTimer] = useState(null);
+  const [showOptions, setShowOptions] = useState(false);
   
+  const postId = post.id || post._id;
   const myName = profile?.name || (profile?.firstName ? `${profile.firstName} ${profile.lastName}` : "You");
 
   useEffect(() => {
@@ -213,8 +215,9 @@ const PostCard = ({ post }) => {
   };
 
   const handleCommentClick = () => {
-    const username = (post.repostedFrom ? post.repostedFrom.authorUsername : post.authorUsername) || 'user';
-    navigate(`/${username}/posts/${post.id}`);
+    const username = post.repostedFrom?.authorUsername || post.repostedFrom?.userId?.username || post.authorUsername || post.userId?.username || '';
+    if (!username) return;
+    navigate(`/${username}/posts/${postId}`);
   };
 
   const handleRepost = async () => {
@@ -236,17 +239,18 @@ const PostCard = ({ post }) => {
   const activeColor = currentReaction ? currentReaction.icon.props.color : "#666";
 
   const isRepost = !!post.repostedFrom;
-  const displayAvatar = isRepost ? post.repostedFrom.authorAvatar : post.avatar;
-  const displayName = isRepost ? post.repostedFrom.authorName : post.authorName;
-  const displayUsername = isRepost ? post.repostedFrom.authorUsername : post.authorUsername;
-  const displayHeadline = isRepost ? post.repostedFrom.authorHeadline : post.authorHeadline;
+  const authorSource = isRepost ? post.repostedFrom : post;
+  const displayAvatar = authorSource?.authorAvatar || authorSource?.avatar || authorSource?.userId?.profilePicture?.url || null;
+  const displayName = authorSource?.authorName || (authorSource?.userId?.firstName ? `${authorSource.userId.firstName} ${authorSource.userId.lastName}` : (authorSource?.userId?.name || authorSource?.userId?.username || authorSource?.author || 'Anonymous'));
+  const displayUsername = authorSource?.authorUsername || authorSource?.userId?.username || authorSource?.username || '';
+  const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
   const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";
   const displayImage = isRepost ? post.repostedFrom.image : post.image;
 
   const handlePostBodyClick = () => {
+    if (!displayUsername) return;
     trackActivity('view');
-    const username = displayUsername || 'user';
-    navigate(`/${username}/posts/${post.id}`);
+    navigate(`/${displayUsername}/posts/${postId}`);
   };
 
   const handleSendClick = () => {
@@ -262,8 +266,33 @@ const PostCard = ({ post }) => {
     }
   };
 
-  const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : '/profile';
+  const handleToggleOptions = (e) => {
+    e.stopPropagation();
+    setShowOptions((prev) => !prev);
+  };
+
+  const handleCopyPostLink = async (e) => {
+    e.stopPropagation();
+    const username = displayUsername || 'user';
+    const postUrl = `${window.location.origin}/${username}/posts/${postId}`;
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      alert('Post link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy post link', err);
+    }
+    setShowOptions(false);
+  };
+
+  const handleReportPost = (e) => {
+    e.stopPropagation();
+    alert('Thanks for reporting this post. Our team will review it.');
+    setShowOptions(false);
+  };
+
+  const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : null;
   const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : 'View profile';
+  const hasProfileLink = Boolean(displayUsername);
 
   return (
     <div className="card postCard">
@@ -273,19 +302,56 @@ const PostCard = ({ post }) => {
         </div>
       )}
       <div className="postHeader">
-        <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
-          {displayAvatar ? (
-            <img src={displayAvatar} alt={displayName} className="postAvatar" />
-          ) : (
-            <CgProfile className="postAvatar postAvatarFallback" />
-          )}
-          <div className="postInfo">
-            <h2>{displayName}</h2>
-            <p>{displayHeadline}</p>
-            <p>{post.time}</p>
+        {hasProfileLink ? (
+          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
+            {displayAvatar ? (
+              <img src={displayAvatar} alt={displayName} className="postAvatar" />
+            ) : (
+              <CgProfile className="postAvatar postAvatarFallback" />
+            )}
+            <div className="postInfo">
+              <h2>{displayName}</h2>
+              <p>{displayHeadline}</p>
+              <p>{post.time}</p>
+            </div>
+          </Link>
+        ) : (
+          <div className="postHeaderLink">
+            {displayAvatar ? (
+              <img src={displayAvatar} alt={displayName} className="postAvatar" />
+            ) : (
+              <CgProfile className="postAvatar postAvatarFallback" />
+            )}
+            <div className="postInfo">
+              <h2>{displayName}</h2>
+              <p>{displayHeadline}</p>
+              <p>{post.time}</p>
+            </div>
           </div>
-        </Link>
-        <FaEllipsisH className="moreIcon" />
+        )}
+        <div style={{ position: 'relative' }}>
+          <FaEllipsisH className="moreIcon" onClick={handleToggleOptions} />
+          {showOptions && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              background: '#fff',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              zIndex: 20,
+              minWidth: '160px',
+            }}>
+              <button onClick={handleCopyPostLink} style={{ width: '100%', padding: '10px 12px', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                Copy post link
+              </button>
+              <button onClick={handleReportPost} style={{ width: '100%', padding: '10px 12px', textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                Report post
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="postBody" onClick={handlePostBodyClick} style={{ cursor: "pointer" }}>
         <p>

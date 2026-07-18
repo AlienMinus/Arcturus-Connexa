@@ -29,7 +29,7 @@ const Feed = () => {
           return {
             id: post._id,
             authorName: post.userId?.firstName ? `${post.userId.firstName} ${post.userId.lastName}` : (post.userId?.name || post.userId?.username || post.author || 'Anonymous'),
-            authorUsername: post.userId?.username || '',
+            authorUsername: post.authorUsername || post.userId?.username || post.userId?.name || '',
             authorHeadline: post.userId?.headline || 'Member',
             time: (
               <>
@@ -50,7 +50,7 @@ const Feed = () => {
             repostedFrom: post.repostedFrom ? {
             id: post.repostedFrom._id,
             authorName: post.repostedFrom.userId?.firstName ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}` : (post.repostedFrom.userId?.name || post.repostedFrom.userId?.username || post.repostedFrom.author || 'Anonymous'),
-            authorUsername: post.repostedFrom.userId?.username || '',
+            authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
             authorHeadline: post.repostedFrom.userId?.headline || 'Member',
             content: post.repostedFrom.content || '',
             image: post.repostedFrom.media?.[0]?.url,
