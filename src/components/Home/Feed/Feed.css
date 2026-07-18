@@ -150,6 +150,8 @@
   text-decoration: none;
   color: inherit;
   flex: 1;
+  width: 100%;
+  cursor: pointer;
 }
 
 .postHeaderLink:hover .postInfo h2 {
