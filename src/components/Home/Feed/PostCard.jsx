@@ -265,6 +265,13 @@ const PostCard = ({ post }) => {
   const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : null;
   const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : undefined;
 
+  const handleProfileHeaderClick = (e) => {
+    if (!profileUrl) return;
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(profileUrl);
+  };
+
   return (
     <div className="card postCard">
       {isRepost && (
@@ -274,7 +281,7 @@ const PostCard = ({ post }) => {
       )}
       <div className="postHeader">
         {profileUrl ? (
-          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
+          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle} onClick={handleProfileHeaderClick}>
             {displayAvatar ? (
               <img src={displayAvatar} alt={displayName} className="postAvatar" />
             ) : (
