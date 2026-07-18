@@ -220,6 +220,11 @@ const PostCard = ({ post }) => {
     navigate(`/${username}/posts/${postId}`);
   };
 
+  const handlePostHeaderClick = () => {
+    if (!displayUsername) return;
+    navigate(`/profile/${encodeURIComponent(displayUsername)}`);
+  };
+
   const handleRepost = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -303,7 +308,7 @@ const PostCard = ({ post }) => {
       )}
       <div className="postHeader">
         {hasProfileLink ? (
-          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
+          <div className="postHeaderLink" title={profileLinkTitle} onClick={handlePostHeaderClick} style={{ cursor: 'pointer' }}>
             {displayAvatar ? (
               <img src={displayAvatar} alt={displayName} className="postAvatar" />
             ) : (
@@ -314,7 +319,7 @@ const PostCard = ({ post }) => {
               <p>{displayHeadline}</p>
               <p>{post.time}</p>
             </div>
-          </Link>
+          </div>
         ) : (
           <div className="postHeaderLink">
             {displayAvatar ? (
