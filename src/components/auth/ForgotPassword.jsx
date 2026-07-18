@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Auth.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const ForgotPassword = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -26,16 +28,21 @@ const ForgotPassword = ({ onSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to process request');
+        throw new Error(data?.error || response.statusText || 'Failed to process request');
       }
 
       setSuccess('Password reset link has been sent to your email');

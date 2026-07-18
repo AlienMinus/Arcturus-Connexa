@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import './Auth.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const ResetPassword = ({ onSuccess }) => {
   const [searchParams] = useSearchParams();
   const [resetToken, setResetToken] = useState('');
@@ -51,7 +53,7 @@ const ResetPassword = ({ onSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -61,10 +63,15 @@ const ResetPassword = ({ onSuccess }) => {
         }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to reset password');
+        throw new Error(data?.error || response.statusText || 'Failed to reset password');
       }
 
       setSuccess('Password has been reset successfully');

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Auth.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const Registration = ({ onSuccess }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -79,7 +81,7 @@ const Registration = ({ onSuccess }) => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,9 +96,15 @@ const Registration = ({ onSuccess }) => {
         }),
       });
 
-      const data = await response.json();
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data?.error || response.statusText || 'Registration failed');
       }
 
       // Redirect to login so the user can sign in with their new account
