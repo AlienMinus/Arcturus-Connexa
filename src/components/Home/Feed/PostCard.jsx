@@ -263,6 +263,7 @@ const PostCard = ({ post }) => {
   };
 
   const profileUrl = displayUsername ? `/profile/${encodeURIComponent(displayUsername)}` : null;
+  const profileLinkTitle = displayUsername ? `View ${displayName}'s profile` : undefined;
 
   return (
     <div className="card postCard">
@@ -273,7 +274,7 @@ const PostCard = ({ post }) => {
       )}
       <div className="postHeader">
         {profileUrl ? (
-          <Link to={profileUrl} className="postHeaderLink">
+          <Link to={profileUrl} className="postHeaderLink" title={profileLinkTitle}>
             {displayAvatar ? (
               <img src={displayAvatar} alt={displayName} className="postAvatar" />
             ) : (
