@@ -25,10 +25,10 @@ function AppRouter() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username" element={<ProfilePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/network" element={<NetworkPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/:username/posts/:postId" element={<PostPage />} />
