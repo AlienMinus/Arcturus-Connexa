@@ -1,5 +1,7 @@
 ﻿import React from "react";
 import Feed from "../../components/Home/Feed/Feed";
+import Sidebar from "../../components/Home/Sidebar/Sidebar";
+import RightSidebar from "../../components/Home/RightSidebar/RightSidebar";
 import Messenger from "../../components/Home/Messenger/Messenger";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import "./Home.css";
@@ -12,7 +14,11 @@ const Home = () => {
   return (
     <div>
       <div className="homeLayout">
+        {/* Sidebar & RightSidebar render in the layout on large screens only.
+            On small screens they are hidden and accessible via the hamburger drawer. */}
+        {isLargeScreen && <Sidebar />}
         <Feed />
+        {isLargeScreen && <RightSidebar />}
       </div>
 
       {isLargeScreen && <Messenger />}

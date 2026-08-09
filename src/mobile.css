@@ -169,9 +169,10 @@
     flex-shrink: 0;
   }
 
-  .searchBox {
+.searchBox {
     flex: 1;
     min-width: 0;
+    max-width: none;
   }
 
   .searchBox input {
@@ -186,13 +187,18 @@
     max-width: none;
   }
 
-  /* Hide "For Business" and "Advertise" on mobile */
-  .businessMenu,
+  /* Keep the "For Business" dropdown visible on mobile and hide "Advertise" */
+  .businessMenu {
+    display: flex;
+  }
+
   .advertise {
     display: none;
   }
 
+  /* Let the searchbar take all extra space; anchor navRight to the far right */
   .navRight {
+    flex: 0 0 auto;
     gap: 6px;
   }
 
