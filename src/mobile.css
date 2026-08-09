@@ -183,6 +183,19 @@
   /* Keep account and business controls anchored at the right edge. */
   .navRightContainer {
     margin-left: auto;
+    width: max-content;
+  }
+
+  .navRight {
+    flex: 0 0 auto;
+    gap: 0;
+    width: max-content;
+  }
+
+  .profileMenu,
+  .businessMenu {
+    padding-left: 2px;
+    padding-right: 2px;
   }
 
   .business-text {
