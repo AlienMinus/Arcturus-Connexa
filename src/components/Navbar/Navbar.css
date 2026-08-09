@@ -468,3 +468,45 @@
 .profile-dropdown-footer ul li:hover {
   background-color: #f3f3f3;
 }
+
+@media (max-width: 768px) {
+  .navbar {
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+
+  .navLeft {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .searchBox {
+    flex: 1 1 auto;
+    min-width: 40px;
+  }
+
+  .navRightContainer,
+  .navRight {
+    flex: 0 0 auto;
+    margin-left: 0;
+    width: max-content;
+  }
+
+  .navRight {
+    gap: 0;
+  }
+
+  .profileMenu,
+  .businessMenu {
+    padding: 0 2px;
+  }
+
+  .business-text {
+    display: flex;
+  }
+
+  /* Preserve room for Search; Advertise stays available on larger screens. */
+  .advertise {
+    display: none;
+  }
+}
