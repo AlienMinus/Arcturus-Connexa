@@ -57,6 +57,10 @@
 }
 
 @media (max-width: 768px) {
+  .profilePage {
+    padding: 12px 12px calc(82px + env(safe-area-inset-bottom));
+  }
+
   .profileIntroCard {
     align-items: center;
     flex-direction: column;

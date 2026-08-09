@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProfile } from '../../context/ProfileContext';
+import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import ProfileHeader from '../../components/Profile/ProfileHeader';
 import ProfileSummary from '../../components/Profile/ProfileSummary';
@@ -20,17 +21,20 @@ const ProfilePage = () => {
     refreshProfile,
     getProfileByUsername,
   } = useProfile();
+  const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const isOwnProfile = !username || username === currentProfile?.username;
+  const isOwnProfile = !username || username === currentProfile?.username || username === user?.username;
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!username || username === currentProfile?.username) {
+      if (authLoading) return;
+
+      if (isOwnProfile) {
         setProfile(currentProfile);
         setLoading(currentLoading);
         setError(currentError);
@@ -47,7 +51,7 @@ const ProfilePage = () => {
       }
     };
     loadProfile();
-  }, [username, currentProfile, currentLoading, currentError, getProfileByUsername]);
+  }, [username, currentProfile, currentLoading, currentError, getProfileByUsername, authLoading, isOwnProfile]);
 
   const updateProfileField = (changes) => {
     setProfile((current) => ({ ...current, ...changes }));

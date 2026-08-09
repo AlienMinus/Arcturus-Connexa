@@ -46,6 +46,8 @@ export const ProfileProvider = ({ children }) => {
   };
 
   const getProfileByUsername = async (username) => {
+    if (!token) return null;
+
     try {
       const response = await fetch(buildApiUrl(`/profile/${username}`), {
         headers: {
