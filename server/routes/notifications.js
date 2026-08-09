@@ -16,7 +16,44 @@ router.get('/', authMiddleware, async (req, res) => {
       .slice()
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    res.status(200).json({ notifications: sortedNotifications });
+    // Populate the author (fromUserId) of each notification so the frontend
+    // can render avatars and names.
+    const fromUserIds = [
+      ...new Set(
+        sortedNotifications
+          .map((notification) => notification.fromUserId)
+          .filter(Boolean)
+      ),
+    ];
+
+    const authors = await User.find({ _id: { $in: fromUserIds } })
+      .select('firstName lastName username headline profilePicture')
+      .lean();
+
+    const authorMap = new Map(
+      authors.map((author) => [
+        author._id.toString(),
+        {
+          id: author._id,
+          name: `${author.firstName} ${author.lastName}`,
+          username: author.username,
+          headline: author.headline || '',
+          avatar: author.profilePicture || null,
+        },
+      ])
+    );
+
+    const notifications = sortedNotifications.map((notification) => {
+      const n = notification.toObject
+        ? notification.toObject()
+        : { ...notification, _id: notification._id };
+      n.author = notification.fromUserId
+        ? authorMap.get(notification.fromUserId.toString()) || null
+        : null;
+      return n;
+    });
+
+    res.status(200).json({ notifications });
   } catch (err) {
     console.error('Failed to fetch notifications:', err);
     res.status(500).json({ error: 'Failed to fetch notifications' });

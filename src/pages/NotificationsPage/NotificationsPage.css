@@ -6,7 +6,13 @@
 }
 
 .notificationsPage h1 {
-  margin-bottom: 20px;
+  margin-bottom: 8px;
+}
+
+.notificationsBadge {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
 }
 
 .notificationsList {
@@ -18,21 +24,62 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-  padding: 18px;
+  padding: 14px 18px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
 }
 
 .notificationItem.unread {
   border: 1px solid #2563eb;
 }
 
-.notificationMessage {
-  margin: 0 0 8px;
+.notificationAvatar,
+.notificationAvatarFallback {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #0f172a;
   font-size: 1rem;
+}
+
+.notificationContent {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Single-line header: no overflow, ellipsis */
+.notificationHeader {
+  font-size: 0.95rem;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+/* Single-line description: no overflow, ellipsis */
+.notificationDesc {
+  font-size: 0.9rem;
+  color: #4b5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
 .notificationMeta {
   color: #6b7280;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
 .notificationsEmpty,

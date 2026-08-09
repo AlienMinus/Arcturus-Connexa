@@ -3,11 +3,21 @@ import { buildApiUrl } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import './NetworkPage.css';
 
+const getInitials = (name) =>
+  name
+    ?.split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || '';
+
 const NetworkPage = () => {
   const { token } = useAuth();
   const [network, setNetwork] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
 
   useEffect(() => {
     const loadNetwork = async () => {
@@ -38,6 +48,50 @@ const NetworkPage = () => {
     }
   }, [token]);
 
+  const performAction = async (userId, path) => {
+    setActionLoadingId(userId);
+    try {
+      const response = await fetch(buildApiUrl(`/users/${userId}${path}`), {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) {
+        const json = await response.json().catch(() => null);
+        throw new Error(json?.error || 'Action failed');
+      }
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleAccept = async (user) => {
+    const success = await performAction(user.id, '/connect/accept');
+    if (success) {
+      setNetwork((current) =>
+        current.map((u) =>
+          u.id === user.id
+            ? { ...u, isConnected: true, hasIncomingRequest: false }
+            : u
+        )
+      );
+    }
+  };
+
+  const handleDecline = async (user) => {
+    const success = await performAction(user.id, '/connect/decline');
+    if (success) {
+      setNetwork((current) =>
+        current.map((u) =>
+          u.id === user.id ? { ...u, hasIncomingRequest: false } : u
+        )
+      );
+    }
+  };
+
   if (loading) {
     return <div className="networkPage loading">Loading network…</div>;
   }
@@ -55,11 +109,13 @@ const NetworkPage = () => {
         <div className="networkGrid">
           {network.map((user) => (
             <div className="networkCard" key={user.id}>
-              {user.avatar?.url ? (
-                <img src={user.avatar.url} alt={user.name} className="networkAvatar" />
-              ) : (
-                <div className="networkAvatarFallback">{user.name?.[0] || 'U'}</div>
-              )}
+              <div className="networkAvatarWrap">
+                {user.avatar?.url ? (
+                  <img src={user.avatar.url} alt={user.name} className="networkAvatar" />
+                ) : (
+                  <div className="networkAvatarFallback">{getInitials(user.name)}</div>
+                )}
+              </div>
               <div className="networkDetails">
                 <h3>{user.name}</h3>
                 <p>{user.headline}</p>
@@ -70,6 +126,24 @@ const NetworkPage = () => {
                 {user.hasPendingRequest && <span className="networkBadge pending">Request sent</span>}
                 {user.hasIncomingRequest && <span className="networkBadge incoming">Request received</span>}
               </div>
+              {user.hasIncomingRequest && (
+                <div className="networkActions">
+                  <button
+                    className="networkActionBtn accept"
+                    disabled={actionLoadingId === user.id}
+                    onClick={() => handleAccept(user)}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="networkActionBtn decline"
+                    disabled={actionLoadingId === user.id}
+                    onClick={() => handleDecline(user)}
+                  >
+                    Decline
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

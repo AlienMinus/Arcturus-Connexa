@@ -23,6 +23,12 @@
   display: grid;
   gap: 12px;
   align-items: center;
+  grid-template-columns: 56px 1fr;
+}
+
+.networkAvatarWrap {
+  width: 56px;
+  height: 56px;
 }
 
 .networkAvatar,
@@ -47,12 +53,16 @@
   margin: 0;
   color: #51606a;
   font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .networkBadges {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  grid-column: 1 / -1;
 }
 
 .networkBadge {
@@ -80,4 +90,35 @@
 .networkBadge.incoming {
   background: #ede9fe;
   color: #7c3aed;
+}
+
+.networkActions {
+  display: flex;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.networkActionBtn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.networkActionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.networkActionBtn.accept {
+  background: #0f766e;
+  color: #fff;
+}
+
+.networkActionBtn.decline {
+  background: #e2e8f0;
+  color: #111;
 }

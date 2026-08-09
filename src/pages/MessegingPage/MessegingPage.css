@@ -118,3 +118,25 @@
 .messaging-main .chatInputArea {
   padding: 16px;
 }
+
+/* Mobile: ensure the chat window fills the main column and message area scrolls */
+@media (max-width: 768px) {
+  .messaging-page-container {
+    border-radius: 8px;
+  }
+
+  .messaging-main .chatWindow,
+  .messaging-main .messaging-empty-state {
+    height: 100%;
+    max-height: none;
+  }
+
+  .messaging-main .chatMessages {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .messaging-main .chatInputArea {
+    padding: 10px;
+  }
+}
