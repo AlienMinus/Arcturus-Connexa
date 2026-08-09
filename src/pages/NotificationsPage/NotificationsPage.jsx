@@ -56,7 +56,20 @@ const NotificationsPage = () => {
           throw new Error('Failed to load notifications');
         }
         const data = await response.json();
-        setNotifications(data.notifications || []);
+        const loadedNotifications = data.notifications || [];
+        setNotifications(loadedNotifications);
+
+        if (loadedNotifications.some((notification) => !notification.read)) {
+          const markReadResponse = await fetch(buildApiUrl('/notifications/read-all'), {
+            method: 'PATCH',
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+
+          if (markReadResponse.ok) {
+            setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
+            window.dispatchEvent(new Event('notifications-read'));
+          }
+        }
       } catch (err) {
         setError(err.message);
       } finally {

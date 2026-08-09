@@ -28,6 +28,10 @@ const NavCenter = () => {
     };
 
     loadUnread();
+
+    const clearUnreadBadge = () => setUnreadCount(0);
+    window.addEventListener('notifications-read', clearUnreadBadge);
+    return () => window.removeEventListener('notifications-read', clearUnreadBadge);
   }, [token]);
 
   return (

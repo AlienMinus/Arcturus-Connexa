@@ -75,6 +75,20 @@ router.get('/unread', authMiddleware, async (req, res) => {
   }
 });
 
+// Mark every notification as read when the notification inbox is opened.
+router.patch('/read-all', authMiddleware, async (req, res) => {
+  try {
+    await User.updateOne(
+      { _id: req.userId },
+      { $set: { 'notifications.$[].read': true } }
+    );
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Failed to mark notifications as read:', err);
+    res.status(500).json({ error: 'Failed to update notification state' });
+  }
+});
+
 // Mark notification as read
 router.patch('/:notificationId/read', authMiddleware, async (req, res) => {
   try {
