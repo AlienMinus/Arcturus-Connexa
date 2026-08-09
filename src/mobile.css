@@ -180,6 +180,34 @@
     font-size: 13px;
   }
 
+  /* Keep account and business controls anchored at the right edge. */
+  .navRightContainer {
+    margin-left: auto;
+  }
+
+  .business-text {
+    display: flex;
+  }
+
+  /* Search temporarily owns the top bar while the input is active. */
+  .navbar.searchFocused .hamburgerMenu,
+  .navbar.searchFocused .arcturusLogo,
+  .navbar.searchFocused .navRightContainer {
+    display: none;
+  }
+
+  .navbar.searchFocused .navLeft,
+  .navbar.searchFocused .searchBox {
+    flex: 1;
+    width: 100%;
+  }
+
+  .navbar.searchFocused .searchResults {
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+
   .searchResults {
     left: 44px;
     right: 10px;

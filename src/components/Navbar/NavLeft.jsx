@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfile } from "../../context/ProfileContext";
 
-const NavLeft = () => {
+const NavLeft = ({ onSearchFocusChange }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -62,7 +62,11 @@ const NavLeft = () => {
           placeholder="Search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => query && setIsDropdownVisible(true)}
+          onFocus={() => {
+            onSearchFocusChange?.(true);
+            if (query) setIsDropdownVisible(true);
+          }}
+          onBlur={() => onSearchFocusChange?.(false)}
         />
         {isDropdownVisible && results.length > 0 && (
           <div className="searchResults">

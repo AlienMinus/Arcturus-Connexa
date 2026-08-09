@@ -333,6 +333,8 @@
 
 .navRightContainer {
   position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .profile-dropdown {
