@@ -152,7 +152,11 @@ router.get('/', authMiddleware, async (req, res) => {
     const posts = await Post.find({ userId: req.userId })
       .sort({ createdAt: -1 })
       .populate('userId', 'firstName lastName username headline profilePicture')
-      .populate('likes.userId', 'firstName lastName username');
+      .populate('likes.userId', 'firstName lastName username')
+      .populate({
+        path: 'repostedFrom',
+        populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' },
+      });
 
     profileData.posts = await Promise.all(posts.map(async (post) => {
       const userLike = post.likes.find((like) => like.userId?._id?.toString() === req.userId);
@@ -160,11 +164,22 @@ router.get('/', authMiddleware, async (req, res) => {
         id: post._id,
         content: post.content,
         media: post.media,
+        image: post.media?.[0]?.url,
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         repostsCount: await Post.countDocuments({ repostedFrom: post._id }),
         createdAt: post.createdAt,
-        repostedFrom: post.repostedFrom,
+        repostedFrom: post.repostedFrom ? {
+          id: post.repostedFrom._id,
+          authorName: post.repostedFrom.userId?.firstName
+            ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}`
+            : post.repostedFrom.author || 'Anonymous',
+          authorUsername: post.repostedFrom.userId?.username || '',
+          authorHeadline: post.repostedFrom.userId?.headline || 'Member',
+          authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null,
+          content: post.repostedFrom.content || '',
+          image: post.repostedFrom.media?.[0]?.url || null,
+        } : null,
         authorName: `${post.userId.firstName} ${post.userId.lastName}`,
         authorUsername: post.userId.username,
         authorHeadline: post.userId.headline,
@@ -208,7 +223,11 @@ router.get('/:username', authMiddleware, async (req, res) => {
     const posts = await Post.find({ userId: targetUser._id })
       .sort({ createdAt: -1 })
       .populate('userId', 'firstName lastName username headline profilePicture')
-      .populate('likes.userId', 'firstName lastName username');
+      .populate('likes.userId', 'firstName lastName username')
+      .populate({
+        path: 'repostedFrom',
+        populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' },
+      });
 
     const currentUser = await populateProfileUser(req.userId);
     const profileData = buildProfileResponse(targetUser, profile, currentUser);
@@ -220,11 +239,22 @@ router.get('/:username', authMiddleware, async (req, res) => {
         id: post._id,
         content: post.content,
         media: post.media,
+        image: post.media?.[0]?.url,
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         repostsCount: await Post.countDocuments({ repostedFrom: post._id }),
         createdAt: post.createdAt,
-        repostedFrom: post.repostedFrom,
+        repostedFrom: post.repostedFrom ? {
+          id: post.repostedFrom._id,
+          authorName: post.repostedFrom.userId?.firstName
+            ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}`
+            : post.repostedFrom.author || 'Anonymous',
+          authorUsername: post.repostedFrom.userId?.username || '',
+          authorHeadline: post.repostedFrom.userId?.headline || 'Member',
+          authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null,
+          content: post.repostedFrom.content || '',
+          image: post.repostedFrom.media?.[0]?.url || null,
+        } : null,
         authorName: `${post.userId.firstName} ${post.userId.lastName}`,
         authorUsername: post.userId.username,
         authorHeadline: post.userId.headline,
