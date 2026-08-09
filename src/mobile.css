@@ -1,1 +1,646 @@
-﻿
+﻿/* ==========================================================================
+   MOBILE RESPONSIVE STYLES
+   Optimized for small screen mobile devices.
+   Loaded globally via main.jsx after index.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   TABLETS & SMALL LAPTOPS (max-width: 1024px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Navbar: reduce gaps so all items fit */
+  .navbar {
+    padding: 0 12px;
+  }
+
+  .navCenter {
+    gap: 16px;
+  }
+
+  .navRight {
+    gap: 12px;
+  }
+
+  /* Compact the business + advertise labels on medium screens */
+  .business-text,
+  .advertise {
+    display: none;
+  }
+
+  /* Messenger panels: keep within viewport */
+  .chatWindow {
+    right: 340px;
+  }
+
+  .newMessageModal {
+    right: 340px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   LARGE PHONES / SMALL TABLETS (max-width: 900px)
+   Home layout collapses to single column (already handled in App.css),
+   but we tighten spacing and normalize cards.
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .homeLayout {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .sidebar,
+  .rightSidebar {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Footer links should span full width in the grid */
+  .rightSidebar .footerLinks {
+    grid-column: 1 / -1;
+  }
+
+  /* Profile page: ensure sidebar column no longer sticky issues */
+  .profilePageLayout {
+    gap: 16px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   MAIN MOBILE BREAKPOINT (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* ===== GLOBAL ===== */
+  body {
+    font-size: 14px;
+  }
+
+  /* ===== NAVBAR =====
+     Convert to a two-row layout:
+     - Top row: logo + search + profile
+     - Bottom (fixed) nav bar: Home / Network / Jobs / Messaging / Notifications
+     The existing .navbar is sticky; we hide its center and restructure.
+     To avoid editing React markup, we keep .navbar as the top bar and use
+     a fixed .navCenter as the bottom navigation for mobile.
+  -------------------------------------------------------------------------- */
+  .navbar {
+    height: 56px;
+    padding: 0 10px;
+    justify-content: space-between;
+  }
+
+  /* Move the center nav to a fixed bottom bar */
+  .navCenter {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    z-index: 1000;
+    height: 58px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 0;
+    padding: 0 4px;
+  }
+
+  /* Style bottom nav items as icon-only buttons */
+  .navItem {
+    flex: 1;
+    font-size: 10px;
+    color: #666;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .navItem.active {
+    border-bottom: 2px solid #0a66c2;
+    color: #0a66c2;
+  }
+
+  .navIcon {
+    font-size: 20px;
+    display: block;
+  }
+
+  .navLabel {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .badge {
+    top: -2px;
+    right: -8px;
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+
+  /* Top bar: logo, search, profile */
+  .navLeft {
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .arcturusLogo {
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .searchBox {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .searchBox input {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .searchResults {
+    left: 44px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+  }
+
+  /* Hide "For Business" and "Advertise" on mobile */
+  .businessMenu,
+  .advertise {
+    display: none;
+  }
+
+  .navRight {
+    gap: 6px;
+  }
+
+  .profile-text {
+    display: none;
+  }
+
+  .profileMenu {
+    padding: 0 4px;
+  }
+
+  .profileAvatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .profile-dropdown {
+    top: 48px;
+    right: 0;
+    width: 260px;
+    max-width: calc(100vw - 20px);
+  }
+
+  /* Add bottom padding to page content so it isn't hidden behind bottom nav */
+  .homeLayout,
+  .profilePage,
+  .networkPage,
+  .notificationsPage,
+  .activity-page,
+  .post-page-container,
+  .messaging-page-container {
+    padding-bottom: 70px;
+  }
+
+  /* ===== HOME LAYOUT ===== */
+  .homeLayout {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .rightSidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== SIDEBAR / CARDS ===== */
+  .card {
+    padding: 10px;
+  }
+
+  .profileCard {
+    padding-bottom: 14px;
+  }
+
+  .cover {
+    height: 72px;
+  }
+
+  .avatar {
+    width: 60px;
+    height: 60px;
+    margin-top: -30px;
+  }
+
+  /* ===== FEED ===== */
+  .feed {
+    padding: 0;
+    gap: 12px;
+  }
+
+  .postAvatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .postInput {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  /* Create post options: 2x2 grid on small screens */
+  .createPostBottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .postOption {
+    padding: 8px 6px;
+    font-size: 12px;
+    justify-content: flex-start;
+  }
+
+  .postOption svg {
+    font-size: 18px;
+  }
+
+  /* Post card actions: space evenly, hide text labels to save space */
+  .postActionOptions {
+    gap: 2px;
+  }
+
+  .actionOption {
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+
+  .actionOption svg {
+    font-size: 18px;
+  }
+
+  .reactionsPopup {
+    bottom: 100%;
+    left: 0;
+    right: auto;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 20px;
+  }
+
+  .reactionIcon {
+    font-size: 22px;
+  }
+
+  .postStats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* ===== MODALS ===== */
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  .postModal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 14px;
+  }
+
+  .postTools {
+    gap: 8px;
+  }
+
+  .postButton {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+
+  /* ===== MESSENGER POPUPS → FULL-WIDTH BOTTOM SHEETS ===== */
+  .messenger,
+  .chatWindow,
+  .newMessageModal {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 75vh;
+    max-height: 480px;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1100;
+  }
+
+  .messenger.closed {
+    height: 50px;
+  }
+
+/* ===== MESSAGING PAGE =====
+     Stack vertically: sidebar (conversation list) on top,
+     chat area below. Whole page scrolls naturally.
+  -------------------------------------------------------------------------- */
+  .messaging-page-container {
+    flex-direction: column;
+    height: auto;
+    max-height: calc(100vh - 130px);
+    min-height: 70vh;
+  }
+
+  .messaging-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    flex: 0 0 auto;
+    max-height: 55vh;
+    min-width: 0;
+  }
+
+  .messaging-main {
+    flex: 1;
+    min-height: 45vh;
+  }
+
+  .messaging-main .chatWindow {
+    height: 100%;
+  } 
+
+  /* ===== PROFILE PAGE ===== */
+  .profilePage {
+    padding: 12px;
+  }
+
+  .profilePageLayout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .profileSidebarColumn {
+    position: static;
+  }
+
+  .profileCover {
+    min-height: 140px;
+  }
+
+  .profileIntroCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .profileAvatarLarge {
+    width: 96px;
+    height: 96px;
+  }
+
+  .profileIntroText h1 {
+    font-size: 1.5rem;
+  }
+
+  .profileIntroTop {
+    align-items: center;
+  }
+
+  .actionButtons,
+  .connectionActions {
+    justify-content: center;
+  }
+
+  .actionButtons button,
+  .connectionActions button {
+    flex: 1 auto;
+    width: auto;
+    min-width: 120px;
+  }
+
+  .editProfileButton {
+    width: 100%;
+  }
+
+  /* ===== NETWORK PAGE ===== */
+  .networkPage {
+    padding: 12px;
+  }
+
+  .networkGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .networkCard {
+    grid-template-columns: 56px 1fr;
+  }
+
+  /* ===== NOTIFICATIONS PAGE ===== */
+  .notificationsPage {
+    padding: 12px;
+  }
+
+  .notificationItem {
+    padding: 14px;
+  }
+
+  /* ===== ACTIVITY PAGE ===== */
+  .activity-page {
+    margin: 12px;
+    padding: 14px;
+  }
+
+  .activity-tabs {
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  /* ===== POST PAGE ===== */
+  .post-page-container {
+    margin: 12px;
+  }
+
+  .post-page-comment-form {
+    flex-direction: column;
+  }
+
+  .post-page-comment-submit {
+    padding: 10px 16px;
+  }
+
+  /* ===== AUTH ===== */
+  .authContainer {
+    padding: 16px;
+  }
+
+  .authCard {
+    padding: 24px;
+  }
+
+  /* ===== NOTFOUND ===== */
+  .notFoundContent {
+    text-align: center;
+    padding: 40px 20px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SMALL PHONES (max-width: 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 8px;
+  }
+
+  .searchBox {
+    padding: 5px 8px;
+  }
+
+  .searchBox input {
+    font-size: 12px;
+  }
+
+  .navItem {
+    font-size: 9px;
+  }
+
+  .navIcon {
+    font-size: 18px;
+  }
+
+  .navLabel {
+    font-size: 9px;
+  }
+
+  .homeLayout {
+    padding: 8px;
+  }
+
+  .feed {
+    gap: 10px;
+  }
+
+  .postAvatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .postInfo h2 {
+    font-size: 13px;
+  }
+
+  .postBody {
+    font-size: 13px;
+  }
+
+  .createPostBottom {
+    gap: 2px;
+  }
+
+  .postOption {
+    font-size: 11px;
+    padding: 7px 4px;
+  }
+
+  .actionOption {
+    font-size: 10px;
+    padding: 7px 2px;
+  }
+
+  .rightSidebar {
+    gap: 10px;
+  }
+
+  .profileDropdown {
+    width: 240px;
+  }
+
+  .authCard {
+    padding: 20px;
+  }
+
+  .authTitle {
+    font-size: 20px;
+  }
+
+  .profileIntroText h1 {
+    font-size: 1.3rem;
+  }
+
+  .profileAvatarLarge {
+    width: 84px;
+    height: 84px;
+  }
+
+  .messenger,
+  .chatWindow,
+  .newMessageModal {
+    height: 80vh;
+  }
+}
+
+/* ==========================================================================
+   SAFE AREA & TOUCH ENHANCEMENTS
+   ========================================================================== */
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .navCenter {
+      padding-bottom: env(safe-area-inset-bottom);
+      height: calc(58px + env(safe-area-inset-bottom));
+    }
+
+    .homeLayout,
+    .profilePage,
+    .networkPage,
+    .notificationsPage,
+    .activity-page,
+    .post-page-container,
+    .messaging-page-container {
+      padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+
+    .messenger,
+    .chatWindow,
+    .newMessageModal {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}
+
+/* Larger touch targets for interactive elements on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .actionOption,
+  .postOption,
+  .navItem,
+  .linkItem,
+  .conversationItem,
+  .notificationItem {
+    min-height: 44px;
+  }
+}
