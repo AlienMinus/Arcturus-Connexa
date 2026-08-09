@@ -173,8 +173,8 @@ const ProfilePage = () => {
         </main>
 
         <aside className="profileSidebarColumn">
-          <ProfileSection title="Skills" items={profile.skills?.map((skill) => ({ title: skill }))} />
-          <ProfileSection title="Honors & awards" items={profile.honors} />
+          <ProfileSection title="Skills" type="skills" items={profile.skills?.map((skill) => ({ title: skill }))} />
+          <ProfileSection title="Achievements" items={profile.honors} />
           <ProfileSection title="Interests" items={profile.interests?.map((interest) => ({ title: interest }))} />
           <ProfileConnectionList title="Connections" items={profile.connections} />
           <ProfileConnectionList title="Followers" items={profile.followers} />

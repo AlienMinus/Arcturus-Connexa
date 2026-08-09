@@ -60,6 +60,8 @@ const ProfileSchema = new mongoose.Schema(
         title: String,
         description: String,
         url: String,
+        image: String,
+        techStack: [String],
       },
     ],
     skills: [String],

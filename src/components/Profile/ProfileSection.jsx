@@ -10,9 +10,9 @@ const ProfileSection = ({ title, items = [], type }) => {
       <div className="sectionHeader">
         <h2>{title}</h2>
       </div>
-      <div className="sectionList">
+      <div className={type === 'skills' ? 'skillBubbles' : 'sectionList'}>
         {items.map((item, index) => (
-          <div className="sectionItem" key={`${title}-${index}`}>
+          <div className={type === 'skills' ? 'skillBubble' : 'sectionItem'} key={`${title}-${index}`}>
             {item.title && <h3>{item.title}</h3>}
             {item.subtitle && <p className="itemSubtitle">{item.subtitle}</p>}
             {item.description && <p className="itemDescription">{item.description}</p>}

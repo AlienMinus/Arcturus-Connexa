@@ -190,6 +190,51 @@
   gap: 8px;
 }
 
+.structuredEditor {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.structuredEditorHeader {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.structuredEditorHeader p {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+.structuredEntry {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+}
+
+.addEntryButton,
+.removeEntryButton {
+  background: transparent;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.removeEntryButton {
+  border-color: #dc2626;
+  color: #dc2626;
+  justify-self: start;
+}
+
 .profileEditForm label {
   font-weight: 600;
   color: #334155;
@@ -316,6 +361,48 @@
   margin-top: 10px;
   color: #2563eb;
   text-decoration: none;
+}
+
+.profileItemImage {
+  border-radius: 10px;
+  display: block;
+  margin: 0 0 12px;
+  max-height: 180px;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+.techStack,
+.skillBubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.techStack {
+  margin-top: 10px;
+}
+
+.techStack span,
+.skillBubble {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #1d4ed8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 7px 11px;
+}
+
+.skillBubble h3 {
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+}
+
+.skillBubble p,
+.skillBubble a {
+  display: none;
 }
 
 .summaryText {

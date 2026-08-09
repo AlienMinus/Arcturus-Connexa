@@ -2,19 +2,62 @@ import React, { useState } from 'react';
 import { buildApiUrl } from '../../utils/api';
 import './Profile.css';
 
+const StructuredSectionEditor = ({ title, items, fields, onAdd, onChange, onRemove }) => (
+  <div className="structuredEditor">
+    <div className="structuredEditorHeader">
+      <div>
+        <label>{title}</label>
+        <p>Add one entry at a time. All fields are optional.</p>
+      </div>
+      <button type="button" className="addEntryButton" onClick={onAdd}>Add {title.slice(0, -1)}</button>
+    </div>
+    {items.map((item, index) => (
+      <div className="structuredEntry" key={`${title}-${index}`}>
+        {fields.map((field) => (
+          <div className="formRow" key={field.name}>
+            <label>{field.label}</label>
+            {field.multiline ? (
+              <textarea rows={3} value={item[field.name] || ''} onChange={(event) => onChange(index, field.name, event.target.value)} />
+            ) : (
+              <input type={field.type || 'text'} value={item[field.name] || ''} onChange={(event) => onChange(index, field.name, event.target.value)} placeholder={field.placeholder} />
+            )}
+          </div>
+        ))}
+        <button type="button" className="removeEntryButton" onClick={() => onRemove(index)}>Remove</button>
+      </div>
+    ))}
+  </div>
+);
+
 const ProfileEditForm = ({ profile, onSaved }) => {
   const [name, setName] = useState(profile?.name || '');
   const [headline, setHeadline] = useState(profile?.headline || '');
   const [location, setLocation] = useState(profile?.location || '');
   const [summary, setSummary] = useState(profile?.summary || '');
   const [skills, setSkills] = useState((profile?.skills || []).join(', '));
-  const [honors, setHonors] = useState((profile?.honors || []).map((item) => item.title).join(', '));
+  const [education, setEducation] = useState(profile?.education || []);
+  const [experience, setExperience] = useState(profile?.experience || []);
+  const [projects, setProjects] = useState((profile?.projects || []).map((project) => ({
+    ...project,
+    techStack: Array.isArray(project.techStack) ? project.techStack.join(', ') : project.techStack || '',
+  })));
+  const [achievements, setAchievements] = useState(profile?.honors || []);
   const [interests, setInterests] = useState((profile?.interests || []).join(', '));
   const [avatarFile, setAvatarFile] = useState(null);
   const [backgroundFile, setBackgroundFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  const updateEntry = (setEntries, index, field, value) => {
+    setEntries((entries) => entries.map((entry, entryIndex) => (
+      entryIndex === index ? { ...entry, [field]: value } : entry
+    )));
+  };
+
+  const removeEntry = (setEntries, index) => {
+    setEntries((entries) => entries.filter((_, entryIndex) => entryIndex !== index));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,7 +77,13 @@ const ProfileEditForm = ({ profile, onSaved }) => {
       formData.append('location', location);
       formData.append('summary', summary);
       formData.append('skills', skills);
-      formData.append('honors', honors);
+      formData.append('education', JSON.stringify(education));
+      formData.append('experience', JSON.stringify(experience));
+      formData.append('projects', JSON.stringify(projects.map((project) => ({
+        ...project,
+        techStack: project.techStack.split(',').map((tech) => tech.trim()).filter(Boolean),
+      }))));
+      formData.append('honors', JSON.stringify(achievements));
       formData.append('interests', interests);
       if (avatarFile) {
         formData.append('avatar', avatarFile);
@@ -93,10 +142,38 @@ const ProfileEditForm = ({ profile, onSaved }) => {
           <label>Skills</label>
           <input type="text" value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="React, Node.js, MongoDB" />
         </div>
-        <div className="formRow">
-          <label>Honors</label>
-          <input type="text" value={honors} onChange={(e) => setHonors(e.target.value)} placeholder="Award1, Award2" />
-        </div>
+        <StructuredSectionEditor
+          title="Education"
+          items={education}
+          fields={[{ name: 'title', label: 'Institute' }, { name: 'dateRange', label: 'Period', placeholder: '2020 – 2024' }, { name: 'description', label: 'Description', multiline: true }]}
+          onAdd={() => setEducation((items) => [...items, {}])}
+          onChange={(index, field, value) => updateEntry(setEducation, index, field, value)}
+          onRemove={(index) => removeEntry(setEducation, index)}
+        />
+        <StructuredSectionEditor
+          title="Experience"
+          items={experience}
+          fields={[{ name: 'title', label: 'Organization' }, { name: 'subtitle', label: 'Job title or certificate ID' }, { name: 'dateRange', label: 'Period' }, { name: 'description', label: 'Job description', multiline: true }]}
+          onAdd={() => setExperience((items) => [...items, {}])}
+          onChange={(index, field, value) => updateEntry(setExperience, index, field, value)}
+          onRemove={(index) => removeEntry(setExperience, index)}
+        />
+        <StructuredSectionEditor
+          title="Projects"
+          items={projects}
+          fields={[{ name: 'title', label: 'Project name' }, { name: 'image', label: 'Image URL', type: 'url' }, { name: 'techStack', label: 'Tech stack', placeholder: 'React, Node.js, MongoDB' }, { name: 'url', label: 'Public link', type: 'url' }, { name: 'description', label: 'Description', multiline: true }]}
+          onAdd={() => setProjects((items) => [...items, { techStack: '' }])}
+          onChange={(index, field, value) => updateEntry(setProjects, index, field, value)}
+          onRemove={(index) => removeEntry(setProjects, index)}
+        />
+        <StructuredSectionEditor
+          title="Achievements"
+          items={achievements}
+          fields={[{ name: 'title', label: 'Achievement' }, { name: 'issuer', label: 'Issuer' }, { name: 'date', label: 'Date' }]}
+          onAdd={() => setAchievements((items) => [...items, {}])}
+          onChange={(index, field, value) => updateEntry(setAchievements, index, field, value)}
+          onRemove={(index) => removeEntry(setAchievements, index)}
+        />
         <div className="formRow">
           <label>Interests</label>
           <input type="text" value={interests} onChange={(e) => setInterests(e.target.value)} placeholder="AI, Web Development" />
