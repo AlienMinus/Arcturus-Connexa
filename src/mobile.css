@@ -48,7 +48,7 @@
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
   .homeLayout {
-    padding: 12px;
+    padding: 12px 8px;
     gap: 16px;
   }
 
@@ -226,9 +226,9 @@
     padding-bottom: 70px;
   }
 
-  /* ===== HOME LAYOUT ===== */
+/* ===== HOME LAYOUT ===== */
   .homeLayout {
-    padding: 10px;
+    padding: 10px 6px;
     gap: 12px;
   }
 
@@ -240,6 +240,12 @@
   /* ===== SIDEBAR / CARDS ===== */
   .card {
     padding: 10px;
+  }
+
+  /* Post cards span edge-to-edge on mobile (minimal outer gap) */
+  .feed .card {
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .profileCard {
@@ -364,8 +370,15 @@
     z-index: 1100;
   }
 
-  .messenger.closed {
+.messenger.closed {
     height: 50px;
+  }
+
+  /* Hide the floating home messenger on mobile.
+     It's already available on the dedicated Messaging page.
+     (JS also prevents rendering it, this is a CSS safety net.) */
+  .messenger {
+    display: none;
   }
 
 /* ===== MESSAGING PAGE =====
@@ -548,12 +561,19 @@
     font-size: 9px;
   }
 
-  .homeLayout {
-    padding: 8px;
+.homeLayout {
+    padding: 8px 4px;
   }
 
   .feed {
     gap: 10px;
+    padding: 0;
+  }
+
+  /* Post cards near edge-to-edge on very small phones */
+  .feed .card {
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
   .postAvatar {
