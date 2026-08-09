@@ -28,6 +28,9 @@ const ProfileHeader = ({
   } = actionState;
 
   const renderConnectionButton = () => {
+    if (isConnected) {
+      return <button className="connectedButton" type="button" disabled>Connected</button>;
+    }
     if (hasIncomingConnectionRequest) {
       return (
         <div className="connectionActions">
@@ -90,9 +93,9 @@ const ProfileHeader = ({
             <span>{profile.followingCount || 0} following</span>
             <span>{profile.connectionsCount || 0} connections</span>
           </div>
-          {(onFollow && !isFollowing) || (onConnectRequest && !isConnected) ? (
+          {onFollow || onConnectRequest ? (
             <div className="actionButtons">
-              {onFollow && !isFollowing && (
+              {onFollow && (
                 <button
                   className={`followButton ${isFollowing ? 'following' : ''}`}
                   type="button"
@@ -102,7 +105,7 @@ const ProfileHeader = ({
                   {isFollowing ? 'Following' : 'Follow'}
                 </button>
               )}
-              {onConnectRequest && !isConnected && renderConnectionButton()}
+              {onConnectRequest && renderConnectionButton()}
             </div>
           ) : null}
         </div>

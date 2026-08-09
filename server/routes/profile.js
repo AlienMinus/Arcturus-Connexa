@@ -57,15 +57,20 @@ const simplifyUser = (user) => ({
   avatar: user.profilePicture || null,
 });
 
+const includesUser = (users, userId) =>
+  users?.some((user) => (user?._id || user)?.toString() === userId) || false;
+
 const buildProfileResponse = (targetUser, profile, currentUser) => {
   const currentUserId = currentUser?._id?.toString();
   const targetId = targetUser._id.toString();
 
+  // Check both sides so existing relationships created before bidirectional
+  // updates are still displayed correctly.
   const isFollowing = currentUser
-    ? currentUser.following?.some((id) => id.toString() === targetId)
+    ? includesUser(currentUser.following, targetId) || includesUser(targetUser.followers, currentUserId)
     : false;
   const isConnected = currentUser
-    ? currentUser.connections?.some((id) => id.toString() === targetId)
+    ? includesUser(currentUser.connections, targetId) || includesUser(targetUser.connections, currentUserId)
     : false;
   const hasOutgoingConnectionRequest = currentUser
     ? currentUser.sentConnectionRequests?.some((id) => id.toString() === targetId)
