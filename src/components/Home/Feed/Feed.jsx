@@ -22,9 +22,12 @@ const Feed = () => {
 
       const response = await fetch(buildApiUrl('/posts'), { headers });
       const data = await response.json();
+      const currentUserId = profile?.userId || profile?._id || profile?.id;
       setPosts(
         data.map((post) => {
-          const myReaction = post.likes?.find(like => String(like.userId?._id || like.userId || like) === String(profile?._id || profile?.id));
+          const myReaction = post.likes?.find(
+            (like) => String(like.userId?._id || like.userId || like) === String(currentUserId)
+          );
           
           return {
             id: post._id,

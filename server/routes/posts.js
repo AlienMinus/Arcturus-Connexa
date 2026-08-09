@@ -37,6 +37,12 @@ const normalizePostResponse = (post) => {
   return result;
 };
 
+const withRepostCount = async (post) => {
+  const result = normalizePostResponse(post);
+  result.repostsCount = await Post.countDocuments({ repostedFrom: result._id });
+  return result;
+};
+
 // Create post (requires authentication)
 router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
   try {
@@ -116,7 +122,7 @@ router.get('/', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(50);
 
-    res.json(posts.map(normalizePostResponse));
+    res.json(await Promise.all(posts.map(withRepostCount)));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch posts' });
@@ -145,7 +151,7 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    res.json(normalizePostResponse(post));
+    res.json(await withRepostCount(post));
   } catch (err) {
     console.error(err);
     if (err.name === 'CastError') {

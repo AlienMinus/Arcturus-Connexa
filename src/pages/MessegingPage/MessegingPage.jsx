@@ -9,7 +9,7 @@ const MessegingPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
-    <div className="messaging-page-container">
+    <div className={`messaging-page-container ${activeChat ? "has-active-chat" : ""}`}>
       <div className="messaging-sidebar">
         <div className="messaging-sidebar-header">
           <h2>Messaging</h2>

@@ -243,6 +243,8 @@ const PostCard = ({ post }) => {
 
   const activeLabel = currentReaction ? currentReaction.name : "Like";
   const activeColor = currentReaction ? currentReaction.icon.props.color : "#666";
+  const lastLiker = likers[likers.length - 1];
+  const likerSummary = lastLiker ? `${lastLiker}${likers.length > 1 ? ' & others' : ''}` : null;
 
   const isRepost = !!post.repostedFrom;
   const authorSource = isRepost ? post.repostedFrom : post;
@@ -372,8 +374,9 @@ const PostCard = ({ post }) => {
           alt="Post visual content" 
         />
       )}
-      <div className="postStats" style={{ padding: "0 16px 8px", fontSize: "12px", color: "#666", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #ebebeb" }}>
-        <div className="likesDisplay" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+      <div className="postStats">
+        <div className="likesDisplay">
+          <div className="likeCountLine">
           {likesCount > 0 && (
             <div style={{ display: "flex", alignItems: "center", marginRight: "4px", background: "#fff", borderRadius: "10px", padding: "2px" }}>
               {currentReaction ? (
@@ -386,14 +389,14 @@ const PostCard = ({ post }) => {
               )}
             </div>
           )}
-          <span>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
-          {likers.length > 0 && (
-            <span style={{ fontSize: "11px", color: "#888" }}>
-              (Liked by {likers.slice(0, 2).join(", ")}{likers.length > 2 ? ` and ${likers.length - 2} ${likers.length - 2 === 1 ? 'other' : 'others'}` : ''})
-            </span>
-          )}
+          <span className="postStatCount">{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
+          </div>
+          {likerSummary && <span className="likerSummary">{likerSummary}</span>}
         </div>
-        <span>{post.commentsCount || 0} Comments</span>
+        <div className="engagementDisplay">
+          <span>{post.commentsCount || 0} {post.commentsCount === 1 ? 'Comment' : 'Comments'}</span>
+          <span>{post.repostsCount || 0} {post.repostsCount === 1 ? 'Repost' : 'Reposts'}</span>
+        </div>
       </div>
       <div className="postActionOptions">
         <div 

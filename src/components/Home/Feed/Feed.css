@@ -212,6 +212,47 @@
   padding-top: 8px;
 }
 
+.postStats {
+  align-items: flex-start;
+  border-bottom: 1px solid #ebebeb;
+  color: #666;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  padding: 0 16px 8px;
+}
+
+.likesDisplay,
+.engagementDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.likesDisplay {
+  align-items: flex-start;
+}
+
+.engagementDisplay {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.likeCountLine {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.postStatCount {
+  font-weight: 600;
+}
+
+.likerSummary {
+  color: #888;
+  font-size: 11px;
+}
+
 /* Reactions Popup */
 .likeContainer {
   position: relative;

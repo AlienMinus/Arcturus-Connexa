@@ -107,8 +107,21 @@
 }
 
 .messaging-main .chatHeaderActions {
-  /* Hide the close (X) button on full page layout since selecting another chat or nothing is done from sidebar */
+  /* The conversation list remains visible on larger screens. */
   display: none;
+}
+
+.chatBackButton {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #0a66c2;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+  padding: 6px;
 }
 
 .messaging-main .chatMessages {
@@ -122,7 +135,34 @@
 /* Mobile: ensure the chat window fills the main column and message area scrolls */
 @media (max-width: 768px) {
   .messaging-page-container {
-    border-radius: 8px;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    height: calc(100vh - 64px);
+    margin: 0;
+    width: 100%;
+  }
+
+  .messaging-sidebar {
+    border-right: 0;
+    width: 100%;
+  }
+
+  .messaging-main {
+    display: none;
+    width: 100%;
+  }
+
+  .messaging-page-container.has-active-chat .messaging-sidebar {
+    display: none;
+  }
+
+  .messaging-page-container.has-active-chat .messaging-main {
+    display: flex;
+  }
+
+  .messaging-main .chatHeaderActions {
+    display: block;
   }
 
   .messaging-main .chatWindow,

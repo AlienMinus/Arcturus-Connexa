@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaPaperPlane, FaLock } from "react-icons/fa";
+import { FaArrowLeft, FaPaperPlane, FaLock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { buildApiUrl } from "../../../utils/api";
 import "./ChatWindow.css";
@@ -113,7 +113,10 @@ const ChatWindow = ({ contact, closeChat }) => {
           <span>{contact.name}</span>
         </div>
         <div className="chatHeaderActions">
-          <FaTimes style={{ cursor: "pointer" }} onClick={closeChat} color="#666" />
+          <button className="chatBackButton" type="button" onClick={closeChat} aria-label="Back to conversations">
+            <FaArrowLeft />
+            <span>Back</span>
+          </button>
         </div>
       </div>
 

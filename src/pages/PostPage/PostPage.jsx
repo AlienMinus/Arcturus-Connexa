@@ -34,7 +34,10 @@ const PostPage = () => {
         }
         
         const data = await response.json();
-        const myReaction = data.likes?.find(like => String(like.userId?._id || like.userId || like) === String(profile?._id || profile?.id));
+        const currentUserId = profile?.userId || profile?._id || profile?.id;
+        const myReaction = data.likes?.find(
+          (like) => String(like.userId?._id || like.userId || like) === String(currentUserId)
+        );
         
         // Format single post data exactly like Feed.jsx
         setPost({
