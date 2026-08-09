@@ -122,7 +122,7 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading || !profile) {
     return <div className="profilePage loading">Loading profile…</div>;
   }
 
