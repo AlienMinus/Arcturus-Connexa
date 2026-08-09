@@ -65,7 +65,7 @@ const ProfilePage = () => {
         const json = await response.json().catch(() => null);
         throw new Error(json?.error || 'Action failed');
       }
-      return true;
+      return await response.json().catch(() => ({ success: true }));
     } catch (err) {
       setError(err.message);
       return false;
@@ -90,7 +90,11 @@ const ProfilePage = () => {
     if (!profile?.userId) return;
     const success = await performAction(`/users/${profile.userId}/connect/request`);
     if (success) {
-      updateProfileField({ hasOutgoingConnectionRequest: true });
+      updateProfileField({
+        hasOutgoingConnectionRequest: true,
+        isFollowing: success.isFollowing ?? profile.isFollowing,
+        followersCount: success.followersCount ?? profile.followersCount,
+      });
     }
   };
 

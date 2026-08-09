@@ -73,10 +73,10 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
     ? includesUser(currentUser.connections, targetId) || includesUser(targetUser.connections, currentUserId)
     : false;
   const hasOutgoingConnectionRequest = currentUser
-    ? currentUser.sentConnectionRequests?.some((id) => id.toString() === targetId)
+    ? includesUser(currentUser.sentConnectionRequests, targetId) || includesUser(targetUser.pendingConnectionRequests, currentUserId)
     : false;
   const hasIncomingConnectionRequest = currentUser
-    ? currentUser.pendingConnectionRequests?.some((id) => id.toString() === targetId)
+    ? includesUser(currentUser.pendingConnectionRequests, targetId) || includesUser(targetUser.sentConnectionRequests, currentUserId)
     : false;
 
   const profileData = profile.toObject();
@@ -164,7 +164,9 @@ router.get('/:username', authMiddleware, async (req, res) => {
       .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
       .populate('followers', 'firstName lastName username headline profilePicture')
       .populate('following', 'firstName lastName username headline profilePicture')
-      .populate('connections', 'firstName lastName username headline profilePicture');
+      .populate('connections', 'firstName lastName username headline profilePicture')
+      .populate('pendingConnectionRequests', 'firstName lastName username headline profilePicture')
+      .populate('sentConnectionRequests', 'firstName lastName username headline profilePicture');
 
     if (!targetUser) {
       return res.status(404).json({ error: 'Profile not found' });

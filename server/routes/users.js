@@ -28,6 +28,9 @@ const buildRelationshipState = (currentUser, targetUser) => {
   };
 };
 
+const includesUserId = (users, userId) =>
+  users?.some((user) => (user?._id || user)?.toString() === userId) || false;
+
 const sendNotificationToUsers = async (userIds, notification) => {
   if (!userIds || userIds.length === 0) return;
   await User.updateMany(
@@ -170,18 +173,32 @@ router.post('/:id/connect/request', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (currentUser.connections?.some((id) => id.toString() === targetId)) {
+    if (includesUserId(currentUser.connections, targetId) || includesUserId(targetUser.connections, req.userId)) {
       return res.status(400).json({ error: 'Already connected' });
     }
 
-    if (currentUser.sentConnectionRequests?.some((id) => id.toString() === targetId)) {
+    if (includesUserId(currentUser.sentConnectionRequests, targetId) || includesUserId(targetUser.pendingConnectionRequests, req.userId)) {
       return res.status(400).json({ error: 'Connection request already sent' });
     }
+
+    const targetAlreadyHasFollower = includesUserId(targetUser.followers, req.userId);
+    const currentAlreadyFollowsTarget = includesUserId(currentUser.following, targetId);
 
     await Promise.all([
       User.findByIdAndUpdate(req.userId, { $addToSet: { sentConnectionRequests: targetId } }),
       User.findByIdAndUpdate(targetId, { $addToSet: { pendingConnectionRequests: req.userId } }),
+      User.findByIdAndUpdate(req.userId, { $addToSet: { following: targetId } }),
+      User.findByIdAndUpdate(targetId, { $addToSet: { followers: req.userId } }),
     ]);
+
+    if (!currentAlreadyFollowsTarget && !targetAlreadyHasFollower) {
+      await sendNotificationToUsers([targetId], {
+        type: 'follow',
+        message: `${currentUser.firstName} ${currentUser.lastName} started following you.`,
+        fromUserId: currentUser._id,
+        read: false,
+      });
+    }
 
     await sendNotificationToUsers([targetId], {
       type: 'request',
@@ -190,7 +207,11 @@ router.post('/:id/connect/request', authMiddleware, async (req, res) => {
       read: false,
     });
 
-    res.status(200).json({ success: true });
+    res.status(200).json({
+      success: true,
+      isFollowing: true,
+      followersCount: (targetUser.followers?.length || 0) + (targetAlreadyHasFollower ? 0 : 1),
+    });
   } catch (err) {
     console.error('Connection request failed:', err);
     res.status(500).json({ error: 'Failed to send connection request' });
