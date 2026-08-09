@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
+import Post from '../models/Post.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -319,19 +320,21 @@ router.get('/activity/:username', authMiddleware, async (req, res) => {
         path: 'activities.postId',
         populate: { path: 'userId', select: 'firstName lastName profilePicture username headline' }
       })
-      .populate({
-        path: 'posts',
-        populate: { path: 'userId', select: 'firstName lastName profilePicture username headline' }
-      })
       .lean();
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    const posts = await Post.find({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'firstName lastName profilePicture username headline')
+      .populate('likes.userId', 'firstName lastName username')
+      .lean();
+
     res.json({
       activities: user.activities || [],
-      posts: user.posts || []
+      posts,
     });
   } catch (err) {
     console.error('Failed to fetch activity:', err);

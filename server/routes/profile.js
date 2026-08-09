@@ -149,6 +149,34 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 
     const profileData = buildProfileResponse(targetUser, profile, targetUser);
+    const posts = await Post.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'firstName lastName username headline profilePicture')
+      .populate('likes.userId', 'firstName lastName username');
+
+    profileData.posts = await Promise.all(posts.map(async (post) => {
+      const userLike = post.likes.find((like) => like.userId?._id?.toString() === req.userId);
+      return {
+        id: post._id,
+        content: post.content,
+        media: post.media,
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        repostsCount: await Post.countDocuments({ repostedFrom: post._id }),
+        createdAt: post.createdAt,
+        repostedFrom: post.repostedFrom,
+        authorName: `${post.userId.firstName} ${post.userId.lastName}`,
+        authorUsername: post.userId.username,
+        authorHeadline: post.userId.headline,
+        authorAvatar: post.userId.profilePicture?.url,
+        hasLiked: !!userLike,
+        userReactionType: userLike ? userLike.reactionType : null,
+        likers: post.likes.map((like) => {
+          const liker = like.userId;
+          return liker?.firstName ? `${liker.firstName} ${liker.lastName}` : liker?.username;
+        }).filter(Boolean),
+      };
+    }));
     res.json(profileData);
   } catch (err) {
     console.error(err);
