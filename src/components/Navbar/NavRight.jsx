@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaCaretDown, FaTh } from "react-icons/fa";
+import { FaBullhorn, FaCaretDown, FaTh } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../context/ProfileContext";
@@ -74,7 +74,10 @@ const NavRight = () => {
           </span>
         </div>
 
-        <div className="advertise">Advertise</div>
+        <div className="advertise">
+          <FaBullhorn size={20} aria-hidden="true" />
+          <span>Advertise</span>
+        </div>
       </div>
 
       {isDropdownOpen && (
