@@ -235,9 +235,6 @@ const ProfilePage = () => {
             {/* Experience Section: Limit 2 items with toggle */}
             <ProfileListSection title="Experience" items={profile.experience} />
 
-            {/* Education Section: Limit 2 items with toggle */}
-            <ProfileListSection title="Education" items={profile.education} />
-
             {/* Licenses & certifications Section: Limit 2 items with toggle */}
             <ProfileListSection title="Licenses & certifications" items={profile.certifications} />
 
@@ -253,6 +250,9 @@ const ProfilePage = () => {
               type="skills" 
               items={profile.skills?.map((skill) => ({ title: skill }))} 
             />
+
+            {/* Education Section: Limit 2 items with toggle */}
+            <ProfileListSection title="Education" items={profile.education} />
 
             {/* Achievements / Honors: Limit 2 items with toggle */}
             <ProfileSection title="Achievements" items={profile.honors} />
