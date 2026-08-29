@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -10,6 +10,7 @@ import ProfileListSection from '../../components/Profile/ProfileListSection';
 import ProfileConnectionList from '../../components/Profile/ProfileConnectionList';
 import ProfileEditForm from '../../components/Profile/ProfileEditForm';
 import PostCard from '../../components/Home/Feed/PostCard';
+import { FaChevronDown, FaChevronUp, FaArrowRight } from 'react-icons/fa';
 import '../../components/Profile/Profile.css';
 
 const ProfilePage = () => {
@@ -27,6 +28,7 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [arePostsExpanded, setArePostsExpanded] = useState(false);
 
   const isOwnProfile = !username || username === currentProfile?.username || username === user?.username;
 
@@ -123,63 +125,154 @@ const ProfilePage = () => {
   };
 
   if (loading || authLoading || !profile) {
-    return <div className="profilePage loading">Loading profile…</div>;
+    return (
+      <div className="profilePage-wrapper">
+        <div className="profilePage loading">
+          <div className="profileLoadingSpinner"></div>
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="profilePage error">{error}</div>;
+    return (
+      <div className="profilePage-wrapper">
+        <div className="profilePage error">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
-  return (
-    <div className="profilePage">
-      <ProfileHeader
-        profile={profile}
-        onEdit={isOwnProfile ? () => setIsEditing(!isEditing) : undefined}
-        onFollow={!isOwnProfile ? handleFollowToggle : undefined}
-        onConnectRequest={!isOwnProfile ? handleConnectRequest : undefined}
-        onAcceptConnection={!isOwnProfile ? handleAcceptConnection : undefined}
-        onDeclineConnection={!isOwnProfile ? handleDeclineConnection : undefined}
-        actionState={{
-          isFollowing: profile?.isFollowing,
-          isConnected: profile?.isConnected,
-          hasOutgoingConnectionRequest: profile?.hasOutgoingConnectionRequest,
-          hasIncomingConnectionRequest: profile?.hasIncomingConnectionRequest,
-          loading: actionLoading,
-        }}
-      />
-      {isEditing && isOwnProfile && (
-        <ProfileEditForm profile={profile} onSaved={() => {
-          refreshProfile();
-          setIsEditing(false);
-        }} />
-      )}
-      <div className="profilePageLayout">
-        <main className="profileMainColumn">
-          <ProfileSummary summary={profile.summary} />
-          <ProfileSection title="Featured" items={profile.featured} type="featured" />
-          {profile.posts && profile.posts.length > 0 && (
-            <div className="profile-posts">
-              <h3>Posts</h3>
-              {profile.posts.map((post) => (
-                <PostCard post={post} key={post.id} />
-              ))}
-            </div>
-          )}
-          <ProfileSection title="Activity" items={profile.activity} type="activity" />
-          <ProfileListSection title="Experience" items={profile.experience} />
-          <ProfileListSection title="Education" items={profile.education} />
-          <ProfileListSection title="Licenses & certifications" items={profile.certifications} />
-          <ProfileListSection title="Projects" items={profile.projects} />
-        </main>
+  const postsList = profile.posts || [];
+  const hasMorePosts = postsList.length > 2;
+  const displayedPosts = (!hasMorePosts || arePostsExpanded) ? postsList : postsList.slice(0, 2);
+  const profileUsername = profile.username || username || '';
 
-        <aside className="profileSidebarColumn">
-          <ProfileSection title="Skills" type="skills" items={profile.skills?.map((skill) => ({ title: skill }))} />
-          <ProfileSection title="Achievements" items={profile.honors} />
-          <ProfileSection title="Interests" items={profile.interests?.map((interest) => ({ title: interest }))} />
-          <ProfileConnectionList title="Connections" items={profile.connections} />
-          <ProfileConnectionList title="Followers" items={profile.followers} />
-          <ProfileConnectionList title="Following" items={profile.following} />
-        </aside>
+  return (
+    <div className="profilePage-wrapper">
+      <div className="profilePage">
+        <ProfileHeader
+          profile={profile}
+          onEdit={isOwnProfile ? () => setIsEditing(!isEditing) : undefined}
+          onFollow={!isOwnProfile ? handleFollowToggle : undefined}
+          onConnectRequest={!isOwnProfile ? handleConnectRequest : undefined}
+          onAcceptConnection={!isOwnProfile ? handleAcceptConnection : undefined}
+          onDeclineConnection={!isOwnProfile ? handleDeclineConnection : undefined}
+          actionState={{
+            isFollowing: profile?.isFollowing,
+            isConnected: profile?.isConnected,
+            hasOutgoingConnectionRequest: profile?.hasOutgoingConnectionRequest,
+            hasIncomingConnectionRequest: profile?.hasIncomingConnectionRequest,
+            loading: actionLoading,
+          }}
+        />
+
+        {isEditing && isOwnProfile && (
+          <ProfileEditForm 
+            profile={profile} 
+            onSaved={() => {
+              refreshProfile();
+              setIsEditing(false);
+            }} 
+          />
+        )}
+
+        <div className="profilePageLayout">
+          {/* Main Column */}
+          <main className="profileMainColumn">
+            {/* About Section: Full content (no truncation) */}
+            <ProfileSummary summary={profile.summary} />
+
+            {/* Featured Section: Limit 2 items with toggle */}
+            <ProfileSection title="Featured" items={profile.featured} type="featured" />
+
+            {/* Posts Section: Limit 2 posts with toggle & activity link */}
+            {postsList.length > 0 && (
+              <section className="profileSection profilePostsSection">
+                <div className="sectionHeader">
+                  <h2>Posts</h2>
+                  {profileUsername && (
+                    <Link 
+                      to={`/profile/${encodeURIComponent(profileUsername)}/activity`}
+                      className="sectionHeaderLink"
+                    >
+                      View all activity <FaArrowRight size={11} />
+                    </Link>
+                  )}
+                </div>
+
+                <div className="profilePostsList">
+                  {displayedPosts.map((post) => (
+                    <div key={post.id || post._id} className="profilePostWrapper">
+                      <PostCard post={post} />
+                    </div>
+                  ))}
+                </div>
+
+                {hasMorePosts && (
+                  <div className="sectionFooter">
+                    <button
+                      type="button"
+                      className="viewAllButton"
+                      onClick={() => setArePostsExpanded(!arePostsExpanded)}
+                    >
+                      {arePostsExpanded ? (
+                        <>Show fewer <FaChevronUp size={12} /></>
+                      ) : (
+                        <>Show all {postsList.length} posts <FaChevronDown size={12} /></>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Activity Section: Limit 2 items with toggle */}
+            <ProfileSection title="Activity" items={profile.activity} type="activity" />
+
+            {/* Experience Section: Limit 2 items with toggle */}
+            <ProfileListSection title="Experience" items={profile.experience} />
+
+            {/* Education Section: Limit 2 items with toggle */}
+            <ProfileListSection title="Education" items={profile.education} />
+
+            {/* Licenses & certifications Section: Limit 2 items with toggle */}
+            <ProfileListSection title="Licenses & certifications" items={profile.certifications} />
+
+            {/* Projects Section: Limit 2 items with toggle */}
+            <ProfileListSection title="Projects" items={profile.projects} />
+          </main>
+
+          {/* Sidebar Column */}
+          <aside className="profileSidebarColumn">
+            {/* Skills Section: Full content (no truncation) */}
+            <ProfileSection 
+              title="Skills" 
+              type="skills" 
+              items={profile.skills?.map((skill) => ({ title: skill }))} 
+            />
+
+            {/* Achievements / Honors: Limit 2 items with toggle */}
+            <ProfileSection title="Achievements" items={profile.honors} />
+
+            {/* Interests: Limit 2 items with toggle */}
+            <ProfileSection 
+              title="Interests" 
+              items={profile.interests?.map((interest) => ({ title: interest }))} 
+            />
+
+            {/* Connections: Limit 2 items with toggle */}
+            <ProfileConnectionList title="Connections" items={profile.connections} />
+
+            {/* Followers: Limit 2 items with toggle */}
+            <ProfileConnectionList title="Followers" items={profile.followers} />
+
+            {/* Following: Limit 2 items with toggle */}
+            <ProfileConnectionList title="Following" items={profile.following} />
+          </aside>
+        </div>
       </div>
     </div>
   );

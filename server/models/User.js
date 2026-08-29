@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema(
       ref: 'Post'
     }],
     activities: [{
-      activityType: { type: String, enum: ['reaction', 'view'] },
+      activityType: { type: String, default: 'reaction' },
       postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
       createdAt: { type: Date, default: Date.now }
     }],

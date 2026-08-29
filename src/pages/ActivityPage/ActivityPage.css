@@ -1,56 +1,118 @@
+.activity-page-container {
+  min-height: calc(100vh - 60px);
+  background-color: #f4f2ee;
+  padding: 24px 16px 60px;
+}
+
 .activity-page {
   max-width: 800px;
-  margin: 20px auto;
-  background-color: #fff;
-  border-radius: 8px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* User Header Card */
+.activity-user-header {
+  background-color: #ffffff;
+  border-radius: 10px;
   border: 1px solid #e0e0e0;
-  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px 24px 0;
 }
 
-.activity-header {
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: 10px;
+.activity-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: #0a66c2;
   text-decoration: none;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  transition: color 0.15s ease;
 }
 
-.back-link:hover {
+.activity-back-link:hover {
+  color: #004182;
   text-decoration: underline;
 }
 
-.activity-header h2 {
-  margin: 0 0 15px 0;
-  font-size: 20px;
-  color: #333;
+.activity-profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e8e8e8;
 }
 
+.activity-user-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.activity-user-avatar-fallback {
+  color: #666666;
+  background: #eef3f8;
+  padding: 4px;
+}
+
+.activity-user-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.activity-user-info h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #191919;
+  line-height: 1.25;
+}
+
+.activity-user-headline {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.activity-user-stats {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Tabs */
 .activity-tabs {
   display: flex;
-  gap: 15px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .tab-btn {
   background: none;
   border: none;
-  padding: 8px 16px;
-  font-size: 16px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #666;
+  color: #666666;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-  background-color: #f3f2ef;
-  border-radius: 4px 4px 0 0;
+  color: #191919;
+  background-color: #f8fafc;
 }
 
 .tab-btn.active {
@@ -58,36 +120,170 @@
   border-bottom-color: #01754f;
 }
 
+.tab-count {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.tab-btn.active .tab-count {
+  background: #e6f4ea;
+  color: #01754f;
+}
+
+/* Content List */
 .activity-content {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.no-data {
+.posts-list,
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-post-wrapper {
+  margin-bottom: 0;
+}
+
+.activity-item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activity-item-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  align-self: flex-start;
+  font-size: 0.8rem;
+  color: #555555;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.activity-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0a66c2;
+}
+
+.activity-badge-text {
+  font-weight: 600;
+  color: #334155;
+}
+
+.activity-badge-date {
+  color: #94a3b8;
+}
+
+/* Empty States */
+.activity-empty-state {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 48px 24px;
   text-align: center;
-  color: #666;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.activities-list .activity-item {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
+.activity-empty-state .empty-icon {
+  font-size: 40px;
+  color: #94a3b8;
+  margin-bottom: 4px;
 }
 
-.activity-meta {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 8px;
-  padding-left: 8px;
+.activity-empty-state h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1e293b;
+  font-weight: 600;
 }
 
+.activity-empty-state p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  max-width: 400px;
+}
+
+/* Loading & Error States */
 .activity-page.loading,
 .activity-page.error {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 48px 24px;
   text-align: center;
-  padding: 40px;
-  font-size: 16px;
+  font-size: 1rem;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.activity-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0a66c2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .activity-page.error {
-  color: #d11124;
+  color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .activity-page-container {
+    padding: 12px 8px 70px;
+  }
+
+  .activity-user-header {
+    padding: 16px 14px 0;
+  }
+
+  .activity-profile-summary {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .activity-user-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .activity-tabs {
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
 }

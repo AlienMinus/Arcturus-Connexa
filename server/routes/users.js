@@ -227,10 +227,8 @@ router.post('/:id/connect/accept', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Cannot accept connection with yourself' });
     }
 
-    const [currentUser, targetUser] = await Promise.all([
-      User.findById(req.userId),
-      User.findById(targetId),
-    ]);
+    const currentUser = await User.findById(req.userId);
+    const targetUser = await User.findById(targetId);
 
     if (!targetUser) {
       return res.status(404).json({ error: 'User not found' });
@@ -311,31 +309,139 @@ router.post('/activity', authMiddleware, async (req, res) => {
   }
 });
 
-// Get user activity
+const formatPostItem = async (post, currentUserId) => {
+  if (!post) return null;
+  const rawPost = post.toObject ? post.toObject() : post;
+  const userLike = rawPost.likes?.find((like) => {
+    const likerId = like.userId?._id || like.userId;
+    return likerId?.toString() === currentUserId?.toString();
+  });
+
+  const repostsCount = await Post.countDocuments({ repostedFrom: rawPost._id });
+
+  return {
+    id: rawPost._id,
+    _id: rawPost._id,
+    content: rawPost.content || '',
+    media: rawPost.media || [],
+    image: rawPost.media?.[0]?.url || null,
+    likesCount: rawPost.likes?.length || 0,
+    commentsCount: rawPost.comments?.length || 0,
+    repostsCount,
+    createdAt: rawPost.createdAt,
+    time: rawPost.createdAt ? new Date(rawPost.createdAt).toLocaleDateString() : '',
+    repostedFrom: rawPost.repostedFrom ? {
+      id: rawPost.repostedFrom._id,
+      _id: rawPost.repostedFrom._id,
+      authorName: rawPost.repostedFrom.userId?.firstName
+        ? `${rawPost.repostedFrom.userId.firstName} ${rawPost.repostedFrom.userId.lastName}`
+        : rawPost.repostedFrom.author || 'Anonymous',
+      authorUsername: rawPost.repostedFrom.userId?.username || '',
+      authorHeadline: rawPost.repostedFrom.userId?.headline || 'Member',
+      authorAvatar: rawPost.repostedFrom.userId?.profilePicture?.url || null,
+      content: rawPost.repostedFrom.content || '',
+      image: rawPost.repostedFrom.media?.[0]?.url || null,
+    } : null,
+    authorName: rawPost.userId?.firstName
+      ? `${rawPost.userId.firstName} ${rawPost.userId.lastName}`
+      : rawPost.author || 'Anonymous',
+    authorUsername: rawPost.userId?.username || '',
+    authorHeadline: rawPost.userId?.headline || 'Member',
+    authorAvatar: rawPost.userId?.profilePicture?.url || null,
+    hasLiked: !!userLike,
+    userReactionType: userLike ? userLike.reactionType : null,
+    likers: (rawPost.likes || []).map((like) => {
+      const liker = like.userId;
+      return liker?.firstName ? `${liker.firstName} ${liker.lastName}` : (liker?.username || '');
+    }).filter(Boolean),
+  };
+};
+
+const getUserActivityData = async (user, currentUserId) => {
+  const posts = await Post.find({ userId: user._id })
+    .sort({ createdAt: -1 })
+    .populate('userId', 'firstName lastName profilePicture username headline')
+    .populate('likes.userId', 'firstName lastName username')
+    .populate({
+      path: 'repostedFrom',
+      populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' },
+    });
+
+  const formattedPosts = (await Promise.all(posts.map((p) => formatPostItem(p, currentUserId)))).filter(Boolean);
+
+  const rawActivities = [...(user.activities || [])].reverse();
+  const formattedActivities = (await Promise.all(
+    rawActivities.map(async (act) => {
+      if (!act.postId) return null;
+      const formattedPost = await formatPostItem(act.postId, currentUserId);
+      if (!formattedPost) return null;
+      return {
+        activityType: act.activityType || 'reaction',
+        createdAt: act.createdAt,
+        postId: formattedPost,
+      };
+    })
+  )).filter(Boolean);
+
+  return {
+    user: {
+      id: user._id,
+      name: `${user.firstName} ${user.lastName}`,
+      username: user.username,
+      headline: user.headline || user.email,
+      avatar: user.profilePicture?.url || null,
+      location: user.location || '',
+    },
+    activities: formattedActivities,
+    posts: formattedPosts,
+  };
+};
+
+// Get authenticated user's activity
+router.get('/activity', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId)
+      .populate({
+        path: 'activities.postId',
+        populate: [
+          { path: 'userId', select: 'firstName lastName profilePicture username headline' },
+          { path: 'likes.userId', select: 'firstName lastName username' },
+          { path: 'repostedFrom', populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' } }
+        ]
+      });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const data = await getUserActivityData(user, req.userId);
+    res.json(data);
+  } catch (err) {
+    console.error('Failed to fetch user activity:', err);
+    res.status(500).json({ error: 'Failed to fetch activity' });
+  }
+});
+
+// Get user activity by username
 router.get('/activity/:username', authMiddleware, async (req, res) => {
   try {
     const username = req.params.username.toLowerCase();
     const user = await User.findOne({ username })
       .populate({
         path: 'activities.postId',
-        populate: { path: 'userId', select: 'firstName lastName profilePicture username headline' }
-      })
-      .lean();
+        populate: [
+          { path: 'userId', select: 'firstName lastName profilePicture username headline' },
+          { path: 'likes.userId', select: 'firstName lastName username' },
+          { path: 'repostedFrom', populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' } }
+        ]
+      });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const posts = await Post.find({ userId: user._id })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'firstName lastName profilePicture username headline')
-      .populate('likes.userId', 'firstName lastName username')
-      .lean();
-
-    res.json({
-      activities: user.activities || [],
-      posts,
-    });
+    const data = await getUserActivityData(user, req.userId);
+    res.json(data);
   } catch (err) {
     console.error('Failed to fetch activity:', err);
     res.status(500).json({ error: 'Failed to fetch activity' });

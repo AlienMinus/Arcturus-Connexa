@@ -1,183 +1,609 @@
-.profilePage {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  color: #111;
+/* ==========================================================================
+   PROFILE PAGE STYLES
+   Modern LinkedIn-inspired aesthetic with optimal space utilization
+   ========================================================================== */
+
+.profilePage-wrapper {
+  background-color: #f4f2ee;
+  min-height: calc(100vh - 60px);
+  padding: 20px 16px 60px;
 }
 
-.profilePageLayout {
-  display: grid;
-  gap: 24px;
-  grid-template-columns: 2fr 1fr;
-  margin-top: 24px;
+.profilePage {
+  max-width: 1128px;
+  margin: 0 auto;
+  color: #191919;
 }
+
+/* ==========================================================================
+   PROFILE HEADER CARD
+   ========================================================================== */
 
 .profileHeaderCard {
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  position: relative;
 }
 
 .profileCover {
-  min-height: 180px;
+  min-height: 200px;
   background-size: cover;
   background-position: center;
   position: relative;
 }
 
 .profileCoverFallback {
-  height: 180px;
+  height: 200px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1.2rem;
+  justify-content: flex-end;
+  padding-right: 32px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
 }
 
 .profileIntroCard {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  padding: 76px 24px 24px;
+  padding: 0 24px 24px;
   position: relative;
 }
 
+.profileAvatarWrapper {
+  position: relative;
+  height: 60px; /* Offset space for the overlapping avatar */
+}
+
 .profileAvatarLarge {
-  width: 120px;
-  height: 120px;
+  width: 136px;
+  height: 136px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #fff;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
-  left: 24px;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   position: absolute;
-  top: -60px;
+  top: -76px;
+  left: 0;
+  background: #ffffff;
 }
 
-@media (max-width: 768px) {
-  .profilePage {
-    padding: 12px 12px calc(82px + env(safe-area-inset-bottom));
-  }
-
-  .profileIntroCard {
-    align-items: center;
-    flex-direction: column;
-    gap: 12px;
-    padding: 76px 16px 16px;
-    text-align: center;
-  }
-
-  .profileAvatarLarge {
-    height: 120px;
-    left: 50%;
-    top: -60px;
-    transform: translateX(-50%);
-    width: 120px;
-  }
+.profileAvatarLargeFallback {
+  background: #eef3f8;
+  color: #64748b;
+  padding: 8px;
 }
 
-@media (max-width: 480px) {
-  .profileIntroCard {
-    padding-top: 70px;
-  }
-
-  .profileAvatarLarge {
-    height: 108px;
-    top: -54px;
-    width: 108px;
-  }
+.profileIntroText {
+  margin-top: 16px;
 }
 
-.profileIntroText h1 {
+.profileIntroTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.profileInfoPrimary {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #191919;
+  line-height: 1.25;
 }
 
-.profileHeadline,
-.profileLocation,
-.profileStats span {
-  color: #555;
+.profileHeadline {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  color: #191919;
+  line-height: 1.4;
+}
+
+.profileLocation {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.editProfileButton {
+  border: 1px solid #0a66c2;
+  background: #ffffff;
+  color: #0a66c2;
+  padding: 7px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.editProfileButton:hover {
+  background: #ebf4fd;
+  border-color: #004182;
+  color: #004182;
 }
 
 .profileStats {
   margin-top: 12px;
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
+  font-size: 0.875rem;
+}
+
+.profileStatItem {
+  color: #0a66c2;
+  font-weight: 500;
+}
+
+.profileStatItem strong {
+  font-weight: 700;
+}
+
+.profileStatDot {
+  color: #94a3b8;
+  font-size: 0.75rem;
 }
 
 .actionButtons {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .actionButtons button,
 .connectionActions button {
   border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: 20px;
+  padding: 7px 18px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.connectButton {
+  background: #0a66c2;
+  color: #ffffff;
+}
+
+.connectButton:hover {
+  background: #004182;
 }
 
 .followButton {
-  background: #2563eb;
-  color: #fff;
+  background: transparent;
+  color: #0a66c2;
+  border: 1px solid #0a66c2 !important;
+}
+
+.followButton:hover {
+  background: #ebf4fd;
+  border-color: #004182 !important;
+  color: #004182;
 }
 
 .followButton.following {
-  background: #f3f4f6;
-  color: #111;
-}
-
-.connectButton,
-.acceptConnectionButton {
-  background: #0f766e;
-  color: #fff;
-}
-
-.pendingButton,
-.declineConnectionButton {
-  background: #e2e8f0;
-  color: #111;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569;
 }
 
 .connectedButton {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #e6f4ea;
+  color: #01754f;
+  border: 1px solid #b7e1cd !important;
+  cursor: default;
+}
+
+.pendingButton {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1 !important;
+  cursor: default;
 }
 
 .connectionActions {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.acceptConnectionButton {
+  background: #0a66c2;
+  color: #ffffff;
+}
+
+.acceptConnectionButton:hover {
+  background: #004182;
+}
+
+.declineConnectionButton {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #94a3b8 !important;
+}
+
+.declineConnectionButton:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* ==========================================================================
+   PAGE LAYOUT (2-COLUMN GRID)
+   ========================================================================== */
+
+.profilePageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: start;
 }
 
 .profileMainColumn,
 .profileSidebarColumn {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-.profileSidebarColumn {
-  position: sticky;
-  top: 100px;
-}
+/* ==========================================================================
+   CARD STYLING & SECTION STRUCTURE
+   ========================================================================== */
 
 .profileSection {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px 24px;
+  overflow: hidden;
 }
 
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #191919;
+}
+
+.sectionHeaderLink {
+  color: #0a66c2;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+
+.sectionHeaderLink:hover {
+  color: #004182;
+  text-decoration: underline;
+}
+
+.sectionHeaderBadge {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.summaryText {
+  margin: 0;
+  color: #191919;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ==========================================================================
+   SECTION ITEMS & LISTS (Experience, Education, Projects, etc.)
+   ========================================================================== */
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionItem {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.sectionItem:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.sectionItem:last-child {
+  padding-bottom: 0;
+}
+
+.simpleSectionItem {
+  display: block;
+}
+
+.sectionItemIconCol {
+  flex-shrink: 0;
+}
+
+.sectionItemIconPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #f3f6f8;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  font-size: 1.15rem;
+}
+
+.profileItemImage {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  display: block;
+}
+
+.sectionItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #191919;
+  line-height: 1.35;
+}
+
+.itemSubtitle {
+  margin: 3px 0 0;
+  font-size: 0.9rem;
+  color: #191919;
+  font-weight: 400;
+}
+
+.itemMeta {
+  margin: 3px 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.itemDescription {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.techStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.techStack span {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 3px 10px;
+}
+
+.itemLink {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  color: #0a66c2;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.itemLink:hover {
+  text-decoration: underline;
+  color: #004182;
+}
+
+/* ==========================================================================
+   VIEW ALL / COLLAPSE BUTTON FOOTER
+   ========================================================================== */
+
+.sectionFooter {
+  border-top: 1px solid #e8e8e8;
+  margin-top: 16px;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: -20px;
+}
+
+.viewAllButton {
+  width: 100%;
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.viewAllButton:hover {
+  background: #f3f2ef;
+  color: #191919;
+}
+
+/* ==========================================================================
+   SKILLS SECTION
+   ========================================================================== */
+
+.skillBubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skillBubble {
+  background: #f3f6f8;
+  border: 1px solid #d0d7de;
+  border-radius: 20px;
+  color: #191919;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.skillBubble:hover {
+  background: #e8f0fe;
+  border-color: #0a66c2;
+  color: #0a66c2;
+}
+
+/* ==========================================================================
+   SIDEBAR CONNECTIONS / FOLLOWERS / FOLLOWING
+   ========================================================================== */
+
+.profileConnectionsSection {
+  padding: 20px;
+}
+
+.connectionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.connectionCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.connectionCardLink {
+  cursor: pointer;
+}
+
+.connectionCardLink:hover {
+  background: #f8fafc;
+}
+
+.connectionAvatar,
+.connectionAvatarFallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.connectionDetails {
+  min-width: 0;
+  flex: 1;
+}
+
+.connectionName {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #191919;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connectionHeadline {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   POSTS IN PROFILE
+   ========================================================================== */
+
+.profilePostsSection {
+  padding: 20px 24px;
+}
+
+.profilePostsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profilePostWrapper {
+  margin: 0;
+}
+
+/* ==========================================================================
+   PROFILE EDIT FORM
+   ========================================================================== */
+
 .profileEditSection {
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .profileEditForm {
@@ -187,7 +613,33 @@
 
 .profileEditForm .formRow {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+}
+
+.profileEditForm label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.profileEditForm input,
+.profileEditForm textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.profileEditForm input:focus,
+.profileEditForm textarea:focus {
+  outline: none;
+  border-color: #0a66c2;
+  background: #ffffff;
 }
 
 .structuredEditor {
@@ -196,10 +648,10 @@
 }
 
 .structuredEditorHeader {
-  align-items: center;
   display: flex;
-  gap: 12px;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .structuredEditorHeader p {
@@ -211,7 +663,7 @@
 .structuredEntry {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 10px;
   display: grid;
   gap: 12px;
   margin-top: 12px;
@@ -221,12 +673,18 @@
 .addEntryButton,
 .removeEntryButton {
   background: transparent;
-  border: 1px solid #2563eb;
-  border-radius: 8px;
-  color: #2563eb;
+  border: 1px solid #0a66c2;
+  border-radius: 6px;
+  color: #0a66c2;
   cursor: pointer;
   font-weight: 600;
-  padding: 8px 12px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+}
+
+.addEntryButton:hover {
+  background: #ebf4fd;
 }
 
 .removeEntryButton {
@@ -235,51 +693,42 @@
   justify-self: start;
 }
 
-.profileEditForm label {
-  font-weight: 600;
-  color: #334155;
-}
-
-.profileEditForm input,
-.profileEditForm textarea {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 0.95rem;
-  color: #0f172a;
-  background: #f8fafc;
-}
-
-.profileEditForm input[type="file"] {
-  padding: 10px 12px;
+.removeEntryButton:hover {
+  background: #fee2e2;
 }
 
 .formActions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .saveButton {
   border: none;
-  background-color: #2563eb;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 10px;
+  background-color: #0a66c2;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.15s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: #004182;
 }
 
 .saveButton:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .formError,
 .formSuccess {
-  padding: 14px 16px;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
 .formError {
@@ -292,200 +741,107 @@
   color: #166534;
 }
 
-.profileIntroTop {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: flex-start;
-}
-
-.editProfileButton {
-  border: 1px solid #2563eb;
-  background: #fff;
-  color: #2563eb;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-@media (max-width: 768px) {
-  .profileIntroTop {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.sectionHeader h2 {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
-.sectionList {
-  display: grid;
-  gap: 16px;
-}
-
-.sectionItem {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 16px;
-}
-
-.sectionItem:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-
-.sectionItem h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.itemSubtitle,
-.itemMeta,
-.itemDescription {
-  margin: 6px 0 0 0;
-  color: #555;
-  line-height: 1.5;
-}
-
-.itemLink {
-  display: inline-block;
-  margin-top: 10px;
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.profileItemImage {
-  border-radius: 10px;
-  display: block;
-  margin: 0 0 12px;
-  max-height: 180px;
-  max-width: 100%;
-  object-fit: cover;
-}
-
-.techStack,
-.skillBubbles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.techStack {
-  margin-top: 10px;
-}
-
-.techStack span,
-.skillBubble {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 999px;
-  color: #1d4ed8;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 7px 11px;
-}
-
-.skillBubble h3 {
-  font-size: inherit;
-  font-weight: inherit;
-  margin: 0;
-}
-
-.skillBubble p,
-.skillBubble a {
-  display: none;
-}
-
-.summaryText {
-  margin: 0;
-  color: #333;
-  line-height: 1.8;
-}
-
-/* ===== CONNECTIONS / FOLLOWERS / FOLLOWING LISTS ===== */
-.profileConnectionsSection {
-  padding: 16px;
-}
-
-.connectionsGrid {
-  display: grid;
-  gap: 10px;
-}
-
-.connectionCard {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.connectionAvatar,
-.connectionAvatarFallback {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-  background: #e2e8f0;
-  color: #0f172a;
-  font-size: 0.9rem;
-}
-
-.connectionCard > div:last-child {
-  min-width: 0;
-}
-
-.connectionName {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #111;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.connectionHeadline {
-  margin: 2px 0 0 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* ==========================================================================
+   LOADING & ERROR STATES
+   ========================================================================== */
 
 .profilePage.loading,
 .profilePage.error {
-  max-width: 900px;
-  margin: 50px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-  font-size: 1rem;
-  color: #333;
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 48px 24px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
+
+.profileLoadingSpinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0a66c2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
 
 @media (max-width: 960px) {
   .profilePageLayout {
     grid-template-columns: 1fr;
   }
+}
 
-  .profileSidebarColumn {
-    position: static;
-    top: auto;
+@media (max-width: 768px) {
+  .profilePage-wrapper {
+    padding: 12px 8px 70px;
+  }
+
+  .profileCover {
+    min-height: 140px;
+  }
+
+  .profileCoverFallback {
+    height: 140px;
+    font-size: 0.95rem;
+    padding-right: 16px;
+  }
+
+  .profileIntroCard {
+    padding: 0 16px 20px;
+  }
+
+  .profileAvatarLarge {
+    width: 100px;
+    height: 100px;
+    top: -55px;
+  }
+
+  .profileAvatarWrapper {
+    height: 48px;
+  }
+
+  .profileName {
+    font-size: 1.35rem;
+  }
+
+  .profileIntroTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .editProfileButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .actionButtons,
+  .connectionActions {
+    width: 100%;
+  }
+
+  .actionButtons button,
+  .connectionActions button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .profileSection {
+    padding: 16px;
+  }
+
+  .sectionFooter {
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: -16px;
   }
 }

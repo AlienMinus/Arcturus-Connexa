@@ -1,14 +1,6 @@
 import React from 'react';
 import { CgProfile } from "react-icons/cg";
-
-const getInitials = (name) =>
-  name
-    ?.split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase() || '';
+import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck } from "react-icons/fa";
 
 const ProfileHeader = ({
   profile,
@@ -29,7 +21,11 @@ const ProfileHeader = ({
 
   const renderConnectionButton = () => {
     if (isConnected) {
-      return <button className="connectedButton" type="button" disabled>Connected</button>;
+      return (
+        <button className="connectedButton" type="button" disabled>
+          <FaCheck size={12} /> Connected
+        </button>
+      );
     }
     if (hasIncomingConnectionRequest) {
       return (
@@ -44,11 +40,15 @@ const ProfileHeader = ({
       );
     }
     if (hasOutgoingConnectionRequest) {
-      return <button className="pendingButton" type="button" disabled>Request Sent</button>;
+      return (
+        <button className="pendingButton" type="button" disabled>
+          Pending
+        </button>
+      );
     }
     return (
       <button className="connectButton" type="button" onClick={onConnectRequest} disabled={actionLoading}>
-        Connect
+        <FaUserPlus size={13} /> Connect
       </button>
     );
   };
@@ -60,40 +60,50 @@ const ProfileHeader = ({
         style={{
           backgroundImage: profile.backgroundImage?.url
             ? `url(${profile.backgroundImage.url})`
-            : 'linear-gradient(135deg, #0c4a6e 0%, #2563eb 100%)',
+            : 'linear-gradient(135deg, #0a4373 0%, #0077b5 50%, #00a0dc 100%)',
         }}
       >
-        {profile.backgroundImage?.url ? null : <div className="profileCoverFallback">Arcturus Profile</div>}
-      </div>
-      <div className="profileIntroCard">
-        {profile.avatar?.url ? (
-          <img
-            className="profileAvatarLarge"
-            src={profile.avatar.url}
-            alt={profile.name}
-          />
-        ) : (
-          <CgProfile className="profileAvatarLarge profileAvatarLargeFallback" />
+        {!profile.backgroundImage?.url && (
+          <div className="profileCoverFallback">Arcturus Network</div>
         )}
+      </div>
+
+      <div className="profileIntroCard">
+        <div className="profileAvatarWrapper">
+          {profile.avatar?.url ? (
+            <img
+              className="profileAvatarLarge"
+              src={profile.avatar.url}
+              alt={profile.name}
+            />
+          ) : (
+            <CgProfile className="profileAvatarLarge profileAvatarLargeFallback" />
+          )}
+        </div>
+
         <div className="profileIntroText">
           <div className="profileIntroTop">
-            <div>
-              <h1>{profile.name}</h1>
-              <p className="profileHeadline">{profile.headline}</p>
-              <p className="profileLocation">{profile.location}</p>
+            <div className="profileInfoPrimary">
+              <h1 className="profileName">{profile.name}</h1>
+              {profile.headline && <p className="profileHeadline">{profile.headline}</p>}
+              {profile.location && <p className="profileLocation">{profile.location}</p>}
             </div>
             {onEdit && (
               <button className="editProfileButton" type="button" onClick={onEdit}>
-                Edit profile
+                <FaPencilAlt size={12} /> Edit profile
               </button>
             )}
           </div>
+
           <div className="profileStats">
-            <span>{profile.followersCount || 0} followers</span>
-            <span>{profile.followingCount || 0} following</span>
-            <span>{profile.connectionsCount || 0} connections</span>
+            <span className="profileStatItem"><strong>{profile.connectionsCount || 0}</strong> connections</span>
+            <span className="profileStatDot">•</span>
+            <span className="profileStatItem"><strong>{profile.followersCount || 0}</strong> followers</span>
+            <span className="profileStatDot">•</span>
+            <span className="profileStatItem"><strong>{profile.followingCount || 0}</strong> following</span>
           </div>
-          {onFollow || onConnectRequest ? (
+
+          {(onFollow || onConnectRequest) && (
             <div className="actionButtons">
               {onFollow && (
                 <button
@@ -102,12 +112,16 @@ const ProfileHeader = ({
                   onClick={onFollow}
                   disabled={actionLoading}
                 >
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {isFollowing ? (
+                    <><FaUserCheck size={13} /> Following</>
+                  ) : (
+                    <><FaUserPlus size={13} /> Follow</>
+                  )}
                 </button>
               )}
               {onConnectRequest && renderConnectionButton()}
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

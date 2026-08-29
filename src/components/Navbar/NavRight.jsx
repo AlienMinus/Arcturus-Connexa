@@ -101,6 +101,7 @@ const NavRight = () => {
             <Link
               to={`/profile/${profile?.username || ""}`}
               className="view-profile-btn"
+              onClick={() => setDropdownOpen(false)}
             >
               View Profile
             </Link>
@@ -108,13 +109,13 @@ const NavRight = () => {
           <div className="profile-dropdown-section">
             <h5>Account</h5>
             <ul>
-              <Link to="/settings">
+              <Link to="/settings" onClick={() => setDropdownOpen(false)}>
                 <li>Settings & Privacy</li>
               </Link>
-              <Link to="/help">
+              <Link to="/help" onClick={() => setDropdownOpen(false)}>
                 <li>Help</li>
               </Link>
-              <Link to="/settings/language">
+              <Link to="/settings/language" onClick={() => setDropdownOpen(false)}>
                 <li>Language</li>
               </Link>
             </ul>
@@ -122,10 +123,13 @@ const NavRight = () => {
           <div className="profile-dropdown-section">
             <h5>Manage</h5>
             <ul>
-              <Link to="/profile/activity">
+              <Link
+                to={profile?.username ? `/profile/${encodeURIComponent(profile.username)}/activity` : "/profile/activity"}
+                onClick={() => setDropdownOpen(false)}
+              >
                 <li>Posts & Activity</li>
               </Link>
-              <Link to="/jobs/manage">
+              <Link to="/jobs/manage" onClick={() => setDropdownOpen(false)}>
                 <li>Job Posting Account</li>
               </Link>
             </ul>
