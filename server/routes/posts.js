@@ -20,6 +20,12 @@ const streamUpload = (buffer, options = {}) =>
     stream.end(buffer);
   });
 
+const getFullName = (u) => {
+  if (!u) return '';
+  const parts = [u.firstName, u.middleName, u.lastName].filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : (u.name || u.username || '');
+};
+
 const notifyUsers = async (userIds, notification) => {
   if (!Array.isArray(userIds) || userIds.length === 0) return;
   await User.updateMany(
@@ -31,8 +37,10 @@ const notifyUsers = async (userIds, notification) => {
 const normalizePostResponse = (post) => {
   const result = post.toObject ? post.toObject() : post;
   result.authorUsername = result.userId?.username || result.userId?.name || result.authorUsername || '';
+  result.authorName = getFullName(result.userId) || result.author || 'Anonymous';
   if (result.repostedFrom) {
     result.repostedFrom.authorUsername = result.repostedFrom.userId?.username || result.repostedFrom.userId?.name || result.repostedFrom.authorUsername || '';
+    result.repostedFrom.authorName = getFullName(result.repostedFrom.userId) || result.repostedFrom.author || 'Anonymous';
   }
   return result;
 };
@@ -67,7 +75,7 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
 
     const post = new Post({
       userId,
-      author: `${user.firstName} ${user.lastName}`,
+      author: getFullName(user) || 'Anonymous',
       content,
       media,
     });
@@ -81,7 +89,7 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
     );
 
     // Notify followers and connections about the new post
-    const author = await User.findById(userId).select('followers connections firstName lastName');
+    const author = await User.findById(userId).select('followers connections firstName middleName lastName');
     const recipientIds = [
       ...(author.followers || []),
       ...(author.connections || []),
@@ -91,14 +99,14 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
 
     await notifyUsers(recipientIds, {
       type: 'post',
-      message: `${author.firstName} ${author.lastName} shared a new post.`,
+      message: `${getFullName(author)} shared a new post.`,
       fromUserId: author._id,
       postId: post._id,
       read: false,
     });
 
     // Populate user data for response
-    const postWithUser = await post.populate('userId', 'firstName lastName name profilePicture username headline');
+    const postWithUser = await post.populate('userId', 'firstName middleName lastName name profilePicture username headline');
     res.status(201).json(normalizePostResponse(postWithUser));
   } catch (err) {
     console.error(err);
@@ -110,17 +118,23 @@ router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('userId', 'firstName lastName name profilePicture username headline')
-      .populate('likes.userId', 'firstName lastName name username')
+      .populate('userId', 'firstName middleName lastName name profilePicture username headline')
+      .populate('likes.userId', 'firstName middleName lastName name username')
       .populate({
         path: 'repostedFrom',
         populate: {
           path: 'userId',
-          select: 'firstName lastName name profilePicture username headline'
+          select: 'firstName middleName lastName name profilePicture username headline'
         }
       })
       .sort({ createdAt: -1 })
       .limit(50);
+
+    // Track impressions for returned posts
+    if (posts.length > 0) {
+      const postIds = posts.map((p) => p._id);
+      Post.updateMany({ _id: { $in: postIds } }, { $inc: { impressionsCount: 1 } }).catch(() => {});
+    }
 
     res.json(await Promise.all(posts.map(withRepostCount)));
   } catch (err) {
@@ -129,27 +143,46 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Record batch post impressions
+router.post('/impressions', async (req, res) => {
+  try {
+    const { postIds } = req.body || {};
+    if (Array.isArray(postIds) && postIds.length > 0) {
+      await Post.updateMany(
+        { _id: { $in: postIds } },
+        { $inc: { impressionsCount: 1 } }
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to record impressions' });
+  }
+});
+
 // Get a single post by ID
 router.get('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
-      .populate('userId', 'firstName lastName name profilePicture username headline')
-      .populate('likes.userId', 'firstName lastName name username')
+      .populate('userId', 'firstName middleName lastName name profilePicture username headline')
+      .populate('likes.userId', 'firstName middleName lastName name username')
       .populate({
         path: 'repostedFrom',
         populate: {
           path: 'userId',
-          select: 'firstName lastName name profilePicture username headline',
+          select: 'firstName middleName lastName name profilePicture username headline',
         },
       })
       .populate({
         path: 'comments.userId',
-        select: 'firstName lastName name profilePicture username headline',
+        select: 'firstName middleName lastName name profilePicture username headline',
       });
 
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
+
+    // Increment impressions for single view
+    Post.updateOne({ _id: post._id }, { $inc: { impressionsCount: 1 } }).catch(() => {});
 
     res.json(await withRepostCount(post));
   } catch (err) {
@@ -180,20 +213,20 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
     }
 
     if (result.matchedCount === 0) {
-      // So, add a new like.
+      // Add new like
       await Post.updateOne(
         { _id: postId },
         { $addToSet: { likes: { userId, reactionType } } }
       );
     }
 
-    const currentUser = await User.findById(userId).select('firstName lastName');
-    const postOwner = await User.findById(post.userId).select('firstName lastName');
+    const currentUser = await User.findById(userId).select('firstName middleName lastName');
+    const postOwner = await User.findById(post.userId).select('firstName middleName lastName');
 
     if (postOwner && postOwner._id.toString() !== userId) {
       await notifyUsers([postOwner._id], {
         type: 'reaction',
-        message: `${currentUser.firstName} ${currentUser.lastName} reacted to your post.`,
+        message: `${getFullName(currentUser)} reacted to your post.`,
         fromUserId: currentUser._id,
         postId,
         read: false,
@@ -228,13 +261,13 @@ router.delete('/:id/like', authMiddleware, async (req, res) => {
 // GET /api/posts/:id/comments - Retrieve comments for a post
 router.get('/:id/comments', authMiddleware, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate('comments.userId', 'firstName lastName name username profilePicture');
-    const comments = post.comments.map(c => ({
+    const post = await Post.findById(req.params.id).populate('comments.userId', 'firstName middleName lastName name username profilePicture');
+    const comments = (post?.comments || []).map(c => ({
       _id: c._id,
       content: c.content,
       createdAt: c.createdAt,
-      authorName: c.userId.firstName ? `${c.userId.firstName} ${c.userId.lastName}` : (c.userId.name || c.userId.username || 'Anonymous'),
-      authorAvatar: c.userId.profilePicture
+      authorName: getFullName(c.userId) || 'Anonymous',
+      authorAvatar: c.userId?.profilePicture
     }));
     res.status(200).json({ comments });
   } catch (err) {
@@ -246,19 +279,21 @@ router.get('/:id/comments', authMiddleware, async (req, res) => {
 router.post('/:id/comments', authMiddleware, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
     post.comments.push({ userId: req.userId, content: req.body.content });
     await post.save();
     
     // Return the newly added comment populated
-    const populatedPost = await Post.findById(req.params.id).populate('comments.userId', 'firstName lastName name username profilePicture');
+    const populatedPost = await Post.findById(req.params.id).populate('comments.userId', 'firstName middleName lastName name username profilePicture');
     const newComment = populatedPost.comments[populatedPost.comments.length - 1];
     
     res.status(201).json({ comment: {
       _id: newComment._id,
       content: newComment.content,
       createdAt: newComment.createdAt,
-      authorName: newComment.userId.firstName ? `${newComment.userId.firstName} ${newComment.userId.lastName}` : (newComment.userId.name || newComment.userId.username || 'Anonymous'),
-      authorAvatar: newComment.userId.profilePicture
+      authorName: getFullName(newComment.userId) || 'Anonymous',
+      authorAvatar: newComment.userId?.profilePicture
     } });
   } catch (err) {
     res.status(500).json({ error: 'Failed to post comment' });
@@ -277,7 +312,7 @@ router.post('/:id/repost', authMiddleware, async (req, res) => {
     });
     await repost.save();
 
-    const repostingUser = await User.findById(req.userId).select('followers connections firstName lastName');
+    const repostingUser = await User.findById(req.userId).select('followers connections firstName middleName lastName');
     const recipientIds = [
       ...(repostingUser.followers || []),
       ...(repostingUser.connections || []),
@@ -287,7 +322,7 @@ router.post('/:id/repost', authMiddleware, async (req, res) => {
 
     await notifyUsers(recipientIds, {
       type: 'repost',
-      message: `${repostingUser.firstName} ${repostingUser.lastName} reposted a post.`,
+      message: `${getFullName(repostingUser)} reposted a post.`,
       fromUserId: repostingUser._id,
       postId: repost._id,
       read: false,
@@ -296,7 +331,7 @@ router.post('/:id/repost', authMiddleware, async (req, res) => {
     if (originalPost.userId && originalPost.userId.toString() !== req.userId) {
       await notifyUsers([originalPost.userId], {
         type: 'post',
-        message: `${repostingUser.firstName} ${repostingUser.lastName} reposted your post.`,
+        message: `${getFullName(repostingUser)} reposted your post.`,
         fromUserId: repostingUser._id,
         postId: repost._id,
         read: false,

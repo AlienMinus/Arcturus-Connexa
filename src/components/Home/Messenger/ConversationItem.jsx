@@ -35,7 +35,9 @@ const ConversationItem = ({ data, onClick }) => {
           alt={data.name}
         />
       ) : (
-        <CgProfile className="chatAvatar chatAvatarFallback" />
+        <div className="chatAvatar chatAvatarFallback">
+          {getInitials(data.name) || <CgProfile size={22} />}
+        </div>
       )}
 
       <div className="chatText" style={{ flex: 1, minWidth: 0 }}>

@@ -107,21 +107,25 @@ const NewMessageModal = ({ closeModal }) => {
             Suggested
           </div>
           <div className="suggestedList">
-            {loading && <div style={{ padding: "0 12px", color: "#666" }}>Loading users...</div>}
-            {error && <div style={{ padding: "0 12px", color: "red" }}>{error}</div>}
+            {loading && <div style={{ padding: "0 14px", color: "#666" }}>Loading users...</div>}
+            {error && <div style={{ padding: "0 14px", color: "red" }}>{error}</div>}
             {!loading && !error && filteredUsers.map((item) => (
               <div 
                 key={item.id || item._id} 
                 className="suggestedUser"
                 onClick={() => setSelectedUser(item)}
-                style={{ cursor: "pointer" }}
               >
                 {item.avatar?.url ? (
-                  <img src={item.avatar.url} alt={item.name} className="suggestedAvatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <img src={item.avatar.url} alt={item.name} className="suggestedAvatar" />
                 ) : (
-                  <CgProfile className="suggestedAvatar suggestedAvatarFallback" />
+                  <div className="suggestedAvatar suggestedAvatarFallback">
+                    {getInitials(item.name) || <CgProfile size={22} />}
+                  </div>
                 )}
-                <span>{item.name}</span>
+                <div className="suggestedUserInfo">
+                  <span className="suggestedUserName">{item.name}</span>
+                  {item.headline && <span className="suggestedUserHeadline">{item.headline}</span>}
+                </div>
               </div>
             ))}
           </div>

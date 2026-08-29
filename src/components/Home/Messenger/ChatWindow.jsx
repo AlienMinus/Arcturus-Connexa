@@ -10,6 +10,15 @@ const ChatWindow = ({ contact, closeChat }) => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
+  const getInitials = (name) =>
+    name
+      ?.split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() || '';
+
   useEffect(() => {
     let interval;
     const fetchMessages = async () => {
@@ -17,7 +26,6 @@ const ChatWindow = ({ contact, closeChat }) => {
       try {
         const token = localStorage.getItem('authToken');
         const contactId = contact.id || contact._id;
-        // Assuming your API supports fetching conversation with a user by ID
         const response = await fetch(buildApiUrl(`/messages/${contactId}`), {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
@@ -41,7 +49,6 @@ const ChatWindow = ({ contact, closeChat }) => {
   }, [contact]);
 
   useEffect(() => {
-    // Auto-scroll to bottom whenever messages update
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
@@ -108,7 +115,9 @@ const ChatWindow = ({ contact, closeChat }) => {
           {contact.avatar?.url ? (
             <img src={contact.avatar.url} alt={contact.name} className="chatHeaderAvatar" />
           ) : (
-            <CgProfile className="chatHeaderAvatar chatAvatarFallback" />
+            <div className="chatHeaderAvatar chatHeaderAvatarFallback">
+              {getInitials(contact.name) || <CgProfile size={18} />}
+            </div>
           )}
           <span>{contact.name}</span>
         </div>
