@@ -103,6 +103,10 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
   profileData.hasIncomingConnectionRequest = hasIncomingConnectionRequest;
   profileData.userId = targetUser._id;
 
+  const profileViewsCount = targetUser.profileViewsCount || targetUser.profileViews?.length || 0;
+  profileData.profileViewers = profileViewsCount;
+  profileData.profileViewsCount = profileViewsCount;
+
   if (targetUser.profilePicture?.url) {
     profileData.avatar = targetUser.profilePicture;
   }
@@ -198,6 +202,12 @@ router.get('/', authMiddleware, async (req, res) => {
         }).filter(Boolean),
       };
     }));
+
+    const userPosts = await Post.find({ userId: req.userId });
+    const postImpressions = userPosts.reduce((sum, p) => sum + (p.impressionsCount || p.impressions?.length || 0), 0);
+    profileData.postImpressions = postImpressions;
+    profileData.postImpressionsCount = postImpressions;
+
     res.json(profileData);
   } catch (err) {
     console.error(err);
@@ -221,6 +231,30 @@ router.get('/:username', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
+    // Record view if another user visits
+    if (req.userId && req.userId.toString() !== targetUser._id.toString()) {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      const recentView = targetUser.profileViews?.some(
+        (v) => v.viewerId?.toString() === req.userId && new Date(v.viewedAt) > tenMinutesAgo
+      );
+
+      if (!recentView) {
+        targetUser.profileViews = targetUser.profileViews || [];
+        targetUser.profileViews.push({ viewerId: req.userId, viewedAt: new Date() });
+        targetUser.profileViewsCount = (targetUser.profileViewsCount || 0) + 1;
+        await targetUser.save();
+
+        User.findByIdAndUpdate(req.userId, {
+          $push: {
+            activities: {
+              activityType: 'view',
+              createdAt: new Date(),
+            }
+          }
+        }).catch(() => {});
+      }
+    }
+
     let profile = await Profile.findOne({ userId: targetUser._id });
     if (!profile) {
       profile = await createDefaultProfileForUser(targetUser);
@@ -237,6 +271,11 @@ router.get('/:username', authMiddleware, async (req, res) => {
 
     const currentUser = await populateProfileUser(req.userId);
     const profileData = buildProfileResponse(targetUser, profile, currentUser);
+
+    const targetUserPosts = await Post.find({ userId: targetUser._id });
+    const postImpressions = targetUserPosts.reduce((sum, p) => sum + (p.impressionsCount || p.impressions?.length || 0), 0);
+    profileData.postImpressions = postImpressions;
+    profileData.postImpressionsCount = postImpressions;
 
     const currentUserId = req.userId;
     profileData.posts = await Promise.all(posts.map(async (post) => {

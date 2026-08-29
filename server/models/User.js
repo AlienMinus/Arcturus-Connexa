@@ -45,6 +45,11 @@ const UserSchema = new mongoose.Schema(
       postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
       createdAt: { type: Date, default: Date.now }
     }],
+    profileViews: [{
+      viewerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      viewedAt: { type: Date, default: Date.now }
+    }],
+    profileViewsCount: { type: Number, default: 0 },
     passwordHistory: [PasswordHistorySchema],
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
@@ -113,7 +118,6 @@ UserSchema.pre('save', async function () {
     throw error;
   }
 });
-
 
 const User = mongoose.model('User', UserSchema);
 

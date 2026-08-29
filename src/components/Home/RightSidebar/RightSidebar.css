@@ -45,6 +45,15 @@
   cursor: pointer;
 }
 
+.spinAnimation {
+  animation: spinNews 0.8s linear infinite;
+}
+
+@keyframes spinNews {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* puzzles */
 
 .puzzleItem {

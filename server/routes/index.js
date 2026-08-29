@@ -5,6 +5,7 @@ import auth from './auth.js';
 import users from './users.js';
 import messages from './messages.js';
 import notifications from './notifications.js';
+import news from './news.js';
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use('/auth', auth);
 router.use('/users', users);
 router.use('/messages', messages);
 router.use('/notifications', notifications);
+router.use('/news', news);
 
 export default router;

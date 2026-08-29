@@ -49,7 +49,9 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
             className="profileImg"
           />
         ) : (
-          <CgProfile className="profileImg profileImgFallback" />
+          <div className="profileImg profileImgFallback">
+            {getInitials(profile?.name) || <CgProfile size={18} />}
+          </div>
         )}
 
         <span>Messaging</span>
