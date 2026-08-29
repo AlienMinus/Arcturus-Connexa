@@ -105,9 +105,11 @@ const ProfileEditForm = ({ profile, onSaved }) => {
         throw new Error(json?.error || 'Failed to save profile');
       }
 
-      await response.json();
+      const savedData = await response.json();
       setSuccess('Profile updated successfully.');
-      onSaved();
+      if (onSaved) {
+        onSaved(savedData);
+      }
     } catch (err) {
       setError(err.message);
     } finally {

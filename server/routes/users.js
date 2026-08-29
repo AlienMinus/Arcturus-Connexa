@@ -6,10 +6,16 @@ import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
+const getFullName = (u) => {
+  if (!u) return '';
+  const parts = [u.firstName, u.middleName, u.lastName].filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : (u.name || u.username || '');
+};
+
 const simplifyUser = (user) => ({
   id: user._id,
   username: user.username,
-  name: `${user.firstName} ${user.lastName}`,
+  name: getFullName(user),
   headline: user.headline || user.email,
   avatar: user.profilePicture || null,
 });
@@ -19,7 +25,7 @@ const buildRelationshipState = (currentUser, targetUser) => {
   return {
     id: targetUser._id,
     username: targetUser.username,
-    name: `${targetUser.firstName} ${targetUser.lastName}`,
+    name: getFullName(targetUser),
     headline: targetUser.headline || targetUser.email,
     avatar: targetUser.profilePicture || null,
     isFollowing: currentUser?.following?.some((id) => id.toString() === targetId) || false,
@@ -386,7 +392,7 @@ const getUserActivityData = async (user, currentUserId) => {
   return {
     user: {
       id: user._id,
-      name: `${user.firstName} ${user.lastName}`,
+      name: getFullName(user),
       username: user.username,
       headline: user.headline || user.email,
       avatar: user.profilePicture?.url || null,

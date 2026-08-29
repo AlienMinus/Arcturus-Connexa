@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    MOBILE RESPONSIVE STYLES
    Optimized for small screen mobile devices.
    Loaded globally via main.jsx after index.css.
@@ -507,9 +507,21 @@
     gap: 12px;
   }
 
+  .profileAvatarWrapper {
+    height: 52px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+
   .profileAvatarLarge {
-    width: 96px;
-    height: 96px;
+    width: 104px;
+    height: 104px;
+    position: absolute;
+    top: -52px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   .profileIntroText h1 {
@@ -695,8 +707,12 @@
   }
 
   .profileAvatarLarge {
-    width: 84px;
-    height: 84px;
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    top: -45px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
 .messenger,

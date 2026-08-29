@@ -49,10 +49,16 @@ const normalizeHonors = (value) => {
   return [];
 };
 
+const getFullName = (u) => {
+  if (!u) return '';
+  const parts = [u.firstName, u.middleName, u.lastName].filter(Boolean);
+  return parts.length > 0 ? parts.join(' ') : (u.name || u.username || '');
+};
+
 const simplifyUser = (user) => ({
   id: user._id,
   username: user.username,
-  name: `${user.firstName} ${user.lastName}`,
+  name: getFullName(user),
   headline: user.headline || user.email,
   avatar: user.profilePicture || null,
 });
@@ -64,8 +70,6 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
   const currentUserId = currentUser?._id?.toString();
   const targetId = targetUser._id.toString();
 
-  // Check both sides so existing relationships created before bidirectional
-  // updates are still displayed correctly.
   const isFollowing = currentUser
     ? includesUser(currentUser.following, targetId) || includesUser(targetUser.followers, currentUserId)
     : false;
@@ -80,8 +84,9 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
     : false;
 
   const profileData = profile.toObject();
+  const fullName = getFullName(targetUser) || profile.name || '';
 
-  profileData.name = `${targetUser.firstName} ${targetUser.lastName}`;
+  profileData.name = fullName;
   profileData.email = targetUser.email;
   profileData.username = targetUser.username;
   profileData.phoneNumber = targetUser.phoneNumber;
@@ -108,16 +113,16 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
 const populateProfileUser = async (userId) =>
   User.findById(userId)
     .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
-    .populate('followers', 'firstName lastName username headline profilePicture')
-    .populate('following', 'firstName lastName username headline profilePicture')
-    .populate('connections', 'firstName lastName username headline profilePicture')
-    .populate('pendingConnectionRequests', 'firstName lastName username headline profilePicture')
-    .populate('sentConnectionRequests', 'firstName lastName username headline profilePicture');
+    .populate('followers', 'firstName middleName lastName username headline profilePicture')
+    .populate('following', 'firstName middleName lastName username headline profilePicture')
+    .populate('connections', 'firstName middleName lastName username headline profilePicture')
+    .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
+    .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
 
 const createDefaultProfileForUser = async (user) => {
   const profile = new Profile({
     userId: user._id,
-    name: `${user.firstName} ${user.lastName}`,
+    name: getFullName(user),
     headline: '',
     location: user.location || '',
     summary: '',
@@ -151,15 +156,18 @@ router.get('/', authMiddleware, async (req, res) => {
     const profileData = buildProfileResponse(targetUser, profile, targetUser);
     const posts = await Post.find({ userId: req.userId })
       .sort({ createdAt: -1 })
-      .populate('userId', 'firstName lastName username headline profilePicture')
-      .populate('likes.userId', 'firstName lastName username')
+      .populate('userId', 'firstName middleName lastName username headline profilePicture')
+      .populate('likes.userId', 'firstName middleName lastName username')
       .populate({
         path: 'repostedFrom',
-        populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' },
+        populate: { path: 'userId', select: 'firstName middleName lastName username headline profilePicture' },
       });
 
     profileData.posts = await Promise.all(posts.map(async (post) => {
       const userLike = post.likes.find((like) => like.userId?._id?.toString() === req.userId);
+      const postAuthorName = getFullName(post.userId) || post.author || 'Anonymous';
+      const repostAuthorName = post.repostedFrom?.userId ? getFullName(post.repostedFrom.userId) : (post.repostedFrom?.author || 'Anonymous');
+
       return {
         id: post._id,
         content: post.content,
@@ -171,24 +179,22 @@ router.get('/', authMiddleware, async (req, res) => {
         createdAt: post.createdAt,
         repostedFrom: post.repostedFrom ? {
           id: post.repostedFrom._id,
-          authorName: post.repostedFrom.userId?.firstName
-            ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}`
-            : post.repostedFrom.author || 'Anonymous',
+          authorName: repostAuthorName,
           authorUsername: post.repostedFrom.userId?.username || '',
           authorHeadline: post.repostedFrom.userId?.headline || 'Member',
           authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null,
           content: post.repostedFrom.content || '',
           image: post.repostedFrom.media?.[0]?.url || null,
         } : null,
-        authorName: `${post.userId.firstName} ${post.userId.lastName}`,
-        authorUsername: post.userId.username,
-        authorHeadline: post.userId.headline,
-        authorAvatar: post.userId.profilePicture?.url,
+        authorName: postAuthorName,
+        authorUsername: post.userId?.username,
+        authorHeadline: post.userId?.headline,
+        authorAvatar: post.userId?.profilePicture?.url,
         hasLiked: !!userLike,
         userReactionType: userLike ? userLike.reactionType : null,
         likers: post.likes.map((like) => {
           const liker = like.userId;
-          return liker?.firstName ? `${liker.firstName} ${liker.lastName}` : liker?.username;
+          return liker ? getFullName(liker) : '';
         }).filter(Boolean),
       };
     }));
@@ -205,11 +211,11 @@ router.get('/:username', authMiddleware, async (req, res) => {
     const username = req.params.username.toLowerCase();
     const targetUser = await User.findOne({ username })
       .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
-      .populate('followers', 'firstName lastName username headline profilePicture')
-      .populate('following', 'firstName lastName username headline profilePicture')
-      .populate('connections', 'firstName lastName username headline profilePicture')
-      .populate('pendingConnectionRequests', 'firstName lastName username headline profilePicture')
-      .populate('sentConnectionRequests', 'firstName lastName username headline profilePicture');
+      .populate('followers', 'firstName middleName lastName username headline profilePicture')
+      .populate('following', 'firstName middleName lastName username headline profilePicture')
+      .populate('connections', 'firstName middleName lastName username headline profilePicture')
+      .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
+      .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
 
     if (!targetUser) {
       return res.status(404).json({ error: 'Profile not found' });
@@ -222,11 +228,11 @@ router.get('/:username', authMiddleware, async (req, res) => {
 
     const posts = await Post.find({ userId: targetUser._id })
       .sort({ createdAt: -1 })
-      .populate('userId', 'firstName lastName username headline profilePicture')
-      .populate('likes.userId', 'firstName lastName username')
+      .populate('userId', 'firstName middleName lastName username headline profilePicture')
+      .populate('likes.userId', 'firstName middleName lastName username')
       .populate({
         path: 'repostedFrom',
-        populate: { path: 'userId', select: 'firstName lastName username headline profilePicture' },
+        populate: { path: 'userId', select: 'firstName middleName lastName username headline profilePicture' },
       });
 
     const currentUser = await populateProfileUser(req.userId);
@@ -235,6 +241,9 @@ router.get('/:username', authMiddleware, async (req, res) => {
     const currentUserId = req.userId;
     profileData.posts = await Promise.all(posts.map(async (post) => {
       const userLike = post.likes.find((like) => like.userId?._id?.toString() === currentUserId);
+      const postAuthorName = getFullName(post.userId) || post.author || 'Anonymous';
+      const repostAuthorName = post.repostedFrom?.userId ? getFullName(post.repostedFrom.userId) : (post.repostedFrom?.author || 'Anonymous');
+
       return {
         id: post._id,
         content: post.content,
@@ -246,24 +255,22 @@ router.get('/:username', authMiddleware, async (req, res) => {
         createdAt: post.createdAt,
         repostedFrom: post.repostedFrom ? {
           id: post.repostedFrom._id,
-          authorName: post.repostedFrom.userId?.firstName
-            ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}`
-            : post.repostedFrom.author || 'Anonymous',
+          authorName: repostAuthorName,
           authorUsername: post.repostedFrom.userId?.username || '',
           authorHeadline: post.repostedFrom.userId?.headline || 'Member',
           authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null,
           content: post.repostedFrom.content || '',
           image: post.repostedFrom.media?.[0]?.url || null,
         } : null,
-        authorName: `${post.userId.firstName} ${post.userId.lastName}`,
-        authorUsername: post.userId.username,
-        authorHeadline: post.userId.headline,
-        authorAvatar: post.userId.profilePicture?.url,
+        authorName: postAuthorName,
+        authorUsername: post.userId?.username,
+        authorHeadline: post.userId?.headline,
+        authorAvatar: post.userId?.profilePicture?.url,
         hasLiked: !!userLike,
         userReactionType: userLike ? userLike.reactionType : null,
         likers: post.likes.map((like) => {
           const liker = like.userId;
-          return liker?.firstName ? `${liker.firstName} ${liker.lastName}` : liker?.username;
+          return liker ? getFullName(liker) : '';
         }).filter(Boolean),
       };
     }));
@@ -291,6 +298,7 @@ router.post(
       }
 
       const {
+        name,
         headline,
         location,
         summary,
@@ -306,10 +314,37 @@ router.post(
       } = req.body;
 
       const updateData = {
-        headline: headline || user.headline || '',
-        location: location || user.location || '',
+        headline: headline !== undefined ? headline : (user.headline || ''),
+        location: location !== undefined ? location : (user.location || ''),
         summary: summary || '',
       };
+
+      // Handle name splitting and User model updates
+      if (typeof name === 'string' && name.trim()) {
+        const trimmedName = name.trim();
+        const parts = trimmedName.split(/\s+/);
+        if (parts.length === 1) {
+          user.firstName = parts[0];
+          user.middleName = '';
+          user.lastName = '';
+        } else if (parts.length === 2) {
+          user.firstName = parts[0];
+          user.middleName = '';
+          user.lastName = parts[1];
+        } else {
+          user.firstName = parts[0];
+          user.middleName = parts.slice(1, -1).join(' ');
+          user.lastName = parts[parts.length - 1];
+        }
+        updateData.name = trimmedName;
+      }
+
+      if (headline !== undefined) {
+        user.headline = headline;
+      }
+      if (location !== undefined) {
+        user.location = location;
+      }
 
       // Handle avatar upload to Cloudinary
       if (req.files?.avatar?.[0]) {
@@ -318,8 +353,9 @@ router.post(
           url: result.secure_url,
           public_id: result.public_id,
         };
-        await user.save();
       }
+
+      await user.save();
 
       // Handle background image
       if (req.files?.backgroundImage?.[0]) {
@@ -351,7 +387,7 @@ router.post(
       if (!profile) {
         profile = new Profile({
           userId: req.userId,
-          name: `${user.firstName} ${user.lastName}`,
+          name: getFullName(user),
           ...updateData,
         });
       } else {

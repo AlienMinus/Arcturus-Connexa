@@ -172,7 +172,10 @@ const ProfilePage = () => {
         {isEditing && isOwnProfile && (
           <ProfileEditForm 
             profile={profile} 
-            onSaved={() => {
+            onSaved={(savedData) => {
+              if (savedData) {
+                setProfile((prev) => ({ ...prev, ...savedData }));
+              }
               refreshProfile();
               setIsEditing(false);
             }} 

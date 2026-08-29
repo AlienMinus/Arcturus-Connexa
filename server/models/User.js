@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     middleName: { type: String, default: '' },
-    lastName: { type: String, required: true },
+    lastName: { type: String, default: '' },
     email: {
       type: String,
       required: true,
@@ -81,12 +81,7 @@ function generateRandomAlphaNumeric(length) {
 }
 
 UserSchema.pre('save', async function () {
-  if (
-    !this.isModified('firstName') &&
-    !this.isModified('middleName') &&
-    !this.isModified('lastName') &&
-    this.username
-  ) {
+  if (this.username) {
     return;
   }
 
