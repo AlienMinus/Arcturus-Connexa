@@ -7,12 +7,18 @@
   background-color: #f4f2ee;
   min-height: calc(100vh - 60px);
   padding: 20px 16px 60px;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .profilePage {
   max-width: 1128px;
+  width: 100%;
   margin: 0 auto;
   color: #191919;
+  box-sizing: border-box;
 }
 
 /* ==========================================================================
@@ -91,7 +97,9 @@
 
 .profileInfoPrimary {
   flex: 1;
-  min-width: 260px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .profileName {
@@ -119,12 +127,14 @@
 .profileHeaderStatsRow {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 10px 18px;
+  padding: 10px 16px;
   flex-shrink: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .profileHeaderStatBox {
@@ -1108,26 +1118,55 @@
 
 @media (max-width: 768px) {
   .profilePage-wrapper {
-    padding: 12px 8px 70px;
+    padding: 10px 8px 70px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .profilePage {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .profilePageLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profileHeaderCard {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .profileCover {
-    min-height: 140px;
+    min-height: 120px;
   }
 
   .profileCoverFallback {
-    height: 140px;
-    font-size: 0.95rem;
-    padding-right: 16px;
+    height: 120px;
+    font-size: 0.9rem;
+    padding-right: 14px;
   }
 
   .profileIntroCard {
-    padding: 0 16px 20px;
+    padding: 0 12px 16px;
     text-align: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .profileAvatarWrapper {
-    height: 52px;
+    height: 48px;
     display: flex;
     justify-content: center;
     position: relative;
@@ -1135,51 +1174,78 @@
   }
 
   .profileAvatarLarge {
-    width: 108px;
-    height: 108px;
-    top: -54px;
+    width: 100px;
+    height: 100px;
+    top: -50px;
     left: 50% !important;
     transform: translateX(-50%) !important;
   }
 
   .profileName {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
   }
 
   .profileIntroTop {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .profileInfoPrimary {
     text-align: center;
     width: 100%;
+    min-width: 0;
   }
 
   .profileHeaderStatsRow {
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
     justify-content: space-around;
-    gap: 12px;
-    padding: 8px 12px;
+    gap: 4px;
+    padding: 8px 6px;
+  }
+
+  .profileStatNumber {
+    font-size: 1.05rem;
+  }
+
+  .profileStatLabel {
+    font-size: 0.68rem;
   }
 
   .profileSocialProof {
-    margin: 12px auto 0;
+    margin: 10px auto 0;
     justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+  }
+
+  .socialProofText {
+    font-size: 0.78rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .profileHeaderActions {
     flex-direction: column;
     width: 100%;
-    gap: 10px;
+    gap: 8px;
+    margin-top: 12px;
   }
 
   .editProfileButton {
     justify-content: center;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .actionButtons,
@@ -1195,12 +1261,15 @@
   }
 
   .profileSection {
-    padding: 16px;
+    padding: 14px 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .sectionFooter {
-    margin-left: -16px;
-    margin-right: -16px;
-    margin-bottom: -16px;
+    margin-left: -12px;
+    margin-right: -12px;
+    margin-bottom: -12px;
   }
 }
