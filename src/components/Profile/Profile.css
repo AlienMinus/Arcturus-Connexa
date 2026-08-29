@@ -437,6 +437,9 @@
   font-size: 0.95rem;
   line-height: 1.6;
   white-space: pre-line;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 
 /* ==========================================================================
@@ -526,6 +529,9 @@
   color: #334155;
   line-height: 1.5;
   white-space: pre-line;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 
 .techStack {

@@ -195,9 +195,19 @@
 
 .postBody {
   font-size: 14px;
-  line-height: 1.4;
-  color: #000;
+  line-height: 1.55;
+  color: #191919;
   margin-bottom: 8px;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+.postBody p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  line-height: 1.55;
 }
 
 .postImage {
@@ -500,4 +510,3 @@
 .hashtag:hover {
   text-decoration: underline;
 }
-

@@ -232,6 +232,7 @@ router.get('/:username', authMiddleware, async (req, res) => {
     }
 
     // Record view if another user visits
+    // Record view and generate notification if another user visits
     if (req.userId && req.userId.toString() !== targetUser._id.toString()) {
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
       const recentView = targetUser.profileViews?.some(
@@ -242,6 +243,20 @@ router.get('/:username', authMiddleware, async (req, res) => {
         targetUser.profileViews = targetUser.profileViews || [];
         targetUser.profileViews.push({ viewerId: req.userId, viewedAt: new Date() });
         targetUser.profileViewsCount = (targetUser.profileViewsCount || 0) + 1;
+
+        // Fetch viewer's name for notification
+        const viewer = await User.findById(req.userId).select('firstName middleName lastName name username');
+        const viewerName = getFullName(viewer) || viewer?.username || 'Someone';
+
+        targetUser.notifications = targetUser.notifications || [];
+        targetUser.notifications.push({
+          type: 'profile_view',
+          message: `${viewerName} viewed your profile.`,
+          fromUserId: req.userId,
+          read: false,
+          createdAt: new Date(),
+        });
+
         await targetUser.save();
 
         User.findByIdAndUpdate(req.userId, {

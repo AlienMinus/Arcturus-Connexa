@@ -86,19 +86,44 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// Fetch network users and relationship state
+// Fetch network users, profile viewers, and relationship state
 router.get('/network', authMiddleware, async (req, res) => {
   try {
     const currentUser = await User.findById(req.userId)
-      .select('following followers connections pendingConnectionRequests sentConnectionRequests')
+      .select('following followers connections pendingConnectionRequests sentConnectionRequests profileViews profileViewsCount')
+      .populate('profileViews.viewerId', 'firstName middleName lastName username headline profilePicture')
       .lean();
 
     const users = await User.find({ _id: { $ne: req.userId } })
-      .select('firstName lastName email username headline profilePicture')
+      .select('firstName middleName lastName email username headline profilePicture')
       .lean();
 
     const network = users.map((user) => buildRelationshipState(currentUser, user));
-    res.json({ network });
+
+    // Process profile viewers (most recent first, deduplicated by viewer)
+    const rawViews = (currentUser?.profileViews || []).slice().reverse();
+    const seenViewers = new Set();
+    const profileViewers = [];
+
+    for (const v of rawViews) {
+      const viewer = v.viewerId;
+      if (!viewer || !viewer._id) continue;
+      const vId = viewer._id.toString();
+      if (seenViewers.has(vId) || vId === req.userId.toString()) continue;
+      seenViewers.add(vId);
+
+      const relationship = buildRelationshipState(currentUser, viewer);
+      profileViewers.push({
+        ...relationship,
+        viewedAt: v.viewedAt,
+      });
+    }
+
+    res.json({
+      network,
+      profileViewers,
+      profileViewsCount: currentUser?.profileViewsCount || profileViewers.length,
+    });
   } catch (err) {
     console.error('Failed to fetch network users:', err);
     res.status(500).json({ error: 'Failed to fetch network users' });

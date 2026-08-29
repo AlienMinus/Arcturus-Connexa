@@ -19,6 +19,7 @@ const NOTIFICATION_LABELS = {
   follow: 'followed you',
   connection: 'accepted your connection request',
   request: 'sent you a connection request',
+  profile_view: 'viewed your profile',
   other: '',
 };
 
