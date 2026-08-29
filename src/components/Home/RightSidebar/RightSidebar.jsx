@@ -1,5 +1,5 @@
 import React from "react";
-import LinkedInNews from "./LinkedInNews";
+import ArcturusNews from "./ArcturusNews";
 import PuzzleGames from "./PuzzleGames";
 import AdCard from "./AdCard";
 import FooterLinks from "./FooterLinks";
@@ -9,7 +9,7 @@ const RightSidebar = () => {
   return (
     <div className="rightSidebar">
 
-      <LinkedInNews />
+      <ArcturusNews />
 
       <PuzzleGames />
 

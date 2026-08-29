@@ -47,7 +47,7 @@ const FooterLinks = () => {
 
       <div className="linksRow">
         <span>
-          <FaMobileAlt /> Get the LinkedIn app
+          <FaMobileAlt /> Get the Arcturus app
         </span>
         <span>
           <FaEllipsisH /> More
@@ -55,7 +55,7 @@ const FooterLinks = () => {
       </div>
 
       <p className="copyright">
-        LinkedIn Corporation © 2026
+        Arcturus Corporation © 2026
       </p>
 
     </div>

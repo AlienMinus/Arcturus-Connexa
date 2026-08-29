@@ -9,8 +9,8 @@
 /* ===== ROOT VARIABLES ===== */
 
 :root {
-  --linkedin-blue: #0a66c2;
-  --linkedin-bg: #f3f2ef;
+  --arcturus-blue: #0a66c2;
+  --arcturus-bg: #f3f2ef;
   --border-color: #e0e0e0;
   --text-primary: #000000;
   --text-secondary: #666666;
@@ -23,7 +23,7 @@ body {
                "Segoe UI", Roboto, Oxygen, Ubuntu, 
                Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-  background-color: var(--linkedin-bg);
+  background-color: var(--arcturus-bg);
   color: var(--text-primary);
 }
 

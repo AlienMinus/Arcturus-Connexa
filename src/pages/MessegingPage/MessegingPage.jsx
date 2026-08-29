@@ -26,7 +26,7 @@ const MessegingPage = () => {
           <ChatWindow contact={activeChat} closeChat={() => setActiveChat(null)} />
         ) : (
           <div className="messaging-empty-state">
-            <img src="/logo.png" alt="LinkedIn" className="empty-state-logo" />
+            <img src="/logo.png" alt="Arcturus" className="empty-state-logo" />
             <h2>Select a message</h2>
             <p>Choose from your existing conversations, start a new one, or simply keep swimming.</p>
           </div>

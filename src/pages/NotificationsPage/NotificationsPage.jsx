@@ -97,7 +97,7 @@ const NotificationsPage = () => {
         <div className="notificationsList">
           {notifications.map((notification) => {
             const author = notification.author;
-            const authorName = author?.name || 'LinkedIn';
+            const authorName = author?.name || 'Arcturus';
             const label = NOTIFICATION_LABELS[notification.type] || '';
             return (
               <div

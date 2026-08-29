@@ -27,7 +27,7 @@ const CompanyCard = () => {
       <button className="btn">Try Premium Page</button>
 
       <button className="btnOutline">
-        Advertise on LinkedIn
+        Advertise on Arcturus
       </button>
 
     </div>
