@@ -80,16 +80,18 @@
   margin-top: 16px;
 }
 
+/* Header Top Layout */
 .profileIntroTop {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .profileInfoPrimary {
   flex: 1;
-  min-width: 0;
+  min-width: 260px;
 }
 
 .profileName {
@@ -111,6 +113,133 @@
   margin: 6px 0 0;
   font-size: 0.875rem;
   color: #64748b;
+}
+
+/* Header Stats Row (Posts, Followers, Following, Connections) */
+.profileHeaderStatsRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  flex-shrink: 0;
+}
+
+.profileHeaderStatBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.profileHeaderStatBox.clickable {
+  cursor: pointer;
+}
+
+.profileHeaderStatBox.clickable:hover {
+  transform: translateY(-2px);
+}
+
+.profileHeaderStatBox.clickable:hover .profileStatNumber {
+  color: #0a66c2;
+}
+
+.profileHeaderStatBox.clickable:hover .profileStatLabel {
+  color: #0a66c2;
+}
+
+.profileStatNumber {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #191919;
+  line-height: 1.2;
+}
+
+.profileStatLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+/* Social Proof (Overlapping Avatar Stack + Text) */
+.profileSocialProof {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  cursor: pointer;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s ease;
+  width: fit-content;
+}
+
+.profileSocialProof:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.profileSocialProof:hover .socialProofText {
+  color: #0a66c2;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.avatarStackItem {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  margin-left: -8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.avatarStackItem:first-child {
+  margin-left: 0;
+}
+
+.avatarStackFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.socialProofText {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.35;
+}
+
+.socialProofText strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Action Buttons Header Row */
+.profileHeaderActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
 }
 
 .editProfileButton {
@@ -135,34 +264,10 @@
   color: #004182;
 }
 
-.profileStats {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  font-size: 0.875rem;
-}
-
-.profileStatItem {
-  color: #0a66c2;
-  font-weight: 500;
-}
-
-.profileStatItem strong {
-  font-weight: 700;
-}
-
-.profileStatDot {
-  color: #94a3b8;
-  font-size: 0.75rem;
-}
-
 .actionButtons {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 16px;
 }
 
 .actionButtons button,
@@ -742,6 +847,227 @@
 }
 
 /* ==========================================================================
+   NETWORK MODAL (Followers, Following, Connections)
+   ========================================================================== */
+
+.networkModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalOverlayFade 0.2s ease-out;
+}
+
+.networkModalContent {
+  background: #ffffff;
+  width: 100%;
+  max-width: 540px;
+  max-height: 80vh;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalOverlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.networkModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 16px;
+  background: #ffffff;
+}
+
+.networkModalTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.networkTabBtn {
+  background: none;
+  border: none;
+  padding: 14px 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.networkTabBtn:hover {
+  color: #0f172a;
+}
+
+.networkTabBtn.active {
+  color: #0a66c2;
+  border-bottom-color: #0a66c2;
+}
+
+.networkModalCloseBtn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.networkModalCloseBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.networkModalBody {
+  overflow-y: auto;
+  padding: 8px 0;
+  max-height: calc(80vh - 60px);
+}
+
+.networkUserList {
+  display: flex;
+  flex-direction: column;
+}
+
+.networkUserRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.networkUserRow:hover {
+  background: #f8fafc;
+}
+
+.networkUserInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+  min-width: 0;
+}
+
+.networkUserAvatar,
+.networkUserAvatarFallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.networkUserDetails {
+  min-width: 0;
+  flex: 1;
+}
+
+.networkUserName {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.networkUserHeadline {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.networkViewProfileBtn {
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid #0a66c2;
+  color: #0a66c2;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.networkViewProfileBtn:hover {
+  background: #ebf4fd;
+  border-color: #004182;
+  color: #004182;
+}
+
+.networkEmptyState {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.networkEmptyIcon {
+  font-size: 36px;
+  color: #94a3b8;
+}
+
+.networkEmptyState h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+
+.networkEmptyState p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+
+/* ==========================================================================
    LOADING & ERROR STATES
    ========================================================================== */
 
@@ -824,7 +1150,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 12px;
+    gap: 16px;
     width: 100%;
   }
 
@@ -833,8 +1159,22 @@
     width: 100%;
   }
 
-  .profileStats {
+  .profileHeaderStatsRow {
+    width: 100%;
+    justify-content: space-around;
+    gap: 12px;
+    padding: 8px 12px;
+  }
+
+  .profileSocialProof {
+    margin: 12px auto 0;
     justify-content: center;
+  }
+
+  .profileHeaderActions {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
   }
 
   .editProfileButton {

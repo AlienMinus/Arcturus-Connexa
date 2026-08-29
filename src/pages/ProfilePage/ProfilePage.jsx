@@ -265,15 +265,6 @@ const ProfilePage = () => {
               title="Interests" 
               items={profile.interests?.map((interest) => ({ title: interest }))} 
             />
-
-            {/* Connections: Limit 2 items with toggle */}
-            <ProfileConnectionList title="Connections" items={profile.connections} />
-
-            {/* Followers: Limit 2 items with toggle */}
-            <ProfileConnectionList title="Followers" items={profile.followers} />
-
-            {/* Following: Limit 2 items with toggle */}
-            <ProfileConnectionList title="Following" items={profile.following} />
           </aside>
         </div>
       </div>
