@@ -10,6 +10,7 @@ import AuthPage from './pages/AuthPage/AuthPage';
 import MessegingPage from './pages/MessegingPage/MessegingPage';
 import NetworkPage from './pages/NetworkPage/NetworkPage';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
+import UnderConstruction from './components/UnderConstruction/UnderConstruction';
 
 function AppRouter() {
   return (
@@ -26,6 +27,10 @@ function AppRouter() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/jobs" element={<UnderConstruction title="Jobs Portal is Under Construction" featureName="Jobs & Careers" subtitle="We're crafting an intelligent job discovery and recruiting system. Check back soon!" />} />
+                <Route path="/learning" element={<UnderConstruction title="Learning Hub is Under Construction" featureName="Courses & Certifications" />} />
+                <Route path="/advertise" element={<UnderConstruction title="Ad Platform is Under Construction" featureName="Campaigns & Ads" />} />
+                <Route path="/settings" element={<UnderConstruction title="Settings are Under Construction" featureName="Account Preferences" />} />
                 <Route path="/profile/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/:username/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/activity" element={<ActivityPage />} />
