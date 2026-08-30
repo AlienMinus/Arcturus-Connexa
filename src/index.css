@@ -13,25 +13,52 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* ===== ROOT VARIABLES ===== */
+/* ===== ROOT VARIABLES (DEFAULT LIGHT THEME) ===== */
 
-:root {
+:root,
+:root[data-theme="light"],
+body:not(.dark-mode) {
+  --bg-primary: #f3f2ef;       /* Light Canvas */
+  --bg-secondary: #ffffff;     /* White Card Surface */
+  --bg-card: #ffffff;          /* Card Container */
+  --bg-input: #ffffff;         /* Inputs */
+  --bg-hover: #f1f5f9;         /* Hover State */
+  --border-color: #e2e8f0;     /* Border Color */
+  --border-light: #f1f5f9;     /* Subtle Inner Border */
+  --text-primary: #0f172a;     /* Deep Slate / Dark Text */
+  --text-secondary: #334155;   /* Subtitle & Body */
+  --text-muted: #64748b;       /* Meta & Timestamps */
+  --accent-blue: #0a66c2;      /* Brand Blue Accent */
+  --accent-blue-hover: #004182;/* Darker Blue */
+  --accent-blue-bg: #ebf4fd;   /* Light Blue Tint */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+
   --arcturus-blue: #0a66c2;
   --arcturus-bg: #f3f2ef;
-  --border-color: #e0e0e0;
-  --text-primary: #000000;
-  --text-secondary: #666666;
 }
 
-/* ===== BODY ===== */
+/* ===== BODY & TYPOGRAPHY ===== */
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 
                "Segoe UI", Roboto, Oxygen, Ubuntu, 
                Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-  background-color: var(--arcturus-bg);
-  color: var(--text-primary);
+  background-color: var(--bg-primary, #f3f2ef);
+  color: var(--text-primary, #0f172a);
+}
+
+/* Default Light Mode Headings & Text */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary, #0f172a);
+}
+
+p {
+  color: var(--text-secondary, #334155);
+}
+
+label {
+  color: var(--text-secondary, #334155);
 }
 
 /* ===== LINKS ===== */
@@ -56,10 +83,10 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: #94a3b8;
 }

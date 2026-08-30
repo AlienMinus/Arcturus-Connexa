@@ -1,6 +1,6 @@
 /* ==========================================================================
    MODERN GLASSMORPHISM AUTH STYLES (Auth.css)
-   Scenic illustrated twilight background with frosted glassmorphism card
+   Scenic backdrop (/login.png) with frosted glassmorphic card
    ========================================================================== */
 
 .modernAuthWrapper,
@@ -34,7 +34,7 @@
 
 /* Glassmorphic Auth Card */
 .modernGlassCard,
-.authCard {
+.authContainer .authCard {
   position: relative;
   z-index: 10;
   width: 100%;
@@ -65,7 +65,7 @@
 
 /* Auth Header */
 .modernAuthTitle,
-.authTitle {
+.authContainer .authTitle {
   font-size: 32px !important;
   font-weight: 700 !important;
   color: #ffffff !important;
@@ -75,7 +75,8 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.authSubtitle {
+.modernGlassCard .authSubtitle,
+.authContainer .authSubtitle {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85) !important;
   text-align: center;
@@ -96,7 +97,8 @@
 }
 
 .modernInputGroup label,
-.formGroup label {
+.modernGlassCard .formGroup label,
+.authContainer .formGroup label {
   font-size: 14px !important;
   font-weight: 600 !important;
   color: rgba(255, 255, 255, 0.95) !important;
@@ -201,7 +203,8 @@
 
 /* High Contrast Pill Action Button */
 .modernLoginBtn,
-.primaryBtn {
+.modernGlassCard .primaryBtn,
+.authContainer .primaryBtn {
   background: #ffffff !important;
   color: #1e1b4b !important;
   border: none !important;
@@ -219,19 +222,22 @@
 }
 
 .modernLoginBtn:hover:not(:disabled),
-.primaryBtn:hover:not(:disabled) {
+.modernGlassCard .primaryBtn:hover:not(:disabled),
+.authContainer .primaryBtn:hover:not(:disabled) {
   background: #f8fafc !important;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(255, 255, 255, 0.35) !important;
 }
 
 .modernLoginBtn:active:not(:disabled),
-.primaryBtn:active:not(:disabled) {
+.modernGlassCard .primaryBtn:active:not(:disabled),
+.authContainer .primaryBtn:active:not(:disabled) {
   transform: translateY(0);
 }
 
 .modernLoginBtn:disabled,
-.primaryBtn:disabled {
+.modernGlassCard .primaryBtn:disabled,
+.authContainer .primaryBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -258,7 +264,8 @@
 
 /* Alerts */
 .glassErrorMessage,
-.errorMessage {
+.modernGlassCard .errorMessage,
+.authContainer .errorMessage {
   background: rgba(239, 68, 68, 0.2) !important;
   border: 1px solid rgba(248, 113, 113, 0.5) !important;
   color: #fecaca !important;
@@ -271,7 +278,8 @@
   backdrop-filter: blur(8px);
 }
 
-.successMessage {
+.modernGlassCard .successMessage,
+.authContainer .successMessage {
   background: rgba(34, 197, 94, 0.2) !important;
   border: 1px solid rgba(74, 222, 128, 0.5) !important;
   color: #bbf7d0 !important;
@@ -322,14 +330,16 @@
   background: #ffffff;
 }
 
-.formStep h2 {
+.modernGlassCard .formStep h2,
+.authContainer .formStep h2 {
   color: #ffffff;
   font-size: 18px;
   margin-bottom: 18px;
   text-align: center;
 }
 
-.formStep input {
+.modernGlassCard .formStep input,
+.authContainer .formStep input {
   width: 100%;
   background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -341,19 +351,22 @@
   box-sizing: border-box;
 }
 
-.formStep input:focus {
+.modernGlassCard .formStep input:focus,
+.authContainer .formStep input:focus {
   border-color: #ffffff !important;
   background: rgba(255, 255, 255, 0.15) !important;
   outline: none;
 }
 
-.formActions {
+.modernGlassCard .formActions,
+.authContainer .formActions {
   display: flex;
   gap: 12px;
   margin-top: 20px;
 }
 
-.secondaryBtn {
+.modernGlassCard .secondaryBtn,
+.authContainer .secondaryBtn {
   background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -365,7 +378,8 @@
   transition: all 0.2s ease;
 }
 
-.secondaryBtn:hover:not(:disabled) {
+.modernGlassCard .secondaryBtn:hover:not(:disabled),
+.authContainer .secondaryBtn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.25) !important;
 }
 
@@ -380,13 +394,13 @@
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .modernGlassCard,
-  .authCard {
+  .authContainer .authCard {
     padding: 34px 22px 28px !important;
     border-radius: 22px !important;
   }
 
   .modernAuthTitle,
-  .authTitle {
+  .authContainer .authTitle {
     font-size: 26px !important;
     margin-bottom: 22px !important;
   }
