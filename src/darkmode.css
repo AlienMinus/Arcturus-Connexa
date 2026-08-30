@@ -44,6 +44,8 @@ body.dark-mode .profilePage-wrapper,
 body.dark-mode .settingsPageWrapper,
 [data-theme="dark"] .helpPageWrapper,
 body.dark-mode .helpPageWrapper,
+[data-theme="dark"] .jobsPortalWrapper,
+body.dark-mode .jobsPortalWrapper,
 [data-theme="dark"] .jobPostingWrapper,
 body.dark-mode .jobPostingWrapper,
 [data-theme="dark"] .activity-page-container,
@@ -81,7 +83,6 @@ body.dark-mode .navbar {
   border-bottom: 1px solid var(--border-color) !important;
 }
 
-/* Desktop nav center should NEVER have a top border */
 [data-theme="dark"] .navCenter,
 body.dark-mode .navCenter {
   background-color: transparent !important;
@@ -201,8 +202,6 @@ body.dark-mode .sign-out-btn:hover {
 /* ==========================================================================
    3. FEED, SIDEBARS & POST CAPTIONS
    ========================================================================== */
-
-/* Outer Sidebar Container MUST remain completely transparent */
 [data-theme="dark"] .sidebar,
 body.dark-mode .sidebar {
   background: transparent !important;
@@ -211,7 +210,6 @@ body.dark-mode .sidebar {
   box-shadow: none !important;
 }
 
-/* Individual Cards inside sidebar and feed */
 [data-theme="dark"] .card,
 body.dark-mode .card,
 [data-theme="dark"] .profileCard,
@@ -251,7 +249,6 @@ body.dark-mode .avatar {
   border-color: var(--bg-secondary) !important;
 }
 
-/* Post Caption & Body Typography */
 [data-theme="dark"] .postBody,
 body.dark-mode .postBody,
 [data-theme="dark"] .postBody p,
@@ -322,17 +319,6 @@ body.dark-mode .postModal textarea {
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .reactionsPopup,
-body.dark-mode .reactionsPopup {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-card) !important;
-}
-
-[data-theme="dark"] .tryPremiumBtn,
-body.dark-mode .tryPremiumBtn,
-[data-theme="dark"] .advertiseBtn,
-body.dark-mode .advertiseBtn,
 [data-theme="dark"] .btnOutline,
 body.dark-mode .btnOutline {
   background-color: transparent !important;
@@ -399,12 +385,8 @@ body.dark-mode .newsCard li:hover .newsTitleText {
 
 [data-theme="dark"] .newsMetaText,
 body.dark-mode .newsMetaText,
-[data-theme="dark"] .newsMetaText span,
-body.dark-mode .newsMetaText span,
 [data-theme="dark"] .puzzleItemDesc,
-body.dark-mode .puzzleItemDesc,
-[data-theme="dark"] .subTitle,
-body.dark-mode .subTitle {
+body.dark-mode .puzzleItemDesc {
   color: var(--text-muted) !important;
 }
 
@@ -492,21 +474,122 @@ body.dark-mode .zipClueWord {
   border: 2px dashed var(--border-color) !important;
 }
 
-[data-theme="dark"] .newsCard li,
-body.dark-mode .newsCard li {
-  border-bottom-color: var(--border-color) !important;
+/* ==========================================================================
+   5. MESSAGING PAGE & FLOATING MESSENGER
+   ========================================================================== */
+[data-theme="dark"] .messaging-page-container,
+body.dark-mode .messaging-page-container {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
-[data-theme="dark"] .footerLinks,
-body.dark-mode .footerLinks,
-[data-theme="dark"] .linksRow span,
-body.dark-mode .linksRow span {
+[data-theme="dark"] .messaging-sidebar,
+body.dark-mode .messaging-sidebar {
+  background-color: var(--bg-secondary) !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-sidebar-header,
+body.dark-mode .messaging-sidebar-header {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-sidebar-header h2,
+body.dark-mode .messaging-sidebar-header h2 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .msgActionIconBtn,
+body.dark-mode .msgActionIconBtn {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .msgActionIconBtn:hover,
+body.dark-mode .msgActionIconBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .messagingHeaderMenu,
+body.dark-mode .messagingHeaderMenu,
+[data-theme="dark"] .messengerOptionsMenu,
+body.dark-mode .messengerOptionsMenu,
+[data-theme="dark"] .messengerFilterDropdown,
+body.dark-mode .messengerFilterDropdown {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .messagingHeaderMenu button,
+body.dark-mode .messagingHeaderMenu button,
+[data-theme="dark"] .messagingHeaderMenu a,
+body.dark-mode .messagingHeaderMenu a,
+[data-theme="dark"] .messengerOptionsMenu button,
+body.dark-mode .messengerOptionsMenu button,
+[data-theme="dark"] .messengerOptionsMenu a,
+body.dark-mode .messengerOptionsMenu a,
+[data-theme="dark"] .messengerFilterDropdown button,
+body.dark-mode .messengerFilterDropdown button {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .messagingHeaderMenu button:hover,
+body.dark-mode .messagingHeaderMenu button:hover,
+[data-theme="dark"] .messagingHeaderMenu a:hover,
+body.dark-mode .messagingHeaderMenu a:hover,
+[data-theme="dark"] .messengerOptionsMenu button:hover,
+body.dark-mode .messengerOptionsMenu button:hover,
+[data-theme="dark"] .messengerOptionsMenu a:hover,
+body.dark-mode .messengerOptionsMenu a:hover,
+[data-theme="dark"] .messengerFilterDropdown button:hover,
+body.dark-mode .messengerFilterDropdown button:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .messaging-search-container,
+body.dark-mode .messaging-search-container {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-list-container,
+body.dark-mode .messaging-list-container {
+  background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .messaging-list-container .conversationItem,
+body.dark-mode .messaging-list-container .conversationItem {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-main,
+body.dark-mode .messaging-main {
+  background-color: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] .messaging-empty-state,
+body.dark-mode .messaging-empty-state {
   color: var(--text-muted) !important;
 }
 
-/* ==========================================================================
-   5. FLOATING MESSENGER & SEARCH BOX
-   ========================================================================== */
+[data-theme="dark"] .messaging-empty-state h2,
+body.dark-mode .messaging-empty-state h2 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .messaging-empty-state p,
+body.dark-mode .messaging-empty-state p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .composeContainer,
+body.dark-mode .composeContainer {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Floating Messenger */
 [data-theme="dark"] .messenger,
 body.dark-mode .messenger {
   background-color: var(--bg-secondary) !important;
@@ -522,7 +605,6 @@ body.dark-mode .messengerHeader {
   color: var(--text-primary) !important;
 }
 
-/* Message Search Box */
 [data-theme="dark"] .messageSearchWrapper,
 body.dark-mode .messageSearchWrapper {
   background-color: var(--bg-primary) !important;
@@ -558,13 +640,10 @@ body.dark-mode .messageSearch input::placeholder {
 [data-theme="dark"] .messageSearchIcon,
 body.dark-mode .messageSearchIcon,
 [data-theme="dark"] .messageSearchFilterIcon,
-body.dark-mode .messageSearchFilterIcon,
-[data-theme="dark"] .messageSearch svg,
-body.dark-mode .messageSearch svg {
+body.dark-mode .messageSearchFilterIcon {
   color: var(--text-muted) !important;
 }
 
-/* Tabs & Conversation List */
 [data-theme="dark"] .messageTabs,
 body.dark-mode .messageTabs {
   background-color: var(--bg-primary) !important;
@@ -627,14 +706,25 @@ body.dark-mode .chatMessages {
   background-color: var(--bg-primary) !important;
 }
 
+[data-theme="dark"] .messageBubble.received,
+body.dark-mode .messageBubble.received {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .messageBubble.sent,
+body.dark-mode .messageBubble.sent {
+  background-color: #0a66c2 !important;
+  color: #ffffff !important;
+}
+
 [data-theme="dark"] .chatInputArea,
 body.dark-mode .chatInputArea {
   background-color: var(--bg-secondary) !important;
   border-top: 1px solid var(--border-color) !important;
 }
 
-[data-theme="dark"] .chatInputArea input,
-body.dark-mode .chatInputArea input,
 [data-theme="dark"] .chatInputArea textarea,
 body.dark-mode .chatInputArea textarea {
   background-color: var(--bg-input) !important;
@@ -642,8 +732,43 @@ body.dark-mode .chatInputArea textarea {
   color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .newMessageModal,
+body.dark-mode .newMessageModal {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .newMessageHeader,
+body.dark-mode .newMessageHeader {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .receiverInput input,
+body.dark-mode .receiverInput input {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .suggestedUser:hover,
+body.dark-mode .suggestedUser:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .suggestedUserName,
+body.dark-mode .suggestedUserName {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .suggestedUserHeadline,
+body.dark-mode .suggestedUserHeadline {
+  color: #94a3b8 !important;
+}
+
 /* ==========================================================================
-   6. PROFILE PAGE (FULL THEME OVERHAUL)
+   6. PROFILE PAGE
    ========================================================================== */
 [data-theme="dark"] .profileHeaderCard,
 body.dark-mode .profileHeaderCard,
@@ -780,31 +905,205 @@ body.dark-mode .sectionFooter {
   border-top-color: var(--border-color) !important;
 }
 
-[data-theme="dark"] .viewAllButton,
-body.dark-mode .viewAllButton {
-  color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] .viewAllButton:hover,
-body.dark-mode .viewAllButton:hover {
-  background-color: var(--bg-hover) !important;
+/* ==========================================================================
+   7. JOBS PORTAL & DETAILS
+   ========================================================================== */
+[data-theme="dark"] .jobsFilterBar,
+body.dark-mode .jobsFilterBar,
+[data-theme="dark"] .jobCard,
+body.dark-mode .jobCard,
+[data-theme="dark"] .jobDetailsCard,
+body.dark-mode .jobDetailsCard,
+[data-theme="dark"] .jobDetailsPlaceholder,
+body.dark-mode .jobDetailsPlaceholder,
+[data-theme="dark"] .jobsLoadingCard,
+body.dark-mode .jobsLoadingCard,
+[data-theme="dark"] .jobsEmptyCard,
+body.dark-mode .jobsEmptyCard {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .connectionCardLink:hover,
-body.dark-mode .connectionCardLink:hover {
+[data-theme="dark"] .jobCard:hover,
+body.dark-mode .jobCard:hover {
   background-color: var(--bg-hover) !important;
+  border-color: var(--accent-blue) !important;
 }
 
-[data-theme="dark"] .sectionItemIconPlaceholder,
-body.dark-mode .sectionItemIconPlaceholder {
+[data-theme="dark"] .jobCardTitle,
+body.dark-mode .jobCardTitle,
+[data-theme="dark"] .detailsCompanyRow h2,
+body.dark-mode .detailsCompanyRow h2,
+[data-theme="dark"] .jobDetailsPlaceholder h3,
+body.dark-mode .jobDetailsPlaceholder h3,
+[data-theme="dark"] .jobsEmptyCard h3,
+body.dark-mode .jobsEmptyCard h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .jobCompanyName,
+body.dark-mode .jobCompanyName,
+[data-theme="dark"] .detailsCompanyName,
+body.dark-mode .detailsCompanyName {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .jobCardMeta,
+body.dark-mode .jobCardMeta,
+[data-theme="dark"] .detailsMetaRow,
+body.dark-mode .detailsMetaRow,
+[data-theme="dark"] .jobPostedTime,
+body.dark-mode .jobPostedTime,
+[data-theme="dark"] .jobDetailsPlaceholder p,
+body.dark-mode .jobDetailsPlaceholder p,
+[data-theme="dark"] .jobsEmptyCard p,
+body.dark-mode .jobsEmptyCard p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .workplaceBadge,
+body.dark-mode .workplaceBadge,
+[data-theme="dark"] .jobSkillTag,
+body.dark-mode .jobSkillTag,
+[data-theme="dark"] .detailsSkillPill,
+body.dark-mode .detailsSkillPill {
   background-color: var(--bg-primary) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-muted) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .typeChip,
+body.dark-mode .typeChip,
+[data-theme="dark"] .manageListingsBtn,
+body.dark-mode .manageListingsBtn,
+[data-theme="dark"] .detailsSaveBtn,
+body.dark-mode .detailsSaveBtn {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .typeChip:hover,
+body.dark-mode .typeChip:hover,
+[data-theme="dark"] .manageListingsBtn:hover,
+body.dark-mode .manageListingsBtn:hover,
+[data-theme="dark"] .detailsSaveBtn:hover,
+body.dark-mode .detailsSaveBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .typeChip.active,
+body.dark-mode .typeChip.active {
+  background-color: var(--accent-blue) !important;
+  color: #0f172a !important;
+  border-color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .jobCardSalary,
+body.dark-mode .jobCardSalary {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border: 1px solid #10b981 !important;
+  color: #34d399 !important;
+}
+
+[data-theme="dark"] .detailsDescriptionText,
+body.dark-mode .detailsDescriptionText {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .jobCardBottom,
+body.dark-mode .jobCardBottom {
+  border-top-color: var(--border-color) !important;
 }
 
 /* ==========================================================================
-   7. SETTINGS & PRIVACY PAGE
+   8. JOB POSTING & RECRUITER ACCOUNT
+   ========================================================================== */
+[data-theme="dark"] .jobPostingTopBar,
+body.dark-mode .jobPostingTopBar,
+[data-theme="dark"] .jobPostCard,
+body.dark-mode .jobPostCard,
+[data-theme="dark"] .jobListingCard,
+body.dark-mode .jobListingCard,
+[data-theme="dark"] .emptyJobsBox,
+body.dark-mode .emptyJobsBox {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .jobPostingTopBar h2,
+body.dark-mode .jobPostingTopBar h2,
+[data-theme="dark"] .jobCardHeader h3,
+body.dark-mode .jobCardHeader h3,
+[data-theme="dark"] .jobPrimary h4,
+body.dark-mode .jobPrimary h4,
+[data-theme="dark"] .emptyJobsBox h3,
+body.dark-mode .emptyJobsBox h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .jobCardHeader p,
+body.dark-mode .jobCardHeader p,
+[data-theme="dark"] .jobMetaRow,
+body.dark-mode .jobMetaRow,
+[data-theme="dark"] .jobListingDesc,
+body.dark-mode .jobListingDesc,
+[data-theme="dark"] .applicantCount,
+body.dark-mode .applicantCount,
+[data-theme="dark"] .emptyJobsBox p,
+body.dark-mode .emptyJobsBox p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .jobBackBtn,
+body.dark-mode .jobBackBtn,
+[data-theme="dark"] .jobTabBtn,
+body.dark-mode .jobTabBtn {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .jobBackBtn:hover,
+body.dark-mode .jobBackBtn:hover,
+[data-theme="dark"] .jobTabBtn:hover,
+body.dark-mode .jobTabBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .jobTabBtn.active,
+body.dark-mode .jobTabBtn.active {
+  background-color: var(--accent-blue-bg) !important;
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .jobStatusPill,
+body.dark-mode .jobStatusPill {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border: 1px solid #10b981 !important;
+  color: #34d399 !important;
+}
+
+[data-theme="dark"] .jobDeleteBtn,
+body.dark-mode .jobDeleteBtn {
+  background-color: transparent !important;
+  border: 1px solid #ef4444 !important;
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .jobDeleteBtn:hover,
+body.dark-mode .jobDeleteBtn:hover {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+/* ==========================================================================
+   9. SETTINGS & PRIVACY PAGE
    ========================================================================== */
 [data-theme="dark"] .settingsTopBar,
 body.dark-mode .settingsTopBar,
@@ -905,7 +1204,7 @@ body.dark-mode .badgeActive {
 }
 
 /* ==========================================================================
-   8. HELP & SUPPORT PAGE
+   10. HELP & SUPPORT PAGE
    ========================================================================== */
 [data-theme="dark"] .helpBackBtn,
 body.dark-mode .helpBackBtn {
@@ -1010,7 +1309,7 @@ body.dark-mode .ticketHeader p {
 }
 
 /* ==========================================================================
-   9. ACTIVITIES PAGE
+   11. ACTIVITIES PAGE
    ========================================================================== */
 [data-theme="dark"] .activity-user-header,
 body.dark-mode .activity-user-header,
@@ -1097,7 +1396,31 @@ body.dark-mode .activity-empty-state p {
 }
 
 /* ==========================================================================
-   10. MY NETWORK & NOTIFICATIONS
+   12. UNDER CONSTRUCTION PAGES (LEARNING & ADVERTISE)
+   ========================================================================== */
+[data-theme="dark"] .underConstructionCard,
+body.dark-mode .underConstructionCard,
+[data-theme="dark"] .highlightsBox,
+body.dark-mode .highlightsBox {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .constructionTitle,
+body.dark-mode .constructionTitle {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .constructionSubtitle,
+body.dark-mode .constructionSubtitle,
+[data-theme="dark"] .highlightItem span,
+body.dark-mode .highlightItem span {
+  color: #cbd5e1 !important;
+}
+
+/* ==========================================================================
+   13. MY NETWORK & NOTIFICATIONS
    ========================================================================== */
 [data-theme="dark"] .networkHeader h1,
 body.dark-mode .networkHeader h1,
@@ -1177,7 +1500,7 @@ body.dark-mode .notificationItem.unread {
 }
 
 /* ==========================================================================
-   11. GLOBAL FORM CONTROLS & SPINNERS
+   14. GLOBAL FORM CONTROLS & SPINNERS
    ========================================================================== */
 [data-theme="dark"] .formGroup label,
 body.dark-mode .formGroup label {
@@ -1204,7 +1527,9 @@ body.dark-mode .skillChip {
 
 /* Spinners */
 [data-theme="dark"] .activity-loading-spinner,
-body.dark-mode .activity-loading-spinner {
+body.dark-mode .activity-loading-spinner,
+[data-theme="dark"] .jobsSpinner,
+body.dark-mode .jobsSpinner {
   border-color: #334155 !important;
   border-top-color: var(--accent-blue) !important;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FaBriefcase, 
@@ -13,6 +13,8 @@ import {
   FaTrashAlt, 
   FaTags 
 } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
+import { buildApiUrl } from '../../utils/api';
 import './JobPostingPage.css';
 
 const INITIAL_JOBS = [
@@ -45,8 +47,11 @@ const INITIAL_JOBS = [
 ];
 
 const JobPostingPage = () => {
+  const { token, user } = useAuth();
   const [activeTab, setActiveTab] = useState('post'); // 'post' or 'manage'
-  const [jobListings, setJobListings] = useState(INITIAL_JOBS);
+  const [jobListings, setJobListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   const [form, setForm] = useState({
@@ -64,33 +69,111 @@ const JobPostingPage = () => {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
-  const handlePostJob = (e) => {
+  const fetchMyListings = async () => {
+    setLoading(true);
+    try {
+      if (token) {
+        const res = await fetch(buildApiUrl('/jobs/my-listings'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.jobs && data.jobs.length > 0) {
+            setJobListings(data.jobs);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+      setJobListings(INITIAL_JOBS);
+    } catch (err) {
+      console.error('Failed to fetch job listings:', err);
+      setJobListings(INITIAL_JOBS);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyListings();
+  }, [token]);
+
+  const handlePostJob = async (e) => {
     e.preventDefault();
     if (!form.title || !form.company) return;
 
-    const newJob = {
-      id: `job-${Date.now()}`,
-      title: form.title,
-      company: form.company,
-      location: form.location || 'Remote',
-      type: form.type,
-      salary: form.salary || 'Competitive',
-      applicants: 0,
-      postedDate: 'Just now',
-      status: 'Active',
-      skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
-      description: form.description,
-    };
+    setSubmitting(true);
+    try {
+      if (token) {
+        const res = await fetch(buildApiUrl('/jobs'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: form.title,
+            company: form.company,
+            location: form.location || 'Remote',
+            employmentType: form.type,
+            salary: form.salary,
+            skills: form.skills,
+            description: form.description,
+          }),
+        });
 
-    setJobListings([newJob, ...jobListings]);
-    setForm({ title: '', company: '', location: '', type: 'Full-time', salary: '', skills: '', description: '' });
-    showToast('Job posting published successfully! 🎉');
-    setActiveTab('manage');
+        const data = await res.json();
+        if (res.ok && data.job) {
+          setJobListings([data.job, ...jobListings]);
+          setForm({ title: '', company: '', location: '', type: 'Full-time', salary: '', skills: '', description: '' });
+          showToast('Job posting published successfully to Arcturus Jobs! 🎉');
+          setActiveTab('manage');
+          return;
+        }
+      }
+
+      // Local fallback if offline/no token
+      const newJob = {
+        id: `job-${Date.now()}`,
+        _id: `job-${Date.now()}`,
+        title: form.title,
+        company: form.company,
+        location: form.location || 'Remote',
+        type: form.type,
+        salary: form.salary || 'Competitive',
+        applicants: 0,
+        postedDate: 'Just now',
+        status: 'Active',
+        skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
+        description: form.description,
+      };
+
+      setJobListings([newJob, ...jobListings]);
+      setForm({ title: '', company: '', location: '', type: 'Full-time', salary: '', skills: '', description: '' });
+      showToast('Job posting published successfully! 🎉');
+      setActiveTab('manage');
+    } catch (err) {
+      console.error('Failed to post job:', err);
+      showToast('Error publishing job listing.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteJob = (id) => {
-    setJobListings((prev) => prev.filter((j) => j.id !== id));
-    showToast('Job listing removed.');
+  const handleDeleteJob = async (id) => {
+    try {
+      if (token && id && !id.toString().startsWith('job-')) {
+        await fetch(buildApiUrl(`/jobs/${id}`), {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      setJobListings((prev) => prev.filter((j) => (j._id || j.id) !== id));
+      showToast('Job listing removed.');
+    } catch (err) {
+      console.error('Delete job error:', err);
+      showToast('Failed to delete listing.');
+    }
   };
 
   return (
@@ -217,8 +300,8 @@ const JobPostingPage = () => {
               </div>
 
               <div className="jobFormActions">
-                <button type="submit" className="publishJobBtn">
-                  <FaPlus size={13} /> <span>Publish Job Listing</span>
+                <button type="submit" className="publishJobBtn" disabled={submitting}>
+                  <FaPlus size={13} /> <span>{submitting ? 'Publishing...' : 'Publish Job Listing'}</span>
                 </button>
               </div>
             </form>
@@ -239,56 +322,61 @@ const JobPostingPage = () => {
               </div>
             ) : (
               <div className="jobCardsList">
-                {jobListings.map((job) => (
-                  <div key={job.id} className="jobListingCard">
-                    <div className="jobCardTop">
-                      <div className="jobPrimary">
-                        <h4>{job.title}</h4>
-                        <div className="jobMetaRow">
-                          <span><FaBuilding /> {job.company}</span>
-                          <span><FaMapMarkerAlt /> {job.location}</span>
-                          <span><FaClock /> {job.type}</span>
-                          {job.salary && <span><FaMoneyBillWave /> {job.salary}</span>}
+                {jobListings.map((job) => {
+                  const jobId = job._id || job.id;
+                  const applicantCount = Array.isArray(job.applicants) ? job.applicants.length : (job.applicants || 0);
+
+                  return (
+                    <div key={jobId} className="jobListingCard">
+                      <div className="jobCardTop">
+                        <div className="jobPrimary">
+                          <h4>{job.title}</h4>
+                          <div className="jobMetaRow">
+                            <span><FaBuilding /> {job.company}</span>
+                            <span><FaMapMarkerAlt /> {job.location}</span>
+                            <span><FaClock /> {job.employmentType || job.type}</span>
+                            {job.salary && <span><FaMoneyBillWave /> {job.salary}</span>}
+                          </div>
+                        </div>
+
+                        <div className="jobStatusPill">
+                          <span className="statusDot"></span>
+                          <span>Active</span>
                         </div>
                       </div>
 
-                      <div className="jobStatusPill">
-                        <span className="statusDot"></span>
-                        <span>{job.status}</span>
+                      {job.description && (
+                        <p className="jobListingDesc">{job.description}</p>
+                      )}
+
+                      {job.skills && job.skills.length > 0 && (
+                        <div className="jobSkillsRow">
+                          {job.skills.map((skill, i) => (
+                            <span key={i} className="skillChip">{skill}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="jobCardBottom">
+                        <div className="applicantCount">
+                          <FaUsers />
+                          <span><strong>{applicantCount}</strong> candidates applied</span>
+                        </div>
+
+                        <div className="jobActionBtns">
+                          <button
+                            type="button"
+                            className="jobDeleteBtn"
+                            onClick={() => handleDeleteJob(jobId)}
+                            title="Close & remove this job"
+                          >
+                            <FaTrashAlt size={12} /> <span>Close Job</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-
-                    {job.description && (
-                      <p className="jobListingDesc">{job.description}</p>
-                    )}
-
-                    {job.skills && job.skills.length > 0 && (
-                      <div className="jobSkillsRow">
-                        {job.skills.map((skill, i) => (
-                          <span key={i} className="skillChip">{skill}</span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="jobCardBottom">
-                      <div className="applicantCount">
-                        <FaUsers />
-                        <span><strong>{job.applicants}</strong> candidates applied · Posted {job.postedDate}</span>
-                      </div>
-
-                      <div className="jobActionBtns">
-                        <button
-                          type="button"
-                          className="jobDeleteBtn"
-                          onClick={() => handleDeleteJob(job.id)}
-                          title="Close & remove this job"
-                        >
-                          <FaTrashAlt size={12} /> <span>Close Job</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -299,4 +387,3 @@ const JobPostingPage = () => {
 };
 
 export default JobPostingPage;
-
