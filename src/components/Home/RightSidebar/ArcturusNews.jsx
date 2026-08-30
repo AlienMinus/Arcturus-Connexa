@@ -121,7 +121,7 @@ const ArcturusNews = () => {
   return (
     <div className="card newsCard">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-        <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "600", color: "#191919" }}>Arcturus News</h3>
+        <h3 className="newsHeaderTitle">Arcturus News</h3>
         <button
           type="button"
           onClick={fetchLiveNewsFromInternet}
@@ -210,22 +210,11 @@ const ArcturusNews = () => {
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div 
-                    style={{ 
-                      fontSize: "13.5px", 
-                      fontWeight: "600", 
-                      color: "#1e293b",
-                      lineHeight: "1.35",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                    }}
                     className="newsTitleText"
                   >
                     {item.title}
                   </div>
-                  <div style={{ fontSize: "11.5px", color: "#64748b", marginTop: "3px", display: "flex", gap: "6px", alignItems: "center" }}>
+                  <div className="newsMetaText" style={{ fontSize: "11.5px", color: "#64748b", marginTop: "3px", display: "flex", gap: "6px", alignItems: "center" }}>
                     <span>{item.timeAgo || "Recent"}</span>
                     <span>•</span>
                     <span>{item.readers || item.source || "Tech"}</span>

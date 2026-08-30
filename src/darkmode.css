@@ -54,7 +54,7 @@ body.dark-mode .notFoundWrapper {
   color: var(--text-primary) !important;
 }
 
-/* Global Headings & Paragraphs in Dark Mode */
+/* Global Headings in Dark Mode */
 [data-theme="dark"] h1,
 body.dark-mode h1,
 [data-theme="dark"] h2,
@@ -64,13 +64,6 @@ body.dark-mode h3,
 [data-theme="dark"] h4,
 body.dark-mode h4 {
   color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] p,
-body.dark-mode p,
-[data-theme="dark"] span,
-body.dark-mode span {
-  color: inherit;
 }
 
 /* ==========================================================================
@@ -163,22 +156,57 @@ body.dark-mode .view-profile-btn:hover {
 }
 
 /* ==========================================================================
-   3. FEED, POSTS & SIDEBARS
+   3. FEED, POST CAPTIONS & AUTHOR HEADERS
    ========================================================================== */
 [data-theme="dark"] .card,
 body.dark-mode .card,
 [data-theme="dark"] .sidebar,
 body.dark-mode .sidebar,
-[data-theme="dark"] .rightSidebar .card,
-body.dark-mode .rightSidebar .card,
 [data-theme="dark"] .profileCard,
 body.dark-mode .profileCard,
 [data-theme="dark"] .feed .card,
-body.dark-mode .feed .card {
+body.dark-mode .feed .card,
+[data-theme="dark"] .postCard,
+body.dark-mode .postCard {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
   color: var(--text-primary) !important;
+}
+
+/* Post Caption & Body Typography */
+[data-theme="dark"] .postBody,
+body.dark-mode .postBody,
+[data-theme="dark"] .postBody p,
+body.dark-mode .postBody p,
+[data-theme="dark"] .postBody span,
+body.dark-mode .postBody span {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .hashtag,
+body.dark-mode .hashtag {
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .postInfo h2,
+body.dark-mode .postInfo h2 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .postInfo p,
+body.dark-mode .postInfo p,
+[data-theme="dark"] .postStats,
+body.dark-mode .postStats,
+[data-theme="dark"] .repostLabel,
+body.dark-mode .repostLabel {
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .postActionOptions,
+body.dark-mode .postActionOptions {
+  border-top-color: var(--border-color) !important;
 }
 
 [data-theme="dark"] .postInput,
@@ -234,7 +262,67 @@ body.dark-mode .advertiseBtn {
 }
 
 /* ==========================================================================
-   4. FLOATING MESSENGER & CHAT WINDOW
+   4. RIGHT SIDEBAR & NEWS HEADLINES
+   ========================================================================== */
+[data-theme="dark"] .rightSidebar .card,
+body.dark-mode .rightSidebar .card,
+[data-theme="dark"] .newsCard,
+body.dark-mode .newsCard {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .newsHeaderTitle,
+body.dark-mode .newsHeaderTitle,
+[data-theme="dark"] .newsCard h3,
+body.dark-mode .newsCard h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .newsTitleText,
+body.dark-mode .newsTitleText {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .newsCard li:hover .newsTitleText,
+body.dark-mode .newsCard li:hover .newsTitleText {
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .newsMetaText,
+body.dark-mode .newsMetaText,
+[data-theme="dark"] .newsMetaText span,
+body.dark-mode .newsMetaText span,
+[data-theme="dark"] .subTitle,
+body.dark-mode .subTitle {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .newsCard li,
+body.dark-mode .newsCard li {
+  border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .puzzleItem,
+body.dark-mode .puzzleItem {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .puzzleItem svg,
+body.dark-mode .puzzleItem svg {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .footerLinks,
+body.dark-mode .footerLinks,
+[data-theme="dark"] .linksRow span,
+body.dark-mode .linksRow span {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================================================
+   5. FLOATING MESSENGER & SEARCH BOX
    ========================================================================== */
 [data-theme="dark"] .messenger,
 body.dark-mode .messenger {
@@ -251,18 +339,49 @@ body.dark-mode .messengerHeader {
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .messageSearch,
-body.dark-mode .messageSearch {
+/* Message Search Box */
+[data-theme="dark"] .messageSearchWrapper,
+body.dark-mode .messageSearchWrapper {
   background-color: var(--bg-primary) !important;
 }
 
-[data-theme="dark"] .messageSearch input,
-body.dark-mode .messageSearch input {
+[data-theme="dark"] .messageSearch,
+body.dark-mode .messageSearch {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .messageSearch:focus-within,
+body.dark-mode .messageSearch:focus-within {
+  border-color: var(--accent-blue) !important;
+  background-color: var(--bg-input) !important;
+}
+
+[data-theme="dark"] .messageSearchInput,
+body.dark-mode .messageSearchInput,
+[data-theme="dark"] .messageSearch input,
+body.dark-mode .messageSearch input {
+  color: #f8fafc !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .messageSearchInput::placeholder,
+body.dark-mode .messageSearchInput::placeholder,
+[data-theme="dark"] .messageSearch input::placeholder,
+body.dark-mode .messageSearch input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .messageSearchIcon,
+body.dark-mode .messageSearchIcon,
+[data-theme="dark"] .messageSearchFilterIcon,
+body.dark-mode .messageSearchFilterIcon,
+[data-theme="dark"] .messageSearch svg,
+body.dark-mode .messageSearch svg {
+  color: var(--text-muted) !important;
+}
+
+/* Tabs & Conversation List */
 [data-theme="dark"] .messageTabs,
 body.dark-mode .messageTabs {
   background-color: var(--bg-primary) !important;
@@ -341,7 +460,7 @@ body.dark-mode .chatInputArea textarea {
 }
 
 /* ==========================================================================
-   5. DEDICATED MESSAGING PAGE
+   6. DEDICATED MESSAGING PAGE
    ========================================================================== */
 [data-theme="dark"] .messaging-page-container,
 body.dark-mode .messaging-page-container {
@@ -422,7 +541,7 @@ body.dark-mode .empty-state-logo {
 }
 
 /* ==========================================================================
-   6. MY NETWORK PAGE
+   7. MY NETWORK PAGE
    ========================================================================== */
 [data-theme="dark"] .networkHeader h1,
 body.dark-mode .networkHeader h1 {
@@ -491,7 +610,7 @@ body.dark-mode .networkDetails p {
 }
 
 /* ==========================================================================
-   7. NOTIFICATIONS PAGE
+   8. NOTIFICATIONS PAGE
    ========================================================================== */
 [data-theme="dark"] .notificationsPage h1,
 body.dark-mode .notificationsPage h1 {
@@ -533,7 +652,7 @@ body.dark-mode .notificationItem.unread {
 }
 
 /* ==========================================================================
-   8. SETTINGS & PRIVACY PAGE
+   9. SETTINGS & PRIVACY PAGE
    ========================================================================== */
 [data-theme="dark"] .settingsTopBar,
 body.dark-mode .settingsTopBar,
@@ -609,7 +728,7 @@ body.dark-mode .settingsBackBtn {
 }
 
 /* ==========================================================================
-   9. HELP & SUPPORT, JOB POSTING, UNDER CONSTRUCTION, 404
+   10. HELP & SUPPORT, JOB POSTING, UNDER CONSTRUCTION, 404
    ========================================================================== */
 [data-theme="dark"] .categoryCard,
 body.dark-mode .categoryCard,

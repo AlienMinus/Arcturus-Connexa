@@ -194,13 +194,14 @@
 }
 
 .postBody {
-  font-size: 14px;
+  font-size: 14.5px;
   line-height: 1.55;
   color: #191919;
   margin-bottom: 8px;
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;
+  word-break: break-word;
 }
 
 .postBody p {
@@ -208,6 +209,14 @@
   text-justify: inter-word;
   hyphens: auto;
   line-height: 1.55;
+  color: inherit;
+  margin: 0;
+}
+
+.hashtag {
+  color: #0a66c2;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .postImage {

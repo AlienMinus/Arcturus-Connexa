@@ -66,22 +66,47 @@
 }
 
 /* SEARCH */
-.messageSearch {
+.messageSearchWrapper {
   padding: 8px 12px;
+  background: #ffffff;
 }
 
-.messageSearch input {
-  width: 100%;
-  padding: 8px 12px;
+.messageSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: #eef3f8;
   border-radius: 20px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.messageSearch:focus-within {
+  border-color: #0a66c2;
+  background-color: #ffffff;
+}
+
+.messageSearchIcon,
+.messageSearchFilterIcon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.messageSearchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
   outline: none;
   font-family: inherit;
   font-size: 13.5px;
+  color: #191919;
+  padding: 2px 0;
+  width: 100%;
 }
 
-.messageSearch input:focus {
-  border-color: #0a66c2;
+.messageSearchInput::placeholder {
+  color: #64748b;
 }
 
 /* TABS */
