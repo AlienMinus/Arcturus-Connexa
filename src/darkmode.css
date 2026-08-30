@@ -46,6 +46,8 @@ body.dark-mode .settingsPageWrapper,
 body.dark-mode .helpPageWrapper,
 [data-theme="dark"] .jobPostingWrapper,
 body.dark-mode .jobPostingWrapper,
+[data-theme="dark"] .activity-page-container,
+body.dark-mode .activity-page-container,
 [data-theme="dark"] .underConstructionWrapper,
 body.dark-mode .underConstructionWrapper,
 [data-theme="dark"] .notFoundWrapper,
@@ -62,7 +64,11 @@ body.dark-mode h2,
 [data-theme="dark"] h3,
 body.dark-mode h3,
 [data-theme="dark"] h4,
-body.dark-mode h4 {
+body.dark-mode h4,
+[data-theme="dark"] h5,
+body.dark-mode h5,
+[data-theme="dark"] h6,
+body.dark-mode h6 {
   color: var(--text-primary) !important;
 }
 
@@ -75,10 +81,11 @@ body.dark-mode .navbar {
   border-bottom: 1px solid var(--border-color) !important;
 }
 
+/* Desktop nav center should NEVER have a top border */
 [data-theme="dark"] .navCenter,
 body.dark-mode .navCenter {
-  background-color: var(--bg-secondary) !important;
-  border-top: 1px solid var(--border-color) !important;
+  background-color: transparent !important;
+  border-top: none !important;
 }
 
 [data-theme="dark"] .navItem,
@@ -114,7 +121,7 @@ body.dark-mode .advertise {
   color: var(--text-muted) !important;
 }
 
-/* Dropdown Menu */
+/* Dropdown Menu Modal */
 [data-theme="dark"] .profile-dropdown,
 body.dark-mode .profile-dropdown {
   background-color: var(--bg-secondary) !important;
@@ -144,9 +151,18 @@ body.dark-mode .profile-dropdown-header .user-info p {
 }
 
 [data-theme="dark"] .profile-dropdown-section h5,
-body.dark-mode .profile-dropdown-section h5 {
+body.dark-mode .profile-dropdown-section h5,
+[data-theme="dark"] .profile-dropdown h5,
+body.dark-mode .profile-dropdown h5 {
   color: #f8fafc !important;
+  font-size: 13.5px !important;
   font-weight: 700 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  padding: 8px 16px 4px !important;
+  letter-spacing: 0.01em !important;
 }
 
 [data-theme="dark"] .profile-dropdown-list li a,
@@ -186,9 +202,10 @@ body.dark-mode .sign-out-btn:hover {
    3. FEED, SIDEBARS & POST CAPTIONS
    ========================================================================== */
 
-/* Outer Sidebar Container must remain transparent */
+/* Outer Sidebar Container MUST remain completely transparent */
 [data-theme="dark"] .sidebar,
 body.dark-mode .sidebar {
+  background: transparent !important;
   background-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -203,6 +220,8 @@ body.dark-mode .profileCard,
 body.dark-mode .analyticsCard,
 [data-theme="dark"] .companyCard,
 body.dark-mode .companyCard,
+[data-theme="dark"] .quickLinks,
+body.dark-mode .quickLinks,
 [data-theme="dark"] .quickLinksCard,
 body.dark-mode .quickLinksCard,
 [data-theme="dark"] .feed .card,
@@ -224,6 +243,7 @@ body.dark-mode .linkItem {
 [data-theme="dark"] .linkItem:hover,
 body.dark-mode .linkItem:hover {
   background-color: var(--bg-hover) !important;
+  color: var(--accent-blue) !important;
 }
 
 [data-theme="dark"] .avatar,
@@ -315,20 +335,30 @@ body.dark-mode .tryPremiumBtn,
 body.dark-mode .advertiseBtn,
 [data-theme="dark"] .btnOutline,
 body.dark-mode .btnOutline {
-  background-color: var(--bg-input) !important;
+  background-color: transparent !important;
   border: 1px solid var(--accent-blue) !important;
   color: var(--accent-blue) !important;
 }
 
+[data-theme="dark"] .btnOutline:hover,
+body.dark-mode .btnOutline:hover {
+  background-color: var(--accent-blue-bg) !important;
+}
+
 [data-theme="dark"] .btn,
 body.dark-mode .btn {
-  background-color: var(--bg-input) !important;
+  background-color: var(--bg-hover) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border-color) !important;
 }
 
+[data-theme="dark"] .btn:hover,
+body.dark-mode .btn:hover {
+  background-color: #475569 !important;
+}
+
 /* ==========================================================================
-   4. RIGHT SIDEBAR & NEWS HEADLINES
+   4. RIGHT SIDEBAR, NEWS & PUZZLE GAMES
    ========================================================================== */
 [data-theme="dark"] .rightSidebar,
 body.dark-mode .rightSidebar {
@@ -338,7 +368,9 @@ body.dark-mode .rightSidebar {
 [data-theme="dark"] .rightSidebar .card,
 body.dark-mode .rightSidebar .card,
 [data-theme="dark"] .newsCard,
-body.dark-mode .newsCard {
+body.dark-mode .newsCard,
+[data-theme="dark"] .puzzleCard,
+body.dark-mode .puzzleCard {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
@@ -347,12 +379,16 @@ body.dark-mode .newsCard {
 [data-theme="dark"] .newsHeaderTitle,
 body.dark-mode .newsHeaderTitle,
 [data-theme="dark"] .newsCard h3,
-body.dark-mode .newsCard h3 {
+body.dark-mode .newsCard h3,
+[data-theme="dark"] .puzzleCard h4,
+body.dark-mode .puzzleCard h4 {
   color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .newsTitleText,
-body.dark-mode .newsTitleText {
+body.dark-mode .newsTitleText,
+[data-theme="dark"] .puzzleItemName,
+body.dark-mode .puzzleItemName {
   color: #f8fafc !important;
 }
 
@@ -365,24 +401,100 @@ body.dark-mode .newsCard li:hover .newsTitleText {
 body.dark-mode .newsMetaText,
 [data-theme="dark"] .newsMetaText span,
 body.dark-mode .newsMetaText span,
+[data-theme="dark"] .puzzleItemDesc,
+body.dark-mode .puzzleItemDesc,
 [data-theme="dark"] .subTitle,
 body.dark-mode .subTitle {
   color: var(--text-muted) !important;
 }
 
-[data-theme="dark"] .newsCard li,
-body.dark-mode .newsCard li {
-  border-bottom-color: var(--border-color) !important;
+[data-theme="dark"] .puzzleItem:hover,
+body.dark-mode .puzzleItem:hover {
+  background-color: var(--bg-hover) !important;
 }
 
-[data-theme="dark"] .puzzleItem,
-body.dark-mode .puzzleItem {
+[data-theme="dark"] .puzzleShowMoreBtn,
+body.dark-mode .puzzleShowMoreBtn {
+  color: var(--accent-blue) !important;
+}
+
+/* Game Modal */
+[data-theme="dark"] .gameModalContent,
+body.dark-mode .gameModalContent {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .puzzleItem svg,
-body.dark-mode .puzzleItem svg {
-  color: var(--text-muted) !important;
+[data-theme="dark"] .gameModalHeader,
+body.dark-mode .gameModalHeader {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .gameHeaderTitle,
+body.dark-mode .gameHeaderTitle,
+[data-theme="dark"] .gameTimer,
+body.dark-mode .gameTimer {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .gameInstructions,
+body.dark-mode .gameInstructions {
+  background-color: var(--bg-primary) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .gameActionBtn,
+body.dark-mode .gameActionBtn {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .gameActionBtn:hover,
+body.dark-mode .gameActionBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .sudokuCell,
+body.dark-mode .sudokuCell {
+  background-color: var(--bg-primary) !important;
+  color: #f8fafc !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .sudokuCell.prefilled,
+body.dark-mode .sudokuCell.prefilled {
+  background-color: var(--bg-secondary) !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .tangoCell,
+body.dark-mode .tangoCell {
+  background-color: var(--bg-primary) !important;
+  border: 2px solid var(--border-color) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .tangoGrid,
+body.dark-mode .tangoGrid {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .zipClueWord,
+body.dark-mode .zipClueWord {
+  background-color: var(--bg-primary) !important;
+  color: #f8fafc !important;
+  border: 2px dashed var(--border-color) !important;
+}
+
+[data-theme="dark"] .newsCard li,
+body.dark-mode .newsCard li {
+  border-bottom-color: var(--border-color) !important;
 }
 
 [data-theme="dark"] .footerLinks,
@@ -692,7 +804,7 @@ body.dark-mode .sectionItemIconPlaceholder {
 }
 
 /* ==========================================================================
-   7. SETTINGS & PRIVACY PAGE (COMPLETE DARK OVERHAUL)
+   7. SETTINGS & PRIVACY PAGE
    ========================================================================== */
 [data-theme="dark"] .settingsTopBar,
 body.dark-mode .settingsTopBar,
@@ -793,18 +905,221 @@ body.dark-mode .badgeActive {
 }
 
 /* ==========================================================================
-   8. MY NETWORK PAGE
+   8. HELP & SUPPORT PAGE
    ========================================================================== */
-[data-theme="dark"] .networkHeader h1,
-body.dark-mode .networkHeader h1 {
+[data-theme="dark"] .helpBackBtn,
+body.dark-mode .helpBackBtn {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .helpBackBtn:hover,
+body.dark-mode .helpBackBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .helpSearchBox,
+body.dark-mode .helpSearchBox {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .helpSearchBox input,
+body.dark-mode .helpSearchBox input {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .helpSearchBox input::placeholder,
+body.dark-mode .helpSearchBox input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .sectionTitle,
+body.dark-mode .sectionTitle {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .categoryCard,
+body.dark-mode .categoryCard {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .categoryCard:hover,
+body.dark-mode .categoryCard:hover {
+  background-color: var(--bg-hover) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .categoryCard h3,
+body.dark-mode .categoryCard h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .categoryCard p,
+body.dark-mode .categoryCard p {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .faqItem,
+body.dark-mode .faqItem {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .faqQuestion,
+body.dark-mode .faqQuestion {
+  color: #f8fafc !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .faqQuestion:hover,
+body.dark-mode .faqQuestion:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .faqAnswer,
+body.dark-mode .faqAnswer {
+  background-color: var(--bg-primary) !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .faqAnswer p,
+body.dark-mode .faqAnswer p {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .supportTicketCard,
+body.dark-mode .supportTicketCard {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .ticketHeader h2,
+body.dark-mode .ticketHeader h2 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .ticketHeader p,
+body.dark-mode .ticketHeader p {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================================================
+   9. ACTIVITIES PAGE
+   ========================================================================== */
+[data-theme="dark"] .activity-user-header,
+body.dark-mode .activity-user-header,
+[data-theme="dark"] .activity-empty-state,
+body.dark-mode .activity-empty-state,
+[data-theme="dark"] .activity-page.loading,
+body.dark-mode .activity-page.loading,
+[data-theme="dark"] .activity-page.error,
+body.dark-mode .activity-page.error {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .networkSectionCard,
-body.dark-mode .networkSectionCard {
+[data-theme="dark"] .activity-user-info h1,
+body.dark-mode .activity-user-info h1 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .activity-user-headline,
+body.dark-mode .activity-user-headline {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .activity-user-stats,
+body.dark-mode .activity-user-stats {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .activity-profile-summary,
+body.dark-mode .activity-profile-summary {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .tab-btn,
+body.dark-mode .tab-btn {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .tab-btn:hover,
+body.dark-mode .tab-btn:hover {
+  color: #f8fafc !important;
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .tab-btn.active,
+body.dark-mode .tab-btn.active {
+  color: var(--accent-blue) !important;
+  border-bottom-color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .tab-count,
+body.dark-mode .tab-count {
+  background-color: var(--bg-primary) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .tab-btn.active .tab-count,
+body.dark-mode .tab-btn.active .tab-count {
+  background-color: var(--accent-blue-bg) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .activity-item-badge,
+body.dark-mode .activity-item-badge {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .activity-badge-text,
+body.dark-mode .activity-badge-text {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .activity-empty-state h3,
+body.dark-mode .activity-empty-state h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .activity-empty-state p,
+body.dark-mode .activity-empty-state p {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================================================
+   10. MY NETWORK & NOTIFICATIONS
+   ========================================================================== */
+[data-theme="dark"] .networkHeader h1,
+body.dark-mode .networkHeader h1,
+[data-theme="dark"] .notificationsPage h1,
+body.dark-mode .notificationsPage h1 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notificationsBadge,
+body.dark-mode .notificationsBadge,
+[data-theme="dark"] .sectionSubtitle,
+body.dark-mode .sectionSubtitle {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .networkSectionCard,
+body.dark-mode .networkSectionCard,
+[data-theme="dark"] .notificationItem,
+body.dark-mode .notificationItem {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
   color: var(--text-primary) !important;
 }
 
@@ -814,19 +1129,19 @@ body.dark-mode .networkSectionHeader {
 }
 
 [data-theme="dark"] .networkSectionHeader h2,
-body.dark-mode .networkSectionHeader h2 {
+body.dark-mode .networkSectionHeader h2,
+[data-theme="dark"] .notificationHeader,
+body.dark-mode .notificationHeader {
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .sectionSubtitle,
-body.dark-mode .sectionSubtitle {
-  color: var(--text-muted) !important;
-}
-
 [data-theme="dark"] .profileViewerRow,
-body.dark-mode .profileViewerRow {
+body.dark-mode .profileViewerRow,
+[data-theme="dark"] .networkCard,
+body.dark-mode .networkCard {
   background-color: var(--bg-primary) !important;
   border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .profileViewerRow:hover,
@@ -835,66 +1150,24 @@ body.dark-mode .profileViewerRow:hover {
 }
 
 [data-theme="dark"] .viewerName,
-body.dark-mode .viewerName {
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .viewerHeadline,
-body.dark-mode .viewerHeadline {
-  color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] .networkCard,
-body.dark-mode .networkCard {
-  background-color: var(--bg-primary) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
+body.dark-mode .viewerName,
 [data-theme="dark"] .networkDetails h3,
 body.dark-mode .networkDetails h3 {
   color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .viewerHeadline,
+body.dark-mode .viewerHeadline,
 [data-theme="dark"] .networkDetails p,
-body.dark-mode .networkDetails p {
+body.dark-mode .networkDetails p,
+[data-theme="dark"] .notificationMeta,
+body.dark-mode .notificationMeta {
   color: var(--text-muted) !important;
-}
-
-/* ==========================================================================
-   9. NOTIFICATIONS PAGE
-   ========================================================================== */
-[data-theme="dark"] .notificationsPage h1,
-body.dark-mode .notificationsPage h1 {
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .notificationsBadge,
-body.dark-mode .notificationsBadge {
-  color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] .notificationItem,
-body.dark-mode .notificationItem {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .notificationHeader,
-body.dark-mode .notificationHeader {
-  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .notificationDesc,
 body.dark-mode .notificationDesc {
   color: var(--text-secondary) !important;
-}
-
-[data-theme="dark"] .notificationMeta,
-body.dark-mode .notificationMeta {
-  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .notificationItem.unread,
@@ -904,48 +1177,11 @@ body.dark-mode .notificationItem.unread {
 }
 
 /* ==========================================================================
-   10. HELP & SUPPORT, JOB POSTING, UNDER CONSTRUCTION, 404
+   11. GLOBAL FORM CONTROLS & SPINNERS
    ========================================================================== */
-[data-theme="dark"] .categoryCard,
-body.dark-mode .categoryCard,
-[data-theme="dark"] .faqItem,
-body.dark-mode .faqItem,
-[data-theme="dark"] .supportTicketCard,
-body.dark-mode .supportTicketCard,
-[data-theme="dark"] .jobPostingTopBar,
-body.dark-mode .jobPostingTopBar,
-[data-theme="dark"] .jobPostCard,
-body.dark-mode .jobPostCard,
-[data-theme="dark"] .jobListingCard,
-body.dark-mode .jobListingCard,
-[data-theme="dark"] .emptyJobsBox,
-body.dark-mode .emptyJobsBox,
-[data-theme="dark"] .underConstructionCard,
-body.dark-mode .underConstructionCard,
-[data-theme="dark"] .highlightsBox,
-body.dark-mode .highlightsBox,
-[data-theme="dark"] .notFoundCard,
-body.dark-mode .notFoundCard {
-  background-color: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .faqAnswer,
-body.dark-mode .faqAnswer {
-  background-color: var(--bg-primary) !important;
-  border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .faqAnswer p,
-body.dark-mode .faqAnswer p,
-[data-theme="dark"] .jobListingDesc,
-body.dark-mode .jobListingDesc,
-[data-theme="dark"] .constructionSubtitle,
-body.dark-mode .constructionSubtitle,
-[data-theme="dark"] .notFoundSubtitle,
-body.dark-mode .notFoundSubtitle {
-  color: var(--text-muted) !important;
+[data-theme="dark"] .formGroup label,
+body.dark-mode .formGroup label {
+  color: #cbd5e1 !important;
 }
 
 [data-theme="dark"] .formGroup input,
@@ -964,4 +1200,16 @@ body.dark-mode .skillChip {
   background-color: var(--bg-input) !important;
   border-color: var(--border-color) !important;
   color: var(--text-secondary) !important;
+}
+
+/* Spinners */
+[data-theme="dark"] .activity-loading-spinner,
+body.dark-mode .activity-loading-spinner {
+  border-color: #334155 !important;
+  border-top-color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .spinAnimation,
+body.dark-mode .spinAnimation {
+  color: var(--accent-blue) !important;
 }
