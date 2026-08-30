@@ -1,3 +1,7 @@
+/* ==========================================================================
+   MESSAGING PAGE STYLES (MessegingPage.css)
+   ========================================================================== */
+
 .messaging-page-container {
   display: flex;
   max-width: 1128px;
@@ -16,32 +20,99 @@
   display: flex;
   flex-direction: column;
   background: white;
+  flex-shrink: 0;
 }
 
 .messaging-sidebar-header {
-  padding: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid #ebebeb;
+}
+
+.sidebarHeaderTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .messaging-sidebar-header h2 {
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.9);
-  font-weight: 600;
+  color: #0f172a;
+  font-weight: 700;
   margin: 0;
 }
 
+.sidebarHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msgActionIconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.msgActionIconBtn:hover {
+  background: #f1f5f9;
+  color: #0a66c2;
+}
+
+.messagingHeaderMenu {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  min-width: 185px;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.messagingHeaderMenu button,
+.messagingHeaderMenu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  color: #1e293b;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.messagingHeaderMenu button:hover,
+.messagingHeaderMenu a:hover {
+  background: #f1f5f9;
+  color: #0a66c2;
+}
+
 .messaging-search-container {
-  padding: 8px;
+  padding: 8px 12px;
   border-bottom: 1px solid #ebebeb;
 }
 
 .messaging-search-container .messageSearch {
   background-color: #eef3f8;
-  border-radius: 4px;
-}
-
-.messaging-search-container input {
-  background-color: transparent !important;
+  border-radius: 20px;
 }
 
 .messaging-list-container {
@@ -49,7 +120,6 @@
   overflow-y: auto;
 }
 
-/* Make conversation items fit better in the page layout */
 .messaging-list-container .conversationItem {
   padding: 12px 16px;
   border-bottom: 1px solid #ebebeb;
@@ -59,7 +129,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #f8fafc;
   position: relative;
 }
 
@@ -69,26 +139,72 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: rgba(0, 0, 0, 0.6);
+  color: #64748b;
   text-align: center;
-  padding: 20px;
+  padding: 24px;
 }
 
 .empty-state-logo {
-  width: 80px;
-  margin-bottom: 20px;
-  opacity: 0.3;
+  width: 72px;
+  margin-bottom: 16px;
+  opacity: 0.8;
 }
 
 .messaging-empty-state h2 {
-  font-size: 20px;
-  color: rgba(0, 0, 0, 0.9);
-  margin-bottom: 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
 }
 
 .messaging-empty-state p {
-  font-size: 14px;
-  max-width: 300px;
+  font-size: 0.9rem;
+  max-width: 320px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.startNewMsgBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.startNewMsgBtn:hover {
+  background: #004182;
+}
+
+/* Embedded composer inside right pane */
+.composeContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  height: 100%;
+}
+
+.composeContainer .newMessageModal {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  bottom: auto !important;
+  right: auto !important;
+}
+
+.composeContainer .suggestedList {
+  max-height: none !important;
 }
 
 /* OVERRIDES FOR CHAT WINDOW TO FIT FULL PAGE */
@@ -107,7 +223,6 @@
 }
 
 .messaging-main .chatHeaderActions {
-  /* The conversation list remains visible on larger screens. */
   display: none;
 }
 
@@ -125,14 +240,15 @@
 }
 
 .messaging-main .chatMessages {
-  background: #fff;
+  background: #ffffff;
+  flex: 1;
 }
 
 .messaging-main .chatInputArea {
   padding: 16px;
 }
 
-/* Mobile: ensure the chat window fills the main column and message area scrolls */
+/* Mobile responsive */
 @media (max-width: 768px) {
   .messaging-page-container {
     border-radius: 0;

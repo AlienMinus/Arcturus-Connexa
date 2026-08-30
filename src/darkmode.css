@@ -519,7 +519,7 @@ body.dark-mode .messengerOptionsMenu,
 body.dark-mode .messengerFilterDropdown {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-card) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="dark"] .messagingHeaderMenu button,
@@ -530,9 +530,14 @@ body.dark-mode .messagingHeaderMenu a,
 body.dark-mode .messengerOptionsMenu button,
 [data-theme="dark"] .messengerOptionsMenu a,
 body.dark-mode .messengerOptionsMenu a,
+[data-theme="dark"] .messengerOptionItem,
+body.dark-mode .messengerOptionItem,
 [data-theme="dark"] .messengerFilterDropdown button,
-body.dark-mode .messengerFilterDropdown button {
+body.dark-mode .messengerFilterDropdown button,
+[data-theme="dark"] .messengerFilterItem,
+body.dark-mode .messengerFilterItem {
   color: #f8fafc !important;
+  background-color: transparent !important;
 }
 
 [data-theme="dark"] .messagingHeaderMenu button:hover,
@@ -543,8 +548,12 @@ body.dark-mode .messagingHeaderMenu a:hover,
 body.dark-mode .messengerOptionsMenu button:hover,
 [data-theme="dark"] .messengerOptionsMenu a:hover,
 body.dark-mode .messengerOptionsMenu a:hover,
+[data-theme="dark"] .messengerOptionItem:hover,
+body.dark-mode .messengerOptionItem:hover,
 [data-theme="dark"] .messengerFilterDropdown button:hover,
-body.dark-mode .messengerFilterDropdown button:hover {
+body.dark-mode .messengerFilterDropdown button:hover,
+[data-theme="dark"] .messengerFilterItem:hover,
+body.dark-mode .messengerFilterItem:hover {
   background-color: var(--bg-hover) !important;
   color: var(--accent-blue) !important;
 }

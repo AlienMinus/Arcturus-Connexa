@@ -76,7 +76,6 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
       <div className="headerIcons">
         <div className="headerMenuWrapper" ref={menuRef} style={{ position: "relative" }}>
           <span
-            style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen(!menuOpen);
@@ -87,78 +86,34 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
           </span>
 
           {menuOpen && (
-            <div
-              className="messengerOptionsMenu"
-              style={{
-                position: "absolute",
-                top: "28px",
-                right: "0",
-                background: "var(--bg-secondary, #ffffff)",
-                border: "1px solid var(--border-color, #e0dfdc)",
-                borderRadius: "8px",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-                zIndex: 9999,
-                minWidth: "180px",
-                padding: "6px 0",
-                fontSize: "13px"
-              }}
-            >
+            <div className="messengerOptionsMenu">
               <button
                 type="button"
+                className="messengerOptionItem"
                 onClick={handleMarkAllRead}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  width: "100%",
-                  padding: "8px 14px",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--text-primary, #1e293b)",
-                  textAlign: "left"
-                }}
               >
-                <FaCheckDouble size={12} color="#0a66c2" />
+                <FaCheckDouble size={13} color="#0a66c2" />
                 <span>Mark all as read</span>
               </button>
 
               <button
                 type="button"
+                className="messengerOptionItem"
                 onClick={() => {
                   setMenuOpen(false);
                   navigate("/messaging");
                 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  width: "100%",
-                  padding: "8px 14px",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--text-primary, #1e293b)",
-                  textAlign: "left"
-                }}
               >
-                <FaExpandAlt size={12} color="#0a66c2" />
+                <FaExpandAlt size={13} color="#0a66c2" />
                 <span>Open full messenger</span>
               </button>
 
               <Link
                 to="/settings"
+                className="messengerOptionItem"
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "8px 14px",
-                  color: "var(--text-primary, #1e293b)",
-                  textDecoration: "none"
-                }}
               >
-                <FaCog size={12} color="#64748b" />
+                <FaCog size={13} color="#64748b" />
                 <span>Messaging settings</span>
               </Link>
             </div>
@@ -170,7 +125,7 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
             e.stopPropagation();
             openNewMessage();
           }}
-          style={{ cursor: "pointer", position: "relative", display: "flex", alignItems: "center" }}
+          style={{ position: "relative" }}
           title="Compose new message"
         >
           <FaEdit />
@@ -193,7 +148,7 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
           )}
         </span>
 
-        <span style={{ cursor: "pointer", display: "flex", alignItems: "center" }} onClick={toggle} title={isOpen ? "Minimize" : "Expand"}>
+        <span onClick={toggle} title={isOpen ? "Minimize" : "Expand"}>
           {isOpen ? <FaChevronDown /> : <FaChevronUp />}
         </span>
       </div>
