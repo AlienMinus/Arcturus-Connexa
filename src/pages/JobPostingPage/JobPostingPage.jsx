@@ -11,21 +11,34 @@ import {
   FaArrowLeft, 
   FaClock, 
   FaTrashAlt, 
-  FaTags 
+  FaTags,
+  FaImage,
+  FaCheck
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import './JobPostingPage.css';
 
+const LOGO_PRESETS = [
+  { label: 'Tech / Figma', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png' },
+  { label: 'React / Web', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png' },
+  { label: 'AI / Innovation', url: 'https://cdn-icons-png.flaticon.com/512/8637/8637105.png' },
+  { label: 'Cloud / DevOps', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968853.png' },
+  { label: 'Finance / Business', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
+];
+
 const INITIAL_JOBS = [
   {
     id: 'job-1',
+    _id: 'job-1',
     title: 'Senior Frontend Engineer (React & TypeScript)',
     company: 'Arcturus Labs',
+    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
     location: 'Bengaluru, India · Hybrid',
     type: 'Full-time',
+    employmentType: 'Full-time',
     salary: '₹22,00,000 - ₹30,00,000 / yr',
-    applicants: 18,
+    applicants: [{}, {}, {}, {}],
     postedDate: '2 days ago',
     status: 'Active',
     skills: ['React', 'TypeScript', 'Redux', 'CSS3', 'WebSockets'],
@@ -33,13 +46,16 @@ const INITIAL_JOBS = [
   },
   {
     id: 'job-2',
+    _id: 'job-2',
     title: 'Full-Stack Developer (Node.js & MongoDB)',
     company: 'Connexa Tech',
+    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png',
     location: 'Remote · India',
     type: 'Full-time',
+    employmentType: 'Full-time',
     salary: '₹16,00,000 - ₹24,00,000 / yr',
-    applicants: 34,
-    postedDate: '5 days ago',
+    applicants: [{}, {}],
+    postedDate: '3 days ago',
     status: 'Active',
     skills: ['Node.js', 'Express', 'MongoDB', 'REST APIs', 'Cloudinary'],
     description: 'Lead backend microservices development, optimize MongoDB queries, and implement real-time streaming communication architectures.',
@@ -47,16 +63,18 @@ const INITIAL_JOBS = [
 ];
 
 const JobPostingPage = () => {
-  const { token, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('post'); // 'post' or 'manage'
+  const { user, token } = useAuth();
+  const [activeTab, setActiveTab] = useState('manage'); // 'post' or 'manage'
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+  // Form State
   const [form, setForm] = useState({
     title: '',
     company: '',
+    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
     location: '',
     type: 'Full-time',
     salary: '',
@@ -74,8 +92,9 @@ const JobPostingPage = () => {
     try {
       if (token) {
         const res = await fetch(buildApiUrl('/jobs/my-listings'), {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
+
         if (res.ok) {
           const data = await res.json();
           if (data.jobs && data.jobs.length > 0) {
@@ -114,6 +133,7 @@ const JobPostingPage = () => {
           body: JSON.stringify({
             title: form.title,
             company: form.company,
+            companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
             location: form.location || 'Remote',
             employmentType: form.type,
             salary: form.salary,
@@ -125,23 +145,34 @@ const JobPostingPage = () => {
         const data = await res.json();
         if (res.ok && data.job) {
           setJobListings([data.job, ...jobListings]);
-          setForm({ title: '', company: '', location: '', type: 'Full-time', salary: '', skills: '', description: '' });
+          setForm({
+            title: '',
+            company: '',
+            companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+            location: '',
+            type: 'Full-time',
+            salary: '',
+            skills: '',
+            description: '',
+          });
           showToast('Job posting published successfully to Arcturus Jobs! 🎉');
           setActiveTab('manage');
           return;
         }
       }
 
-      // Local fallback if offline/no token
+      // Local fallback
       const newJob = {
         id: `job-${Date.now()}`,
         _id: `job-${Date.now()}`,
         title: form.title,
         company: form.company,
+        companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
         location: form.location || 'Remote',
         type: form.type,
+        employmentType: form.type,
         salary: form.salary || 'Competitive',
-        applicants: 0,
+        applicants: [],
         postedDate: 'Just now',
         status: 'Active',
         skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
@@ -149,7 +180,16 @@ const JobPostingPage = () => {
       };
 
       setJobListings([newJob, ...jobListings]);
-      setForm({ title: '', company: '', location: '', type: 'Full-time', salary: '', skills: '', description: '' });
+      setForm({
+        title: '',
+        company: '',
+        companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+        location: '',
+        type: 'Full-time',
+        salary: '',
+        skills: '',
+        description: '',
+      });
       showToast('Job posting published successfully! 🎉');
       setActiveTab('manage');
     } catch (err) {
@@ -245,6 +285,46 @@ const JobPostingPage = () => {
                   />
                 </div>
 
+                {/* Company Logo / Icon Field */}
+                <div className="formGroup fullWidth">
+                  <label>Company Logo / Icon URL</label>
+                  <div className="logoInputWrapper">
+                    <div className="logoPreviewContainer">
+                      <img
+                        src={form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                        alt="Company Logo Preview"
+                        className="logoPreviewImg"
+                        onError={(e) => {
+                          e.target.src = 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+                        }}
+                      />
+                    </div>
+                    <div className="logoInputRight">
+                      <input
+                        type="url"
+                        placeholder="https://example.com/logo.png"
+                        value={form.companyLogo}
+                        onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
+                      />
+                      <div className="presetLogosRow">
+                        <span className="presetLabel">Presets:</span>
+                        {LOGO_PRESETS.map((preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            className={`presetLogoBtn ${form.companyLogo === preset.url ? 'active' : ''}`}
+                            onClick={() => setForm({ ...form, companyLogo: preset.url })}
+                            title={preset.label}
+                          >
+                            <img src={preset.url} alt={preset.label} />
+                            <span>{preset.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="formGroup">
                   <label>Work Location & Workplace Type</label>
                   <input
@@ -329,6 +409,11 @@ const JobPostingPage = () => {
                   return (
                     <div key={jobId} className="jobListingCard">
                       <div className="jobCardTop">
+                        <img
+                          src={job.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                          alt={job.company}
+                          className="manageCompanyLogo"
+                        />
                         <div className="jobPrimary">
                           <h4>{job.title}</h4>
                           <div className="jobMetaRow">
@@ -339,40 +424,34 @@ const JobPostingPage = () => {
                           </div>
                         </div>
 
-                        <div className="jobStatusPill">
-                          <span className="statusDot"></span>
-                          <span>Active</span>
-                        </div>
+                        <span className="statusBadge active">
+                          <span className="statusDot" /> {job.status || 'Active'}
+                        </span>
                       </div>
 
-                      {job.description && (
-                        <p className="jobListingDesc">{job.description}</p>
-                      )}
+                      <p className="jobDescSnippet">{job.description}</p>
 
                       {job.skills && job.skills.length > 0 && (
-                        <div className="jobSkillsRow">
-                          {job.skills.map((skill, i) => (
-                            <span key={i} className="skillChip">{skill}</span>
+                        <div className="jobSkillsPills">
+                          {job.skills.map((s, idx) => (
+                            <span key={idx} className="skillPill">{s}</span>
                           ))}
                         </div>
                       )}
 
-                      <div className="jobCardBottom">
-                        <div className="applicantCount">
-                          <FaUsers />
-                          <span><strong>{applicantCount}</strong> candidates applied</span>
+                      <div className="jobCardFooter">
+                        <div className="applicantCountBadge">
+                          <FaUsers size={13} /> <span>{applicantCount} candidates applied</span>
                         </div>
 
-                        <div className="jobActionBtns">
-                          <button
-                            type="button"
-                            className="jobDeleteBtn"
-                            onClick={() => handleDeleteJob(jobId)}
-                            title="Close & remove this job"
-                          >
-                            <FaTrashAlt size={12} /> <span>Close Job</span>
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          className="deleteJobBtn"
+                          onClick={() => handleDeleteJob(jobId)}
+                          title="Close and delete job"
+                        >
+                          <FaTrashAlt size={12} /> <span>Close Job</span>
+                        </button>
                       </div>
                     </div>
                   );

@@ -1534,6 +1534,42 @@ body.dark-mode .skillChip {
   color: var(--text-secondary) !important;
 }
 
+[data-theme="dark"] .logoPreviewContainer,
+body.dark-mode .logoPreviewContainer {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .presetLabel,
+body.dark-mode .presetLabel {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .presetLogoBtn,
+body.dark-mode .presetLogoBtn {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .presetLogoBtn:hover,
+body.dark-mode .presetLogoBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .presetLogoBtn.active,
+body.dark-mode .presetLogoBtn.active {
+  background-color: var(--accent-blue-bg) !important;
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .manageCompanyLogo,
+body.dark-mode .manageCompanyLogo {
+  border-color: var(--border-color) !important;
+}
+
 /* Spinners */
 [data-theme="dark"] .activity-loading-spinner,
 body.dark-mode .activity-loading-spinner,
