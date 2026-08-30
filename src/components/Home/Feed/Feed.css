@@ -510,3 +510,41 @@
 .hashtag:hover {
   text-decoration: underline;
 }
+
+/* Progressive Scroll Loading Sentinel & End of Feed */
+.feedLoadingSentinel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.feedLoadingSpinner {
+  animation: feedSpin 0.8s linear infinite;
+  color: #0a66c2;
+}
+
+@keyframes feedSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.feedEndOfContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 600;
+  background: #ecfdf5;
+  border-radius: 8px;
+  border: 1px solid #a7f3d0;
+  margin-top: 8px;
+}
+

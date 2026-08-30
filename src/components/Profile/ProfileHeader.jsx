@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { CgProfile } from "react-icons/cg";
-import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck } from "react-icons/fa";
+import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck, FaCamera, FaSpinner } from "react-icons/fa";
+import { useProfile } from '../../context/ProfileContext';
+import { buildApiUrl } from '../../utils/api';
 import ProfileNetworkModal from './ProfileNetworkModal';
 
 const ProfileHeader = ({
@@ -10,8 +12,10 @@ const ProfileHeader = ({
   onConnectRequest,
   onAcceptConnection,
   onDeclineConnection,
+  onProfileUpdate,
   actionState = {},
 }) => {
+  const { refreshProfile } = useProfile();
   const {
     isFollowing,
     isConnected,
@@ -21,6 +25,11 @@ const ProfileHeader = ({
   } = actionState;
 
   const [networkModalTab, setNetworkModalTab] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+
+  const avatarInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   const followers = profile?.followers || [];
   const following = profile?.following || [];
@@ -30,6 +39,66 @@ const ProfileHeader = ({
   const followingCount = profile?.followingCount ?? following.length;
   const connectionsCount = profile?.connectionsCount ?? connections.length;
   const postsCount = profile?.posts?.length || 0;
+
+  const isOwnProfile = Boolean(onEdit);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const res = await fetch(buildApiUrl('/profile'), {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (onProfileUpdate) onProfileUpdate(data);
+        refreshProfile();
+      }
+    } catch (err) {
+      console.error('Failed to upload avatar', err);
+    } finally {
+      setUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleCoverChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCover(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('backgroundImage', file);
+
+      const res = await fetch(buildApiUrl('/profile'), {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (onProfileUpdate) onProfileUpdate(data);
+        refreshProfile();
+      }
+    } catch (err) {
+      console.error('Failed to upload cover banner', err);
+    } finally {
+      setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = '';
+    }
+  };
 
   const renderConnectionButton = () => {
     if (isConnected) {
@@ -137,6 +206,7 @@ const ProfileHeader = ({
   return (
     <>
       <div className="profileHeaderCard">
+        {/* Cover Photo */}
         <div
           className="profileCover"
           style={{
@@ -148,9 +218,32 @@ const ProfileHeader = ({
           {!profile.backgroundImage?.url && (
             <div className="profileCoverFallback">Arcturus Network</div>
           )}
+
+          {isOwnProfile && (
+            <>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleCoverChange}
+              />
+              <button
+                type="button"
+                className="profileCoverCameraBtn"
+                onClick={() => coverInputRef.current?.click()}
+                title="Change cover banner"
+                disabled={uploadingCover}
+              >
+                {uploadingCover ? <FaSpinner className="spinAnimation" size={12} /> : <FaCamera size={12} />}
+                <span>{uploadingCover ? 'Updating...' : 'Edit cover'}</span>
+              </button>
+            </>
+          )}
         </div>
 
         <div className="profileIntroCard">
+          {/* Avatar with Camera Change Button at Bottom-Right */}
           <div className="profileAvatarWrapper">
             {profile.avatar?.url ? (
               <img
@@ -160,6 +253,27 @@ const ProfileHeader = ({
               />
             ) : (
               <CgProfile className="profileAvatarLarge profileAvatarLargeFallback" />
+            )}
+
+            {isOwnProfile && (
+              <>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
+                <button
+                  type="button"
+                  className="profileAvatarCameraBtn"
+                  onClick={() => avatarInputRef.current?.click()}
+                  title="Change profile picture"
+                  disabled={uploadingAvatar}
+                >
+                  {uploadingAvatar ? <FaSpinner className="spinAnimation" size={13} /> : <FaCamera size={13} />}
+                </button>
+              </>
             )}
           </div>
 
@@ -171,7 +285,7 @@ const ProfileHeader = ({
                 {profile.location && <p className="profileLocation">{profile.location}</p>}
               </div>
 
-              {/* Header Stats Numbers (Posts, Followers, Following, Connections) */}
+              {/* Header Stats Numbers */}
               <div className="profileHeaderStatsRow">
                 <div className="profileHeaderStatBox">
                   <span className="profileStatNumber">{postsCount}</span>
@@ -207,7 +321,7 @@ const ProfileHeader = ({
               </div>
             </div>
 
-            {/* Social Proof Row: Overlapping Avatars + "Followed by ... and X others" */}
+            {/* Social Proof Row */}
             {renderSocialProof()}
 
             {/* Action Buttons */}

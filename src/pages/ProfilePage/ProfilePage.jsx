@@ -160,6 +160,7 @@ const ProfilePage = () => {
           onConnectRequest={!isOwnProfile ? handleConnectRequest : undefined}
           onAcceptConnection={!isOwnProfile ? handleAcceptConnection : undefined}
           onDeclineConnection={!isOwnProfile ? handleDeclineConnection : undefined}
+          onProfileUpdate={isOwnProfile ? (updated) => setProfile((prev) => ({ ...prev, ...updated })) : undefined}
           actionState={{
             isFollowing: profile?.isFollowing,
             isConnected: profile?.isConnected,

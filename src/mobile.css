@@ -264,19 +264,23 @@
 
   /* Add bottom padding to page content so it isn't hidden behind bottom nav */
   .homeLayout,
+  .profilePage-wrapper,
   .profilePage,
   .networkPage,
   .notificationsPage,
   .activity-page,
-  .post-page-container,
-  .messaging-page-container {
-    padding-bottom: 70px;
+  .post-page-container {
+    padding-bottom: 85px;
   }
 
-/* ===== HOME LAYOUT ===== */
+  /* ===== HOME LAYOUT ===== */
   .homeLayout {
-    padding: 10px 6px;
-    gap: 12px;
+    padding: 8px 4px 85px;
+    gap: 8px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    margin: 0;
   }
 
   .rightSidebar {
@@ -286,7 +290,10 @@
 
   /* ===== SIDEBAR / CARDS ===== */
   .card {
-    padding: 10px;
+    padding: 10px 8px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Post cards span edge-to-edge on mobile (minimal outer gap) */
@@ -312,7 +319,10 @@
   /* ===== FEED ===== */
   .feed {
     padding: 0;
-    gap: 12px;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .postAvatar {
@@ -332,7 +342,7 @@
     gap: 4px;
   }
 
-.postOption {
+  .postOption {
     padding: 8px 6px;
     font-size: 12px;
     flex-direction: column;
@@ -376,7 +386,7 @@
     font-size: 22px;
   }
 
-.postStats {
+  .postStats {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -407,7 +417,7 @@
     font-size: 14px;
   }
 
-/* ===== MESSENGER POPUPS → FULL-WIDTH BOTTOM SHEETS =====
+  /* ===== MESSENGER POPUPS → FULL-WIDTH BOTTOM SHEETS =====
      Raised above the fixed bottom nav bar (58px) so they don't overlap it. */
   .messenger,
   .chatWindow,
@@ -424,7 +434,7 @@
     z-index: 1100;
   }
 
-.messenger.closed {
+  .messenger.closed {
     height: 50px;
   }
 
@@ -435,24 +445,33 @@
     display: none;
   }
 
-/* ===== MESSAGING PAGE =====
-     Stack vertically: sidebar (conversation list) on top,
-     chat area below. Whole page scrolls naturally.
+  /* ===== MESSAGING PAGE =====
+     On mobile: Show full list by default.
+     When a conversation is active, hide list and show full-screen chat with back button.
   -------------------------------------------------------------------------- */
   .messaging-page-container {
+    display: flex;
     flex-direction: column;
-    height: auto;
-    max-height: calc(100vh - 130px);
-    min-height: 70vh;
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    background: #fff;
+    box-shadow: none;
   }
 
   .messaging-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #ddd;
-    flex: 0 0 auto;
-    max-height: 40vh;
-    min-width: 0;
+    border-bottom: none;
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .messaging-sidebar-header {
@@ -470,19 +489,33 @@
   }
 
   .messaging-main {
+    display: none;
+    width: 100%;
+    height: 100%;
     flex: 1;
-    min-height: 45vh;
-    display: flex;
-    flex-direction: column;
+    min-height: 0;
+  }
+
+  .messaging-page-container.has-active-chat .messaging-sidebar {
+    display: none !important;
+  }
+
+  .messaging-page-container.has-active-chat .messaging-main {
+    display: flex !important;
   }
 
   .messaging-main .chatWindow {
-    height: 100%;
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 
   /* ===== PROFILE PAGE ===== */
   .profilePage-wrapper {
-    padding: 10px 8px 70px;
+    padding: 8px 4px 85px;
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
@@ -499,8 +532,8 @@
 
   .profilePageLayout {
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 10px;
+    margin-top: 10px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -527,6 +560,13 @@
     min-height: 120px;
   }
 
+  .profileCoverCameraBtn {
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
   .profileIntroCard {
     flex-direction: column;
     align-items: center;
@@ -539,10 +579,10 @@
 
   .profileAvatarWrapper {
     height: 48px;
-    display: flex;
-    justify-content: center;
+    display: inline-block;
     position: relative;
-    width: 100%;
+    width: 100px;
+    margin: 0 auto;
   }
 
   .profileAvatarLarge {
@@ -550,8 +590,15 @@
     height: 100px;
     position: absolute;
     top: -50px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    left: 0 !important;
+    transform: none !important;
+  }
+
+  .profileAvatarCameraBtn {
+    bottom: -4px;
+    right: -4px;
+    width: 32px;
+    height: 32px;
   }
 
   .profileIntroText {
@@ -623,7 +670,7 @@
   }
 
   .profileSection {
-    padding: 14px 12px;
+    padding: 12px 10px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -631,30 +678,82 @@
 
   /* ===== NETWORK PAGE ===== */
   .networkPage {
-    padding: 12px;
+    padding: 8px 4px 85px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .networkGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .networkCard {
-    grid-template-columns: 56px 1fr;
+    padding: 10px 6px;
+    border-radius: 8px;
+    gap: 6px;
+  }
+
+  .networkAvatarWrap,
+  .networkAvatar,
+  .networkAvatarFallback {
+    width: 38px;
+    height: 38px;
+    font-size: 0.85rem;
+  }
+
+  .networkDetails h3 {
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .networkDetails p {
+    font-size: 0.72rem;
+    -webkit-line-clamp: 1;
+    margin-top: 1px;
+  }
+
+  .networkBadges {
+    gap: 4px;
+  }
+
+  .networkBadge {
+    padding: 2px 6px;
+    font-size: 0.68rem;
+  }
+
+  .networkActions {
+    width: 100%;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .networkActionBtn {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    border-radius: 12px;
   }
 
   /* ===== NOTIFICATIONS PAGE ===== */
   .notificationsPage {
-    padding: 12px;
+    padding: 8px 4px 85px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .notificationItem {
-    padding: 14px;
+    padding: 12px 10px;
   }
 
   /* ===== ACTIVITY PAGE ===== */
   .activity-page {
-    margin: 12px;
-    padding: 14px;
+    margin: 8px 4px 85px;
+    padding: 12px 10px;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
   }
 
   .activity-tabs {
@@ -670,7 +769,10 @@
 
   /* ===== POST PAGE ===== */
   .post-page-container {
-    margin: 12px;
+    margin: 8px 4px 85px;
+    padding: 0;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
   }
 
   .post-page-comment-form {

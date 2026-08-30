@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { GiEarthAsiaOceania } from "react-icons/gi";
+import { FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { useProfile } from "../../../context/ProfileContext";
 import { useAuth } from "../../../context/AuthContext";
 import { buildApiUrl } from "../../../utils/api";
@@ -8,10 +9,15 @@ import PostCard from "./PostCard";
 import FeedSort from "./FeedSort";
 import "./Feed.css";
 
+const POSTS_PER_PAGE = 4;
+
 const Feed = () => {
   const { profile } = useProfile();
   const { token } = useAuth();
   const [posts, setPosts] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef(null);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -51,13 +57,13 @@ const Feed = () => {
             }) || [],
             commentsCount: post.comments?.length || 0,
             repostedFrom: post.repostedFrom ? {
-            id: post.repostedFrom._id,
-            authorName: post.repostedFrom.userId?.firstName ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}` : (post.repostedFrom.userId?.name || post.repostedFrom.userId?.username || post.repostedFrom.author || 'Anonymous'),
-            authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
-            authorHeadline: post.repostedFrom.userId?.headline || 'Member',
-            content: post.repostedFrom.content || '',
-            image: post.repostedFrom.media?.[0]?.url,
-            authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null
+              id: post.repostedFrom._id,
+              authorName: post.repostedFrom.userId?.firstName ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}` : (post.repostedFrom.userId?.name || post.repostedFrom.userId?.username || post.repostedFrom.author || 'Anonymous'),
+              authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
+              authorHeadline: post.repostedFrom.userId?.headline || 'Member',
+              content: post.repostedFrom.content || '',
+              image: post.repostedFrom.media?.[0]?.url,
+              authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null
             } : null
           };
         })
@@ -72,15 +78,59 @@ const Feed = () => {
     fetchPosts();
   }, [fetchPosts]);
 
+  // Dynamic Scroll / Intersection Observer to load more posts as user scrolls down
+  useEffect(() => {
+    if (visibleCount >= posts.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          setLoadingMore(true);
+          setTimeout(() => {
+            setVisibleCount((prev) => Math.min(prev + POSTS_PER_PAGE, posts.length));
+            setLoadingMore(false);
+          }, 350);
+        }
+      },
+      { rootMargin: "150px" }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) observer.unobserve(currentSentinel);
+    };
+  }, [visibleCount, posts.length, loadingMore]);
+
+  const displayedPosts = posts.slice(0, visibleCount);
+
   return (
     <div className="feed">
       <CreatePost onPostCreated={fetchPosts} />
       <FeedSort />
 
-      {posts.length > 0 ? (
-        posts.map((post) => <PostCard key={post.id} post={post} />)
+      {displayedPosts.length > 0 ? (
+        displayedPosts.map((post) => <PostCard key={post.id} post={post} />)
       ) : (
         <div className="emptyFeedMessage">No posts yet. Create the first post!</div>
+      )}
+
+      {/* Progressive scroll loader sentinel */}
+      {visibleCount < posts.length && (
+        <div ref={sentinelRef} className="feedLoadingSentinel">
+          <FaSpinner className="feedLoadingSpinner" />
+          <span>Loading more posts...</span>
+        </div>
+      )}
+
+      {posts.length > 0 && visibleCount >= posts.length && (
+        <div className="feedEndOfContent">
+          <FaCheckCircle color="#059669" size={16} />
+          <span>You're all caught up!</span>
+        </div>
       )}
     </div>
   );

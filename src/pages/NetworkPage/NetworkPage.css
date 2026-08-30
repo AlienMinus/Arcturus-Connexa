@@ -343,17 +343,19 @@
 
 @media (max-width: 768px) {
   .networkPage {
-    padding: 10px 8px 70px;
+    padding: 8px 4px 85px;
   }
 
   .networkSectionCard {
-    padding: 14px 12px;
+    padding: 12px 8px;
+    border-radius: 8px;
   }
 
   .profileViewerRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    padding: 10px 8px;
   }
 
   .viewerActions {
@@ -361,7 +363,58 @@
     justify-content: flex-end;
   }
 
+  /* 2-column compact halved-size grid on mobile */
   .networkGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .networkCard {
+    padding: 10px 6px;
+    border-radius: 8px;
+    gap: 6px;
+  }
+
+  .networkAvatarWrap,
+  .networkAvatar,
+  .networkAvatarFallback {
+    width: 38px;
+    height: 38px;
+    font-size: 0.85rem;
+  }
+
+  .networkDetails h3 {
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .networkDetails p {
+    font-size: 0.72rem;
+    -webkit-line-clamp: 1;
+    margin-top: 1px;
+  }
+
+  .networkBadges {
+    gap: 4px;
+  }
+
+  .networkBadge {
+    padding: 2px 6px;
+    font-size: 0.68rem;
+  }
+
+  .networkActions {
+    width: 100%;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .networkActionBtn {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    border-radius: 12px;
   }
 }

@@ -41,6 +41,33 @@
   position: relative;
 }
 
+.profileCoverCameraBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  color: #0a66c2;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+
+.profileCoverCameraBtn:hover {
+  background: #ffffff;
+  color: #004182;
+  transform: scale(1.02);
+}
+
 .profileCoverFallback {
   height: 200px;
   display: flex;
@@ -61,6 +88,8 @@
 .profileAvatarWrapper {
   position: relative;
   height: 60px; /* Offset space for the overlapping avatar */
+  display: inline-block;
+  width: 136px;
 }
 
 .profileAvatarLarge {
@@ -74,6 +103,36 @@
   top: -76px;
   left: 0;
   background: #ffffff;
+}
+
+.profileAvatarCameraBtn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #0a66c2;
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  transition: all 0.15s ease;
+}
+
+.profileAvatarCameraBtn:hover {
+  background: #004182;
+  transform: scale(1.08);
+}
+
+.profileAvatarCameraBtn:disabled,
+.profileCoverCameraBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .profileAvatarLargeFallback {
