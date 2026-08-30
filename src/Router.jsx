@@ -12,6 +12,7 @@ import NetworkPage from './pages/NetworkPage/NetworkPage';
 import NotificationsPage from './pages/NotificationsPage/NotificationsPage';
 import SettingsPage from './pages/SettingsPage/SettingsPage';
 import HelpPage from './pages/HelpPage/HelpPage';
+import JobsPage from './pages/JobsPage/JobsPage';
 import JobPostingPage from './pages/JobPostingPage/JobPostingPage';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
 
@@ -30,7 +31,7 @@ function AppRouter() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/jobs" element={<UnderConstruction title="Jobs Portal is Under Construction" featureName="Jobs & Careers" subtitle="We're crafting an intelligent job discovery and recruiting system. Check back soon!" />} />
+                <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/jobs/manage" element={<JobPostingPage />} />
                 <Route path="/jobs/post" element={<JobPostingPage />} />
                 <Route path="/learning" element={<UnderConstruction title="Learning Hub is Under Construction" featureName="Courses & Certifications" />} />
