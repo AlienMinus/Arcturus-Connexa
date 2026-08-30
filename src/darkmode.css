@@ -1668,18 +1668,47 @@ body.dark-mode .closeJobBtn:hover {
   box-shadow: 0 2px 10px rgba(225, 29, 72, 0.4) !important;
 }
 
-/* Spinners */
+/* Spinners & Loading States in Dark Mode */
+[data-theme="dark"] .profileLoadingSpinner,
+body.dark-mode .profileLoadingSpinner,
 [data-theme="dark"] .activity-loading-spinner,
 body.dark-mode .activity-loading-spinner,
 [data-theme="dark"] .jobsSpinner,
-body.dark-mode .jobsSpinner {
+body.dark-mode .jobsSpinner,
+[data-theme="dark"] .manageSpinner,
+body.dark-mode .manageSpinner,
+[data-theme="dark"] .globalLoadingSpinner {
   border-color: #334155 !important;
   border-top-color: var(--accent-blue) !important;
 }
 
 [data-theme="dark"] .spinAnimation,
-body.dark-mode .spinAnimation {
+body.dark-mode .spinAnimation,
+[data-theme="dark"] .feedLoadingSpinner,
+body.dark-mode .feedLoadingSpinner,
+[data-theme="dark"] .newsLoadingSpinner,
+body.dark-mode .newsLoadingSpinner {
   color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .profilePage.loading,
+body.dark-mode .profilePage.loading,
+[data-theme="dark"] .profileEditPage.loading,
+body.dark-mode .profileEditPage.loading,
+[data-theme="dark"] .notificationsPage.loading,
+body.dark-mode .notificationsPage.loading,
+[data-theme="dark"] .feedLoadingSentinel,
+body.dark-mode .feedLoadingSentinel,
+[data-theme="dark"] .manageLoadingBox,
+body.dark-mode .manageLoadingBox {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .profilePage.loading p,
+body.dark-mode .profilePage.loading p,
+[data-theme="dark"] .feedLoadingSentinel span,
+body.dark-mode .feedLoadingSentinel span {
+  color: var(--text-muted) !important;
 }
 
 /* ==========================================================================
