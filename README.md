@@ -1,6 +1,6 @@
 # ⚡ Arcturus Connexa
 
-<div align="center">
+<div align="left">
   <img src="public/logo.png" alt="Arcturus Logo" width="90" height="90" />
   <h3>Next-Generation Professional Social & Career Networking Platform</h3>
   <p>
