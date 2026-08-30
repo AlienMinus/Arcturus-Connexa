@@ -1931,3 +1931,17 @@ body.dark-mode .profileItemFavicon {
   background-color: var(--bg-primary) !important;
   border-color: var(--border-color) !important;
 }
+
+[data-theme="dark"] .sectionItemIconPlaceholder,
+body.dark-mode .sectionItemIconPlaceholder {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .sectionItemIconLink:hover .sectionItemIconPlaceholder,
+body.dark-mode .sectionItemIconLink:hover .sectionItemIconPlaceholder {
+  border-color: var(--accent-blue) !important;
+  background-color: var(--bg-hover) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}

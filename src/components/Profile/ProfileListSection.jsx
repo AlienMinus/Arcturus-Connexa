@@ -78,7 +78,7 @@ const SmartItemIcon = ({ item, defaultIcon, title }) => {
     );
   }
 
-  return <div className="sectionItemIconPlaceholder">{defaultIcon}</div>;
+  return defaultIcon;
 };
 
 const ProfileListSection = ({ title, items = [] }) => {

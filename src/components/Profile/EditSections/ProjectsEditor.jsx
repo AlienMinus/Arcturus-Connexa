@@ -10,7 +10,8 @@ import {
   FaDribbble,
   FaMedium,
   FaCodepen,
-  FaGlobe
+  FaImage,
+  FaLink
 } from 'react-icons/fa';
 
 const getDomain = (url) => {
@@ -23,7 +24,20 @@ const getDomain = (url) => {
   }
 };
 
-const ProjectIconPreview = ({ url }) => {
+const ProjectIconPreview = ({ item }) => {
+  // If custom direct image/icon URL is provided
+  if (item?.image) {
+    return (
+      <img
+        src={item.image}
+        alt="Custom icon"
+        className="projectFaviconPreview"
+        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+      />
+    );
+  }
+
+  const url = item?.url || item?.link || '';
   const domain = getDomain(url);
   if (!domain) {
     return <FaLaptopCode size={18} className="projectDefaultIcon" />;
@@ -58,6 +72,7 @@ const ProjectsEditor = ({ items = [], onChange }) => {
         description: '',
         techStack: '',
         url: '',
+        image: '',
       },
     ];
     onChange('projects', newItems);
@@ -104,7 +119,7 @@ const ProjectsEditor = ({ items = [], onChange }) => {
                 <div className="editorItemBoxHeader">
                   <div className="projectHeaderTitleWrap">
                     <div className="projectHeaderIconBadge">
-                      <ProjectIconPreview url={item.url} />
+                      <ProjectIconPreview item={item} />
                     </div>
                     <h4>Project #{index + 1}: {item.title || 'Untitled Project'}</h4>
                   </div>
@@ -123,7 +138,7 @@ const ProjectsEditor = ({ items = [], onChange }) => {
                     <label>Project Title</label>
                     <input
                       type="text"
-                      placeholder="e.g. Arcturus Social Network, Camera AI App"
+                      placeholder="e.g. Arcturus Connexa"
                       value={item.title || ''}
                       onChange={(e) => handleUpdate(index, 'title', e.target.value)}
                     />
@@ -139,9 +154,19 @@ const ProjectsEditor = ({ items = [], onChange }) => {
                         onChange={(e) => handleUpdate(index, 'url', e.target.value)}
                       />
                       <div className="projectUrlPreviewBadge" title="Live icon embedded from link">
-                        <ProjectIconPreview url={item.url} />
+                        <ProjectIconPreview item={item} />
                       </div>
                     </div>
+                  </div>
+
+                  <div className="formGroup fullWidth">
+                    <label>Custom Project Icon / Logo URL (Optional)</label>
+                    <input
+                      type="url"
+                      placeholder="e.g. https://example.com/logo.png or image link (overrides auto-embedded icon)"
+                      value={item.image || ''}
+                      onChange={(e) => handleUpdate(index, 'image', e.target.value)}
+                    />
                   </div>
 
                   <div className="formGroup fullWidth">

@@ -142,6 +142,8 @@ const ProfileEditPage = () => {
         education: formData.education,
         projects: formData.projects.map((p) => ({
           ...p,
+          url: p.url || '',
+          image: p.image || '',
           techStack: Array.isArray(p.techStack)
             ? p.techStack
             : typeof p.techStack === 'string'
