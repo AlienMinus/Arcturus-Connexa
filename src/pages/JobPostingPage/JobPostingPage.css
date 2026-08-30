@@ -114,6 +114,57 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Unauthorized Card */
+.unauthorizedJobsCard {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.lockIcon {
+  color: #0a66c2;
+}
+
+.unauthorizedJobsCard h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.unauthorizedJobsCard p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  max-width: 440px;
+  line-height: 1.5;
+}
+
+.authLoginBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 6px;
+  transition: background 0.15s ease;
+}
+
+.authLoginBtn:hover {
+  background: #004182;
+}
+
 /* Post Job Form */
 .jobPostCard {
   background: #ffffff;
@@ -138,8 +189,14 @@
 
 .jobCardHeader p {
   margin: 4px 0 0;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: #64748b;
+}
+
+.jobForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .jobFormGrid {
@@ -148,221 +205,41 @@
   gap: 16px;
 }
 
-.jobForm .formGroup {
+.formGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.jobForm .formGroup.fullWidth {
+.formGroup.fullWidth {
   grid-column: 1 / -1;
 }
 
-.jobForm label {
+.formGroup label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #334155;
 }
 
-.jobForm input,
-.jobForm select,
-.jobForm textarea {
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
   padding: 10px 14px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-family: inherit;
   color: #0f172a;
-  background: #ffffff;
   outline: none;
-  box-sizing: border-box;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.jobForm input:focus,
-.jobForm select:focus,
-.jobForm textarea:focus {
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
   border-color: #0a66c2;
-}
-
-.jobFormActions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.publishJobBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #0a66c2;
-  color: #ffffff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 20px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.publishJobBtn:hover {
-  background: #004182;
-}
-
-/* Manage Listings */
-.jobManageContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.jobCardsList {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.jobListingCard {
-  background: #ffffff;
-  border: 1px solid #e0dfdc;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.jobCardTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.jobPrimary h4 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.jobMetaRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 14px;
-  font-size: 0.82rem;
-  color: #64748b;
-}
-
-.jobMetaRow span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.jobStatusPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-}
-
-.jobListingDesc {
-  margin: 0;
-  font-size: 0.88rem;
-  color: #475569;
-  line-height: 1.45;
-}
-
-.jobSkillsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.skillChip {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.jobCardBottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 12px;
-  margin-top: 4px;
-}
-
-.applicantCount {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  color: #0a66c2;
-}
-
-.jobDeleteBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: transparent;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 4px 12px;
-  border-radius: 14px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.jobDeleteBtn:hover {
-  background: #fee2e2;
-}
-
-.emptyJobsBox {
-  background: #ffffff;
-  border: 1px solid #e0dfdc;
-  border-radius: 12px;
-  padding: 48px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #64748b;
-  gap: 12px;
-}
-
-.emptyJobsBox h3 {
-  margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
-}
-
-.emptyJobsBox p {
-  margin: 0;
-  font-size: 0.88rem;
-  max-width: 380px;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
 }
 
 .logoInputWrapper {
@@ -445,15 +322,229 @@
   border-color: #0a66c2;
 }
 
+.jobFormActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.publishJobBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.publishJobBtn:hover {
+  background: #004182;
+}
+
+/* Manage Listings */
+.jobManageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.manageLoadingBox {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.jobCardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.jobListingCard {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.jobListingCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.jobCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
 .manageCompanyLogo {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 10px;
   border: 1px solid #e2e8f0;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.jobPrimary {
+  flex: 1;
+  min-width: 0;
+}
+
+.jobPrimary h4 {
+  margin: 0 0 4px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.jobMetaRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.jobMetaRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.statusBadge.active {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.jobDescSnippet {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.jobSkillsPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.skillPill {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.jobCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.applicantCountBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #0a66c2;
+}
+
+/* Close Job Button */
+.closeJobBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.closeJobBtn:hover {
+  background: #e11d48;
+  color: #ffffff;
+  border-color: #e11d48;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.25);
+}
+
+.emptyJobsBox {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #64748b;
+  gap: 12px;
+}
+
+.emptyJobsBox h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.emptyJobsBox p {
+  margin: 0;
+  font-size: 0.88rem;
+  max-width: 380px;
 }
 
 @media (max-width: 768px) {
@@ -487,4 +578,3 @@
     flex-direction: column;
   }
 }
-

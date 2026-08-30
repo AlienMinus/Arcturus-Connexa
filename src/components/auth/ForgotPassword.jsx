@@ -45,8 +45,8 @@ const ForgotPassword = ({ onSuccess }) => {
         throw new Error(data?.error || response.statusText || 'Failed to process request');
       }
 
-      setSuccess('Password reset link has been sent to your email');
-      onSuccess(data);
+      setSuccess('Password reset link has been sent to your email! ✉️');
+      if (onSuccess) onSuccess(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -55,18 +55,22 @@ const ForgotPassword = ({ onSuccess }) => {
   };
 
   return (
-    <div className="authContainer">
-      <div className="authCard">
-        <h1 className="authTitle">Forgot Password?</h1>
+    <div className="modernAuthWrapper">
+      {/* Scenic Background Layer */}
+      <div className="scenicAuthBg" />
+
+      {/* Frosted Glassmorphism Card */}
+      <div className="modernGlassCard">
+        <h1 className="modernAuthTitle">Forgot Password</h1>
         <p className="authSubtitle">
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email to receive recovery instructions
         </p>
 
-        <form onSubmit={handleSubmit}>
-          {error && <div className="errorMessage">{error}</div>}
+        <form onSubmit={handleSubmit} className="modernAuthForm">
+          {error && <div className="glassErrorMessage">{error}</div>}
           {success && <div className="successMessage">{success}</div>}
 
-          <div className="formGroup">
+          <div className="modernInputGroup">
             <label>Email Address</label>
             <input
               type="email"
@@ -74,21 +78,21 @@ const ForgotPassword = ({ onSuccess }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
 
-          <button type="submit" disabled={loading} className="primaryBtn fullWidth">
-            {loading ? 'Sending...' : 'Send Reset Link'}
+          <button type="submit" disabled={loading} className="modernLoginBtn" style={{ marginTop: '12px' }}>
+            {loading ? 'Sending link...' : 'Send Reset Link'}
           </button>
+
+          <div className="modernAuthFooter">
+            <span>Remember your password?</span>{' '}
+            <Link to="/login" className="modernRegisterLink">
+              Sign In
+            </Link>
+          </div>
         </form>
-
-        <div className="authDivider">
-          <span>Remember your password?</span>
-        </div>
-
-        <Link to="/login" className="secondaryBtn fullWidth textCenter">
-          Back to Sign In
-        </Link>
       </div>
     </div>
   );

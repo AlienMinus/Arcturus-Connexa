@@ -74,8 +74,8 @@ const ResetPassword = ({ onSuccess }) => {
         throw new Error(data?.error || response.statusText || 'Failed to reset password');
       }
 
-      setSuccess('Password has been reset successfully');
-      onSuccess(data);
+      setSuccess('Password has been reset successfully! 🎉');
+      if (onSuccess) onSuccess(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -85,13 +85,14 @@ const ResetPassword = ({ onSuccess }) => {
 
   if (!resetToken) {
     return (
-      <div className="authContainer">
-        <div className="authCard">
-          <h1 className="authTitle">Invalid Reset Link</h1>
+      <div className="modernAuthWrapper">
+        <div className="scenicAuthBg" />
+        <div className="modernGlassCard">
+          <h1 className="modernAuthTitle">Invalid Link</h1>
           <p className="authSubtitle">
-            The password reset link is invalid or has expired
+            The password reset link is invalid or has expired.
           </p>
-          <Link to="/forgot-password" className="primaryBtn fullWidth textCenter">
+          <Link to="/forgot-password" className="modernLoginBtn" style={{ textDecoration: 'none', textAlign: 'center' }}>
             Request New Reset Link
           </Link>
         </div>
@@ -100,26 +101,27 @@ const ResetPassword = ({ onSuccess }) => {
   }
 
   return (
-    <div className="authContainer">
-      <div className="authCard">
-        <h1 className="authTitle">Reset Password</h1>
+    <div className="modernAuthWrapper">
+      <div className="scenicAuthBg" />
+      <div className="modernGlassCard">
+        <h1 className="modernAuthTitle">Reset Password</h1>
         <p className="authSubtitle">
-          Enter your new password below to reset your account
+          Create a new secure password for your account
         </p>
 
-        <form onSubmit={handleSubmit}>
-          {error && <div className="errorMessage">{error}</div>}
+        <form onSubmit={handleSubmit} className="modernAuthForm">
+          {error && <div className="glassErrorMessage">{error}</div>}
           {success && (
             <div className="successMessage">
               {success}
               <br />
-              <Link to="/login" style={{ color: 'green', marginTop: '10px', display: 'block' }}>
+              <Link to="/login" style={{ color: '#ffffff', fontWeight: 'bold', marginTop: '10px', display: 'block', textDecoration: 'underline' }}>
                 Click here to sign in
               </Link>
             </div>
           )}
 
-          <div className="formGroup">
+          <div className="modernInputGroup">
             <label>New Password</label>
             <input
               type="password"
@@ -127,10 +129,11 @@ const ResetPassword = ({ onSuccess }) => {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
+              autoComplete="new-password"
             />
           </div>
 
-          <div className="formGroup">
+          <div className="modernInputGroup">
             <label>Confirm Password</label>
             <input
               type="password"
@@ -138,26 +141,25 @@ const ResetPassword = ({ onSuccess }) => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              autoComplete="new-password"
             />
           </div>
 
-          <p className="passwordHint">
-            Password must be at least 8 characters, include an uppercase letter and a
-            number
+          <p className="passwordHint" style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '12px', margin: '-10px 0 18px 0' }}>
+            Must be 8+ chars with at least one uppercase letter and a number.
           </p>
 
-          <button type="submit" disabled={loading} className="primaryBtn fullWidth">
+          <button type="submit" disabled={loading} className="modernLoginBtn">
             {loading ? 'Resetting...' : 'Reset Password'}
           </button>
+
+          <div className="modernAuthFooter">
+            <span>Remember your password?</span>{' '}
+            <Link to="/login" className="modernRegisterLink">
+              Sign In
+            </Link>
+          </div>
         </form>
-
-        <div className="authDivider">
-          <span>Remember your password?</span>
-        </div>
-
-        <Link to="/login" className="secondaryBtn fullWidth textCenter">
-          Back to Sign In
-        </Link>
       </div>
     </div>
   );

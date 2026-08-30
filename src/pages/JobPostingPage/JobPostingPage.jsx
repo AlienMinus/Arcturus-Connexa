@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaBriefcase, 
   FaPlus, 
@@ -13,7 +13,8 @@ import {
   FaTrashAlt, 
   FaTags,
   FaImage,
-  FaCheck
+  FaLock,
+  FaSignInAlt
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -27,43 +28,9 @@ const LOGO_PRESETS = [
   { label: 'Finance / Business', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
 ];
 
-const INITIAL_JOBS = [
-  {
-    id: 'job-1',
-    _id: 'job-1',
-    title: 'Senior Frontend Engineer (React & TypeScript)',
-    company: 'Arcturus Labs',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-    location: 'Bengaluru, India · Hybrid',
-    type: 'Full-time',
-    employmentType: 'Full-time',
-    salary: '₹22,00,000 - ₹30,00,000 / yr',
-    applicants: [{}, {}, {}, {}],
-    postedDate: '2 days ago',
-    status: 'Active',
-    skills: ['React', 'TypeScript', 'Redux', 'CSS3', 'WebSockets'],
-    description: 'We are looking for an experienced Frontend Architect to build next-generation collaboration and real-time social networking interfaces.',
-  },
-  {
-    id: 'job-2',
-    _id: 'job-2',
-    title: 'Full-Stack Developer (Node.js & MongoDB)',
-    company: 'Connexa Tech',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png',
-    location: 'Remote · India',
-    type: 'Full-time',
-    employmentType: 'Full-time',
-    salary: '₹16,00,000 - ₹24,00,000 / yr',
-    applicants: [{}, {}],
-    postedDate: '3 days ago',
-    status: 'Active',
-    skills: ['Node.js', 'Express', 'MongoDB', 'REST APIs', 'Cloudinary'],
-    description: 'Lead backend microservices development, optimize MongoDB queries, and implement real-time streaming communication architectures.',
-  },
-];
-
 const JobPostingPage = () => {
   const { user, token } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('manage'); // 'post' or 'manage'
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,26 +55,27 @@ const JobPostingPage = () => {
   };
 
   const fetchMyListings = async () => {
+    if (!token) {
+      setJobListings([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      if (token) {
-        const res = await fetch(buildApiUrl('/jobs/my-listings'), {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const res = await fetch(buildApiUrl('/jobs/my-listings'), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.jobs && data.jobs.length > 0) {
-            setJobListings(data.jobs);
-            setLoading(false);
-            return;
-          }
-        }
+      if (res.ok) {
+        const data = await res.json();
+        setJobListings(data.jobs || []);
+      } else {
+        setJobListings([]);
       }
-      setJobListings(INITIAL_JOBS);
     } catch (err) {
       console.error('Failed to fetch job listings:', err);
-      setJobListings(INITIAL_JOBS);
+      setJobListings([]);
     } finally {
       setLoading(false);
     }
@@ -121,77 +89,50 @@ const JobPostingPage = () => {
     e.preventDefault();
     if (!form.title || !form.company) return;
 
+    if (!token) {
+      showToast('Please sign in to publish a job listing');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      if (token) {
-        const res = await fetch(buildApiUrl('/jobs'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: form.title,
-            company: form.company,
-            companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-            location: form.location || 'Remote',
-            employmentType: form.type,
-            salary: form.salary,
-            skills: form.skills,
-            description: form.description,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok && data.job) {
-          setJobListings([data.job, ...jobListings]);
-          setForm({
-            title: '',
-            company: '',
-            companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-            location: '',
-            type: 'Full-time',
-            salary: '',
-            skills: '',
-            description: '',
-          });
-          showToast('Job posting published successfully to Arcturus Jobs! 🎉');
-          setActiveTab('manage');
-          return;
-        }
-      }
-
-      // Local fallback
-      const newJob = {
-        id: `job-${Date.now()}`,
-        _id: `job-${Date.now()}`,
-        title: form.title,
-        company: form.company,
-        companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-        location: form.location || 'Remote',
-        type: form.type,
-        employmentType: form.type,
-        salary: form.salary || 'Competitive',
-        applicants: [],
-        postedDate: 'Just now',
-        status: 'Active',
-        skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
-        description: form.description,
-      };
-
-      setJobListings([newJob, ...jobListings]);
-      setForm({
-        title: '',
-        company: '',
-        companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-        location: '',
-        type: 'Full-time',
-        salary: '',
-        skills: '',
-        description: '',
+      const res = await fetch(buildApiUrl('/jobs'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: form.title,
+          company: form.company,
+          companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+          location: form.location || 'Remote',
+          employmentType: form.type,
+          salary: form.salary,
+          skills: form.skills,
+          description: form.description,
+        }),
       });
-      showToast('Job posting published successfully! 🎉');
-      setActiveTab('manage');
+
+      const data = await res.json();
+      if (res.ok && data.job) {
+        setJobListings([data.job, ...jobListings]);
+        setForm({
+          title: '',
+          company: '',
+          companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+          location: '',
+          type: 'Full-time',
+          salary: '',
+          skills: '',
+          description: '',
+        });
+        showToast('Job posting published successfully to Arcturus Jobs! 🎉');
+        setActiveTab('manage');
+        return;
+      } else {
+        showToast(data.error || 'Failed to publish job.');
+      }
     } catch (err) {
       console.error('Failed to post job:', err);
       showToast('Error publishing job listing.');
@@ -201,15 +142,28 @@ const JobPostingPage = () => {
   };
 
   const handleDeleteJob = async (id) => {
+    if (!token) {
+      showToast('Please sign in to manage listings');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to close and delete this job listing?')) {
+      return;
+    }
+
     try {
-      if (token && id && !id.toString().startsWith('job-')) {
-        await fetch(buildApiUrl(`/jobs/${id}`), {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      const res = await fetch(buildApiUrl(`/jobs/${id}`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        setJobListings((prev) => prev.filter((j) => (j._id || j.id) !== id));
+        showToast('Job listing closed and deleted successfully.');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to delete listing.');
       }
-      setJobListings((prev) => prev.filter((j) => (j._id || j.id) !== id));
-      showToast('Job listing removed.');
     } catch (err) {
       console.error('Delete job error:', err);
       showToast('Failed to delete listing.');
@@ -253,212 +207,231 @@ const JobPostingPage = () => {
           </div>
         )}
 
-        {/* Tab 1: Post a Job Form */}
-        {activeTab === 'post' && (
-          <div className="jobPostCard">
-            <div className="jobCardHeader">
-              <h3>Create a New Job Opening</h3>
-              <p>Reach thousands of qualified professionals across the Arcturus network.</p>
-            </div>
-
-            <form onSubmit={handlePostJob} className="jobForm">
-              <div className="jobFormGrid">
-                <div className="formGroup">
-                  <label>Job Title *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Lead React Engineer, Cloud Architect"
-                    required
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  />
-                </div>
-
-                <div className="formGroup">
-                  <label>Company / Organization *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Arcturus Labs"
-                    required
-                    value={form.company}
-                    onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  />
-                </div>
-
-                {/* Company Logo / Icon Field */}
-                <div className="formGroup fullWidth">
-                  <label>Company Logo / Icon URL</label>
-                  <div className="logoInputWrapper">
-                    <div className="logoPreviewContainer">
-                      <img
-                        src={form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
-                        alt="Company Logo Preview"
-                        className="logoPreviewImg"
-                        onError={(e) => {
-                          e.target.src = 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
-                        }}
-                      />
-                    </div>
-                    <div className="logoInputRight">
-                      <input
-                        type="url"
-                        placeholder="https://example.com/logo.png"
-                        value={form.companyLogo}
-                        onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
-                      />
-                      <div className="presetLogosRow">
-                        <span className="presetLabel">Presets:</span>
-                        {LOGO_PRESETS.map((preset, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`presetLogoBtn ${form.companyLogo === preset.url ? 'active' : ''}`}
-                            onClick={() => setForm({ ...form, companyLogo: preset.url })}
-                            title={preset.label}
-                          >
-                            <img src={preset.url} alt={preset.label} />
-                            <span>{preset.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="formGroup">
-                  <label>Work Location & Workplace Type</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Bengaluru, India · Hybrid / Remote"
-                    value={form.location}
-                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  />
-                </div>
-
-                <div className="formGroup">
-                  <label>Employment Type</label>
-                  <select
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Internship">Internship</option>
-                  </select>
-                </div>
-
-                <div className="formGroup">
-                  <label>Estimated Compensation / Salary Range</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. ₹18,00,000 - ₹25,00,000 / yr"
-                    value={form.salary}
-                    onChange={(e) => setForm({ ...form, salary: e.target.value })}
-                  />
-                </div>
-
-                <div className="formGroup">
-                  <label>Required Skills (Comma-separated)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. React, Node.js, MongoDB, TypeScript"
-                    value={form.skills}
-                    onChange={(e) => setForm({ ...form, skills: e.target.value })}
-                  />
-                </div>
-
-                <div className="formGroup fullWidth">
-                  <label>Job Description & Responsibilities</label>
-                  <textarea
-                    rows={5}
-                    placeholder="Outline the responsibilities, qualifications, requirements, and benefits..."
-                    value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="jobFormActions">
-                <button type="submit" className="publishJobBtn" disabled={submitting}>
-                  <FaPlus size={13} /> <span>{submitting ? 'Publishing...' : 'Publish Job Listing'}</span>
-                </button>
-              </div>
-            </form>
+        {/* Unauthorized State */}
+        {!token ? (
+          <div className="unauthorizedJobsCard">
+            <FaLock size={44} className="lockIcon" />
+            <h3>Recruiter Authentication Required</h3>
+            <p>You must be signed in with your Arcturus account to publish openings and manage your active job listings.</p>
+            <Link to="/login" className="authLoginBtn">
+              <FaSignInAlt size={14} /> <span>Sign In to Continue</span>
+            </Link>
           </div>
-        )}
+        ) : (
+          <>
+            {/* Tab 1: Post a Job Form */}
+            {activeTab === 'post' && (
+              <div className="jobPostCard">
+                <div className="jobCardHeader">
+                  <h3>Create a New Job Opening</h3>
+                  <p>Reach thousands of qualified professionals across the Arcturus network.</p>
+                </div>
 
-        {/* Tab 2: Manage Active Listings */}
-        {activeTab === 'manage' && (
-          <div className="jobManageContainer">
-            {jobListings.length === 0 ? (
-              <div className="emptyJobsBox">
-                <FaBriefcase size={36} />
-                <h3>No active job listings</h3>
-                <p>You haven't posted any jobs yet. Create your first opening to attract applicants.</p>
-                <button type="button" className="publishJobBtn" onClick={() => setActiveTab('post')}>
-                  <FaPlus size={12} /> Post a Job
-                </button>
-              </div>
-            ) : (
-              <div className="jobCardsList">
-                {jobListings.map((job) => {
-                  const jobId = job._id || job.id;
-                  const applicantCount = Array.isArray(job.applicants) ? job.applicants.length : (job.applicants || 0);
+                <form onSubmit={handlePostJob} className="jobForm">
+                  <div className="jobFormGrid">
+                    <div className="formGroup">
+                      <label>Job Title *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Lead React Engineer, Cloud Architect"
+                        required
+                        value={form.title}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                      />
+                    </div>
 
-                  return (
-                    <div key={jobId} className="jobListingCard">
-                      <div className="jobCardTop">
-                        <img
-                          src={job.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
-                          alt={job.company}
-                          className="manageCompanyLogo"
-                        />
-                        <div className="jobPrimary">
-                          <h4>{job.title}</h4>
-                          <div className="jobMetaRow">
-                            <span><FaBuilding /> {job.company}</span>
-                            <span><FaMapMarkerAlt /> {job.location}</span>
-                            <span><FaClock /> {job.employmentType || job.type}</span>
-                            {job.salary && <span><FaMoneyBillWave /> {job.salary}</span>}
+                    <div className="formGroup">
+                      <label>Company / Organization *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Arcturus Labs"
+                        required
+                        value={form.company}
+                        onChange={(e) => setForm({ ...form, company: e.target.value })}
+                      />
+                    </div>
+
+                    {/* Company Logo / Icon Field */}
+                    <div className="formGroup fullWidth">
+                      <label>Company Logo / Icon URL</label>
+                      <div className="logoInputWrapper">
+                        <div className="logoPreviewContainer">
+                          <img
+                            src={form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                            alt="Company Logo Preview"
+                            className="logoPreviewImg"
+                            onError={(e) => {
+                              e.target.src = 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+                            }}
+                          />
+                        </div>
+                        <div className="logoInputRight">
+                          <input
+                            type="url"
+                            placeholder="https://example.com/logo.png"
+                            value={form.companyLogo}
+                            onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
+                          />
+                          <div className="presetLogosRow">
+                            <span className="presetLabel">Presets:</span>
+                            {LOGO_PRESETS.map((preset, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                className={`presetLogoBtn ${form.companyLogo === preset.url ? 'active' : ''}`}
+                                onClick={() => setForm({ ...form, companyLogo: preset.url })}
+                                title={preset.label}
+                              >
+                                <img src={preset.url} alt={preset.label} />
+                                <span>{preset.label}</span>
+                              </button>
+                            ))}
                           </div>
                         </div>
-
-                        <span className="statusBadge active">
-                          <span className="statusDot" /> {job.status || 'Active'}
-                        </span>
-                      </div>
-
-                      <p className="jobDescSnippet">{job.description}</p>
-
-                      {job.skills && job.skills.length > 0 && (
-                        <div className="jobSkillsPills">
-                          {job.skills.map((s, idx) => (
-                            <span key={idx} className="skillPill">{s}</span>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="jobCardFooter">
-                        <div className="applicantCountBadge">
-                          <FaUsers size={13} /> <span>{applicantCount} candidates applied</span>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="deleteJobBtn"
-                          onClick={() => handleDeleteJob(jobId)}
-                          title="Close and delete job"
-                        >
-                          <FaTrashAlt size={12} /> <span>Close Job</span>
-                        </button>
                       </div>
                     </div>
-                  );
-                })}
+
+                    <div className="formGroup">
+                      <label>Work Location & Workplace Type</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Bengaluru, India · Hybrid / Remote"
+                        value={form.location}
+                        onChange={(e) => setForm({ ...form, location: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="formGroup">
+                      <label>Employment Type</label>
+                      <select
+                        value={form.type}
+                        onChange={(e) => setForm({ ...form, type: e.target.value })}
+                      >
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Internship">Internship</option>
+                      </select>
+                    </div>
+
+                    <div className="formGroup">
+                      <label>Estimated Compensation / Salary Range</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. ₹18,00,000 - ₹25,00,000 / yr"
+                        value={form.salary}
+                        onChange={(e) => setForm({ ...form, salary: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="formGroup">
+                      <label>Required Skills (Comma-separated)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. React, Node.js, MongoDB, TypeScript"
+                        value={form.skills}
+                        onChange={(e) => setForm({ ...form, skills: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="formGroup fullWidth">
+                      <label>Job Description & Responsibilities</label>
+                      <textarea
+                        rows={5}
+                        placeholder="Outline the responsibilities, qualifications, requirements, and benefits..."
+                        value={form.description}
+                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="jobFormActions">
+                    <button type="submit" className="publishJobBtn" disabled={submitting}>
+                      <FaPlus size={13} /> <span>{submitting ? 'Publishing...' : 'Publish Job Listing'}</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
-          </div>
+
+            {/* Tab 2: Manage Active Listings */}
+            {activeTab === 'manage' && (
+              <div className="jobManageContainer">
+                {loading ? (
+                  <div className="manageLoadingBox">
+                    <div className="jobsSpinner" />
+                    <p>Loading your job listings from database...</p>
+                  </div>
+                ) : jobListings.length === 0 ? (
+                  <div className="emptyJobsBox">
+                    <FaBriefcase size={36} />
+                    <h3>No active job listings</h3>
+                    <p>You haven't posted any jobs yet. Create your first opening to attract candidates.</p>
+                    <button type="button" className="publishJobBtn" onClick={() => setActiveTab('post')}>
+                      <FaPlus size={12} /> Post a Job
+                    </button>
+                  </div>
+                ) : (
+                  <div className="jobCardsList">
+                    {jobListings.map((job) => {
+                      const jobId = job._id || job.id;
+                      const applicantCount = Array.isArray(job.applicants) ? job.applicants.length : (job.applicants || 0);
+
+                      return (
+                        <div key={jobId} className="jobListingCard">
+                          <div className="jobCardTop">
+                            <img
+                              src={job.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                              alt={job.company}
+                              className="manageCompanyLogo"
+                            />
+                            <div className="jobPrimary">
+                              <h4>{job.title}</h4>
+                              <div className="jobMetaRow">
+                                <span><FaBuilding size={11} /> {job.company}</span>
+                                <span><FaMapMarkerAlt size={11} /> {job.location}</span>
+                                <span><FaClock size={11} /> {job.employmentType || job.type}</span>
+                                {job.salary && <span><FaMoneyBillWave size={11} /> {job.salary}</span>}
+                              </div>
+                            </div>
+
+                            <span className="statusBadge active">
+                              <span className="statusDot" /> {job.status || 'Active'}
+                            </span>
+                          </div>
+
+                          <p className="jobDescSnippet">{job.description}</p>
+
+                          {job.skills && job.skills.length > 0 && (
+                            <div className="jobSkillsPills">
+                              {(Array.isArray(job.skills) ? job.skills : job.skills.split(',')).map((s, idx) => (
+                                <span key={idx} className="skillPill">{typeof s === 'string' ? s.trim() : s}</span>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="jobCardFooter">
+                            <div className="applicantCountBadge">
+                              <FaUsers size={13} /> <span>{applicantCount} candidates applied</span>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="closeJobBtn"
+                              onClick={() => handleDeleteJob(jobId)}
+                              title="Close and delete job"
+                            >
+                              <FaTrashAlt size={12} /> <span>Close Job</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
