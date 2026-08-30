@@ -299,3 +299,4 @@ const JobPostingPage = () => {
 };
 
 export default JobPostingPage;
+
