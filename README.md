@@ -1,11 +1,12 @@
 # ⚡ Arcturus Connexa
 
-<div align="left">
+<div align="center">
   <img src="public/logo.png" alt="Arcturus Logo" width="90" height="90" />
   <h3>Next-Generation Professional Social & Career Networking Platform</h3>
   <p>
     A full-stack professional networking platform designed to connect developers, creators, and recruiters with real-time communication, multimedia feeds, interactive job listings, and frosted glassmorphic authentication.
   </p>
+  </div>
 
 ---
 
