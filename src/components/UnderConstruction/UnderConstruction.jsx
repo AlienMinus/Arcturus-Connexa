@@ -3,25 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaHardHat, 
   FaTools, 
-  FaRocket, 
   FaArrowLeft, 
   FaHome, 
-  FaCompass, 
+  FaUserFriends, 
   FaCheckCircle 
 } from 'react-icons/fa';
 import './UnderConstruction.css';
 
 const DEFAULT_HIGHLIGHTS = [
-  'Advanced search and curated opportunity matching',
-  'Real-time notifications and status updates',
-  'Seamless integration with your Arcturus profile',
-  'High-speed responsive experience across all devices',
+  'Personalized opportunities & smart recommendations',
+  'Direct messaging with hiring managers',
+  '1-Click Easy Apply with your Arcturus profile',
 ];
 
 const UnderConstruction = ({
   title = 'This page is under construction',
-  subtitle = 'We are working hard to bring you exciting new features, integrations, and opportunities. Stay tuned for upcoming updates!',
-  featureName = 'Feature in Progress',
+  subtitle = "We're crafting an intelligent experience to bring you new tools and opportunities. Check back soon!",
+  featureName = 'Coming Soon',
   highlights = DEFAULT_HIGHLIGHTS,
   showHomeButton = true,
 }) => {
@@ -30,27 +28,27 @@ const UnderConstruction = ({
   return (
     <div className="underConstructionWrapper">
       <div className="underConstructionCard">
-        {/* Animated Construction Badge */}
+        {/* Sleek Icon Badge */}
         <div className="constructionBadge">
           <div className="iconGlow"></div>
-          <FaHardHat className="hardhatIcon" size={44} />
-          <FaTools className="toolsSubIcon" size={20} />
+          <FaHardHat className="hardhatIcon" size={36} />
+          <FaTools className="toolsSubIcon" size={14} />
         </div>
 
-        {/* Status Pill */}
+        {/* Feature Status Pill */}
         <div className="statusPill">
           <span className="pulsingDot"></span>
           <span>{featureName}</span>
         </div>
 
-        {/* Heading & Description */}
+        {/* Heading & Subtitle */}
         <h1 className="constructionTitle">{title}</h1>
         <p className="constructionSubtitle">{subtitle}</p>
 
-        {/* Feature Preview Checklist */}
+        {/* Feature Highlights */}
         {highlights && highlights.length > 0 && (
           <div className="highlightsBox">
-            <h3>What to expect:</h3>
+            <h3>Upcoming Features:</h3>
             <ul className="highlightsList">
               {highlights.map((item, index) => (
                 <li key={index}>
@@ -62,27 +60,27 @@ const UnderConstruction = ({
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Action Controls */}
         <div className="constructionActions">
           <button 
             type="button" 
             className="actionBtn secondary" 
             onClick={() => navigate(-1)}
           >
-            <FaArrowLeft size={13} />
+            <FaArrowLeft size={12} />
             <span>Go Back</span>
           </button>
 
           {showHomeButton && (
             <Link to="/" className="actionBtn primary">
-              <FaHome size={14} />
-              <span>Back to Home Feed</span>
+              <FaHome size={13} />
+              <span>Home Feed</span>
             </Link>
           )}
 
           <Link to="/network" className="actionBtn outline">
-            <FaCompass size={14} />
-            <span>Explore Network</span>
+            <FaUserFriends size={13} />
+            <span>My Network</span>
           </Link>
         </div>
       </div>
@@ -91,4 +89,3 @@ const UnderConstruction = ({
 };
 
 export default UnderConstruction;
-
