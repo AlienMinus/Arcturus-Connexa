@@ -1,0 +1,358 @@
+/* ==========================================================================
+   HELP & SUPPORT PAGE STYLES
+   ========================================================================== */
+
+.helpPageWrapper {
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  background: #f3f2ef;
+  padding-bottom: 85px;
+  box-sizing: border-box;
+}
+
+/* Hero Header */
+.helpHero {
+  background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+  color: #ffffff;
+  padding: 44px 20px 48px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.helpHeroContent {
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helpIconBadge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.helpHeroContent h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.helpHeroContent p {
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.helpSearchBox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  gap: 12px;
+}
+
+.helpSearchBox .searchIcon {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.helpSearchBox input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: transparent;
+}
+
+/* Main Container */
+.helpMainContainer {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.helpTopNav {
+  display: flex;
+  align-items: center;
+}
+
+.helpBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  transition: all 0.15s ease;
+}
+
+.helpBackBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.helpSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #191919;
+}
+
+/* Categories Grid */
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.categoryCard {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.categoryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #0a66c2;
+}
+
+.categoryIcon {
+  color: #0a66c2;
+  margin-bottom: 4px;
+}
+
+.categoryCard h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.categoryCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* FAQ Accordion */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faqItem {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.faqQuestion:hover {
+  background: #f8fafc;
+}
+
+.faqAnswer {
+  padding: 0 20px 16px;
+  border-top: 1px solid #f1f5f9;
+  background: #fafafa;
+}
+
+.faqAnswer p {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.55;
+}
+
+/* Support Ticket Form */
+.supportTicketCard {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ticketHeader h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ticketHeader p {
+  margin: 0 0 20px;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+
+.ticketForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  border-color: #0a66c2;
+}
+
+.submitTicketBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.submitTicketBtn:hover {
+  background: #004182;
+}
+
+.ticketSuccessBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 16px;
+  color: #059669;
+  gap: 8px;
+}
+
+.ticketSuccessBox h3 {
+  margin: 0;
+  color: #065f46;
+  font-size: 1.15rem;
+}
+
+.ticketSuccessBox p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  max-width: 420px;
+}
+
+@media (max-width: 768px) {
+  .helpHero {
+    padding: 32px 14px 36px;
+  }
+
+  .helpHeroContent h1 {
+    font-size: 1.4rem;
+  }
+
+  .helpMainContainer {
+    padding: 16px 8px;
+  }
+
+  .categoriesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .submitTicketBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

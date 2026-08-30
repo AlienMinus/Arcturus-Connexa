@@ -1,0 +1,383 @@
+/* ==========================================================================
+   SETTINGS PAGE STYLES
+   ========================================================================== */
+
+.settingsPageWrapper {
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  background: #f3f2ef;
+  padding: 24px 16px 85px;
+  box-sizing: border-box;
+}
+
+.settingsContainer {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settingsTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: 1px solid #e0dfdc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.settingsTopBar h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #191919;
+}
+
+.settingsBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  transition: all 0.15s ease;
+}
+
+.settingsBackBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.settingsUserBadge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0a66c2;
+  background: #ebf4fd;
+  padding: 4px 12px;
+  border-radius: 14px;
+}
+
+.settingsToast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  animation: toastSlide 0.2s ease-out;
+}
+
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.settingsLayout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.settingsSidebar {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 76px;
+}
+
+.settingsNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settingsTabBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.settingsTabBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.settingsTabBtn.active {
+  background: #ebf4fd;
+  color: #0a66c2;
+  font-weight: 700;
+}
+
+.tabIcon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.settingsContentArea {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settingsCard {
+  background: #ffffff;
+  border: 1px solid #e0dfdc;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.settingsCardHeader {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.settingsCardHeader h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.settingsCardHeader p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.settingsRowsList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.settingsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.settingsRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rowInfo h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.rowInfo p {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.rowControl select {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.rowControl select:focus {
+  border-color: #0a66c2;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleActive {
+  color: #0a66c2;
+}
+
+.toggleInactive {
+  color: #94a3b8;
+}
+
+.badgeActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* Password Form */
+.settingsPasswordBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 8px;
+}
+
+.passwordBoxHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.lockIcon {
+  color: #0a66c2;
+}
+
+.passwordBoxHeader h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formRowGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.passwordForm .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.passwordForm label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.passwordForm input {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  outline: none;
+  background: #fff;
+}
+
+.passwordForm input:focus {
+  border-color: #0a66c2;
+}
+
+.savePasswordBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.15s ease;
+}
+
+.savePasswordBtn:hover {
+  background: #004182;
+}
+
+@media (max-width: 768px) {
+  .settingsPageWrapper {
+    padding: 8px 4px 85px;
+  }
+
+  .settingsLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .settingsSidebar {
+    position: static;
+    padding: 6px;
+    overflow-x: auto;
+  }
+
+  .settingsNav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .settingsTabBtn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .settingsCard {
+    padding: 16px 12px;
+  }
+
+  .settingsRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .formRowGrid {
+    grid-template-columns: 1fr;
+  }
+}

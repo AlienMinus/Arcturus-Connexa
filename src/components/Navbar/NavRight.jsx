@@ -9,9 +9,11 @@ import "./Navbar.css";
 const NavRight = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { profile } = useProfile();
-  const { logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const containerRef = useRef(null);
+
+  const isAuthenticated = Boolean(token);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -31,10 +33,14 @@ const NavRight = () => {
     setDropdownOpen((prev) => !prev);
   };
 
-  const handleSignOut = () => {
-    logout();
+  const handleAuthAction = () => {
     setDropdownOpen(false);
-    navigate("/login", { replace: true });
+    if (isAuthenticated) {
+      logout();
+      navigate("/login", { replace: true });
+    } else {
+      navigate("/login");
+    }
   };
 
   const userProfileUrl = profile?.username
@@ -51,7 +57,7 @@ const NavRight = () => {
           role="button"
           tabIndex={0}
         >
-          {profile?.avatar?.url ? (
+          {isAuthenticated && profile?.avatar?.url ? (
             <img
               src={profile.avatar.url}
               alt={profile?.name || "Profile"}
@@ -61,12 +67,16 @@ const NavRight = () => {
             <CgProfile className="profileAvatar profileAvatarFallback" />
           )}
           <span className="profile-text">
-            {profile?.name ? `${profile.name.split(" ")[0]}` : "Me"}{" "}
+            {isAuthenticated
+              ? profile?.name
+                ? `${profile.name.split(" ")[0]}`
+                : "Me"
+              : "Sign In"}{" "}
             <FaCaretDown />
           </span>
         </div>
 
-        {/* For Business Placeholder */}
+        {/* For Business Link */}
         <Link to="/learning" className="businessMenu">
           <span className="business-icon">
             <FaTh size={20} color="#666" />
@@ -88,7 +98,7 @@ const NavRight = () => {
         <div className="profile-dropdown">
           {/* Header with Avatar & Name */}
           <div className="profile-dropdown-header">
-            {profile?.avatar?.url ? (
+            {isAuthenticated && profile?.avatar?.url ? (
               <img
                 src={profile.avatar.url}
                 alt={profile?.name || "Profile"}
@@ -98,20 +108,38 @@ const NavRight = () => {
               <CgProfile className="dropdownAvatar dropdownAvatarFallback" />
             )}
             <div className="user-info">
-              <h4>{profile?.name || "User"}</h4>
-              <p>{profile?.headline || "Arcturus Member"}</p>
+              <h4>
+                {isAuthenticated
+                  ? profile?.name || user?.name || "Member"
+                  : "Guest Visitor"}
+              </h4>
+              <p>
+                {isAuthenticated
+                  ? profile?.headline || "Arcturus Member"
+                  : "Sign in to access your network"}
+              </p>
             </div>
           </div>
 
-          {/* View Profile CTA */}
+          {/* View Profile or Sign In CTA */}
           <div className="profile-dropdown-body">
-            <Link
-              to={userProfileUrl}
-              className="view-profile-btn"
-              onClick={() => setDropdownOpen(false)}
-            >
-              View Profile
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to={userProfileUrl}
+                className="view-profile-btn"
+                onClick={() => setDropdownOpen(false)}
+              >
+                View Profile
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="view-profile-btn"
+                onClick={() => setDropdownOpen(false)}
+              >
+                Sign In / Join
+              </Link>
+            )}
           </div>
 
           {/* Account Section */}
@@ -129,7 +157,7 @@ const NavRight = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/settings" onClick={() => setDropdownOpen(false)}>
+                <Link to="/settings/language" onClick={() => setDropdownOpen(false)}>
                   Language
                 </Link>
               </li>
@@ -142,28 +170,32 @@ const NavRight = () => {
             <ul className="profile-dropdown-list">
               <li>
                 <Link
-                  to={profile?.username ? `/profile/${encodeURIComponent(profile.username)}/activity` : "/profile/activity"}
+                  to={
+                    profile?.username
+                      ? `/profile/${encodeURIComponent(profile.username)}/activity`
+                      : "/profile/activity"
+                  }
                   onClick={() => setDropdownOpen(false)}
                 >
                   Posts & Activity
                 </Link>
               </li>
               <li>
-                <Link to="/jobs" onClick={() => setDropdownOpen(false)}>
+                <Link to="/jobs/manage" onClick={() => setDropdownOpen(false)}>
                   Job Posting Account
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Sign Out Footer */}
+          {/* Sign Out / Sign In Footer */}
           <div className="profile-dropdown-footer">
             <button
               type="button"
               className="sign-out-btn"
-              onClick={handleSignOut}
+              onClick={handleAuthAction}
             >
-              Sign Out
+              {isAuthenticated ? "Sign Out" : "Sign In"}
             </button>
           </div>
         </div>
