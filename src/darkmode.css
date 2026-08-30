@@ -40,6 +40,8 @@ body.dark-mode .networkPage,
 body.dark-mode .notificationsPage,
 [data-theme="dark"] .profilePage-wrapper,
 body.dark-mode .profilePage-wrapper,
+[data-theme="dark"] .profileEditPageWrapper,
+body.dark-mode .profileEditPageWrapper,
 [data-theme="dark"] .settingsPageWrapper,
 body.dark-mode .settingsPageWrapper,
 [data-theme="dark"] .helpPageWrapper,
@@ -1678,4 +1680,145 @@ body.dark-mode .jobsSpinner {
 [data-theme="dark"] .spinAnimation,
 body.dark-mode .spinAnimation {
   color: var(--accent-blue) !important;
+}
+
+/* ==========================================================================
+   15. PROFILE EDIT PAGE & SECTIONS
+   ========================================================================== */
+[data-theme="dark"] .profileEditTopBar,
+body.dark-mode .profileEditTopBar {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .profileEditTopBar h2,
+body.dark-mode .profileEditTopBar h2 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .profileEditBackBtn,
+body.dark-mode .profileEditBackBtn {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .profileEditBackBtn:hover,
+body.dark-mode .profileEditBackBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .profileEditSidebar,
+body.dark-mode .profileEditSidebar {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .profileEditTabBtn,
+body.dark-mode .profileEditTabBtn {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .profileEditTabBtn:hover,
+body.dark-mode .profileEditTabBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .profileEditTabBtn.active,
+body.dark-mode .profileEditTabBtn.active {
+  background-color: var(--accent-blue-bg) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .editorSectionCard,
+body.dark-mode .editorSectionCard {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .editorSectionHeader,
+body.dark-mode .editorSectionHeader {
+  border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .editorSectionHeader h3,
+body.dark-mode .editorSectionHeader h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .editorSectionHeader p,
+body.dark-mode .editorSectionHeader p {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .editorItemBox,
+body.dark-mode .editorItemBox {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .editorItemBoxHeader,
+body.dark-mode .editorItemBoxHeader {
+  border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .editorItemBoxHeader h4,
+body.dark-mode .editorItemBoxHeader h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .editorEmptyPlaceholder,
+body.dark-mode .editorEmptyPlaceholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .editorSkillChip,
+body.dark-mode .editorSkillChip {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .chipRemoveBtn,
+body.dark-mode .chipRemoveBtn {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .chipRemoveBtn:hover,
+body.dark-mode .chipRemoveBtn:hover {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .editorAddBtn,
+body.dark-mode .editorAddBtn {
+  background-color: var(--accent-blue-bg) !important;
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .editorAddBtn:hover,
+body.dark-mode .editorAddBtn:hover {
+  background-color: var(--accent-blue) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .editorDeleteBtn,
+body.dark-mode .editorDeleteBtn {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .editorDeleteBtn:hover,
+body.dark-mode .editorDeleteBtn:hover {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+[data-theme="dark"] .fieldCharacterCount,
+body.dark-mode .fieldCharacterCount {
+  color: var(--text-muted) !important;
 }
