@@ -16,6 +16,8 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../context/ProfileContext';
+import { useTheme } from '../../context/ThemeContext';
+import { buildApiUrl } from '../../utils/api';
 import './SettingsPage.css';
 
 const LANGUAGES = [
@@ -32,8 +34,9 @@ const LANGUAGES = [
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { profile } = useProfile();
+  const { theme, setTheme, toggleTheme } = useTheme();
 
   // Determine initial tab from pathname (e.g. /settings/language -> 'language')
   const getInitialTab = () => {
@@ -70,6 +73,7 @@ const SettingsPage = () => {
   });
 
   const [toastMessage, setToastMessage] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   useEffect(() => {
     setActiveTab(getInitialTab());
@@ -77,7 +81,7 @@ const SettingsPage = () => {
 
   const showToast = (msg) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3000);
+    setTimeout(() => setToastMessage(''), 3500);
   };
 
   const handleToggle = (key) => {
@@ -95,14 +99,51 @@ const SettingsPage = () => {
     showToast(`Language updated to ${LANGUAGES.find((l) => l.code === code)?.name}`);
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    if (!passwordForm.currentPassword) {
+      showToast('Please enter your current password');
+      return;
+    }
     if (!passwordForm.newPassword || passwordForm.newPassword !== passwordForm.confirmPassword) {
       showToast('New passwords do not match');
       return;
     }
-    showToast('Password updated securely!');
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    if (passwordForm.newPassword.length < 6) {
+      showToast('Password must be at least 6 characters');
+      return;
+    }
+
+    if (!token) {
+      showToast('Password updated locally (guest mode)');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      return;
+    }
+
+    try {
+      setIsUpdatingPassword(true);
+      const res = await fetch(buildApiUrl('/auth/change-password'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(passwordForm),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || 'Password changed successfully! 🔒');
+        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        showToast(data.error || 'Failed to update password');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while updating password');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
   };
 
   return (
@@ -192,17 +233,32 @@ const SettingsPage = () => {
                       <h4>Display Theme</h4>
                       <p>Choose between standard light mode and high-contrast dark theme.</p>
                     </div>
-                    <div className="rowControl">
+                    <div className="rowControl themeControlGroup">
                       <select 
-                        value={settings.theme} 
+                        value={theme} 
                         onChange={(e) => {
-                          setSettings(prev => ({ ...prev, theme: e.target.value }));
-                          showToast(`Theme set to ${e.target.value}`);
+                          setTheme(e.target.value);
+                          showToast(`Theme set to ${e.target.value === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}`);
                         }}
                       >
-                        <option value="light">Light Mode</option>
-                        <option value="dark">Dark Mode</option>
+                        <option value="light">Light Mode ☀️</option>
+                        <option value="dark">Dark Mode 🌙</option>
                       </select>
+                      <button 
+                        type="button" 
+                        className="toggleBtn" 
+                        onClick={() => {
+                          toggleTheme();
+                          showToast(`Theme set to ${theme === 'dark' ? 'Light Mode ☀️' : 'Dark Mode 🌙'}`);
+                        }}
+                        title="Toggle dark mode"
+                      >
+                        {theme === 'dark' ? (
+                          <FaToggleOn size={28} className="toggleActive" />
+                        ) : (
+                          <FaToggleOff size={28} className="toggleInactive" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
@@ -312,8 +368,8 @@ const SettingsPage = () => {
                           />
                         </div>
                       </div>
-                      <button type="submit" className="savePasswordBtn">
-                        <FaSave size={13} /> Update Password
+                      <button type="submit" className="savePasswordBtn" disabled={isUpdatingPassword}>
+                        <FaSave size={13} /> {isUpdatingPassword ? 'Updating Password...' : 'Update Password'}
                       </button>
                     </form>
                   </div>
