@@ -92,7 +92,7 @@
      To avoid editing React markup, we keep .navbar as the top bar and use
      a fixed .navCenter as the bottom navigation for mobile.
   -------------------------------------------------------------------------- */
-.navbar {
+  .navbar {
     height: 56px;
     padding: 0 10px;
     justify-content: space-between;
@@ -144,7 +144,7 @@
     display: block;
   }
 
-.navLabel {
+  .navLabel {
     font-size: 10px;
     margin-top: 2px;
     white-space: nowrap;
@@ -169,7 +169,7 @@
     flex-shrink: 0;
   }
 
-.searchBox {
+  .searchBox {
     flex: 1;
     min-width: 0;
     max-width: none;
@@ -417,15 +417,18 @@
     font-size: 14px;
   }
 
-  /* ===== MESSENGER POPUPS → FULL-WIDTH BOTTOM SHEETS =====
-     Raised above the fixed bottom nav bar (58px) so they don't overlap it. */
-  .messenger,
-  .chatWindow,
-  .newMessageModal {
+  /* ===== MESSENGER POPUPS ON MOBILE (Home / Global) ===== */
+  .messenger {
+    display: none !important;
+  }
+
+  /* Floating chat popup when on non-messaging pages */
+  body:not(:has(.messaging-page-container)) .chatWindow,
+  body:not(:has(.messaging-page-container)) .newMessageModal {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 58px; /* sits above bottom nav bar */
+    bottom: 58px;
     width: 100%;
     height: 75vh;
     max-height: 480px;
@@ -434,66 +437,78 @@
     z-index: 1100;
   }
 
-  .messenger.closed {
-    height: 50px;
-  }
-
-  /* Hide the floating home messenger on mobile.
-     It's already available on the dedicated Messaging page.
-     (JS also prevents rendering it, this is a CSS safety net.) */
-  .messenger {
-    display: none;
-  }
-
-  /* ===== MESSAGING PAGE =====
-     On mobile: Show full list by default.
-     When a conversation is active, hide list and show full-screen chat with back button.
+  /* ===== DEDICATED MESSAGING PAGE =====
+     On mobile: Full height conversation list taking entire screen.
+     When activeChat is selected, full-screen chat with header back button.
   -------------------------------------------------------------------------- */
   .messaging-page-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 120px);
-    max-height: calc(100vh - 120px);
+    height: calc(100vh - 114px);
+    max-height: none;
+    min-height: calc(100vh - 114px);
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0 0 58px 0;
     border-radius: 0;
     border: none;
     background: #fff;
     box-shadow: none;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .messaging-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: none;
-    flex: 1;
-    height: 100%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #fff;
   }
 
   .messaging-sidebar-header {
     padding: 12px 16px;
+    border-bottom: 1px solid #ebebeb;
+    flex-shrink: 0;
   }
 
   .messaging-search-container {
-    padding: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ebebeb;
+    flex-shrink: 0;
   }
 
   .messaging-list-container {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .conversationList {
+    height: 100% !important;
+    overflow-y: auto !important;
   }
 
   .messaging-main {
-    display: none;
+    display: none !important;
     width: 100%;
     height: 100%;
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
+    background: #fff;
+  }
+
+  .messaging-main .messaging-empty-state {
+    display: none !important;
   }
 
   .messaging-page-container.has-active-chat .messaging-sidebar {
@@ -502,6 +517,8 @@
 
   .messaging-page-container.has-active-chat .messaging-main {
     display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
   }
 
   .messaging-main .chatWindow {
@@ -511,6 +528,20 @@
     max-height: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .messaging-main .chatMessages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  .messaging-main .chatInputArea {
+    padding: 8px 12px;
+    flex-shrink: 0;
   }
 
   /* ===== PROFILE PAGE ===== */
@@ -827,7 +858,7 @@
     font-size: 9px;
   }
 
-.homeLayout {
+  .homeLayout {
     padding: 8px 4px;
   }
 
@@ -897,26 +928,6 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
   }
-
-.messenger,
-  .chatWindow,
-  .newMessageModal {
-    height: 80vh;
-  }
-
-  /* ===== MESSAGING PAGE (small phones) ===== */
-  .messaging-page-container {
-    margin: 8px auto;
-    max-height: calc(100vh - 110px);
-  }
-
-  .messaging-sidebar {
-    max-height: 38vh;
-  }
-
-  .messaging-main {
-    min-height: 50vh;
-  }
 }
 
 /* ==========================================================================
@@ -932,18 +943,10 @@
     .homeLayout,
     .profilePage,
     .networkPage,
-.notificationsPage,
+    .notificationsPage,
     .activity-page,
-    .post-page-container,
-    .messaging-page-container {
+    .post-page-container {
       padding-bottom: calc(70px + env(safe-area-inset-bottom));
-    }
-
-    .messenger,
-    .chatWindow,
-    .newMessageModal {
-      bottom: calc(58px + env(safe-area-inset-bottom));
-      padding-bottom: env(safe-area-inset-bottom);
     }
   }
 }
