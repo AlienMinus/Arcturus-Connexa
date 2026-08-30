@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaBell } from 'react-icons/fa';
 import { buildApiUrl } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import './NotificationsPage.css';
@@ -93,7 +94,10 @@ const NotificationsPage = () => {
         {notifications.filter((n) => !n.read).length} unread
       </div>
       {notifications.length === 0 ? (
-        <div className="notificationsEmpty">No notifications yet.</div>
+        <div className="notificationsEmpty">
+          <FaBell size={32} style={{ color: 'var(--accent-blue, #0a66c2)', opacity: 0.8, marginBottom: '4px' }} />
+          <span>No notifications yet.</span>
+        </div>
       ) : (
         <div className="notificationsList">
           {notifications.map((notification) => {

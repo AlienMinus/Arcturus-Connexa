@@ -1502,6 +1502,43 @@ body.dark-mode .notificationDesc {
   color: var(--text-secondary) !important;
 }
 
+[data-theme="dark"] .notificationsPage,
+body.dark-mode .notificationsPage {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notificationsPage h1,
+body.dark-mode .notificationsPage h1 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .notificationsBadge,
+body.dark-mode .notificationsBadge {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .notificationsEmpty,
+body.dark-mode .notificationsEmpty,
+[data-theme="dark"] .notificationItem,
+body.dark-mode .notificationItem,
+[data-theme="dark"] .notificationsPage.error,
+body.dark-mode .notificationsPage.error {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .notificationHeader,
+body.dark-mode .notificationHeader {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notificationHeader strong,
+body.dark-mode .notificationHeader strong {
+  color: #f8fafc !important;
+}
+
 [data-theme="dark"] .notificationItem.unread,
 body.dark-mode .notificationItem.unread {
   background-color: var(--accent-blue-bg) !important;
