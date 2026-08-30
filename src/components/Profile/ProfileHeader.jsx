@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CgProfile } from "react-icons/cg";
 import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck, FaCamera, FaSpinner } from "react-icons/fa";
 import { useProfile } from '../../context/ProfileContext';
@@ -15,6 +16,7 @@ const ProfileHeader = ({
   onProfileUpdate,
   actionState = {},
 }) => {
+  const navigate = useNavigate();
   const { refreshProfile } = useProfile();
   const {
     isFollowing,
@@ -52,7 +54,7 @@ const ProfileHeader = ({
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const res = await fetch(buildApiUrl('/profile'), {
+      const res = await fetch(buildApiUrl('/profile/avatar'), {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -60,8 +62,12 @@ const ProfileHeader = ({
 
       if (res.ok) {
         const data = await res.json();
-        if (onProfileUpdate) onProfileUpdate(data);
-        refreshProfile();
+        if (data.profile && onProfileUpdate) {
+          onProfileUpdate(data.profile);
+        } else if (data.avatar) {
+          onProfileUpdate?.({ avatar: data.avatar });
+        }
+        await refreshProfile();
       }
     } catch (err) {
       console.error('Failed to upload avatar', err);
@@ -81,7 +87,7 @@ const ProfileHeader = ({
       const formData = new FormData();
       formData.append('backgroundImage', file);
 
-      const res = await fetch(buildApiUrl('/profile'), {
+      const res = await fetch(buildApiUrl('/profile/cover'), {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -89,8 +95,12 @@ const ProfileHeader = ({
 
       if (res.ok) {
         const data = await res.json();
-        if (onProfileUpdate) onProfileUpdate(data);
-        refreshProfile();
+        if (data.profile && onProfileUpdate) {
+          onProfileUpdate(data.profile);
+        } else if (data.backgroundImage) {
+          onProfileUpdate?.({ backgroundImage: data.backgroundImage });
+        }
+        await refreshProfile();
       }
     } catch (err) {
       console.error('Failed to upload cover banner', err);

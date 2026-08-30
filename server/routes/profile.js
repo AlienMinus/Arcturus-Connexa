@@ -336,127 +336,186 @@ router.get('/:username', authMiddleware, async (req, res) => {
   }
 });
 
-// Update authenticated user's profile
-router.post(
-  '/',
-  authMiddleware,
-  upload.fields([
-    { name: 'avatar', maxCount: 1 },
-    { name: 'backgroundImage', maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      const user = await User.findById(req.userId);
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      const {
-        name,
-        headline,
-        location,
-        summary,
-        featured,
-        activity,
-        experience,
-        education,
-        certifications,
-        projects,
-        skills,
-        honors,
-        interests,
-      } = req.body;
-
-      const updateData = {
-        headline: headline !== undefined ? headline : (user.headline || ''),
-        location: location !== undefined ? location : (user.location || ''),
-        summary: summary || '',
-      };
-
-      // Handle name splitting and User model updates
-      if (typeof name === 'string' && name.trim()) {
-        const trimmedName = name.trim();
-        const parts = trimmedName.split(/\s+/);
-        if (parts.length === 1) {
-          user.firstName = parts[0];
-          user.middleName = '';
-          user.lastName = '';
-        } else if (parts.length === 2) {
-          user.firstName = parts[0];
-          user.middleName = '';
-          user.lastName = parts[1];
-        } else {
-          user.firstName = parts[0];
-          user.middleName = parts.slice(1, -1).join(' ');
-          user.lastName = parts[parts.length - 1];
-        }
-        updateData.name = trimmedName;
-      }
-
-      if (headline !== undefined) {
-        user.headline = headline;
-      }
-      if (location !== undefined) {
-        user.location = location;
-      }
-
-      // Handle avatar upload to Cloudinary
-      if (req.files?.avatar?.[0]) {
-        const result = await streamUpload(req.files.avatar[0].buffer, { folder: 'arcturus/profile' });
-        user.profilePicture = {
-          url: result.secure_url,
-          public_id: result.public_id,
-        };
-      }
-
-      await user.save();
-
-      // Handle background image
-      if (req.files?.backgroundImage?.[0]) {
-        const result = await streamUpload(req.files.backgroundImage[0].buffer, {
-          folder: 'arcturus/profile',
-        });
-        updateData.backgroundImage = {
-          url: result.secure_url,
-          public_id: result.public_id,
-          resource_type: result.resource_type,
-        };
-      }
-
-      const parsed = {
-        featured: parseJSONField(featured) || [],
-        activity: parseJSONField(activity) || [],
-        experience: parseJSONField(experience) || [],
-        education: parseJSONField(education) || [],
-        certifications: parseJSONField(certifications) || [],
-        projects: parseJSONField(projects) || [],
-        skills: parseJSONField(skills) || [],
-        honors: normalizeHonors(honors) || [],
-        interests: parseJSONField(interests) || [],
-      };
-
-      Object.assign(updateData, parsed);
-
-      let profile = await Profile.findOne({ userId: req.userId });
-      if (!profile) {
-        profile = new Profile({
-          userId: req.userId,
-          name: getFullName(user),
-          ...updateData,
-        });
-      } else {
-        Object.assign(profile, updateData);
-      }
-
-      await profile.save();
-
-      const profileData = buildProfileResponse(user, profile, user);
-      res.json(profileData);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to save profile' });
+// Dedicated endpoint: Upload profile avatar
+router.post('/avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No avatar file provided' });
     }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const result = await streamUpload(req.file.buffer, { folder: 'arcturus/profile' });
+    const profilePicture = {
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+
+    user.profilePicture = profilePicture;
+    await user.save();
+
+    let profile = await Profile.findOne({ userId: req.userId });
+    if (!profile) {
+      profile = await createDefaultProfileForUser(user);
+    }
+    profile.avatar = profilePicture;
+    await profile.save();
+
+    const profileData = buildProfileResponse(user, profile, user);
+    res.json({
+      success: true,
+      avatar: profilePicture,
+      profile: profileData,
+      message: 'Avatar updated successfully',
+    });
+  } catch (err) {
+    console.error('Failed to upload avatar:', err);
+    res.status(500).json({ error: 'Failed to upload avatar' });
   }
-);
+});
+
+// Dedicated endpoint: Upload profile cover banner
+router.post('/cover', authMiddleware, upload.single('backgroundImage'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No cover image file provided' });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const result = await streamUpload(req.file.buffer, { folder: 'arcturus/profile' });
+    const backgroundImage = {
+      url: result.secure_url,
+      public_id: result.public_id,
+      resource_type: result.resource_type,
+    };
+
+    let profile = await Profile.findOne({ userId: req.userId });
+    if (!profile) {
+      profile = await createDefaultProfileForUser(user);
+    }
+    profile.backgroundImage = backgroundImage;
+    await profile.save();
+
+    const profileData = buildProfileResponse(user, profile, user);
+    res.json({
+      success: true,
+      backgroundImage,
+      profile: profileData,
+      message: 'Cover banner updated successfully',
+    });
+  } catch (err) {
+    console.error('Failed to upload cover banner:', err);
+    res.status(500).json({ error: 'Failed to upload cover banner' });
+  }
+});
+
+// Safe partial profile updates (JSON or multipart text)
+const handleProfileUpdate = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const {
+      name,
+      firstName,
+      middleName,
+      lastName,
+      headline,
+      location,
+      summary,
+      featured,
+      activity,
+      experience,
+      education,
+      certifications,
+      projects,
+      skills,
+      honors,
+      interests,
+    } = req.body;
+
+    const updateData = {};
+
+    // Name handling
+    if (firstName !== undefined) user.firstName = firstName;
+    if (middleName !== undefined) user.middleName = middleName;
+    if (lastName !== undefined) user.lastName = lastName;
+
+    if (typeof name === 'string' && name.trim()) {
+      const trimmedName = name.trim();
+      const parts = trimmedName.split(/\s+/);
+      if (parts.length === 1) {
+        user.firstName = parts[0];
+        user.middleName = '';
+        user.lastName = '';
+      } else if (parts.length === 2) {
+        user.firstName = parts[0];
+        user.middleName = '';
+        user.lastName = parts[1];
+      } else {
+        user.firstName = parts[0];
+        user.middleName = parts.slice(1, -1).join(' ');
+        user.lastName = parts[parts.length - 1];
+      }
+      updateData.name = trimmedName;
+    } else if (firstName !== undefined || lastName !== undefined) {
+      updateData.name = getFullName(user);
+    }
+
+    if (headline !== undefined) {
+      user.headline = headline;
+      updateData.headline = headline;
+    }
+    if (location !== undefined) {
+      user.location = location;
+      updateData.location = location;
+    }
+    if (summary !== undefined) {
+      updateData.summary = summary;
+    }
+
+    // Safe partial updates: only parse and set fields that are explicitly provided
+    if (featured !== undefined) updateData.featured = parseJSONField(featured) || [];
+    if (activity !== undefined) updateData.activity = parseJSONField(activity) || [];
+    if (experience !== undefined) updateData.experience = parseJSONField(experience) || [];
+    if (education !== undefined) updateData.education = parseJSONField(education) || [];
+    if (certifications !== undefined) updateData.certifications = parseJSONField(certifications) || [];
+    if (projects !== undefined) updateData.projects = parseJSONField(projects) || [];
+    if (skills !== undefined) updateData.skills = parseJSONField(skills) || [];
+    if (honors !== undefined) updateData.honors = normalizeHonors(honors) || [];
+    if (interests !== undefined) updateData.interests = parseJSONField(interests) || [];
+
+    // Save user document
+    await user.save();
+
+    // Update profile document
+    let profile = await Profile.findOne({ userId: req.userId });
+    if (!profile) {
+      profile = await createDefaultProfileForUser(user);
+    }
+
+    Object.assign(profile, updateData);
+    await profile.save();
+
+    const profileData = buildProfileResponse(user, profile, user);
+    res.json(profileData);
+  } catch (err) {
+    console.error('Failed to update profile:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+};
+
+router.post('/', authMiddleware, upload.none(), handleProfileUpdate);
+router.patch('/', authMiddleware, upload.none(), handleProfileUpdate);
 
 export default router;
+

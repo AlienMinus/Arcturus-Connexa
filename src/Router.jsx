@@ -3,6 +3,7 @@ import NotFound from './NotFound';
 import Home from './pages/HomePage/Home';
 import Navbar from './components/Navbar/Navbar';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import ProfileEditPage from './pages/ProfileEditPage/ProfileEditPage';
 import ActivityPage from './pages/ActivityPage/ActivityPage';
 import PostPage from './pages/PostPage/PostPage';
 import AuthPage from './pages/AuthPage/AuthPage';
@@ -25,6 +26,8 @@ function AppRouter() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/profile/edit" element={<ProfileEditPage />} />
+                <Route path="/profile/:username/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username/activity" element={<ActivityPage />} />
                 <Route path="/profile/:username" element={<ProfilePage />} />

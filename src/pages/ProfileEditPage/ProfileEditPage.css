@@ -1,0 +1,465 @@
+/* ==========================================================================
+   PROFILE EDIT PAGE STYLES
+   ========================================================================== */
+
+.profileEditPageWrapper {
+  width: 100%;
+  max-width: 100vw;
+  min-height: calc(100vh - 120px);
+  background: #f3f4f6;
+  padding: 24px 16px 80px;
+  box-sizing: border-box;
+}
+
+.profileEditPage {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileEditPage.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: #0a66c2;
+  gap: 12px;
+}
+
+/* Top Navigation Bar */
+.profileEditTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.profileEditTopBar h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.profileEditBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  transition: all 0.15s ease;
+}
+
+.profileEditBackBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.profileEditSaveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.25);
+  transition: all 0.15s ease;
+}
+
+.profileEditSaveBtn:hover:not(:disabled) {
+  background: #004182;
+  transform: translateY(-1px);
+}
+
+.profileEditSaveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Toast Messages */
+.profileEditToast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: toastFadeIn 0.2s ease-out;
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profileEditToast.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.profileEditToast.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+/* Main Layout Grid */
+.profileEditLayout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Sidebar Section Navigation */
+.profileEditSidebar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 76px;
+}
+
+.profileEditNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profileEditTabBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.profileEditTabBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.profileEditTabBtn.active {
+  background: #ebf4fd;
+  color: #0a66c2;
+  font-weight: 700;
+}
+
+.tabIcon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Editor Body */
+.profileEditMain {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Section Card */
+.editorSectionCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.editorSectionHeader {
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.editorSectionHeader.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editorSectionHeader h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.editorSectionHeader p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Form Controls */
+.editorFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.formGroup input,
+.formGroup textarea,
+.skillsInputRow input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.skillsInputRow input:focus {
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
+}
+
+.fieldCharacterCount {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  align-self: flex-end;
+  margin-top: 4px;
+}
+
+/* Action Buttons */
+.editorAddBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ebf4fd;
+  color: #0a66c2;
+  border: 1px solid #bce1fe;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.editorAddBtn:hover {
+  background: #0a66c2;
+  color: #ffffff;
+  border-color: #0a66c2;
+}
+
+.editorDeleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: #ef4444;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.editorDeleteBtn:hover {
+  background: #fee2e2;
+}
+
+/* Box Item List */
+.editorItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editorItemBox {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.editorItemBoxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.editorItemBoxHeader h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.editorEmptyPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  color: #94a3b8;
+  gap: 10px;
+}
+
+.editorEmptyPlaceholder p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Skills / Tags Row */
+.skillsInputRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.editorChipsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editorSkillChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.chipRemoveBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.chipRemoveBtn:hover {
+  color: #ef4444;
+}
+
+.profileEditBottomActions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .profileEditPageWrapper {
+    padding: 8px 4px 85px;
+  }
+
+  .profileEditTopBar {
+    padding: 12px 14px;
+  }
+
+  .profileEditTopBar h2 {
+    font-size: 1.1rem;
+  }
+
+  .profileEditLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profileEditSidebar {
+    position: static;
+    padding: 6px;
+    overflow-x: auto;
+  }
+
+  .profileEditNav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profileEditTabBtn {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+    width: auto;
+  }
+
+  .editorSectionCard {
+    padding: 14px 12px;
+  }
+
+  .editorFormGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+

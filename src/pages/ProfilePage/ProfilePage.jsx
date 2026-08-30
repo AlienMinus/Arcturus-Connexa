@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProfile } from '../../context/ProfileContext';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -8,12 +8,12 @@ import ProfileSummary from '../../components/Profile/ProfileSummary';
 import ProfileSection from '../../components/Profile/ProfileSection';
 import ProfileListSection from '../../components/Profile/ProfileListSection';
 import ProfileConnectionList from '../../components/Profile/ProfileConnectionList';
-import ProfileEditForm from '../../components/Profile/ProfileEditForm';
 import PostCard from '../../components/Home/Feed/PostCard';
 import { FaChevronDown, FaChevronUp, FaArrowRight } from 'react-icons/fa';
 import '../../components/Profile/Profile.css';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { username } = useParams();
   const {
     profile: currentProfile,
@@ -26,7 +26,6 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [arePostsExpanded, setArePostsExpanded] = useState(false);
 
@@ -155,7 +154,7 @@ const ProfilePage = () => {
       <div className="profilePage">
         <ProfileHeader
           profile={profile}
-          onEdit={isOwnProfile ? () => setIsEditing(!isEditing) : undefined}
+          onEdit={isOwnProfile ? () => navigate('/profile/edit') : undefined}
           onFollow={!isOwnProfile ? handleFollowToggle : undefined}
           onConnectRequest={!isOwnProfile ? handleConnectRequest : undefined}
           onAcceptConnection={!isOwnProfile ? handleAcceptConnection : undefined}
@@ -169,19 +168,6 @@ const ProfilePage = () => {
             loading: actionLoading,
           }}
         />
-
-        {isEditing && isOwnProfile && (
-          <ProfileEditForm 
-            profile={profile} 
-            onSaved={(savedData) => {
-              if (savedData) {
-                setProfile((prev) => ({ ...prev, ...savedData }));
-              }
-              refreshProfile();
-              setIsEditing(false);
-            }} 
-          />
-        )}
 
         <div className="profilePageLayout">
           {/* Main Column */}
