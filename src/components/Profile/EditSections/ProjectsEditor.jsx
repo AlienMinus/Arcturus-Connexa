@@ -1,5 +1,53 @@
 import React from 'react';
-import { FaPlus, FaTrashAlt, FaLaptopCode } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaTrashAlt, 
+  FaLaptopCode,
+  FaGithub,
+  FaGitlab,
+  FaFigma,
+  FaYoutube,
+  FaDribbble,
+  FaMedium,
+  FaCodepen,
+  FaGlobe
+} from 'react-icons/fa';
+
+const getDomain = (url) => {
+  try {
+    if (!url) return '';
+    const formatted = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+    return new URL(formatted).hostname.replace(/^www\./, '');
+  } catch (err) {
+    return '';
+  }
+};
+
+const ProjectIconPreview = ({ url }) => {
+  const domain = getDomain(url);
+  if (!domain) {
+    return <FaLaptopCode size={18} className="projectDefaultIcon" />;
+  }
+
+  const lower = domain.toLowerCase();
+  if (lower.includes('github.com')) return <FaGithub size={18} className="brandIcon github" />;
+  if (lower.includes('gitlab.com')) return <FaGitlab size={18} className="brandIcon gitlab" />;
+  if (lower.includes('figma.com')) return <FaFigma size={18} className="brandIcon figma" />;
+  if (lower.includes('youtube.com') || lower.includes('youtu.be')) return <FaYoutube size={18} className="brandIcon youtube" />;
+  if (lower.includes('dribbble.com')) return <FaDribbble size={18} className="brandIcon dribbble" />;
+  if (lower.includes('medium.com')) return <FaMedium size={18} className="brandIcon medium" />;
+  if (lower.includes('codepen.io')) return <FaCodepen size={18} className="brandIcon codepen" />;
+
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+  return (
+    <img
+      src={faviconUrl}
+      alt={domain}
+      className="projectFaviconPreview"
+      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+    />
+  );
+};
 
 const ProjectsEditor = ({ items = [], onChange }) => {
   const handleAdd = () => {
@@ -32,7 +80,7 @@ const ProjectsEditor = ({ items = [], onChange }) => {
       <div className="editorSectionHeader between">
         <div>
           <h3>Projects</h3>
-          <p>Showcase personal projects, open-source work, and software apps you built.</p>
+          <p>Showcase personal projects, repositories, and software applications you built.</p>
         </div>
         <button type="button" className="editorAddBtn" onClick={handleAdd}>
           <FaPlus size={12} /> Add Project
@@ -54,7 +102,12 @@ const ProjectsEditor = ({ items = [], onChange }) => {
             return (
               <div key={index} className="editorItemBox">
                 <div className="editorItemBoxHeader">
-                  <h4>Project #{index + 1}</h4>
+                  <div className="projectHeaderTitleWrap">
+                    <div className="projectHeaderIconBadge">
+                      <ProjectIconPreview url={item.url} />
+                    </div>
+                    <h4>Project #{index + 1}: {item.title || 'Untitled Project'}</h4>
+                  </div>
                   <button
                     type="button"
                     className="editorDeleteBtn"
@@ -77,13 +130,18 @@ const ProjectsEditor = ({ items = [], onChange }) => {
                   </div>
 
                   <div className="formGroup">
-                    <label>Project / Demo URL</label>
-                    <input
-                      type="url"
-                      placeholder="e.g. https://github.com/username/project"
-                      value={item.url || ''}
-                      onChange={(e) => handleUpdate(index, 'url', e.target.value)}
-                    />
+                    <label>Project / Demo URL (Auto-embeds icon)</label>
+                    <div className="projectUrlInputWrap">
+                      <input
+                        type="url"
+                        placeholder="e.g. https://github.com/AlienMinus/Arcturus-Connexa"
+                        value={item.url || ''}
+                        onChange={(e) => handleUpdate(index, 'url', e.target.value)}
+                      />
+                      <div className="projectUrlPreviewBadge" title="Live icon embedded from link">
+                        <ProjectIconPreview url={item.url} />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="formGroup fullWidth">
@@ -116,4 +174,3 @@ const ProjectsEditor = ({ items = [], onChange }) => {
 };
 
 export default ProjectsEditor;
-

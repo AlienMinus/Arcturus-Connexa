@@ -492,6 +492,74 @@
   padding-bottom: 8px;
 }
 
+.projectHeaderTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.projectHeaderIconBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.projectUrlInputWrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.projectUrlInputWrap input {
+  padding-right: 42px !important;
+}
+
+.projectUrlPreviewBadge {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.projectFaviconPreview {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
+
+.brandIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandIcon.github { color: #24292f; }
+.brandIcon.gitlab { color: #fc6d26; }
+.brandIcon.figma { color: #f24e1e; }
+.brandIcon.youtube { color: #ff0000; }
+.brandIcon.dribbble { color: #ea4c89; }
+.brandIcon.medium { color: #000000; }
+.brandIcon.codepen { color: #1e1f26; }
+
 .editorItemBoxHeader h4 {
   margin: 0;
   font-size: 0.95rem;

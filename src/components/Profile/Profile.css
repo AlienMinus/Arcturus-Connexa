@@ -537,20 +537,89 @@
 .sectionItemIconPlaceholder {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f3f6f8;
   border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #475569;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.sectionItemIconPlaceholder.withLink {
+  cursor: pointer;
+}
+
+.sectionItemIconLink {
+  text-decoration: none;
+  display: block;
+}
+
+.sectionItemIconLink:hover .sectionItemIconPlaceholder {
+  border-color: #0a66c2;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
+}
+
+.profileItemFavicon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+.brandProjectIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.brandProjectIcon.github {
+  color: #24292f;
+}
+
+.brandProjectIcon.gitlab {
+  color: #fc6d26;
+}
+
+.brandProjectIcon.figma {
+  color: #f24e1e;
+}
+
+.brandProjectIcon.youtube {
+  color: #ff0000;
+}
+
+.brandProjectIcon.dribbble {
+  color: #ea4c89;
+}
+
+.brandProjectIcon.medium {
+  color: #000000;
+}
+
+.brandProjectIcon.codepen {
+  color: #1e1f26;
+}
+
+.itemTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.itemTitleLink:hover {
+  color: #0a66c2;
+  text-decoration: underline;
 }
 
 .profileItemImage {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 10px;
   object-fit: cover;
   border: 1px solid #e2e8f0;
   display: block;

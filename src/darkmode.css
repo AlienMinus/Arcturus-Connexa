@@ -1896,3 +1896,38 @@ body.dark-mode .usernameLockoutNotice {
   border-color: rgba(239, 68, 68, 0.3) !important;
   color: #fca5a5 !important;
 }
+
+[data-theme="dark"] .projectHeaderIconBadge,
+body.dark-mode .projectHeaderIconBadge,
+[data-theme="dark"] .projectUrlPreviewBadge,
+body.dark-mode .projectUrlPreviewBadge {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .brandProjectIcon.github,
+body.dark-mode .brandProjectIcon.github,
+[data-theme="dark"] .brandIcon.github,
+body.dark-mode .brandIcon.github {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .brandProjectIcon.medium,
+body.dark-mode .brandProjectIcon.medium,
+[data-theme="dark"] .brandIcon.medium,
+body.dark-mode .brandIcon.medium {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .brandProjectIcon.codepen,
+body.dark-mode .brandProjectIcon.codepen,
+[data-theme="dark"] .brandIcon.codepen,
+body.dark-mode .brandIcon.codepen {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .profileItemFavicon,
+body.dark-mode .profileItemFavicon {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
