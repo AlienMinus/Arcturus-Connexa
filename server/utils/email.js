@@ -5,11 +5,9 @@ dotenv.config();
 /**
  * Sends an email using the EmailJS REST API (https://www.emailjs.com)
  *
- * Required Environment Variables in Render or .env:
- * - EMAILJS_SERVICE_ID  (e.g., service_xxxxxxx)
- * - EMAILJS_TEMPLATE_ID (e.g., template_xxxxxxx)
- * - EMAILJS_PUBLIC_KEY  (e.g., your public key / user_id)
- * - EMAILJS_PRIVATE_KEY (optional: your private API key / accessToken)
+ * Dedicated Template IDs:
+ * - EMAILJS_TEMPLATE_RESET_PASSWORD : For Password Reset Emails
+ * - EMAILJS_TEMPLATE_OTP            : For OTP Verification Codes
  */
 export const sendEmailJS = async ({
   serviceId,
@@ -19,20 +17,19 @@ export const sendEmailJS = async ({
   templateParams = {},
 }) => {
   const service_id = serviceId || process.env.EMAILJS_SERVICE_ID;
-  const template_id = templateId || process.env.EMAILJS_TEMPLATE_ID;
+  const template_id = templateId;
   const user_id = publicKey || process.env.EMAILJS_PUBLIC_KEY || process.env.EMAILJS_USER_ID;
   const accessToken = privateKey || process.env.EMAILJS_PRIVATE_KEY || process.env.EMAILJS_ACCESS_TOKEN;
 
   if (!service_id || !template_id || !user_id) {
     console.log(`\n================= [EMAILJS CONFIGURATION REQUIRED] =================`);
-    console.log(`ℹ️ EmailJS requires 3 environment variables in your Render Dashboard:`);
-    console.log(`  1. EMAILJS_SERVICE_ID  (Your EmailJS Service ID)`);
-    console.log(`  2. EMAILJS_TEMPLATE_ID (Your EmailJS Template ID)`);
-    console.log(`  3. EMAILJS_PUBLIC_KEY  (Your EmailJS Public Key / User ID)`);
-    console.log(`  4. EMAILJS_PRIVATE_KEY (Optional: If private key authentication is enabled)`);
-    console.log(`\nDispatched Parameters:`, templateParams);
+    console.log(`ℹ️ EmailJS requires the following environment variables:`);
+    console.log(`  - EMAILJS_SERVICE_ID: ${service_id ? '✓ Configured' : '✗ Missing'}`);
+    console.log(`  - Target Template ID: ${template_id ? `✓ ${template_id}` : '✗ Missing (Set specific template variable)'}`);
+    console.log(`  - EMAILJS_PUBLIC_KEY: ${user_id ? '✓ Configured' : '✗ Missing'}`);
+    console.log(`\nTarget Parameters:`, templateParams);
     console.log(`====================================================================\n`);
-    return { success: false, devMode: true, message: 'EmailJS credentials not set' };
+    return { success: false, devMode: true, message: 'Missing required EmailJS credentials or template ID' };
   }
 
   const payload = {
@@ -59,7 +56,7 @@ export const sendEmailJS = async ({
     const responseText = await res.text();
 
     if (res.ok) {
-      console.log(`[EmailJS Success] Email dispatched successfully to ${templateParams.to_email || templateParams.email || 'recipient'} (Status: ${res.status})`);
+      console.log(`[EmailJS Success] Template "${template_id}" dispatched to ${templateParams.to_email || templateParams.email} (Status: ${res.status})`);
       return { success: true, response: responseText };
     } else {
       console.error(`[EmailJS Error] Status: ${res.status}, Response:`, responseText);
@@ -72,9 +69,10 @@ export const sendEmailJS = async ({
 };
 
 /**
- * Sends Password Reset Email via EmailJS
+ * 1. Sends Password Reset Email (Requires EMAILJS_TEMPLATE_RESET_PASSWORD)
  */
 export const sendPasswordResetEmail = async ({ to, resetToken, user }) => {
+  const templateId = process.env.EMAILJS_TEMPLATE_RESET_PASSWORD;
   const clientUrl = process.env.CLIENT_URL || 'https://arcturus-connexa.vercel.app';
   const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
   const userName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Member';
@@ -87,42 +85,47 @@ export const sendPasswordResetEmail = async ({ to, resetToken, user }) => {
     reset_link: resetUrl,
     reset_url: resetUrl,
     token: resetToken,
-    message: `You requested to reset your password. Click here to reset: ${resetUrl}`,
+    message: `Reset your password by visiting: ${resetUrl}`,
     app_name: 'Arcturus Connexa',
   };
 
   return sendEmailJS({
+    templateId,
     templateParams,
   });
 };
 
 /**
- * Sends Welcome Email via EmailJS
+ * 2. Sends OTP Verification Code Email (Requires EMAILJS_TEMPLATE_OTP)
  */
-export const sendWelcomeEmail = async ({ to, user }) => {
-  const userName = user?.firstName || 'Member';
-  const clientUrl = process.env.CLIENT_URL || 'https://arcturus-connexa.vercel.app';
+export const sendOtpEmail = async ({ to, otpCode, user, expiresMinutes = 10 }) => {
+  const templateId = process.env.EMAILJS_TEMPLATE_OTP;
+  const userName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Member';
 
   const templateParams = {
     to_email: to,
     email: to,
     to_name: userName,
     user_name: userName,
-    app_url: clientUrl,
-    message: `Welcome to Arcturus! We are excited to have you join our professional community.`,
+    otp_code: otpCode,
+    passcode: otpCode,
+    expires_in: `${expiresMinutes} minutes`,
+    message: `Your one-time verification code is: ${otpCode}. It expires in ${expiresMinutes} minutes.`,
     app_name: 'Arcturus Connexa',
   };
 
   return sendEmailJS({
+    templateId,
     templateParams,
   });
 };
 
 /**
- * Generic email sender
+ * Generic email sender (Requires explicit templateId)
  */
-export const sendEmail = async ({ to, subject, html, text }) => {
+export const sendEmail = async ({ to, subject, html, text, templateId }) => {
   return sendEmailJS({
+    templateId,
     templateParams: {
       to_email: to,
       email: to,
@@ -136,6 +139,6 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 export default {
   sendEmailJS,
   sendPasswordResetEmail,
-  sendWelcomeEmail,
+  sendOtpEmail,
   sendEmail,
 };

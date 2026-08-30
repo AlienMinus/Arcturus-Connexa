@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import Profile from '../models/Profile.js';
 import { hashPassword, comparePassword, generateRandomToken } from '../utils/passwordUtils.js';
 import { generateAccessToken, generatePasswordResetToken, verifyPasswordResetToken } from '../utils/jwtUtils.js';
-import { sendPasswordResetEmail, sendWelcomeEmail } from '../utils/email.js';
+import { sendPasswordResetEmail } from '../utils/email.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -78,11 +78,6 @@ router.post('/register', async (req, res) => {
 
     // Generate token
     const token = generateAccessToken(user._id);
-
-    // Send welcome email asynchronously
-    sendWelcomeEmail({ to: user.email, user }).catch((err) =>
-      console.warn('Welcome email error:', err.message)
-    );
 
     res.status(201).json({
       message: 'User registered successfully',
