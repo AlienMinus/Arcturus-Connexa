@@ -275,21 +275,10 @@ const SettingsPage = () => {
                 <div className="settingsRowsList">
                   <div className="settingsRow">
                     <div className="rowInfo">
-                      <h4>Display Theme</h4>
-                      <p>Choose between standard light mode and high-contrast dark theme.</p>
+                      <h4>Dark Mode</h4>
+                      <p>Adjust the appearance of Arcturus to reduce glare and optimize for low-light environments.</p>
                     </div>
-                    <div className="rowControl themeControlGroup">
-                      <select 
-                        value={theme} 
-                        onChange={(e) => {
-                          setTheme(e.target.value);
-                          handleSettingChange('theme', e.target.value);
-                          showToast(`Theme set to ${e.target.value === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}`);
-                        }}
-                      >
-                        <option value="light">Light Mode ☀️</option>
-                        <option value="dark">Dark Mode 🌙</option>
-                      </select>
+                    <div className="rowControl">
                       <button 
                         type="button" 
                         className="toggleBtn" 
@@ -302,9 +291,9 @@ const SettingsPage = () => {
                         title="Toggle dark mode"
                       >
                         {theme === 'dark' ? (
-                          <FaToggleOn size={28} className="toggleActive" />
+                          <FaToggleOn size={32} className="toggleActive" />
                         ) : (
-                          <FaToggleOff size={28} className="toggleInactive" />
+                          <FaToggleOff size={32} className="toggleInactive" />
                         )}
                       </button>
                     </div>

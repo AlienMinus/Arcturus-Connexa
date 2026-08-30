@@ -1,42 +1,80 @@
 /* ==========================================================================
    DARK MODE STYLESHEET (darkmode.css)
-   Controlled by Preferences in Settings & Privacy
-   Activated via [data-theme="dark"] or body.dark-mode
+   Full theme overhaul for all Arcturus views & components
+   Activated via [data-theme="dark"] on <html> and body.dark-mode
    ========================================================================== */
 
 :root[data-theme="dark"],
 body.dark-mode {
-  --bg-primary: #12171d;
-  --bg-secondary: #1b222a;
-  --bg-card: #1f2732;
-  --bg-hover: #283341;
-  --border-color: #2f3b4a;
-  --border-light: #26313e;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-blue: #70b5f9;
-  --accent-blue-hover: #93c5fd;
-  --accent-blue-bg: rgba(112, 181, 249, 0.12);
-  --input-bg: #151b22;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5);
+  --bg-primary: #0f172a;       /* Deep Slate Canvas */
+  --bg-secondary: #1e293b;     /* Component Surface */
+  --bg-card: #1e293b;          /* Cards & Containers */
+  --bg-input: #0f172a;         /* Input Backgrounds */
+  --bg-hover: #334155;         /* Hover State */
+  --border-color: #334155;     /* Structural Borders */
+  --border-light: #475569;     /* Subtle Inner Borders */
+  --text-primary: #f8fafc;     /* High Contrast Text */
+  --text-secondary: #cbd5e1;   /* Subtitle & Body */
+  --text-muted: #94a3b8;       /* Meta & Timestamps */
+  --accent-blue: #60a5fa;      /* Vibrant Blue Accent */
+  --accent-blue-hover: #93c5fd;/* Accent Hover */
+  --accent-blue-bg: rgba(96, 165, 250, 0.15); /* Accent Background Tint */
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Base Elements */
+/* ==========================================================================
+   1. GLOBAL CANVAS & LAYOUTS
+   ========================================================================== */
+[data-theme="dark"] html,
+body.dark-mode,
 [data-theme="dark"] body,
-body.dark-mode {
+[data-theme="dark"] #root,
+body.dark-mode #root,
+[data-theme="dark"] .app,
+body.dark-mode .app,
+[data-theme="dark"] .homeLayout,
+body.dark-mode .homeLayout,
+[data-theme="dark"] .networkPage,
+body.dark-mode .networkPage,
+[data-theme="dark"] .notificationsPage,
+body.dark-mode .notificationsPage,
+[data-theme="dark"] .profilePage-wrapper,
+body.dark-mode .profilePage-wrapper,
+[data-theme="dark"] .settingsPageWrapper,
+body.dark-mode .settingsPageWrapper,
+[data-theme="dark"] .helpPageWrapper,
+body.dark-mode .helpPageWrapper,
+[data-theme="dark"] .jobPostingWrapper,
+body.dark-mode .jobPostingWrapper,
+[data-theme="dark"] .underConstructionWrapper,
+body.dark-mode .underConstructionWrapper,
+[data-theme="dark"] .notFoundWrapper,
+body.dark-mode .notFoundWrapper {
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] a,
-body.dark-mode a {
-  color: var(--accent-blue);
+/* Global Headings & Paragraphs in Dark Mode */
+[data-theme="dark"] h1,
+body.dark-mode h1,
+[data-theme="dark"] h2,
+body.dark-mode h2,
+[data-theme="dark"] h3,
+body.dark-mode h3,
+[data-theme="dark"] h4,
+body.dark-mode h4 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] p,
+body.dark-mode p,
+[data-theme="dark"] span,
+body.dark-mode span {
+  color: inherit;
 }
 
 /* ==========================================================================
-   1. NAVBAR & NAVIGATION
+   2. NAVBAR & TOP NAVIGATION
    ========================================================================== */
 [data-theme="dark"] .navbar,
 body.dark-mode .navbar {
@@ -51,16 +89,12 @@ body.dark-mode .navCenter {
 }
 
 [data-theme="dark"] .navItem,
-body.dark-mode .navItem,
-[data-theme="dark"] .navItem svg,
-body.dark-mode .navItem svg {
-  color: var(--text-secondary) !important;
+body.dark-mode .navItem {
+  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .navItem.active,
 body.dark-mode .navItem.active,
-[data-theme="dark"] .navItem.active svg,
-body.dark-mode .navItem.active svg,
 [data-theme="dark"] .navItem.active .navLabel,
 body.dark-mode .navItem.active .navLabel {
   color: var(--accent-blue) !important;
@@ -69,25 +103,13 @@ body.dark-mode .navItem.active .navLabel {
 
 [data-theme="dark"] .searchBox,
 body.dark-mode .searchBox {
-  background-color: var(--input-bg) !important;
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 [data-theme="dark"] .searchBox input,
 body.dark-mode .searchBox input {
   color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .searchResults,
-body.dark-mode .searchResults {
-  background-color: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-[data-theme="dark"] .searchResults li:hover,
-body.dark-mode .searchResults li:hover {
-  background-color: var(--bg-hover) !important;
 }
 
 [data-theme="dark"] .profile-text,
@@ -96,14 +118,15 @@ body.dark-mode .profile-text,
 body.dark-mode .business-text,
 [data-theme="dark"] .advertise,
 body.dark-mode .advertise {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
+/* Dropdown Menu */
 [data-theme="dark"] .profile-dropdown,
 body.dark-mode .profile-dropdown {
-  background-color: var(--bg-card) !important;
+  background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-md) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 
 [data-theme="dark"] .profile-dropdown-header,
@@ -115,13 +138,6 @@ body.dark-mode .profile-dropdown-section,
 [data-theme="dark"] .profile-dropdown-footer,
 body.dark-mode .profile-dropdown-footer {
   border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .profile-dropdown-header .user-info h4,
-body.dark-mode .profile-dropdown-header .user-info h4,
-[data-theme="dark"] .profile-dropdown-section h5,
-body.dark-mode .profile-dropdown-section h5 {
-  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .profile-dropdown-list li a,
@@ -147,7 +163,7 @@ body.dark-mode .view-profile-btn:hover {
 }
 
 /* ==========================================================================
-   2. CARDS, SIDEBARS & FEED
+   3. FEED, POSTS & SIDEBARS
    ========================================================================== */
 [data-theme="dark"] .card,
 body.dark-mode .card,
@@ -159,31 +175,15 @@ body.dark-mode .rightSidebar .card,
 body.dark-mode .profileCard,
 [data-theme="dark"] .feed .card,
 body.dark-mode .feed .card {
-  background-color: var(--bg-card) !important;
+  background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: var(--shadow-sm) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
   color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .postInfo h2,
-body.dark-mode .postInfo h2,
-[data-theme="dark"] .postBody,
-body.dark-mode .postBody,
-[data-theme="dark"] .profile-name,
-body.dark-mode .profile-name {
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .postInfo p,
-body.dark-mode .postInfo p,
-[data-theme="dark"] .profile-headline,
-body.dark-mode .profile-headline {
-  color: var(--text-secondary) !important;
 }
 
 [data-theme="dark"] .postInput,
 body.dark-mode .postInput {
-  background-color: var(--input-bg) !important;
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
@@ -192,7 +192,7 @@ body.dark-mode .postInput {
 body.dark-mode .postOption,
 [data-theme="dark"] .actionOption,
 body.dark-mode .actionOption {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .postOption:hover,
@@ -205,164 +205,279 @@ body.dark-mode .actionOption:hover {
 
 [data-theme="dark"] .postModal,
 body.dark-mode .postModal {
-  background-color: var(--bg-card) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .postModal textarea,
 body.dark-mode .postModal textarea {
-  background-color: var(--input-bg) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .menuDrawer,
-body.dark-mode .menuDrawer,
-[data-theme="dark"] .menuDrawerHeader,
-body.dark-mode .menuDrawerHeader {
-  background-color: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
+[data-theme="dark"] .reactionsPopup,
+body.dark-mode .reactionsPopup {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .tryPremiumBtn,
+body.dark-mode .tryPremiumBtn,
+[data-theme="dark"] .advertiseBtn,
+body.dark-mode .advertiseBtn {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
 }
 
 /* ==========================================================================
-   3. PROFILE PAGE
+   4. FLOATING MESSENGER & CHAT WINDOW
    ========================================================================== */
-[data-theme="dark"] .profilePageWrapper,
-body.dark-mode .profilePageWrapper,
-[data-theme="dark"] .profilePage-wrapper,
-body.dark-mode .profilePage-wrapper {
+[data-theme="dark"] .messenger,
+body.dark-mode .messenger {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .messengerHeader,
+body.dark-mode .messengerHeader {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .messageSearch,
+body.dark-mode .messageSearch {
   background-color: var(--bg-primary) !important;
 }
 
-[data-theme="dark"] .profileHeaderCard,
-body.dark-mode .profileHeaderCard,
-[data-theme="dark"] .profileIntroCard,
-body.dark-mode .profileIntroCard,
-[data-theme="dark"] .profileSection,
-body.dark-mode .profileSection {
-  background-color: var(--bg-card) !important;
+[data-theme="dark"] .messageSearch input,
+body.dark-mode .messageSearch input {
+  background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .profileIntroText h1,
-body.dark-mode .profileIntroText h1,
-[data-theme="dark"] .profileSectionTitle,
-body.dark-mode .profileSectionTitle {
-  color: var(--text-primary) !important;
+[data-theme="dark"] .messageTabs,
+body.dark-mode .messageTabs {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
-[data-theme="dark"] .profileIntroHeadline,
-body.dark-mode .profileIntroHeadline,
-[data-theme="dark"] .profileLocation,
-body.dark-mode .profileLocation {
-  color: var(--text-secondary) !important;
+[data-theme="dark"] .messageTabs span,
+body.dark-mode .messageTabs span {
+  color: var(--text-muted) !important;
 }
 
-[data-theme="dark"] .profileHeaderStatsRow,
-body.dark-mode .profileHeaderStatsRow {
-  background-color: var(--input-bg) !important;
-  border: 1px solid var(--border-color) !important;
+[data-theme="dark"] .messageTabs .activeTab,
+body.dark-mode .messageTabs .activeTab {
+  color: var(--accent-blue) !important;
+  border-bottom-color: var(--accent-blue) !important;
 }
 
-[data-theme="dark"] .profileSocialProof,
-body.dark-mode .profileSocialProof {
-  background-color: var(--input-bg) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-secondary) !important;
-}
-
-/* ==========================================================================
-   4. MESSAGING PAGE
-   ========================================================================== */
-[data-theme="dark"] .messaging-page-container,
-body.dark-mode .messaging-page-container,
-[data-theme="dark"] .messaging-sidebar,
-body.dark-mode .messaging-sidebar,
-[data-theme="dark"] .messaging-main,
-body.dark-mode .messaging-main,
-[data-theme="dark"] .chatWindow,
-body.dark-mode .chatWindow {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .messaging-sidebar-header,
-body.dark-mode .messaging-sidebar-header,
-[data-theme="dark"] .messaging-search-container,
-body.dark-mode .messaging-search-container {
-  border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .messaging-search-box,
-body.dark-mode .messaging-search-box {
-  background-color: var(--input-bg) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-primary) !important;
+[data-theme="dark"] .conversationList,
+body.dark-mode .conversationList {
+  background-color: var(--bg-secondary) !important;
 }
 
 [data-theme="dark"] .conversationItem,
 body.dark-mode .conversationItem {
-  border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .conversationItem:hover,
-body.dark-mode .conversationItem:hover,
-[data-theme="dark"] .conversationItem.active,
-body.dark-mode .conversationItem.active {
-  background-color: var(--bg-hover) !important;
-}
-
-[data-theme="dark"] .conversationName,
-body.dark-mode .conversationName {
+  border-bottom: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .conversationSnippet,
-body.dark-mode .conversationSnippet {
-  color: var(--text-secondary) !important;
+[data-theme="dark"] .conversationItem:hover,
+body.dark-mode .conversationItem:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .chatText h4,
+body.dark-mode .chatText h4 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .chatText p,
+body.dark-mode .chatText p {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .chatWindow,
+body.dark-mode .chatWindow {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+[data-theme="dark"] .chatHeader,
+body.dark-mode .chatHeader {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .chatMessages,
+body.dark-mode .chatMessages {
+  background-color: var(--bg-primary) !important;
 }
 
 [data-theme="dark"] .chatInputArea,
 body.dark-mode .chatInputArea {
   background-color: var(--bg-secondary) !important;
-  border-color: var(--border-color) !important;
+  border-top: 1px solid var(--border-color) !important;
 }
 
 [data-theme="dark"] .chatInputArea input,
 body.dark-mode .chatInputArea input,
 [data-theme="dark"] .chatInputArea textarea,
 body.dark-mode .chatInputArea textarea {
-  background-color: var(--input-bg) !important;
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
 /* ==========================================================================
-   5. MY NETWORK & NOTIFICATIONS
+   5. DEDICATED MESSAGING PAGE
    ========================================================================== */
-[data-theme="dark"] .networkPage,
-body.dark-mode .networkPage,
-[data-theme="dark"] .notificationsPage,
-body.dark-mode .notificationsPage {
-  background-color: var(--bg-primary) !important;
+[data-theme="dark"] .messaging-page-container,
+body.dark-mode .messaging-page-container {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 
-[data-theme="dark"] .networkCard,
-body.dark-mode .networkCard,
-[data-theme="dark"] .notificationItem,
-body.dark-mode .notificationItem {
-  background-color: var(--bg-card) !important;
+[data-theme="dark"] .messaging-sidebar,
+body.dark-mode .messaging-sidebar {
+  background-color: var(--bg-secondary) !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-sidebar-header,
+body.dark-mode .messaging-sidebar-header {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-sidebar-header h2,
+body.dark-mode .messaging-sidebar-header h2 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .messaging-search-container,
+body.dark-mode .messaging-search-container {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-search-container .messageSearch,
+body.dark-mode .messaging-search-container .messageSearch {
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] .messaging-search-container input,
+body.dark-mode .messaging-search-container input {
+  background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-[data-theme="dark"] .notificationItem.unread,
-body.dark-mode .notificationItem.unread {
-  background-color: rgba(112, 181, 249, 0.08) !important;
+[data-theme="dark"] .messaging-list-container,
+body.dark-mode .messaging-list-container {
+  background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .messaging-list-container .conversationItem,
+body.dark-mode .messaging-list-container .conversationItem {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .messaging-main,
+body.dark-mode .messaging-main {
+  background-color: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] .messaging-empty-state,
+body.dark-mode .messaging-empty-state {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .messaging-empty-state h2,
+body.dark-mode .messaging-empty-state h2 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .messaging-empty-state p,
+body.dark-mode .messaging-empty-state p {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .empty-state-logo,
+body.dark-mode .empty-state-logo {
+  filter: brightness(0) invert(1);
+  opacity: 0.35;
+}
+
+/* ==========================================================================
+   6. MY NETWORK PAGE
+   ========================================================================== */
+[data-theme="dark"] .networkHeader h1,
+body.dark-mode .networkHeader h1 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .networkSectionCard,
+body.dark-mode .networkSectionCard {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .networkSectionHeader,
+body.dark-mode .networkSectionHeader {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .networkSectionHeader h2,
+body.dark-mode .networkSectionHeader h2 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .sectionSubtitle,
+body.dark-mode .sectionSubtitle {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .profileViewerRow,
+body.dark-mode .profileViewerRow {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .profileViewerRow:hover,
+body.dark-mode .profileViewerRow:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .viewerName,
+body.dark-mode .viewerName {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .viewerHeadline,
+body.dark-mode .viewerHeadline {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .networkCard,
+body.dark-mode .networkCard {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .networkDetails h3,
@@ -372,25 +487,63 @@ body.dark-mode .networkDetails h3 {
 
 [data-theme="dark"] .networkDetails p,
 body.dark-mode .networkDetails p {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
 /* ==========================================================================
-   6. SETTINGS & PRIVACY PAGE
+   7. NOTIFICATIONS PAGE
    ========================================================================== */
-[data-theme="dark"] .settingsPageWrapper,
-body.dark-mode .settingsPageWrapper {
-  background-color: var(--bg-primary) !important;
+[data-theme="dark"] .notificationsPage h1,
+body.dark-mode .notificationsPage h1 {
+  color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .notificationsBadge,
+body.dark-mode .notificationsBadge {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .notificationItem,
+body.dark-mode .notificationItem {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notificationHeader,
+body.dark-mode .notificationHeader {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notificationDesc,
+body.dark-mode .notificationDesc {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .notificationMeta,
+body.dark-mode .notificationMeta {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .notificationItem.unread,
+body.dark-mode .notificationItem.unread {
+  background-color: var(--accent-blue-bg) !important;
+  border: 1px solid var(--accent-blue) !important;
+}
+
+/* ==========================================================================
+   8. SETTINGS & PRIVACY PAGE
+   ========================================================================== */
 [data-theme="dark"] .settingsTopBar,
 body.dark-mode .settingsTopBar,
 [data-theme="dark"] .settingsSidebar,
 body.dark-mode .settingsSidebar,
 [data-theme="dark"] .settingsCard,
 body.dark-mode .settingsCard {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
   color: var(--text-primary) !important;
 }
 
@@ -407,7 +560,7 @@ body.dark-mode .rowInfo h4 {
 body.dark-mode .rowInfo p,
 [data-theme="dark"] .settingsCardHeader p,
 body.dark-mode .settingsCardHeader p {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .settingsRow,
@@ -419,7 +572,7 @@ body.dark-mode .settingsCardHeader {
 
 [data-theme="dark"] .settingsTabBtn,
 body.dark-mode .settingsTabBtn {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .settingsTabBtn:hover,
@@ -436,15 +589,15 @@ body.dark-mode .settingsTabBtn.active {
 
 [data-theme="dark"] .settingsPasswordBox,
 body.dark-mode .settingsPasswordBox {
-  background-color: var(--input-bg) !important;
-  border-color: var(--border-color) !important;
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 [data-theme="dark"] .passwordForm input,
 body.dark-mode .passwordForm input,
 [data-theme="dark"] .rowControl select,
 body.dark-mode .rowControl select {
-  background-color: var(--bg-card) !important;
+  background-color: var(--bg-primary) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
@@ -456,19 +609,8 @@ body.dark-mode .settingsBackBtn {
 }
 
 /* ==========================================================================
-   7. HELP & SUPPORT, JOB POSTING, UNDER CONSTRUCTION, 404
+   9. HELP & SUPPORT, JOB POSTING, UNDER CONSTRUCTION, 404
    ========================================================================== */
-[data-theme="dark"] .helpPageWrapper,
-body.dark-mode .helpPageWrapper,
-[data-theme="dark"] .jobPostingWrapper,
-body.dark-mode .jobPostingWrapper,
-[data-theme="dark"] .underConstructionWrapper,
-body.dark-mode .underConstructionWrapper,
-[data-theme="dark"] .notFoundWrapper,
-body.dark-mode .notFoundWrapper {
-  background-color: var(--bg-primary) !important;
-}
-
 [data-theme="dark"] .categoryCard,
 body.dark-mode .categoryCard,
 [data-theme="dark"] .faqItem,
@@ -489,25 +631,14 @@ body.dark-mode .underConstructionCard,
 body.dark-mode .highlightsBox,
 [data-theme="dark"] .notFoundCard,
 body.dark-mode .notFoundCard {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .faqQuestion,
-body.dark-mode .faqQuestion,
-[data-theme="dark"] .jobPrimary h4,
-body.dark-mode .jobPrimary h4,
-[data-theme="dark"] .constructionTitle,
-body.dark-mode .constructionTitle,
-[data-theme="dark"] .notFoundTitle,
-body.dark-mode .notFoundTitle {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .faqAnswer,
 body.dark-mode .faqAnswer {
-  background-color: var(--bg-secondary) !important;
+  background-color: var(--bg-primary) !important;
   border-color: var(--border-color) !important;
 }
 
@@ -519,7 +650,7 @@ body.dark-mode .jobListingDesc,
 body.dark-mode .constructionSubtitle,
 [data-theme="dark"] .notFoundSubtitle,
 body.dark-mode .notFoundSubtitle {
-  color: var(--text-secondary) !important;
+  color: var(--text-muted) !important;
 }
 
 [data-theme="dark"] .formGroup input,
@@ -528,29 +659,14 @@ body.dark-mode .formGroup input,
 body.dark-mode .formGroup select,
 [data-theme="dark"] .formGroup textarea,
 body.dark-mode .formGroup textarea {
-  background-color: var(--input-bg) !important;
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
 [data-theme="dark"] .skillChip,
 body.dark-mode .skillChip {
-  background-color: var(--input-bg) !important;
+  background-color: var(--bg-input) !important;
   border-color: var(--border-color) !important;
   color: var(--text-secondary) !important;
 }
-
-[data-theme="dark"] .jobTabBtn,
-body.dark-mode .jobTabBtn {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-secondary) !important;
-}
-
-[data-theme="dark"] .jobTabBtn.active,
-body.dark-mode .jobTabBtn.active {
-  background-color: var(--accent-blue-bg) !important;
-  border-color: var(--accent-blue) !important;
-  color: var(--accent-blue) !important;
-}
-
