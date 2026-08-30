@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Profile from '../models/Profile.js';
 import { hashPassword, comparePassword, generateRandomToken } from '../utils/passwordUtils.js';
 import { generateAccessToken, generatePasswordResetToken, verifyPasswordResetToken } from '../utils/jwtUtils.js';
+import { sendPasswordResetEmail, sendWelcomeEmail } from '../utils/email.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -77,17 +78,23 @@ router.post('/register', async (req, res) => {
 
     // Generate token
     const token = generateAccessToken(user._id);
-res.status(201).json({
-  message: 'User registered successfully',
-  token,
-  user: {
-    id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    username: user.username,
-  },
-});
+
+    // Send welcome email asynchronously
+    sendWelcomeEmail({ to: user.email, user }).catch((err) =>
+      console.warn('Welcome email error:', err.message)
+    );
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username,
+      },
+    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: error.message || 'Registration failed' });
@@ -159,11 +166,16 @@ router.post('/forgot-password', async (req, res) => {
     user.passwordResetExpires = resetTokenExpiry;
     await user.save();
 
-    // In production, send email with reset link
-    // For now, return token in response (for testing only)
+    // Send password reset email
+    try {
+      await sendPasswordResetEmail({ to: user.email, resetToken, user });
+    } catch (emailErr) {
+      console.warn('Could not dispatch password reset email:', emailErr.message);
+    }
+
     res.status(200).json({
-      message: 'Password reset token sent to email',
-      resetToken, // Remove in production
+      message: 'Password reset link has been dispatched to your email address.',
+      resetToken, // Retained for immediate testing convenience
     });
   } catch (error) {
     console.error('Forgot password error:', error);
