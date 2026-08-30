@@ -1,20 +1,85 @@
 import React, { useState, useEffect } from "react";
-import { FaUndo, FaTrophy, FaCheck } from "react-icons/fa";
+import { FaUndo, FaTrophy, FaCheck, FaRandom } from "react-icons/fa";
+import { buildApiUrl } from "../../utils/api";
 
-// Word ladder trivia
-const LADDER_STEPS = [
-  { clue: "Start of life on Earth", word: "SEED", solved: true },
-  { clue: "To perceive with the eyes", word: "SEEN", solved: false },
-  { clue: "The past participle of hide", word: "SEEK", solved: false },
-  { clue: "Fine and smooth soft fabric", word: "SILK", solved: false },
+const FALLBACK_CROSSCLIMB_LEVELS = [
+  {
+    puzzleNumber: 184,
+    difficulty: "Easy",
+    steps: [
+      { clue: "Start of life on Earth", word: "SEED", solved: true },
+      { clue: "To perceive with the eyes", word: "SEEN", solved: false },
+      { clue: "The past participle of hide", word: "SEEK", solved: false },
+      { clue: "Fine and smooth soft fabric", word: "SILK", solved: false },
+    ],
+  },
+  {
+    puzzleNumber: 185,
+    difficulty: "Medium",
+    steps: [
+      { clue: "Cold winter precipitation", word: "SNOW", solved: true },
+      { clue: "Opposite of fast", word: "SLOW", solved: false },
+      { clue: "To sparkle with bright light", word: "GLOW", solved: false },
+      { clue: "To expand in size or maturity", word: "GROW", solved: false },
+    ],
+  },
+  {
+    puzzleNumber: 186,
+    difficulty: "Hard",
+    steps: [
+      { clue: "Firm ground under feet", word: "LAND", solved: true },
+      { clue: "Sandy ocean shore", word: "SAND", solved: false },
+      { clue: "To dispatch mail or a message", word: "SEND", solved: false },
+      { clue: "To repair or fix a tear", word: "MEND", solved: false },
+    ],
+  },
 ];
 
 const CrossclimbGame = () => {
-  const [steps, setSteps] = useState(LADDER_STEPS);
+  const [currentLevel, setCurrentLevel] = useState(FALLBACK_CROSSCLIMB_LEVELS[0]);
+  const [steps, setSteps] = useState(FALLBACK_CROSSCLIMB_LEVELS[0].steps);
   const [currentInput, setCurrentInput] = useState("");
   const [activeStep, setActiveStep] = useState(1);
   const [isWon, setIsWon] = useState(false);
   const [seconds, setSeconds] = useState(0);
+
+  const loadRandomLevel = async () => {
+    try {
+      const res = await fetch(buildApiUrl('/games/crossclimb/random'));
+      if (res.ok) {
+        const data = await res.json();
+        if (data.level?.puzzleData?.steps) {
+          const l = {
+            puzzleNumber: data.level.puzzleNumber || Math.floor(180 + Math.random() * 200),
+            difficulty: data.level.difficulty || "Medium",
+            steps: data.level.puzzleData.steps,
+          };
+          setCurrentLevel(l);
+          setSteps(l.steps.map((s, i) => ({ ...s, solved: i === 0 })));
+          setActiveStep(1);
+          setCurrentInput("");
+          setIsWon(false);
+          setSeconds(0);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Backend crossclimb fetch notice:", err.message);
+    }
+
+    const randIndex = Math.floor(Math.random() * FALLBACK_CROSSCLIMB_LEVELS.length);
+    const chosen = FALLBACK_CROSSCLIMB_LEVELS[randIndex];
+    setCurrentLevel(chosen);
+    setSteps(chosen.steps.map((s, i) => ({ ...s, solved: i === 0 })));
+    setActiveStep(1);
+    setCurrentInput("");
+    setIsWon(false);
+    setSeconds(0);
+  };
+
+  useEffect(() => {
+    loadRandomLevel();
+  }, []);
 
   useEffect(() => {
     if (isWon) return;
@@ -36,14 +101,36 @@ const CrossclimbGame = () => {
         setActiveStep(activeStep + 1);
       } else {
         setIsWon(true);
+        recordWin(seconds);
       }
     } else {
-      alert("Try again! Match the clue and change 1 letter.");
+      alert("Try again! Match the clue and change 1 letter from the previous word.");
+    }
+  };
+
+  const recordWin = async (timeTaken) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      await fetch(buildApiUrl('/games/record-win'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          gameKey: 'crossclimb',
+          puzzleNumber: currentLevel.puzzleNumber,
+          timeSeconds: timeTaken,
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to log crossclimb score:', err);
     }
   };
 
   const handleReset = () => {
-    setSteps(LADDER_STEPS.map((s, i) => ({ ...s, solved: i === 0 })));
+    setSteps(currentLevel.steps.map((s, i) => ({ ...s, solved: i === 0 })));
     setActiveStep(1);
     setCurrentInput("");
     setIsWon(false);
@@ -60,9 +147,18 @@ const CrossclimbGame = () => {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
       <div className="gameControls">
         <div className="gameTimer">⏱️ {formatTimer(seconds)}</div>
-        <button type="button" className="gameActionBtn" onClick={handleReset}>
-          <FaUndo size={11} style={{ marginRight: "4px" }} /> Reset
-        </button>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button type="button" className="gameActionBtn" onClick={loadRandomLevel} title="New word ladder">
+            <FaRandom size={11} style={{ marginRight: "4px" }} /> New
+          </button>
+          <button type="button" className="gameActionBtn" onClick={handleReset}>
+            <FaUndo size={11} style={{ marginRight: "4px" }} /> Reset
+          </button>
+        </div>
+      </div>
+
+      <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: "600" }}>
+        Puzzle #{currentLevel.puzzleNumber} · {currentLevel.difficulty}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", marginBottom: "16px" }}>
@@ -89,7 +185,7 @@ const CrossclimbGame = () => {
         ))}
       </div>
 
-      {!isWon && (
+      {!isWon && activeStep < steps.length && (
         <div style={{ display: "flex", gap: "8px", width: "100%" }}>
           <input
             placeholder={`Guess 4-letter word for Step ${activeStep + 1}`}
@@ -122,7 +218,26 @@ const CrossclimbGame = () => {
       {isWon && (
         <div className="gameWinBox">
           <h3><FaTrophy style={{ color: "#d97706" }} /> Ladder Completed!</h3>
-          <p>You climbed Crossclimb #184 in <strong>{formatTimer(seconds)}</strong>!</p>
+          <p>You climbed Crossclimb #{currentLevel.puzzleNumber} in <strong>{formatTimer(seconds)}</strong>!</p>
+          <button
+            type="button"
+            onClick={loadRandomLevel}
+            style={{
+              marginTop: "12px",
+              background: "#059669",
+              color: "#fff",
+              border: "none",
+              padding: "8px 18px",
+              borderRadius: "20px",
+              fontWeight: "700",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <FaCheck /> Play Next Ladder
+          </button>
         </div>
       )}
     </div>
@@ -130,4 +245,3 @@ const CrossclimbGame = () => {
 };
 
 export default CrossclimbGame;
-

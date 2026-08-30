@@ -1,15 +1,83 @@
 import React, { useState, useEffect } from "react";
-import { FaUndo, FaCheck, FaTrophy, FaBackspace } from "react-icons/fa";
+import { FaUndo, FaCheck, FaTrophy, FaBackspace, FaRandom, FaLightbulb } from "react-icons/fa";
+import { buildApiUrl } from "../../utils/api";
 
-const TARGET_WORDS = ["CODE", "CORE", "DOOR", "RODE", "CORD"];
-const LETTERS = ["C", "O", "D", "E", "R"];
+const FALLBACK_ZIP_LEVELS = [
+  {
+    puzzleNumber: 362,
+    difficulty: "Easy",
+    letters: ["C", "O", "D", "E", "R"],
+    targetWords: ["CODE", "CORE", "DOOR", "RODE", "CORD"],
+  },
+  {
+    puzzleNumber: 363,
+    difficulty: "Medium",
+    letters: ["P", "L", "A", "N", "E"],
+    targetWords: ["PLAN", "LANE", "LEAN", "PALE", "PEAL"],
+  },
+  {
+    puzzleNumber: 364,
+    difficulty: "Medium",
+    letters: ["S", "T", "A", "R", "T"],
+    targetWords: ["STAR", "TART", "ARTS", "RATS", "STAT"],
+  },
+  {
+    puzzleNumber: 365,
+    difficulty: "Hard",
+    letters: ["B", "R", "A", "I", "N"],
+    targetWords: ["RAIN", "BARN", "BRAN", "BAIRN", "RANI"],
+  },
+];
 
 const ZipGame = () => {
+  const [currentLevel, setCurrentLevel] = useState(FALLBACK_ZIP_LEVELS[0]);
+  const [letters, setLetters] = useState(FALLBACK_ZIP_LEVELS[0].letters);
   const [currentWord, setCurrentWord] = useState("");
   const [solvedWords, setSolvedWords] = useState([]);
   const [seconds, setSeconds] = useState(0);
   const [message, setMessage] = useState("");
   const [isWon, setIsWon] = useState(false);
+
+  const loadRandomLevel = async () => {
+    try {
+      const res = await fetch(buildApiUrl('/games/zip/random'));
+      if (res.ok) {
+        const data = await res.json();
+        if (data.level?.puzzleData?.letters) {
+          const l = {
+            puzzleNumber: data.level.puzzleNumber || Math.floor(300 + Math.random() * 500),
+            difficulty: data.level.difficulty || "Medium",
+            letters: data.level.puzzleData.letters,
+            targetWords: data.level.puzzleData.targetWords,
+          };
+          setCurrentLevel(l);
+          setLetters(l.letters);
+          setCurrentWord("");
+          setSolvedWords([]);
+          setIsWon(false);
+          setSeconds(0);
+          setMessage("");
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Backend zip fetch notice:", err.message);
+    }
+
+    const randIndex = Math.floor(Math.random() * FALLBACK_ZIP_LEVELS.length);
+    const chosen = FALLBACK_ZIP_LEVELS[randIndex];
+    setCurrentLevel(chosen);
+    setLetters(chosen.letters);
+    setCurrentWord("");
+    setSolvedWords([]);
+    setIsWon(false);
+    setSeconds(0);
+    setMessage("");
+  };
+
+  useEffect(() => {
+    loadRandomLevel();
+  }, []);
 
   useEffect(() => {
     if (isWon) return;
@@ -18,7 +86,7 @@ const ZipGame = () => {
   }, [isWon]);
 
   const handleLetterClick = (char) => {
-    if (currentWord.length >= 6 || isWon) return;
+    if (currentWord.length >= 7 || isWon) return;
     setCurrentWord(prev => prev + char);
     setMessage("");
   };
@@ -37,17 +105,39 @@ const ZipGame = () => {
       return;
     }
 
-    if (TARGET_WORDS.includes(word)) {
+    if (currentLevel.targetWords.includes(word)) {
       const updated = [...solvedWords, word];
       setSolvedWords(updated);
       setCurrentWord("");
       setMessage("Great find! 🎉");
 
-      if (updated.length === TARGET_WORDS.length) {
+      if (updated.length === currentLevel.targetWords.length) {
         setIsWon(true);
+        recordWin(seconds);
       }
     } else {
-      setMessage("Not in today's word list!");
+      setMessage("Not in this puzzle's word list!");
+    }
+  };
+
+  const recordWin = async (timeTaken) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      await fetch(buildApiUrl('/games/record-win'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          gameKey: 'zip',
+          puzzleNumber: currentLevel.puzzleNumber,
+          timeSeconds: timeTaken,
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to log zip score:', err);
     }
   };
 
@@ -57,6 +147,15 @@ const ZipGame = () => {
     setIsWon(false);
     setSeconds(0);
     setMessage("");
+  };
+
+  const handleHint = () => {
+    if (isWon) return;
+    const remaining = currentLevel.targetWords.filter(w => !solvedWords.includes(w));
+    if (remaining.length > 0) {
+      const target = remaining[0];
+      setMessage(`Hint: Starts with "${target.slice(0, 2)}"`);
+    }
   };
 
   const formatTimer = (sec) => {
@@ -70,11 +169,23 @@ const ZipGame = () => {
       <div className="gameControls">
         <div className="gameTimer">⏱️ {formatTimer(seconds)}</div>
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#d97706" }}>
-          Found: {solvedWords.length} / {TARGET_WORDS.length}
+          Found: {solvedWords.length} / {currentLevel.targetWords.length}
         </div>
-        <button type="button" className="gameActionBtn" onClick={handleReset}>
-          <FaUndo size={11} style={{ marginRight: "4px" }} /> Reset
-        </button>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button type="button" className="gameActionBtn" onClick={loadRandomLevel} title="New random word puzzle">
+            <FaRandom size={11} style={{ marginRight: "4px" }} /> New
+          </button>
+          <button type="button" className="gameActionBtn" onClick={handleHint} title="Show hint for next word">
+            <FaLightbulb size={11} style={{ marginRight: "4px" }} /> Hint
+          </button>
+          <button type="button" className="gameActionBtn" onClick={handleReset}>
+            <FaUndo size={11} style={{ marginRight: "4px" }} /> Reset
+          </button>
+        </div>
+      </div>
+
+      <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px", fontWeight: "600" }}>
+        Puzzle #{currentLevel.puzzleNumber} · {currentLevel.difficulty}
       </div>
 
       <div className="zipClueWord">
@@ -82,13 +193,13 @@ const ZipGame = () => {
       </div>
 
       {message && (
-        <div style={{ fontSize: "12.5px", fontWeight: "600", color: message.includes("Great") ? "#059669" : "#dc2626", marginBottom: "10px" }}>
+        <div style={{ fontSize: "12.5px", fontWeight: "600", color: message.includes("Great") ? "#059669" : message.includes("Hint") ? "#0284c7" : "#dc2626", marginBottom: "10px" }}>
           {message}
         </div>
       )}
 
       <div className="zipLettersPool">
-        {LETTERS.map((letter, idx) => (
+        {letters.map((letter, idx) => (
           <button
             key={idx}
             type="button"
@@ -122,7 +233,7 @@ const ZipGame = () => {
       </div>
 
       <div className="zipWordList">
-        {TARGET_WORDS.map((w, idx) => (
+        {currentLevel.targetWords.map((w, idx) => (
           <span key={idx} className="zipSolvedWord" style={{ opacity: solvedWords.includes(w) ? 1 : 0.4 }}>
             {solvedWords.includes(w) ? w : "• • • •"}
           </span>
@@ -132,7 +243,26 @@ const ZipGame = () => {
       {isWon && (
         <div className="gameWinBox">
           <h3><FaTrophy style={{ color: "#d97706" }} /> All Words Found!</h3>
-          <p>You completed Zip #362 in <strong>{formatTimer(seconds)}</strong>!</p>
+          <p>You completed Zip #{currentLevel.puzzleNumber} in <strong>{formatTimer(seconds)}</strong>!</p>
+          <button
+            type="button"
+            onClick={loadRandomLevel}
+            style={{
+              marginTop: "12px",
+              background: "#059669",
+              color: "#fff",
+              border: "none",
+              padding: "8px 18px",
+              borderRadius: "20px",
+              fontWeight: "700",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <FaCheck /> Play Next Puzzle
+          </button>
         </div>
       )}
     </div>
@@ -140,4 +270,3 @@ const ZipGame = () => {
 };
 
 export default ZipGame;
-
