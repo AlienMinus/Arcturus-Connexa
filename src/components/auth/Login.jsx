@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './Auth.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -7,6 +8,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const Login = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +46,12 @@ const Login = ({ onSuccess }) => {
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      if (rememberMe) {
+        localStorage.setItem('arcturus_remember_email', email);
+      } else {
+        localStorage.removeItem('arcturus_remember_email');
+      }
+
       onSuccess(data);
     } catch (err) {
       setError(err.message);
@@ -52,52 +61,78 @@ const Login = ({ onSuccess }) => {
   };
 
   return (
-    <div className="authContainer">
-      <div className="authCard">
-        <h1 className="authTitle">Sign In</h1>
-        <p className="authSubtitle">Welcome back to Arcturus</p>
+    <div className="modernAuthWrapper">
+      {/* Scenic Background Layer */}
+      <div className="scenicAuthBg" />
 
-        <form onSubmit={handleSubmit}>
-          {error && <div className="errorMessage">{error}</div>}
+      {/* Frosted Glassmorphism Card */}
+      <div className="modernGlassCard">
+        <h1 className="modernAuthTitle">Login</h1>
 
-          <div className="formGroup">
-            <label>Email Address</label>
+        <form onSubmit={handleSubmit} className="modernAuthForm">
+          {error && <div className="glassErrorMessage">{error}</div>}
+
+          <div className="modernInputGroup">
+            <label>Email</label>
             <input
               type="email"
-              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               required
+              autoComplete="email"
             />
           </div>
 
-          <div className="formGroup">
+          <div className="modernInputGroup">
             <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="passwordInputWrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="togglePasswordBtn"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex="-1"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
+            </div>
           </div>
 
-          <Link to="/forgot-password" className="forgotPasswordLink">
-            Forgot password?
-          </Link>
+          <div className="modernFormOptions">
+            <label className="rememberMeLabel">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Remember Me</span>
+            </label>
 
-          <button type="submit" disabled={loading} className="primaryBtn fullWidth">
-            {loading ? 'Signing in...' : 'Sign In'}
+            <Link to="/forgot-password" className="modernForgotLink">
+              Forget Password
+            </Link>
+          </div>
+
+          <button type="submit" disabled={loading} className="modernLoginBtn">
+            {loading ? 'Logging in...' : 'Log in'}
           </button>
+
+          <div className="modernAuthFooter">
+            <span>Don't have an account?</span>{' '}
+            <Link to="/register" className="modernRegisterLink">
+              Register
+            </Link>
+          </div>
         </form>
-
-        <div className="authDivider">
-          <span>Don't have an account?</span>
-        </div>
-
-        <Link to="/register" className="secondaryBtn fullWidth textCenter">
-          Create Account
-        </Link>
       </div>
     </div>
   );

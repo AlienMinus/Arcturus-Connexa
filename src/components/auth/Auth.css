@@ -1,259 +1,404 @@
+/* ==========================================================================
+   MODERN GLASSMORPHISM AUTH STYLES (Auth.css)
+   Scenic illustrated twilight background with frosted glassmorphism card
+   ========================================================================== */
+
+.modernAuthWrapper,
 .authContainer {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #2b1055;
 }
 
+/* Scenic Illustrated Twilight Landscape Background */
+.scenicAuthBg,
+.authContainer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background: 
+    /* Glowing warm cabin lights in distance */
+    radial-gradient(ellipse 70px 40px at 85% 68%, rgba(251, 191, 36, 0.85) 0%, rgba(245, 158, 11, 0.4) 40%, transparent 80%),
+    /* Soft moon/aurora glow in top left */
+    radial-gradient(circle 280px at 20% 30%, rgba(236, 72, 153, 0.35) 0%, rgba(168, 85, 247, 0.2) 50%, transparent 80%),
+    /* Snowy mountain and forest landscape vector art */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' width='100%25' height='100%25' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%231e0b36'/%3E%3Cstop offset='45%25' stop-color='%234c1d95'/%3E%3Cstop offset='75%25' stop-color='%23701a75'/%3E%3Cstop offset='100%25' stop-color='%233b0764'/%3E%3C/linearGradient%3E%3ClinearGradient id='mtnBack' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23581c87'/%3E%3Cstop offset='100%25' stop-color='%232e1065'/%3E%3C/linearGradient%3E%3ClinearGradient id='mtnMid' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b0764'/%3E%3Cstop offset='100%25' stop-color='%231e0838'/%3E%3C/linearGradient%3E%3ClinearGradient id='snow' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2393c5fd' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%236366f1' stop-opacity='0.8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1440' height='900' fill='url(%23sky)'/%3E%3C!-- Clouds --%3E%3Cpath d='M100 240 Q160 180 260 210 Q340 160 440 200 Q500 250 460 300 L120 300 Z' fill='%23ec4899' opacity='0.25'/%3E%3Cpath d='M900 180 Q980 120 1100 150 Q1180 110 1280 160 Q1340 210 1300 260 L920 260 Z' fill='%23f472b6' opacity='0.2'/%3E%3C!-- Distant Mountains --%3E%3Cpolygon points='0,580 220,320 480,560 780,260 1080,540 1340,310 1440,420 1440,900 0,900' fill='url(%23mtnBack)'/%3E%3C!-- Mid Mountain Ridge --%3E%3Cpolygon points='0,680 180,480 380,660 620,440 920,670 1200,430 1440,620 1440,900 0,900' fill='url(%23mtnMid)'/%3E%3C!-- Snowy Valley Slopes --%3E%3Cpath d='M0 640 Q400 760 800 680 T1440 660 L1440 900 L0 900 Z' fill='url(%23snow)' opacity='0.65'/%3E%3Cpath d='M0 720 Q350 630 750 750 T1440 710 L1440 900 L0 900 Z' fill='%236366f1' opacity='0.45'/%3E%3C!-- Cozy Cabin in distance --%3E%3Cpolygon points='1180,590 1280,500 1380,590' fill='%231e1b4b'/%3E%3Crect x='1195' y='590' width='170' height='80' rx='6' fill='%23312e81'/%3E%3Crect x='1220' y='610' width='32' height='26' rx='4' fill='%23fef08a'/%3E%3Crect x='1310' y='610' width='32' height='26' rx='4' fill='%23fef08a'/%3E%3C!-- Pine Trees Silhouette Left --%3E%3Cpolygon points='140,780 180,620 220,780' fill='%231e1b4b'/%3E%3Cpolygon points='180,740 230,560 280,740' fill='%230f172a'/%3E%3Cpolygon points='60,840 120,680 180,840' fill='%231e1b4b'/%3E%3Cpolygon points='100,820 160,600 220,820' fill='%232563eb' opacity='0.6'/%3E%3Cpolygon points='220,850 280,640 340,850' fill='%233b82f6' opacity='0.5'/%3E%3C!-- Pine Trees Right --%3E%3Cpolygon points='1100,740 1150,570 1200,740' fill='%231e1b4b'/%3E%3Cpolygon points='1140,720 1190,540 1240,720' fill='%23312e81'/%3E%3C/svg%3E"),
+    /* Deep rich twilight gradient */
+    linear-gradient(135deg, #1e0b36 0%, #4c1d95 40%, #701a75 75%, #2e1065 100%);
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Glassmorphic Auth Card */
+.modernGlassCard,
 .authCard {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+  position: relative;
+  z-index: 10;
   width: 100%;
-  max-width: 500px;
+  max-width: 410px;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 28px !important;
+  padding: 44px 38px 36px !important;
+  box-shadow: 
+    0 24px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  box-sizing: border-box;
+  animation: glassPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes glassPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Auth Header */
+.modernAuthTitle,
 .authTitle {
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #000;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
   text-align: center;
+  margin: 0 0 28px 0 !important;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .authSubtitle {
   font-size: 14px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.85) !important;
   text-align: center;
-  margin-bottom: 30px;
+  margin: -16px 0 24px 0 !important;
 }
 
+/* Forms */
+.modernAuthForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.modernInputGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.modernInputGroup label,
+.formGroup label {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  margin-bottom: 4px !important;
+}
+
+.modernInputGroup input {
+  width: 100%;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.65) !important;
+  border-radius: 0 !important;
+  padding: 8px 0 10px !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-family: inherit;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.modernInputGroup input:focus {
+  border-bottom-color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.35) !important;
+}
+
+.modernInputGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Password Input & Eye Toggle */
+.passwordInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.passwordInputWrapper input {
+  padding-right: 36px !important;
+}
+
+.togglePasswordBtn {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.togglePasswordBtn:hover {
+  color: #ffffff;
+}
+
+/* Remember Me & Forgot Password Row */
+.modernFormOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 28px;
+  gap: 12px;
+}
+
+.rememberMeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rememberMeLabel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ffffff;
+  cursor: pointer;
+}
+
+.modernForgotLink {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.modernForgotLink:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+/* High Contrast Pill Action Button */
+.modernLoginBtn,
+.primaryBtn {
+  background: #ffffff !important;
+  color: #1e1b4b !important;
+  border: none !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 13px 0 !important;
+  width: 100% !important;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modernLoginBtn:hover:not(:disabled),
+.primaryBtn:hover:not(:disabled) {
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.35) !important;
+}
+
+.modernLoginBtn:active:not(:disabled),
+.primaryBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.modernLoginBtn:disabled,
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Footer / Switch Auth Mode */
+.modernAuthFooter {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.modernRegisterLink {
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: underline;
+  margin-left: 4px;
+  transition: opacity 0.15s ease;
+}
+
+.modernRegisterLink:hover {
+  opacity: 0.85;
+}
+
+/* Alerts */
+.glassErrorMessage,
+.errorMessage {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border: 1px solid rgba(248, 113, 113, 0.5) !important;
+  color: #fecaca !important;
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  font-size: 13.5px !important;
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-align: left;
+  backdrop-filter: blur(8px);
+}
+
+.successMessage {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid rgba(74, 222, 128, 0.5) !important;
+  color: #bbf7d0 !important;
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  font-size: 13.5px !important;
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+/* Step Indicators (Register) */
 .stepIndicator {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .step {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #e8e8e8;
-  color: #666;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  font-size: 13px;
 }
 
 .step.active {
-  background-color: #0a66c2;
-  color: white;
+  background: #ffffff;
+  color: #1e1b4b;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .stepLine {
-  width: 30px;
+  width: 24px;
   height: 2px;
-  background-color: #e8e8e8;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .stepLine.active {
-  background-color: #0a66c2;
-}
-
-.formStep {
-  margin-bottom: 20px;
+  background: #ffffff;
 }
 
 .formStep h2 {
+  color: #ffffff;
   font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #000;
+  margin-bottom: 18px;
+  text-align: center;
 }
 
-.formGroup {
-  margin-bottom: 20px;
-}
-
-.formGroup label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.formGroup input,
 .formStep input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #d0d0d0;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  margin-bottom: 14px;
   box-sizing: border-box;
-  margin-bottom: 12px;
 }
 
-.formGroup input:focus,
 .formStep input:focus {
+  border-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   outline: none;
-  border-color: #0a66c2;
-  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
-}
-
-.formGroup input::placeholder,
-.formStep input::placeholder {
-  color: #999;
-}
-
-.passwordHint {
-  font-size: 12px;
-  color: #999;
-  margin-top: 8px;
-  margin-bottom: 20px;
-}
-
-.errorMessage {
-  background-color: #fee;
-  color: #c33;
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  border-left: 4px solid #c33;
-}
-
-.successMessage {
-  background-color: #efe;
-  color: #3a3;
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  border-left: 4px solid #3a3;
-}
-
-.forgotPasswordLink {
-  display: inline-block;
-  font-size: 13px;
-  color: #0a66c2;
-  text-decoration: none;
-  margin-bottom: 20px;
-  transition: color 0.3s ease;
-}
-
-.forgotPasswordLink:hover {
-  color: #0055a4;
-  text-decoration: underline;
-}
-
-.primaryBtn,
-.secondaryBtn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.primaryBtn {
-  background-color: #0a66c2;
-  color: white;
-  margin-top: 10px;
-}
-
-.primaryBtn:hover:not(:disabled) {
-  background-color: #0055a4;
-  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.4);
-}
-
-.primaryBtn:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.secondaryBtn {
-  background-color: #f0f0f0;
-  color: #333;
-  margin-top: 10px;
-}
-
-.secondaryBtn:hover:not(:disabled) {
-  background-color: #e0e0e0;
-}
-
-.fullWidth {
-  width: 100%;
-}
-
-.textCenter {
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
-.authDivider {
-  text-align: center;
-  margin: 24px 0;
-  font-size: 13px;
-  color: #666;
 }
 
 .formActions {
   display: flex;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
-.formActions button {
-  flex: 1;
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 30px !important;
+  padding: 12px 20px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Responsive Design */
-@media (max-width: 600px) {
+.secondaryBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+.forgotPasswordLink {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: 13.5px;
+  text-decoration: underline;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .modernGlassCard,
   .authCard {
-    padding: 24px;
+    padding: 34px 22px 28px !important;
+    border-radius: 22px !important;
   }
 
+  .modernAuthTitle,
   .authTitle {
-    font-size: 22px;
-  }
-
-  .stepIndicator {
-    gap: 5px;
-    margin-bottom: 20px;
-  }
-
-  .step {
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
-  }
-
-  .stepLine {
-    width: 20px;
-  }
-
-  .formStep h2 {
-    font-size: 16px;
-    margin-bottom: 16px;
+    font-size: 26px !important;
+    margin-bottom: 22px !important;
   }
 }
