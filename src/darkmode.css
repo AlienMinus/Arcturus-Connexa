@@ -133,9 +133,25 @@ body.dark-mode .profile-dropdown-footer {
   border-color: var(--border-color) !important;
 }
 
+[data-theme="dark"] .profile-dropdown-header .user-info h4,
+body.dark-mode .profile-dropdown-header .user-info h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .profile-dropdown-header .user-info p,
+body.dark-mode .profile-dropdown-header .user-info p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .profile-dropdown-section h5,
+body.dark-mode .profile-dropdown-section h5 {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
 [data-theme="dark"] .profile-dropdown-list li a,
 body.dark-mode .profile-dropdown-list li a {
-  color: var(--text-secondary) !important;
+  color: #cbd5e1 !important;
 }
 
 [data-theme="dark"] .profile-dropdown-list li a:hover,
@@ -146,6 +162,7 @@ body.dark-mode .profile-dropdown-list li a:hover {
 
 [data-theme="dark"] .view-profile-btn,
 body.dark-mode .view-profile-btn {
+  background-color: var(--bg-primary) !important;
   border-color: var(--accent-blue) !important;
   color: var(--accent-blue) !important;
 }
@@ -153,6 +170,16 @@ body.dark-mode .view-profile-btn {
 [data-theme="dark"] .view-profile-btn:hover,
 body.dark-mode .view-profile-btn:hover {
   background-color: var(--accent-blue-bg) !important;
+}
+
+[data-theme="dark"] .sign-out-btn,
+body.dark-mode .sign-out-btn {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .sign-out-btn:hover,
+body.dark-mode .sign-out-btn:hover {
+  color: #f87171 !important;
 }
 
 /* ==========================================================================
