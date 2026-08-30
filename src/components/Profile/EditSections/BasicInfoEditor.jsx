@@ -122,7 +122,7 @@ const BasicInfoEditor = ({ data, profile, onChange }) => {
           </div>
 
           <div className={`profileUsernameInputWrap ${availability ? (availability.available ? 'valid' : 'invalid') : ''}`}>
-            <span className="profileUsernamePrefix">arcturus.app/profile/</span>
+            <span className="profileUsernamePrefix">https://arcturus-connexa.vercel.app/profile/</span>
             <input
               id="username"
               type="text"
