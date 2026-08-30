@@ -7,6 +7,7 @@ import messages from './messages.js';
 import notifications from './notifications.js';
 import news from './news.js';
 import games from './games.js';
+import jobs from './jobs.js';
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use('/messages', messages);
 router.use('/notifications', notifications);
 router.use('/news', news);
 router.use('/games', games);
+router.use('/jobs', jobs);
 
 export default router;

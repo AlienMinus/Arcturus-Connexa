@@ -57,8 +57,13 @@ const JobsPage = () => {
         const data = await res.json();
         const list = data.jobs || [];
         setJobs(list);
-        if (list.length > 0 && !selectedJob) {
-          setSelectedJob(list[0]);
+        if (list.length > 0) {
+          setSelectedJob((prev) => {
+            const stillExists = list.find((j) => (j._id || j.id) === (prev?._id || prev?.id));
+            return stillExists || list[0];
+          });
+        } else {
+          setSelectedJob(null);
         }
 
         // Detect if user has already applied
@@ -71,9 +76,14 @@ const JobsPage = () => {
           });
           setAppliedJobIds(applied);
         }
+      } else {
+        setJobs([]);
+        setSelectedJob(null);
       }
     } catch (err) {
-      console.error('Failed to fetch jobs:', err);
+      console.error('Failed to fetch jobs from database:', err);
+      setJobs([]);
+      setSelectedJob(null);
     } finally {
       setLoading(false);
     }
@@ -114,6 +124,7 @@ const JobsPage = () => {
       if (res.ok) {
         setAppliedJobIds((prev) => new Set([...prev, jobId]));
         showToast(`Application submitted to ${job.company}! 🎉`);
+        fetchJobs();
       } else {
         showToast(data.error || 'Failed to submit application');
       }
@@ -154,7 +165,7 @@ const JobsPage = () => {
         <div className="jobsHeroBanner">
           <div className="jobsHeroContent">
             <h1>Find your next career opportunity</h1>
-            <p>Explore thousands of tech, engineering, and product roles curated for you.</p>
+            <p>Explore curated tech, engineering, and product roles straight from the database.</p>
 
             <form onSubmit={handleSearchSubmit} className="jobsSearchForm">
               <div className="jobsSearchInputGroup">
@@ -215,7 +226,7 @@ const JobsPage = () => {
             {loading ? (
               <div className="jobsLoadingCard">
                 <div className="jobsSpinner" />
-                <p>Loading curated job openings...</p>
+                <p>Fetching jobs from database...</p>
               </div>
             ) : jobs.length === 0 ? (
               <div className="jobsEmptyCard">
@@ -410,7 +421,7 @@ const JobsPage = () => {
 
                   {selectedJob.applicants && (
                     <div className="detailsSection applicantsCount">
-                      <span>{selectedJob.applicants.length} candidates have applied</span>
+                      <span>{(selectedJob.applicants || []).length} candidates have applied</span>
                     </div>
                   )}
                 </div>
@@ -430,4 +441,3 @@ const JobsPage = () => {
 };
 
 export default JobsPage;
-
