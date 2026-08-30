@@ -1,22 +1,95 @@
 import express from 'express';
 import User from '../models/User.js';
 import Profile from '../models/Profile.js';
+import Otp from '../models/Otp.js';
 import { hashPassword, comparePassword, generateRandomToken } from '../utils/passwordUtils.js';
 import { generateAccessToken, generatePasswordResetToken, verifyPasswordResetToken } from '../utils/jwtUtils.js';
-import { sendPasswordResetEmail } from '../utils/email.js';
+import { sendPasswordResetEmail, sendOtpEmail } from '../utils/email.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Send Registration OTP
+router.post('/send-registration-otp', async (req, res) => {
+  try {
+    const { email, firstName } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    if (existingUser) {
+      return res.status(409).json({ error: 'Email is already registered. Please sign in.' });
+    }
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Remove any previous OTP for this email
+    await Otp.deleteMany({ email: normalizedEmail, purpose: 'registration' });
+
+    // Store new OTP
+    await Otp.create({
+      email: normalizedEmail,
+      otp: otpCode,
+      purpose: 'registration',
+    });
+
+    // Send OTP via EmailJS
+    try {
+      await sendOtpEmail({
+        to: normalizedEmail,
+        otpCode,
+        user: { firstName: firstName || 'Member' },
+        expiresMinutes: 10,
+      });
+    } catch (emailErr) {
+      console.warn('Failed to send OTP email:', emailErr.message);
+    }
+
+    res.status(200).json({
+      message: `Verification code sent to ${normalizedEmail}`,
+      email: normalizedEmail,
+    });
+  } catch (error) {
+    console.error('Send registration OTP error:', error);
+    res.status(500).json({ error: error.message || 'Failed to send verification code' });
+  }
+});
+
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, middleName, lastName, email, password, dateOfBirth, phoneNumber, location } = req.body;
+    const { firstName, middleName, lastName, email, password, dateOfBirth, phoneNumber, location, otp } = req.body;
 
     // Validation
     if (!firstName || !lastName || !email || !password || !dateOfBirth) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Verify OTP
+    if (!otp) {
+      return res.status(400).json({ error: 'Verification code (OTP) is required' });
+    }
+
+    const otpRecord = await Otp.findOne({
+      email: normalizedEmail,
+      purpose: 'registration',
+      otp: otp.toString().trim(),
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ error: 'Invalid or expired verification code' });
+    }
+
+    // Delete used OTP
+    await Otp.deleteOne({ _id: otpRecord._id });
 
     // Check if user exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
