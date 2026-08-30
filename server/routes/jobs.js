@@ -5,86 +5,9 @@ import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
-const SEED_JOBS = [
-  {
-    title: 'Senior Full Stack Engineer',
-    company: 'Arcturus Labs',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-    location: 'Bengaluru, India',
-    workplaceType: 'Hybrid',
-    employmentType: 'Full-time',
-    salary: '₹24,00,000 - ₹35,00,000 / yr',
-    skills: ['React', 'Node.js', 'MongoDB', 'TypeScript', 'GraphQL'],
-    description: 'We are looking for a Senior Full Stack Engineer to build high-scale web experiences for the Arcturus developer platform. You will lead system architecture, collaborate with cross-functional engineering teams, and deliver robust cloud features.',
-    isActive: true,
-  },
-  {
-    title: 'Frontend Developer (React / Next.js)',
-    company: 'Aerial.Vue Global',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png',
-    location: 'Remote, India',
-    workplaceType: 'Remote',
-    employmentType: 'Full-time',
-    salary: '₹14,00,000 - ₹20,00,000 / yr',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'Redux', 'Web Vitals'],
-    description: 'Join our product frontend team to create sleek, modern user interfaces with responsive animations, accessible components, and high Core Web Vitals performance benchmarks.',
-    isActive: true,
-  },
-  {
-    title: 'AI / ML Solutions Architect',
-    company: 'DeepMind Innovations',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/8637/8637105.png',
-    location: 'Hyderabad, India',
-    workplaceType: 'Hybrid',
-    employmentType: 'Full-time',
-    salary: '₹30,00,000 - ₹45,00,000 / yr',
-    skills: ['Python', 'PyTorch', 'LLMs', 'FastAPI', 'Docker'],
-    description: 'Design and deploy state-of-the-art multimodal AI workflows, vector embeddings, and agentic assistants across enterprise platforms.',
-    isActive: true,
-  },
-  {
-    title: 'Product Designer (UI/UX)',
-    company: 'Starlight Studio',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-    location: 'Mumbai, India',
-    workplaceType: 'On-site',
-    employmentType: 'Full-time',
-    salary: '₹12,00,000 - ₹18,00,000 / yr',
-    skills: ['Figma', 'Prototyping', 'Design Systems', 'User Research'],
-    description: 'We are seeking a talented UI/UX designer to craft intuitive user journeys, interactive design components, and pixel-perfect design systems.',
-    isActive: true,
-  },
-  {
-    title: 'DevOps & Cloud Engineer',
-    company: 'Nexlify Cloud',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968853.png',
-    location: 'Pune, India',
-    workplaceType: 'Remote',
-    employmentType: 'Full-time',
-    salary: '₹18,00,000 - ₹26,00,000 / yr',
-    skills: ['AWS', 'Kubernetes', 'Terraform', 'CI/CD', 'Docker'],
-    description: 'Maintain high availability infrastructure, automated CI/CD pipelines, container orchestration, and multi-region cloud security policies.',
-    isActive: true,
-  },
-];
-
-// Helper to seed initial jobs if empty
-const seedJobsIfEmpty = async () => {
-  try {
-    const count = await Job.countDocuments();
-    if (count === 0) {
-      await Job.insertMany(SEED_JOBS);
-    }
-  } catch (err) {
-    console.error('Failed to seed initial jobs:', err);
-  }
-};
-
 // GET /api/jobs - List all active jobs with search & filter
 router.get('/', async (req, res) => {
   try {
-    await seedJobsIfEmpty();
-
     const { q, location, type } = req.query;
     const filter = { isActive: true };
 
