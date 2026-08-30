@@ -75,6 +75,19 @@ const UserSchema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
+    settings: {
+      profileViewingMode: { type: String, enum: ['public', 'semi', 'private'], default: 'public' },
+      showEmailToConnections: { type: Boolean, default: true },
+      shareProfileUpdates: { type: Boolean, default: true },
+      twoFactorAuth: { type: Boolean, default: false },
+      rememberSessions: { type: Boolean, default: true },
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: true },
+      soundEffects: { type: Boolean, default: true },
+      autoplayVideos: { type: Boolean, default: true },
+      theme: { type: String, default: 'light' },
+      language: { type: String, default: 'en' },
+    },
   },
   { timestamps: true }
 );

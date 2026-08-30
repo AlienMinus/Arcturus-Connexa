@@ -79,23 +79,68 @@ const SettingsPage = () => {
     setActiveTab(getInitialTab());
   }, [location.pathname]);
 
+  // Load user settings from backend
+  useEffect(() => {
+    if (!token) return;
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(buildApiUrl('/users/settings'), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.settings) {
+            setSettings((prev) => ({ ...prev, ...data.settings }));
+            if (data.settings.theme) {
+              setTheme(data.settings.theme);
+            }
+            if (data.settings.language) {
+              setSelectedLanguage(data.settings.language);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load user settings:', err);
+      }
+    };
+    fetchSettings();
+  }, [token]);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
   };
 
+  const handleSettingChange = async (key, val) => {
+    const updated = { ...settings, [key]: val };
+    setSettings(updated);
+    showToast('Settings saved successfully');
+
+    if (token) {
+      try {
+        await fetch(buildApiUrl('/users/settings'), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ [key]: val }),
+        });
+      } catch (err) {
+        console.error('Failed to sync setting with backend:', err);
+      }
+    }
+  };
+
   const handleToggle = (key) => {
-    setSettings((prev) => {
-      const updated = { ...prev, [key]: !prev[key] };
-      showToast('Settings saved successfully');
-      return updated;
-    });
+    handleSettingChange(key, !settings[key]);
   };
 
   const handleLanguageChange = (e) => {
     const code = e.target.value;
     setSelectedLanguage(code);
     localStorage.setItem('arcturus_lang', code);
+    handleSettingChange('language', code);
     showToast(`Language updated to ${LANGUAGES.find((l) => l.code === code)?.name}`);
   };
 
@@ -238,6 +283,7 @@ const SettingsPage = () => {
                         value={theme} 
                         onChange={(e) => {
                           setTheme(e.target.value);
+                          handleSettingChange('theme', e.target.value);
                           showToast(`Theme set to ${e.target.value === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}`);
                         }}
                       >
@@ -248,8 +294,10 @@ const SettingsPage = () => {
                         type="button" 
                         className="toggleBtn" 
                         onClick={() => {
+                          const nextTheme = theme === 'dark' ? 'light' : 'dark';
                           toggleTheme();
-                          showToast(`Theme set to ${theme === 'dark' ? 'Light Mode ☀️' : 'Dark Mode 🌙'}`);
+                          handleSettingChange('theme', nextTheme);
+                          showToast(`Theme set to ${nextTheme === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}`);
                         }}
                         title="Toggle dark mode"
                       >
@@ -395,7 +443,7 @@ const SettingsPage = () => {
                       <select
                         value={settings.profileViewingMode}
                         onChange={(e) => {
-                          setSettings(prev => ({ ...prev, profileViewingMode: e.target.value }));
+                          handleSettingChange('profileViewingMode', e.target.value);
                           showToast('Profile viewing mode updated');
                         }}
                       >
@@ -546,4 +594,3 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
-

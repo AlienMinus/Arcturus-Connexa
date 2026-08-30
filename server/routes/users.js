@@ -509,4 +509,56 @@ router.get('/search', authMiddleware, async (req, res) => {
   }
 });
 
+// Get current user settings
+router.get('/settings', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('settings');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const defaultSettings = {
+      profileViewingMode: 'public',
+      showEmailToConnections: true,
+      shareProfileUpdates: true,
+      twoFactorAuth: false,
+      rememberSessions: true,
+      emailNotifications: true,
+      pushNotifications: true,
+      soundEffects: true,
+      autoplayVideos: true,
+      theme: 'light',
+      language: 'en',
+    };
+
+    const userSettings = { ...defaultSettings, ...(user.settings ? user.settings.toObject?.() || user.settings : {}) };
+    res.json({ settings: userSettings });
+  } catch (err) {
+    console.error('Failed to get settings:', err);
+    res.status(500).json({ error: 'Failed to retrieve settings' });
+  }
+});
+
+// Update user settings
+router.patch('/settings', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.settings) {
+      user.settings = {};
+    }
+
+    Object.assign(user.settings, req.body);
+    await user.save();
+
+    res.json({ message: 'Settings updated successfully', settings: user.settings });
+  } catch (err) {
+    console.error('Failed to update settings:', err);
+    res.status(500).json({ error: 'Failed to save settings' });
+  }
+});
+
 export default router;
