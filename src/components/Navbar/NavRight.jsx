@@ -92,10 +92,10 @@ const NavRight = () => {
               <img
                 src={profile.avatar.url}
                 alt={profile?.name || "Profile"}
-                className="avatar"
+                className="dropdownAvatar"
               />
             ) : (
-              <CgProfile className="avatar avatarFallback" />
+              <CgProfile className="dropdownAvatar dropdownAvatarFallback" />
             )}
             <div className="user-info">
               <h4>{profile?.name || "User"}</h4>

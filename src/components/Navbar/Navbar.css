@@ -373,15 +373,17 @@
   border-bottom: 1px solid #f1f5f9;
 }
 
-.profile-dropdown-header .avatar {
+.profile-dropdown-header .dropdownAvatar {
   width: 52px;
   height: 52px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  margin: 0 !important;
+  border: 1.5px solid #e2e8f0;
 }
 
-.profile-dropdown-header .avatarFallback {
+.profile-dropdown-header .dropdownAvatarFallback {
   width: 52px;
   height: 52px;
   background: #e2e8f0;
@@ -391,6 +393,8 @@
   justify-content: center;
   font-size: 1.2rem;
   font-weight: 700;
+  margin: 0 !important;
+  border-radius: 50%;
 }
 
 .profile-dropdown-header .user-info {
