@@ -45,6 +45,7 @@ const ProfileEditPage = () => {
 
   const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState({
+    username: '',
     firstName: '',
     middleName: '',
     lastName: '',
@@ -85,6 +86,7 @@ const ProfileEditPage = () => {
       }
 
       setFormData({
+        username: profile.username || user?.username || '',
         firstName: fName,
         middleName: mName,
         lastName: lName,
@@ -128,6 +130,7 @@ const ProfileEditPage = () => {
         .join(' ');
 
       const payload = {
+        username: formData.username ? formData.username.trim().toLowerCase() : undefined,
         name: fullName,
         firstName: formData.firstName,
         middleName: formData.middleName,
@@ -248,7 +251,7 @@ const ProfileEditPage = () => {
           {/* Editor Body */}
           <main className="profileEditMain">
             {activeTab === 'basic' && (
-              <BasicInfoEditor data={formData} onChange={handleFieldChange} />
+              <BasicInfoEditor data={formData} profile={profile} onChange={handleFieldChange} />
             )}
 
             {activeTab === 'about' && (

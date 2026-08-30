@@ -1851,3 +1851,48 @@ body.dark-mode .editorDeleteBtn:hover {
 body.dark-mode .fieldCharacterCount {
   color: var(--text-muted) !important;
 }
+
+[data-theme="dark"] .profileUsernameInputWrap,
+body.dark-mode .profileUsernameInputWrap {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .profileUsernamePrefix,
+body.dark-mode .profileUsernamePrefix {
+  background-color: var(--bg-secondary) !important;
+  border-right-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .profileUsernameHint,
+body.dark-mode .profileUsernameHint {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .profileUsernameHint code,
+body.dark-mode .profileUsernameHint code {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .usernameAttemptsPill,
+body.dark-mode .usernameAttemptsPill {
+  background-color: var(--accent-blue-bg) !important;
+  border-color: rgba(96, 165, 250, 0.3) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .usernameAttemptsPill.exhausted,
+body.dark-mode .usernameAttemptsPill.exhausted {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .usernameLockoutNotice,
+body.dark-mode .usernameLockoutNotice {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}

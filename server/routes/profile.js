@@ -111,6 +111,24 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
     profileData.avatar = targetUser.profilePicture;
   }
 
+  // Username change rate-limiting info (max 2 changes per 15 rolling days)
+  const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+  const cutoffDate = new Date(Date.now() - FIFTEEN_DAYS_MS);
+  const recentChanges = (targetUser.usernameChangeHistory || []).filter(
+    (entry) => new Date(entry.changedAt) > cutoffDate
+  );
+  profileData.usernameChangesRemaining = Math.max(0, 2 - recentChanges.length);
+  if (recentChanges.length >= 2) {
+    const oldestRecent = [...recentChanges].sort(
+      (a, b) => new Date(a.changedAt) - new Date(b.changedAt)
+    )[0];
+    profileData.nextUsernameChangeDate = new Date(
+      new Date(oldestRecent.changedAt).getTime() + FIFTEEN_DAYS_MS
+    );
+  } else {
+    profileData.nextUsernameChangeDate = null;
+  }
+
   return profileData;
 };
 
@@ -212,6 +230,58 @@ router.get('/', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// Check username availability & character validation
+router.get('/check-username/:username', authMiddleware, async (req, res) => {
+  try {
+    const rawUsername = (req.params.username || '').trim().toLowerCase();
+    const USERNAME_REGEX = /^[a-z0-9@$\-_]{3,30}$/;
+
+    if (!rawUsername) {
+      return res.status(400).json({ available: false, message: 'Username cannot be empty.' });
+    }
+
+    if (rawUsername.length < 3) {
+      return res.json({ available: false, message: 'Username must be at least 3 characters long.' });
+    }
+
+    if (rawUsername.length > 30) {
+      return res.json({ available: false, message: 'Username cannot exceed 30 characters.' });
+    }
+
+    if (!USERNAME_REGEX.test(rawUsername)) {
+      return res.json({
+        available: false,
+        message: 'Only letters, numbers, @, $, -, and _ are allowed.',
+      });
+    }
+
+    const currentUser = req.userId ? await User.findById(req.userId) : null;
+    if (currentUser && currentUser.username === rawUsername) {
+      return res.json({
+        available: true,
+        isCurrent: true,
+        message: 'This is your current username.',
+      });
+    }
+
+    const existingUser = await User.findOne({ username: rawUsername });
+    if (existingUser) {
+      return res.json({
+        available: false,
+        message: `Username "${rawUsername}" is already taken.`,
+      });
+    }
+
+    return res.json({
+      available: true,
+      message: `Username "${rawUsername}" is available! ✨`,
+    });
+  } catch (err) {
+    console.error('Error checking username:', err);
+    res.status(500).json({ available: false, error: 'Failed to verify username availability' });
   }
 });
 
@@ -426,6 +496,7 @@ const handleProfileUpdate = async (req, res) => {
 
     const {
       name,
+      username,
       firstName,
       middleName,
       lastName,
@@ -444,6 +515,62 @@ const handleProfileUpdate = async (req, res) => {
     } = req.body;
 
     const updateData = {};
+
+    // Username handling & 15-day rate limit (max 2 changes)
+    if (typeof username === 'string' && username.trim()) {
+      const cleanUsername = username.trim().toLowerCase();
+      const USERNAME_REGEX = /^[a-z0-9@$\-_]{3,30}$/;
+
+      if (!USERNAME_REGEX.test(cleanUsername)) {
+        return res.status(400).json({
+          error: 'Username can only contain letters, numbers, @, $, -, and _ (between 3 and 30 characters).',
+        });
+      }
+
+      if (cleanUsername !== user.username) {
+        // Enforce max 2 changes within rolling 15 days
+        const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+        const cutoffDate = new Date(Date.now() - FIFTEEN_DAYS_MS);
+        const recentChanges = (user.usernameChangeHistory || []).filter(
+          (entry) => new Date(entry.changedAt) > cutoffDate
+        );
+
+        if (recentChanges.length >= 2) {
+          const oldestRecent = [...recentChanges].sort(
+            (a, b) => new Date(a.changedAt) - new Date(b.changedAt)
+          )[0];
+          const canChangeAfter = new Date(
+            new Date(oldestRecent.changedAt).getTime() + FIFTEEN_DAYS_MS
+          );
+          const daysRemaining = Math.ceil(
+            (canChangeAfter.getTime() - Date.now()) / (24 * 60 * 60 * 1000)
+          );
+
+          return res.status(400).json({
+            error: `You can only change your username twice within 15 days. Limit reached. Next change available in ${daysRemaining} day${daysRemaining > 1 ? 's' : ''} (${canChangeAfter.toLocaleDateString()}).`,
+          });
+        }
+
+        // Check uniqueness in database
+        const existing = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });
+        if (existing) {
+          return res.status(400).json({
+            error: `Username "${cleanUsername}" is already taken. Please choose another.`,
+          });
+        }
+
+        // Record change in history
+        user.usernameChangeHistory = user.usernameChangeHistory || [];
+        user.usernameChangeHistory.push({
+          changedAt: new Date(),
+          oldUsername: user.username || '',
+          newUsername: cleanUsername,
+        });
+
+        user.username = cleanUsername;
+        updateData.username = cleanUsername;
+      }
+    }
 
     // Name handling
     if (firstName !== undefined) user.firstName = firstName;

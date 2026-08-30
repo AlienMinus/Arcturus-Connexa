@@ -9,6 +9,15 @@ const PasswordHistorySchema = new mongoose.Schema(
   { _id: false }
 );
 
+const UsernameChangeSchema = new mongoose.Schema(
+  {
+    changedAt: { type: Date, default: Date.now },
+    oldUsername: { type: String },
+    newUsername: { type: String },
+  },
+  { _id: false }
+);
+
 const UserSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -27,6 +36,7 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       sparse: true,
     },
+    usernameChangeHistory: [UsernameChangeSchema],
     password: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
     profilePicture: {

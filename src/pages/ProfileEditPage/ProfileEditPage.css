@@ -276,6 +276,156 @@
   margin-top: 4px;
 }
 
+/* Username input with prefix & live availability */
+.usernameLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.usernameAttemptsPill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0369a1;
+  background: #e0f2fe;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+}
+
+.usernameAttemptsPill.exhausted {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+.profileUsernameInputWrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.profileUsernameInputWrap:focus-within {
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
+}
+
+.profileUsernameInputWrap.valid {
+  border-color: #10b981;
+}
+
+.profileUsernameInputWrap.valid:focus-within {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.profileUsernameInputWrap.invalid {
+  border-color: #ef4444;
+}
+
+.profileUsernameInputWrap.invalid:focus-within {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.profileUsernamePrefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-right: 1px solid #cbd5e1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.profileUsernameInputWrap input {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+  padding-right: 36px !important;
+}
+
+.usernameStatusIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.statusIconValid {
+  color: #10b981;
+}
+
+.statusIconInvalid {
+  color: #ef4444;
+}
+
+.checkingSpinner {
+  color: #0a66c2;
+}
+
+.usernameStatusMessage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.usernameStatusMessage.success {
+  color: #059669;
+}
+
+.usernameStatusMessage.error {
+  color: #dc2626;
+}
+
+.usernameStatusMessage.info {
+  color: #0284c7;
+}
+
+.usernameLockoutNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.profileUsernameHint {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.profileUsernameHint code {
+  background: #f1f5f9;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 /* Action Buttons */
 .editorAddBtn {
   display: inline-flex;
