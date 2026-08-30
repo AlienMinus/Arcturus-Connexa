@@ -79,6 +79,16 @@ router.get('/', authMiddleware, async (req, res) => {
       };
     }));
 
+    // Sort contacts: Most recent messages at the top, then alphabetically for remaining
+    contacts.sort((a, b) => {
+      if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
+        return new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp);
+      }
+      if (a.lastMessageTimestamp) return -1;
+      if (b.lastMessageTimestamp) return 1;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
     res.json({ contacts });
   } catch (err) {
     console.error('Failed to fetch users for messenger:', err);

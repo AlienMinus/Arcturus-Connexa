@@ -125,27 +125,9 @@ const MessengerHeader = ({ profile, openNewMessage, toggle, isOpen }) => {
             e.stopPropagation();
             openNewMessage();
           }}
-          style={{ position: "relative" }}
           title="Compose new message"
         >
           <FaEdit />
-          {unreadCount > 0 && (
-            <span
-              style={{
-                position: "absolute",
-                top: "-6px",
-                right: "-6px",
-                backgroundColor: "#cc0000",
-                color: "white",
-                fontSize: "10px",
-                fontWeight: "bold",
-                padding: "1px 4px",
-                borderRadius: "10px",
-              }}
-            >
-              {unreadCount}
-            </span>
-          )}
         </span>
 
         <span onClick={toggle} title={isOpen ? "Minimize" : "Expand"}>

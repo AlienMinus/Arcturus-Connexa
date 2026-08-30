@@ -48,7 +48,16 @@ const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
     return <div className="conversationList">{error}</div>;
   }
 
-  const filteredContacts = contacts.filter(contact => 
+  const sortedContacts = [...contacts].sort((a, b) => {
+    if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
+      return new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp);
+    }
+    if (a.lastMessageTimestamp) return -1;
+    if (b.lastMessageTimestamp) return 1;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
+  const filteredContacts = sortedContacts.filter(contact => 
     contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     contact.lastMessage?.toLowerCase().includes(searchTerm.toLowerCase())
   );
