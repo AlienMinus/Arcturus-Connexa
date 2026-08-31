@@ -2386,3 +2386,15 @@ body.dark-mode .viewersSheetHeader h4,
 body.dark-mode .viewerInfo strong {
   color: var(--text-primary) !important;
 }
+
+[data-theme="dark"] .taleCaptionOverlay,
+body.dark-mode .taleCaptionOverlay,
+[data-theme="dark"] .taleCaptionOverlay p,
+body.dark-mode .taleCaptionOverlay p {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .taleReplyForm input,
+body.dark-mode .taleReplyForm input {
+  color: #ffffff !important;
+}

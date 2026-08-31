@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
 import { buildApiUrl } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
@@ -14,9 +15,11 @@ const getInitials = (name) =>
     .toUpperCase() || '';
 
 const NOTIFICATION_LABELS = {
-  post: 'posted',
+  post: 'shared a new post',
   repost: 'shared your post',
   reaction: 'reacted to your post',
+  like: 'liked your post',
+  comment: 'commented on your post',
   follow: 'followed you',
   connection: 'accepted your connection request',
   request: 'sent you a connection request',
@@ -31,16 +34,17 @@ const formatTime = (timestamp) => {
   const diff = now - date;
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
+  if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
+  if (days < 7) return `${days}d ago`;
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
 const NotificationsPage = () => {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -84,6 +88,33 @@ const NotificationsPage = () => {
     }
   }, [token]);
 
+  const handleNotificationClick = async (notification) => {
+    // If notification has a specific post ID
+    if (notification.postId) {
+      const username = notification.author?.username || 'user';
+      navigate(`/${encodeURIComponent(username)}/posts/${notification.postId}`);
+      return;
+    }
+
+    // If connection request or network notification
+    if (notification.type === 'request' || notification.type === 'connection') {
+      navigate('/mynetwork');
+      return;
+    }
+
+    // If job notification
+    if (notification.type === 'job') {
+      navigate('/jobs');
+      return;
+    }
+
+    // If author exists, view their profile
+    if (notification.author?.username) {
+      navigate(`/profile/${encodeURIComponent(notification.author.username)}`);
+      return;
+    }
+  };
+
   if (loading) return <div className="notificationsPage">Loading notifications…</div>;
   if (error) return <div className="notificationsPage error">{error}</div>;
 
@@ -102,33 +133,63 @@ const NotificationsPage = () => {
         <div className="notificationsList">
           {notifications.map((notification) => {
             const author = notification.author;
-            const authorName = author?.name || 'Arcturus';
+            const authorName = author?.name || 'Arcturus Member';
             const label = NOTIFICATION_LABELS[notification.type] || '';
+            const profileUrl = author?.username ? `/profile/${encodeURIComponent(author.username)}` : '#';
+
             return (
               <div
                 key={notification._id}
                 className={`notificationItem ${notification.read ? 'read' : 'unread'}`}
+                onClick={() => handleNotificationClick(notification)}
               >
-                {author?.avatar?.url ? (
-                  <img
-                    src={author.avatar.url}
-                    alt={authorName}
-                    className="notificationAvatar"
-                  />
+                {author?.username ? (
+                  <Link
+                    to={profileUrl}
+                    className="notificationAvatarLink"
+                    onClick={(e) => e.stopPropagation()}
+                    title={`View ${authorName}'s profile`}
+                  >
+                    {author?.avatar?.url ? (
+                      <img
+                        src={author.avatar.url}
+                        alt={authorName}
+                        className="notificationAvatar"
+                      />
+                    ) : (
+                      <div className="notificationAvatar notificationAvatarFallback">
+                        {getInitials(authorName)}
+                      </div>
+                    )}
+                  </Link>
                 ) : (
-                  <div className="notificationAvatar notificationAvatarFallback">
-                    {getInitials(authorName)}
-                  </div>
+                  author?.avatar?.url ? (
+                    <img
+                      src={author.avatar.url}
+                      alt={authorName}
+                      className="notificationAvatar"
+                    />
+                  ) : (
+                    <div className="notificationAvatar notificationAvatarFallback">
+                      {getInitials(authorName)}
+                    </div>
+                  )
                 )}
+
                 <div className="notificationContent">
                   <div className="notificationHeader">
-                    {label ? (
-                      <span>
-                        <strong>{authorName}</strong> {label}
-                      </span>
+                    {author?.username ? (
+                      <Link
+                        to={profileUrl}
+                        className="notificationAuthorNameLink"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <strong>{authorName}</strong>
+                      </Link>
                     ) : (
                       <strong>{authorName}</strong>
                     )}
+                    {label && <span> {label}</span>}
                   </div>
                   <div className="notificationDesc">{notification.message}</div>
                   <div className="notificationMeta">

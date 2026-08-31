@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaMapMarkerAlt, FaUniversity } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
@@ -16,32 +17,41 @@ const getInitials = (name) =>
 
 const ProfileCard = () => {
   const { profile } = useProfile();
+  const profileLink = `/profile/${encodeURIComponent(profile?.username || profile?.name || '')}`;
 
   return (
     <div className="card profileCard">
-      {profile?.backgroundImage?.url ? (
-        <img
-          className="cover"
-          src={profile.backgroundImage.url}
-          alt="Profile cover"
-        />
-      ) : (
-        <div className="cover coverFallback" />
-      )}
-      {profile?.avatar?.url ? (
-        <img
-          className="avatar"
-          src={profile.avatar.url}
-          alt={profile?.name || "Profile avatar"}
-        />
-      ) : (
-        <CgProfile className="avatar avatarFallback" />
-      )}
+      <Link to={profileLink} className="profileCoverLink">
+        {profile?.backgroundImage?.url ? (
+          <img
+            className="cover"
+            src={profile.backgroundImage.url}
+            alt="Profile cover"
+          />
+        ) : (
+          <div className="cover coverFallback" />
+        )}
+      </Link>
+
+      <Link to={profileLink} className="profileAvatarLink">
+        {profile?.avatar?.url ? (
+          <img
+            className="avatar"
+            src={profile.avatar.url}
+            alt={profile?.name || "Profile avatar"}
+          />
+        ) : (
+          <CgProfile className="avatar avatarFallback" />
+        )}
+      </Link>
+
       <div className="profile-text-container">
-        <div className="profile-name-container">
-          <h3 className="profile-name">{profile?.name || ''}</h3>
-          <MdVerified className="verified-icon" />
-        </div>
+        <Link to={profileLink} className="profileNameLink" style={{ textDecoration: 'none' }}>
+          <div className="profile-name-container">
+            <h3 className="profile-name">{profile?.name || ''}</h3>
+            <MdVerified className="verified-icon" />
+          </div>
+        </Link>
         <p className="description">{profile?.headline || ''}</p>
         <p className="location">
           <FaMapMarkerAlt />&nbsp;{profile?.location || ''}

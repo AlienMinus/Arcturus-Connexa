@@ -16,6 +16,7 @@ import { BiRepost } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../../context/ProfileContext";
 import { useReactions } from "../../../context/ReactionContext";
+import { getUserFullName } from "../../../utils/user";
 
 const reactions = [
   { name: "Like", icon: <FaThumbsUp color="#0a66c2" /> },
@@ -35,7 +36,7 @@ const PostCard = ({ post }) => {
   const [showOptions, setShowOptions] = useState(false);
   
   const postId = post.id || post._id;
-  const myName = profile?.name || (profile?.firstName ? `${profile.firstName} ${profile.lastName}` : "You");
+  const myName = getUserFullName(profile, "You");
 
   useEffect(() => {
     let matchedReaction = null;
@@ -249,7 +250,7 @@ const PostCard = ({ post }) => {
   const isRepost = !!post.repostedFrom;
   const authorSource = isRepost ? post.repostedFrom : post;
   const displayAvatar = authorSource?.authorAvatar || authorSource?.avatar || authorSource?.userId?.profilePicture?.url || null;
-  const displayName = authorSource?.authorName || (authorSource?.userId?.firstName ? `${authorSource.userId.firstName} ${authorSource.userId.lastName}` : (authorSource?.userId?.name || authorSource?.userId?.username || authorSource?.author || 'Anonymous'));
+  const displayName = getUserFullName(authorSource?.userId) || authorSource?.authorName || authorSource?.author || 'Anonymous';
   const displayUsername = authorSource?.authorUsername || authorSource?.userId?.username || authorSource?.userId?.name || '';
   const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
   const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";

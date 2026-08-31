@@ -25,6 +25,7 @@ import { BsEmojiSmile, BsClockHistory } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { useAuth } from "../../../context/AuthContext";
 import { buildApiUrl } from "../../../utils/api";
+import { getUserFullName } from "../../../utils/user";
 import "./Feed.css";
 
 const EMOJI_CATEGORIES = {
@@ -49,7 +50,7 @@ const AI_STARTER_PROMPTS = [
   }
 ];
 
-const PostModal = ({ closeModal, onPostCreated, profile }) => {
+const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) => {
   const { token } = useAuth();
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -118,6 +119,28 @@ const PostModal = ({ closeModal, onPostCreated, profile }) => {
   const toggleTool = (toolName) => {
     setActiveTool((prev) => (prev === toolName ? null : toolName));
   };
+
+  // Trigger quick access tool if specified from CreatePost bar
+  useEffect(() => {
+    if (initialTool === 'media' || initialTool === 'video') {
+      setTimeout(() => {
+        fileInputRef.current?.click();
+      }, 100);
+    } else if (initialTool === 'event') {
+      setActiveTool('event');
+    } else if (initialTool === 'article') {
+      setContent(
+        "📰 [Article Title: Deep Dive & Industry Perspective]\n\n" +
+        "### Introduction\nShare your core thesis, background, and why this topic matters today.\n\n" +
+        "### Key Insights & Lessons Learned\n• Point 1: Key architectural or business insight\n• Point 2: Data-driven takeaways\n• Point 3: Best practices and actionable advice\n\n" +
+        "### Conclusion & Discussion\nWhat are your thoughts on this? Join the discussion below! 👇\n\n" +
+        "#ThoughtLeadership #IndustryInsights #Technology #Architecture"
+      );
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
+  }, [initialTool]);
 
   // Insert text into textarea at cursor
   const insertTextAtCursor = (textToInsert) => {
@@ -362,7 +385,7 @@ const PostModal = ({ closeModal, onPostCreated, profile }) => {
               <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div>
-              <h4>{profile?.name || "Member"}</h4>
+              <h4>{getUserFullName(profile, "Member")}</h4>
               <div className="audience-dropdown">
                 <button className="audience-button" type="button" onClick={toggleAudienceMenu}>
                   {audience === "Anyone" && <FaGlobeAmericas size={11} />}

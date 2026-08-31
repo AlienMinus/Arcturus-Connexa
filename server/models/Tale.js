@@ -28,6 +28,22 @@ const TaleReactionSchema = new mongoose.Schema({
   },
 });
 
+const TaleCommentSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const TaleSchema = new mongoose.Schema(
   {
     userId: {
@@ -62,6 +78,7 @@ const TaleSchema = new mongoose.Schema(
     },
     viewers: [TaleViewerSchema],
     reactions: [TaleReactionSchema],
+    comments: [TaleCommentSchema],
     expiresAt: {
       type: Date,
       default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from creation

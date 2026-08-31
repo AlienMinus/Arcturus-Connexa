@@ -29,10 +29,34 @@
   gap: 14px;
   align-items: center;
   min-width: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notificationItem:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
 }
 
 .notificationItem.unread {
   border: 1px solid #2563eb;
+  background: #f0f7ff;
+}
+
+.notificationAvatarLink {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.notificationAuthorNameLink {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.notificationAuthorNameLink:hover {
+  color: #0a66c2;
+  text-decoration: underline;
 }
 
 .notificationAvatar,

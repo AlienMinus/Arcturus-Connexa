@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfile } from "../../context/ProfileContext";
+import { getUserFullName } from "../../utils/user";
 
 const NavLeft = ({ onSearchFocusChange }) => {
   const [query, setQuery] = useState("");
@@ -83,7 +84,7 @@ const NavLeft = ({ onSearchFocusChange }) => {
                   />
                   <div className="searchResultInfo">
                     <span>
-                      {user.firstName} {user.lastName}
+                      {getUserFullName(user)}
                     </span>
                     <small>{user.headline}</small>
                   </div>

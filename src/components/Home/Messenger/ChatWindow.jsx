@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { FaArrowLeft, FaPaperPlane, FaLock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { buildApiUrl } from "../../../utils/api";
@@ -111,7 +112,12 @@ const ChatWindow = ({ contact, closeChat }) => {
   return (
     <div className="chatWindow">
       <div className="chatHeader">
-        <div className="chatHeaderInfo">
+        <Link
+          to={`/profile/${encodeURIComponent(contact.username || contact.name || '')}`}
+          className="chatHeaderInfo"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+          title={`View ${contact.name}'s profile`}
+        >
           {contact.avatar?.url ? (
             <img src={contact.avatar.url} alt={contact.name} className="chatHeaderAvatar" />
           ) : (
@@ -120,7 +126,7 @@ const ChatWindow = ({ contact, closeChat }) => {
             </div>
           )}
           <span>{contact.name}</span>
-        </div>
+        </Link>
         <div className="chatHeaderActions">
           <button className="chatBackButton" type="button" onClick={closeChat} aria-label="Back to conversations">
             <FaArrowLeft />

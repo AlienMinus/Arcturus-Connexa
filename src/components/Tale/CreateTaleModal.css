@@ -133,7 +133,7 @@
   border: none;
   outline: none;
   resize: none;
-  color: #ffffff;
+  color: #ffffff !important;
   font-size: 1.35rem;
   font-weight: 600;
   text-align: center;
@@ -141,11 +141,11 @@
   align-items: center;
   justify-content: center;
   line-height: 1.4;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .taleTextarea::placeholder {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75) !important;
   font-size: 1.1rem;
 }
 
@@ -154,7 +154,7 @@
   bottom: 8px;
   right: 12px;
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Media Canvas */

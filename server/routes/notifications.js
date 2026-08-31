@@ -27,7 +27,7 @@ router.get('/', authMiddleware, async (req, res) => {
     ];
 
     const authors = await User.find({ _id: { $in: fromUserIds } })
-      .select('firstName lastName username headline profilePicture')
+      .select('firstName middleName lastName username headline profilePicture')
       .lean();
 
     const authorMap = new Map(
@@ -35,7 +35,7 @@ router.get('/', authMiddleware, async (req, res) => {
         author._id.toString(),
         {
           id: author._id,
-          name: `${author.firstName} ${author.lastName}`,
+          name: [author.firstName, author.middleName, author.lastName].filter(Boolean).join(' ') || author.username || 'Anonymous',
           username: author.username,
           headline: author.headline || '',
           avatar: author.profilePicture || null,

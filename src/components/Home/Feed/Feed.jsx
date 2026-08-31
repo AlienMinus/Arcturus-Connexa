@@ -4,6 +4,7 @@ import { FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { useProfile } from "../../../context/ProfileContext";
 import { useAuth } from "../../../context/AuthContext";
 import { buildApiUrl } from "../../../utils/api";
+import { getUserFullName } from "../../../utils/user";
 import CreatePost from "./CreatePost";
 import PostCard from "./PostCard";
 import FeedSort from "./FeedSort";
@@ -38,7 +39,7 @@ const Feed = () => {
           
           return {
             id: post._id,
-            authorName: post.userId?.firstName ? `${post.userId.firstName} ${post.userId.lastName}` : (post.userId?.name || post.userId?.username || post.author || 'Anonymous'),
+            authorName: getUserFullName(post.userId) || post.author || 'Anonymous',
             authorUsername: post.authorUsername || post.userId?.username || post.userId?.name || '',
             authorHeadline: post.userId?.headline || 'Member',
             time: (
@@ -54,12 +55,12 @@ const Feed = () => {
             userReactionType: myReaction?.reactionType || 'Like',
             likers: post.likes?.map(like => {
               const user = like.userId || like;
-              return user?.firstName ? `${user.firstName} ${user.lastName}` : (user?.name || user?.username || 'Someone');
+              return getUserFullName(user, 'Someone');
             }) || [],
             commentsCount: post.comments?.length || 0,
             repostedFrom: post.repostedFrom ? {
               id: post.repostedFrom._id,
-              authorName: post.repostedFrom.userId?.firstName ? `${post.repostedFrom.userId.firstName} ${post.repostedFrom.userId.lastName}` : (post.repostedFrom.userId?.name || post.repostedFrom.userId?.username || post.repostedFrom.author || 'Anonymous'),
+              authorName: getUserFullName(post.repostedFrom.userId) || post.repostedFrom.author || 'Anonymous',
               authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
               authorHeadline: post.repostedFrom.userId?.headline || 'Member',
               content: post.repostedFrom.content || '',
@@ -73,19 +74,28 @@ const Feed = () => {
       console.error('Failed to load posts', error);
       setPosts([]);
     }
-  }, [token, profile]);
+  }, [profile, token]);
 
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // Dynamic Scroll / Intersection Observer to load more posts as user scrolls down
   useEffect(() => {
-    if (visibleCount >= posts.length) return;
+    const handlePostCreated = () => {
+      fetchPosts();
+    };
 
+    window.addEventListener('post-created', handlePostCreated);
+    return () => {
+      window.removeEventListener('post-created', handlePostCreated);
+    };
+  }, [fetchPosts]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loadingMore) {
+        const first = entries[0];
+        if (first.isIntersecting && !loadingMore && visibleCount < posts.length) {
           setLoadingMore(true);
           setTimeout(() => {
             setVisibleCount((prev) => Math.min(prev + POSTS_PER_PAGE, posts.length));
@@ -110,8 +120,8 @@ const Feed = () => {
 
   return (
     <div className="feed">
-      <TaleTray />
       <CreatePost onPostCreated={fetchPosts} />
+      <TaleTray />
       <FeedSort />
 
       {displayedPosts.length > 0 ? (
