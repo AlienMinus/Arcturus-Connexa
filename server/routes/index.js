@@ -10,6 +10,7 @@ import games from './games.js';
 import jobs from './jobs.js';
 import organizations from './organizations.js';
 import admin from './admin.js';
+import tales from './tales.js';
 
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use('/games', games);
 router.use('/jobs', jobs);
 router.use('/organizations', organizations);
 router.use('/admin', admin);
+router.use('/tales', tales);
 
 export default router;

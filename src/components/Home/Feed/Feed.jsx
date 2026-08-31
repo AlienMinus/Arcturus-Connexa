@@ -7,6 +7,7 @@ import { buildApiUrl } from "../../../utils/api";
 import CreatePost from "./CreatePost";
 import PostCard from "./PostCard";
 import FeedSort from "./FeedSort";
+import TaleTray from "../../Tale/TaleTray";
 import "./Feed.css";
 
 const POSTS_PER_PAGE = 4;
@@ -109,6 +110,7 @@ const Feed = () => {
 
   return (
     <div className="feed">
+      <TaleTray />
       <CreatePost onPostCreated={fetchPosts} />
       <FeedSort />
 

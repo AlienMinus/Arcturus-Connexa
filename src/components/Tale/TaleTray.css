@@ -1,0 +1,147 @@
+/* Tale Tray Container */
+.taleTrayCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.taleTrayScroll {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+
+.taleTrayScroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Individual Tale Item */
+.taleItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 68px;
+  transition: transform 0.15s ease;
+}
+
+.taleItem:hover {
+  transform: translateY(-2px);
+}
+
+/* Avatar Rings */
+.taleAvatarRing {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  padding: 2px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.taleAvatarImg {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f1f5f9;
+  border: 2px solid #ffffff;
+}
+
+.taleAvatarImg.fallback {
+  font-size: 50px;
+  color: #94a3b8;
+}
+
+/* Unviewed Story Glowing Gradient Ring */
+.unviewedStoryRing {
+  background: linear-gradient(135deg, #0a66c2 0%, #00d2ff 100%);
+  box-shadow: 0 0 8px rgba(10, 102, 194, 0.35);
+}
+
+/* Viewed Story Ring */
+.viewedStoryRing {
+  background: #cbd5e1;
+}
+
+/* Active User Story Ring */
+.myActiveStoryRing {
+  background: linear-gradient(135deg, #0a66c2 0%, #a855f7 100%);
+}
+
+.myTaleActiveWrap {
+  position: relative;
+}
+
+.myTaleAddBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0a66c2;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.myTaleAddBadge:hover {
+  transform: scale(1.15);
+  background: #004182;
+}
+
+/* Add Tale Plus Badge */
+.addTaleRing {
+  border: 2px dashed #0a66c2;
+  background: #f0f7ff;
+}
+
+.addTalePlusBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0a66c2;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+/* Tale User Name */
+.taleUserName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+  max-width: 64px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

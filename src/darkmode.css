@@ -2286,3 +2286,103 @@ body.dark-mode .postDocLink {
 body.dark-mode .postDocDetails strong {
   color: var(--text-primary) !important;
 }
+
+/* Tale (Story/Status) Dark Mode */
+[data-theme="dark"] .taleTrayCard,
+body.dark-mode .taleTrayCard {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .taleUserName,
+body.dark-mode .taleUserName {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .addTaleRing,
+body.dark-mode .addTaleRing {
+  background: var(--bg-primary) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .createTaleCard,
+body.dark-mode .createTaleCard {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .createTaleHeader,
+body.dark-mode .createTaleHeader,
+[data-theme="dark"] .createTaleFooter,
+body.dark-mode .createTaleFooter {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .taleHeaderIdentity h3,
+body.dark-mode .taleHeaderIdentity h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .taleModeTabs,
+body.dark-mode .taleModeTabs {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .taleModeBtn,
+body.dark-mode .taleModeBtn {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .taleModeBtn.active,
+body.dark-mode .taleModeBtn.active {
+  background-color: var(--bg-secondary) !important;
+  color: var(--accent-blue) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .mediaUploadDropzone,
+body.dark-mode .mediaUploadDropzone {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .mediaUploadDropzone strong,
+body.dark-mode .mediaUploadDropzone strong {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .captionInputWrap input,
+body.dark-mode .captionInputWrap input {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .fontPill,
+body.dark-mode .fontPill,
+[data-theme="dark"] .quickEmojiBtn,
+body.dark-mode .quickEmojiBtn {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .viewersSheetCard,
+body.dark-mode .viewersSheetCard {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .viewersSheetHeader,
+body.dark-mode .viewersSheetHeader {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .viewersSheetHeader h4,
+body.dark-mode .viewersSheetHeader h4,
+[data-theme="dark"] .viewerInfo strong,
+body.dark-mode .viewerInfo strong {
+  color: var(--text-primary) !important;
+}
