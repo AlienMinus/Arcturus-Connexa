@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FaChevronUp } from 'react-icons/fa';
 import './BackToTop.css';
 
+const RADIUS = 18.5;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
 const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -11,7 +14,7 @@ const BackToTop = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 
-      if (scrollTop > 250) {
+      if (scrollTop > 200) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -36,9 +39,7 @@ const BackToTop = () => {
     });
   };
 
-  const radius = 18;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (scrollProgress / 100) * circumference;
+  const strokeDashoffset = CIRCUMFERENCE - (scrollProgress / 100) * CIRCUMFERENCE;
 
   return (
     <button
@@ -48,27 +49,30 @@ const BackToTop = () => {
       aria-label="Back to top"
       title="Back to top"
     >
-      <svg className="backToTopProgressRing" width="44" height="44">
+      <svg className="backToTopProgressRing" viewBox="0 0 44 44" width="44" height="44">
+        {/* Background track */}
         <circle
           className="progressRingBackground"
-          stroke="rgba(10, 102, 194, 0.15)"
+          stroke="rgba(255, 255, 255, 0.28)"
           strokeWidth="3"
-          fill="transparent"
-          r={radius}
+          fill="none"
+          r={RADIUS}
           cx="22"
           cy="22"
         />
+        {/* Animated Progress Ring - Rotated around exact center (22, 22) */}
         <circle
           className="progressRingBar"
-          stroke="#0a66c2"
+          stroke="#ffffff"
           strokeWidth="3"
-          strokeDasharray={circumference}
+          strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          fill="transparent"
-          r={radius}
+          fill="none"
+          r={RADIUS}
           cx="22"
           cy="22"
+          transform="rotate(-90 22 22)"
         />
       </svg>
       <span className="backToTopIcon">
@@ -79,4 +83,3 @@ const BackToTop = () => {
 };
 
 export default BackToTop;
-

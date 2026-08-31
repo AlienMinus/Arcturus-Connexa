@@ -1,16 +1,14 @@
 /* Floating Back to Top Button */
 .backToTopFloatingBtn {
   position: fixed;
-  bottom: 30px;
+  bottom: 28px;
   right: 28px;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(10, 102, 194, 0.25);
-  box-shadow: 0 4px 18px rgba(10, 102, 194, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #0a66c2;
+  border: none;
+  box-shadow: 0 4px 16px rgba(10, 102, 194, 0.4), 0 2px 6px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,12 +16,12 @@
   z-index: 1200;
   padding: 0;
   opacity: 0;
-  transform: translateY(20px) scale(0.85);
+  transform: translateY(16px) scale(0.85);
   pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s ease,
-              background 0.2s ease;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.15s ease,
+              box-shadow 0.15s ease;
 }
 
 .backToTopFloatingBtn.visible {
@@ -33,100 +31,63 @@
 }
 
 .backToTopFloatingBtn:hover {
-  background: #0a66c2;
-  border-color: #0a66c2;
-  box-shadow: 0 6px 24px rgba(10, 102, 194, 0.35);
-  transform: translateY(-3px) scale(1.05);
+  background: #004182;
+  box-shadow: 0 6px 20px rgba(10, 102, 194, 0.55);
+  transform: translateY(-3px) scale(1.08);
 }
 
 .backToTopFloatingBtn:active {
   transform: translateY(0) scale(0.95);
 }
 
-/* SVG Progress Ring */
+/* SVG Progress Ring Overlay */
 .backToTopProgressRing {
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
 .progressRingBar {
-  transition: stroke-dashoffset 0.1s linear;
-}
-
-.backToTopFloatingBtn:hover .progressRingBackground {
-  stroke: rgba(255, 255, 255, 0.2);
-}
-
-.backToTopFloatingBtn:hover .progressRingBar {
-  stroke: #ffffff;
+  transition: stroke-dashoffset 0.12s linear;
 }
 
 /* Chevron Icon */
 .backToTopIcon {
   font-size: 15px;
-  color: #0a66c2;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
-  z-index: 1;
+  z-index: 2;
+  transition: transform 0.18s ease;
 }
 
 .backToTopFloatingBtn:hover .backToTopIcon {
-  color: #ffffff;
   transform: translateY(-2px);
 }
 
 /* Dark Mode Overrides */
 [data-theme="dark"] .backToTopFloatingBtn,
 body.dark-mode .backToTopFloatingBtn {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(56, 189, 248, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  background: #0284c7;
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="dark"] .backToTopFloatingBtn:hover,
 body.dark-mode .backToTopFloatingBtn:hover {
-  background: #0284c7;
-  border-color: #0284c7;
-  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.4);
-}
-
-[data-theme="dark"] .progressRingBackground,
-body.dark-mode .progressRingBackground {
-  stroke: rgba(56, 189, 248, 0.15);
-}
-
-[data-theme="dark"] .progressRingBar,
-body.dark-mode .progressRingBar {
-  stroke: #38bdf8;
-}
-
-[data-theme="dark"] .backToTopIcon,
-body.dark-mode .backToTopIcon {
-  color: #38bdf8;
-}
-
-[data-theme="dark"] .backToTopFloatingBtn:hover .backToTopIcon,
-body.dark-mode .backToTopFloatingBtn:hover .backToTopIcon {
-  color: #ffffff;
+  background: #0369a1;
+  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.6);
 }
 
 /* Mobile Screen Adjustment */
 @media (max-width: 768px) {
   .backToTopFloatingBtn {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
     right: 16px;
     width: 42px;
     height: 42px;
   }
-
-  .backToTopProgressRing {
-    width: 42px;
-    height: 42px;
-  }
 }
-
