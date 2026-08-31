@@ -185,6 +185,13 @@ const NavRight = () => {
                   Job Posting Account
                 </Link>
               </li>
+              {(user?.role === 'admin' || user?.isAdmin || user?.username?.toLowerCase() === 'arcturus_admin' || profile?.username?.toLowerCase() === 'arcturus_admin') && (
+                <li>
+                  <Link to="/admin" onClick={() => setDropdownOpen(false)} style={{ color: "#0a66c2", fontWeight: "700" }}>
+                    🛡️ Admin Operations Hub
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

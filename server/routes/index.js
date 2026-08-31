@@ -8,6 +8,8 @@ import notifications from './notifications.js';
 import news from './news.js';
 import games from './games.js';
 import jobs from './jobs.js';
+import organizations from './organizations.js';
+import admin from './admin.js';
 
 const router = express.Router();
 
@@ -24,5 +26,7 @@ router.use('/notifications', notifications);
 router.use('/news', news);
 router.use('/games', games);
 router.use('/jobs', jobs);
+router.use('/organizations', organizations);
+router.use('/admin', admin);
 
 export default router;

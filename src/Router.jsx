@@ -14,6 +14,7 @@ import SettingsPage from './pages/SettingsPage/SettingsPage';
 import HelpPage from './pages/HelpPage/HelpPage';
 import JobsPage from './pages/JobsPage/JobsPage';
 import JobPostingPage from './pages/JobPostingPage/JobPostingPage';
+import AdminDashboardPage from './pages/AdminDashboardPage/AdminDashboardPage';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
 
 function AppRouter() {
@@ -31,6 +32,7 @@ function AppRouter() {
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/admin" element={<AdminDashboardPage />} />
                 <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/jobs/manage" element={<JobPostingPage />} />
                 <Route path="/jobs/post" element={<JobPostingPage />} />

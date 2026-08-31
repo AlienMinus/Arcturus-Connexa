@@ -1,6 +1,7 @@
 import express from 'express';
 import Job from '../models/Job.js';
 import User from '../models/User.js';
+import Organization from '../models/Organization.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -29,6 +30,7 @@ router.get('/', async (req, res) => {
 
     const jobs = await Job.find(filter)
       .sort({ createdAt: -1 })
+      .populate('organizationId', 'name logo slug industry location status')
       .populate('recruiterId', 'firstName lastName email profilePicture')
       .lean();
 
@@ -39,11 +41,20 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/jobs/my-listings - Get jobs posted by the authenticated recruiter
+// GET /api/jobs/my-listings - Get jobs posted by the authenticated recruiter / organization
 router.get('/my-listings', authMiddleware, async (req, res) => {
   try {
-    const jobs = await Job.find({ recruiterId: req.userId })
+    // Find user's organizations
+    const userOrgs = await Organization.find({
+      $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+    }).select('_id');
+    const orgIds = userOrgs.map((o) => o._id);
+
+    const jobs = await Job.find({
+      $or: [{ recruiterId: req.userId }, { organizationId: { $in: orgIds } }],
+    })
       .sort({ createdAt: -1 })
+      .populate('organizationId', 'name logo slug status')
       .lean();
 
     res.json({ jobs });
@@ -57,6 +68,7 @@ router.get('/my-listings', authMiddleware, async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
+      .populate('organizationId', 'name logo slug industry location description website status')
       .populate('recruiterId', 'firstName lastName email profilePicture headline')
       .lean();
 
@@ -71,13 +83,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/jobs - Post a new job (Authenticated Recruiter)
+// POST /api/jobs - Post a new job (Requires Approved Organization)
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const {
       title,
       company,
       companyLogo,
+      organizationId,
       location,
       workplaceType,
       employmentType,
@@ -86,8 +99,59 @@ router.post('/', authMiddleware, async (req, res) => {
       description,
     } = req.body;
 
-    if (!title || !company || !location || !description) {
-      return res.status(400).json({ error: 'Title, company, location, and description are required' });
+    if (!title || !location || !description) {
+      return res.status(400).json({ error: 'Title, location, and description are required' });
+    }
+
+    // 1. Verify Organization Requirement & Approval Status
+    let targetOrg = null;
+    if (organizationId) {
+      targetOrg = await Organization.findOne({
+        _id: organizationId,
+        $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+      });
+    } else {
+      // Find user's primary approved organization
+      targetOrg = await Organization.findOne({
+        status: 'approved',
+        $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+      });
+
+      // If no approved org, check if user has any pending org
+      if (!targetOrg) {
+        const pendingOrg = await Organization.findOne({
+          $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+        });
+
+        if (pendingOrg) {
+          if (pendingOrg.status === 'pending') {
+            return res.status(403).json({
+              error: `Your organization "${pendingOrg.name}" is currently under review by Arcturus Admin. Job posting will be enabled once your documents are approved.`,
+            });
+          }
+          if (pendingOrg.status === 'rejected') {
+            return res.status(403).json({
+              error: `Your organization registration for "${pendingOrg.name}" was not approved (${pendingOrg.rejectionReason || 'Verification failed'}). Please submit updated documents.`,
+            });
+          }
+        }
+
+        return res.status(403).json({
+          error: 'Organization account required. Only verified organizations can publish job postings. Please register your company page and submit verification documents first.',
+        });
+      }
+    }
+
+    if (!targetOrg) {
+      return res.status(403).json({
+        error: 'Organization account required. Please register your company page and submit verification documents to post jobs.',
+      });
+    }
+
+    if (targetOrg.status !== 'approved') {
+      return res.status(403).json({
+        error: `Organization "${targetOrg.name}" verification is ${targetOrg.status}. You need an approved organization account to publish job listings.`,
+      });
     }
 
     const parsedSkills = Array.isArray(skills)
@@ -96,16 +160,20 @@ router.post('/', authMiddleware, async (req, res) => {
       ? skills.split(',').map((s) => s.trim()).filter(Boolean)
       : [];
 
+    const finalCompanyName = targetOrg.name || company;
+    const finalCompanyLogo = targetOrg.logo?.url || companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+
     const newJob = await Job.create({
-      title,
-      company,
-      companyLogo: companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-      location,
+      title: title.trim(),
+      company: finalCompanyName,
+      companyLogo: finalCompanyLogo,
+      organizationId: targetOrg._id,
+      location: location.trim(),
       workplaceType: workplaceType || 'Hybrid',
       employmentType: employmentType || 'Full-time',
-      salary: salary || '',
+      salary: salary ? salary.trim() : '',
       skills: parsedSkills,
-      description,
+      description: description.trim(),
       recruiterId: req.userId,
       isActive: true,
       applicants: [],

@@ -1950,3 +1950,179 @@ body.dark-mode .sectionItemIconLink:hover .sectionItemIconPlaceholder {
 body.dark-mode .badge {
   border-color: var(--bg-secondary) !important;
 }
+
+/* ==========================================================================
+   16. ADMIN DASHBOARD & ORGANIZATION VERIFICATION DARK THEME
+   ========================================================================== */
+
+[data-theme="dark"] .adminTopHeader,
+body.dark-mode .adminTopHeader,
+[data-theme="dark"] .adminSectionPanel,
+body.dark-mode .adminSectionPanel,
+[data-theme="dark"] .orgRequiredNoticeCard,
+body.dark-mode .orgRequiredNoticeCard,
+[data-theme="dark"] .jobPostingFormCard,
+body.dark-mode .jobPostingFormCard,
+[data-theme="dark"] .registerOrgCard,
+body.dark-mode .registerOrgCard,
+[data-theme="dark"] .myListingCard,
+body.dark-mode .myListingCard,
+[data-theme="dark"] .noListingsCard,
+body.dark-mode .noListingsCard,
+[data-theme="dark"] .jobPostingTopBar,
+body.dark-mode .jobPostingTopBar,
+[data-theme="dark"] .adminLightboxCard,
+body.dark-mode .adminLightboxCard,
+[data-theme="dark"] .adminRejectionCard,
+body.dark-mode .adminRejectionCard,
+[data-theme="dark"] .accessDeniedCard,
+body.dark-mode .accessDeniedCard {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="dark"] .adminHeaderTitleRow h1,
+body.dark-mode .adminHeaderTitleRow h1,
+[data-theme="dark"] .panelHeaderRow h3,
+body.dark-mode .panelHeaderRow h3,
+[data-theme="dark"] .orgTitleRow h3,
+body.dark-mode .orgTitleRow h3,
+[data-theme="dark"] .pageTitleGroup h2,
+body.dark-mode .pageTitleGroup h2,
+[data-theme="dark"] .formSectionTitle h3,
+body.dark-mode .formSectionTitle h3,
+[data-theme="dark"] .orgRequiredNoticeCard h3,
+body.dark-mode .orgRequiredNoticeCard h3,
+[data-theme="dark"] .myListingTitleGroup h4,
+body.dark-mode .myListingTitleGroup h4,
+[data-theme="dark"] .noListingsCard h4,
+body.dark-mode .noListingsCard h4,
+[data-theme="dark"] .lightboxHeader h3,
+body.dark-mode .lightboxHeader h3,
+[data-theme="dark"] .metricValue,
+body.dark-mode .metricValue,
+[data-theme="dark"] .postingAsOrgName strong,
+body.dark-mode .postingAsOrgName strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .metricCard,
+body.dark-mode .metricCard,
+[data-theme="dark"] .adminOrgCard,
+body.dark-mode .adminOrgCard,
+[data-theme="dark"] .adminOrgMetaGrid,
+body.dark-mode .adminOrgMetaGrid,
+[data-theme="dark"] .adminDocsSection,
+body.dark-mode .adminDocsSection,
+[data-theme="dark"] .verificationUploadBox,
+body.dark-mode .verificationUploadBox,
+[data-theme="dark"] .postingAsHeader,
+body.dark-mode .postingAsHeader {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .adminTabBtn,
+body.dark-mode .adminTabBtn,
+[data-theme="dark"] .tabBtn,
+body.dark-mode .tabBtn,
+[data-theme="dark"] .filterPill,
+body.dark-mode .filterPill,
+[data-theme="dark"] .logoPresetOption,
+body.dark-mode .logoPresetOption,
+[data-theme="dark"] .adminRefreshBtn,
+body.dark-mode .adminRefreshBtn {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .adminTabBtn:hover,
+body.dark-mode .adminTabBtn:hover,
+[data-theme="dark"] .tabBtn:hover,
+body.dark-mode .tabBtn:hover,
+[data-theme="dark"] .filterPill:hover,
+body.dark-mode .filterPill:hover,
+[data-theme="dark"] .adminRefreshBtn:hover,
+body.dark-mode .adminRefreshBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .adminTabBtn.active,
+body.dark-mode .adminTabBtn.active,
+[data-theme="dark"] .tabBtn.active,
+body.dark-mode .tabBtn.active,
+[data-theme="dark"] .filterPill.active,
+body.dark-mode .filterPill.active {
+  background-color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .adminDataTable th,
+body.dark-mode .adminDataTable th {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .adminDataTable td,
+body.dark-mode .adminDataTable td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .adminSearchForm input,
+body.dark-mode .adminSearchForm input,
+[data-theme="dark"] .formGroup input,
+body.dark-mode .formGroup input,
+[data-theme="dark"] .formGroup select,
+body.dark-mode .formGroup select,
+[data-theme="dark"] .formGroup textarea,
+body.dark-mode .formGroup textarea {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .docThumbnailCard,
+body.dark-mode .docThumbnailCard,
+[data-theme="dark"] .attachedDocItem,
+body.dark-mode .attachedDocItem {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .docTypeBadge,
+body.dark-mode .docTypeBadge {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .lightboxHeader,
+body.dark-mode .lightboxHeader,
+[data-theme="dark"] .lightboxFooter,
+body.dark-mode .lightboxFooter,
+[data-theme="dark"] .rejectionModalHeader,
+body.dark-mode .rejectionModalHeader {
+  border-color: var(--border-color) !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .presetChipBtn,
+body.dark-mode .presetChipBtn {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .presetChipBtn:hover,
+body.dark-mode .presetChipBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}

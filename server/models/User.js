@@ -71,6 +71,9 @@ const UserSchema = new mongoose.Schema(
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     pendingConnectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     sentConnectionRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    organizations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' }],
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    isAdmin: { type: Boolean, default: false },
     notifications: [
       {
         type: {

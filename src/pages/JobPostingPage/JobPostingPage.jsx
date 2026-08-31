@@ -14,44 +14,134 @@ import {
   FaTags,
   FaImage,
   FaLock,
-  FaSignInAlt
+  FaSignInAlt,
+  FaHourglassHalf,
+  FaTimesCircle,
+  FaShieldAlt,
+  FaFileUpload,
+  FaFileInvoice,
+  FaGlobe,
+  FaExclamationTriangle,
+  FaChevronDown
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import './JobPostingPage.css';
 
 const LOGO_PRESETS = [
-  { label: 'Tech / Figma', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png' },
-  { label: 'React / Web', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png' },
-  { label: 'AI / Innovation', url: 'https://cdn-icons-png.flaticon.com/512/8637/8637105.png' },
+  { label: 'Tech / Innovation', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png' },
+  { label: 'Web / Digital', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png' },
+  { label: 'AI & Data', url: 'https://cdn-icons-png.flaticon.com/512/8637/8637105.png' },
   { label: 'Cloud / DevOps', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968853.png' },
   { label: 'Finance / Business', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
+];
+
+const INDUSTRIES = [
+  'Software Development',
+  'Technology & Internet',
+  'Financial Services & Fintech',
+  'Healthcare & Biotechnology',
+  'E-Commerce & Retail',
+  'Telecommunications',
+  'Media & Entertainment',
+  'Education & EdTech',
+  'Consulting & Business Services',
+  'Design & Creative Agency',
+  'Aerospace & Defense',
+  'Other',
+];
+
+const ORG_SIZES = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
+
+const ORG_TYPES = [
+  'Privately Held',
+  'Public Company',
+  'Startup',
+  'Nonprofit',
+  'Government Agency',
+  'Sole Proprietorship',
+  'Partnership',
+];
+
+const DOCUMENT_TYPES = [
+  'Certificate of Incorporation',
+  'Business License',
+  'Tax ID / Registration',
+  'GST / VAT Certificate',
+  'Utility / Proof of Address',
+  'Other Verification Document',
 ];
 
 const JobPostingPage = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('manage'); // 'post' or 'manage'
+
+  const [activeTab, setActiveTab] = useState('post'); // 'post', 'manage', 'register_org'
+  const [organizations, setOrganizations] = useState([]);
+  const [selectedOrgId, setSelectedOrgId] = useState('');
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  // Form State
+  // Job Form State
   const [form, setForm] = useState({
     title: '',
-    company: '',
-    companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
     location: '',
-    type: 'Full-time',
+    workplaceType: 'Hybrid',
+    employmentType: 'Full-time',
     salary: '',
     skills: '',
     description: '',
   });
 
+  // Organization Registration Form State
+  const [orgForm, setOrgForm] = useState({
+    name: '',
+    tagline: '',
+    description: '',
+    industry: 'Software Development',
+    organizationSize: '11-50',
+    organizationType: 'Privately Held',
+    website: '',
+    location: '',
+    logoUrl: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+    documentType: 'Certificate of Incorporation',
+  });
+  const [logoFile, setLogoFile] = useState(null);
+  const [documentFiles, setDocumentFiles] = useState([]);
+  const [documentPreviews, setDocumentPreviews] = useState([]);
+
   const showToast = (msg) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3500);
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  const fetchOrganizations = async () => {
+    if (!token) {
+      setOrganizations([]);
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(buildApiUrl('/organizations/my'), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.organizations || [];
+        setOrganizations(list);
+        
+        const approved = list.find((o) => o.status === 'approved');
+        if (approved) {
+          setSelectedOrgId(approved._id);
+        } else if (list.length > 0) {
+          setSelectedOrgId(list[0]._id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch user organizations:', err);
+    }
   };
 
   const fetchMyListings = async () => {
@@ -60,37 +150,123 @@ const JobPostingPage = () => {
       setLoading(false);
       return;
     }
-
-    setLoading(true);
     try {
       const res = await fetch(buildApiUrl('/jobs/my-listings'), {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (res.ok) {
         const data = await res.json();
         setJobListings(data.jobs || []);
-      } else {
-        setJobListings([]);
       }
     } catch (err) {
       console.error('Failed to fetch job listings:', err);
-      setJobListings([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMyListings();
+    const init = async () => {
+      setLoading(true);
+      await Promise.all([fetchOrganizations(), fetchMyListings()]);
+      setLoading(false);
+    };
+    init();
   }, [token]);
 
+  // Handle Document Files selection & local preview
+  const handleDocFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setDocumentFiles(files);
+    const previews = files.map((file) => ({
+      name: file.name,
+      size: (file.size / 1024 / 1024).toFixed(2),
+      url: URL.createObjectURL(file),
+    }));
+    setDocumentPreviews(previews);
+  };
+
+  // Submit Organization Registration (Multipart form upload to Cloudinary & MongoDB Atlas)
+  const handleRegisterOrgSubmit = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      showToast('Please sign in to register an organization');
+      return;
+    }
+
+    if (!orgForm.name.trim()) {
+      showToast('Organization name is required');
+      return;
+    }
+
+    if (!orgForm.location.trim()) {
+      showToast('Headquarters location is required');
+      return;
+    }
+
+    if (documentFiles.length === 0) {
+      showToast('Please attach at least one business verification document image (e.g. Certificate of Incorporation).');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', orgForm.name.trim());
+      formData.append('tagline', orgForm.tagline.trim());
+      formData.append('description', orgForm.description.trim());
+      formData.append('industry', orgForm.industry);
+      formData.append('organizationSize', orgForm.organizationSize);
+      formData.append('organizationType', orgForm.organizationType);
+      formData.append('website', orgForm.website.trim());
+      formData.append('location', orgForm.location.trim());
+      formData.append('documentType', orgForm.documentType);
+      formData.append('customLogoUrl', orgForm.logoUrl);
+
+      if (logoFile) {
+        formData.append('logo', logoFile);
+      }
+
+      for (const file of documentFiles) {
+        formData.append('documents', file);
+      }
+
+      const res = await fetch(buildApiUrl('/organizations'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast('🏢 Organization submitted successfully! Pending Arcturus Admin review.');
+        await fetchOrganizations();
+        setActiveTab('manage');
+      } else {
+        showToast(data.error || 'Failed to submit organization registration');
+      }
+    } catch (err) {
+      console.error('Error registering organization:', err);
+      showToast('Network error while uploading organization documents');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Submit Job Posting
   const handlePostJob = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.company) return;
+    if (!form.title.trim() || !form.location.trim()) {
+      showToast('Title and location are required');
+      return;
+    }
 
-    if (!token) {
-      showToast('Please sign in to publish a job listing');
+    const selectedOrg = organizations.find((o) => o._id === selectedOrgId);
+    if (!selectedOrg || selectedOrg.status !== 'approved') {
+      showToast('You must select an approved Organization account to publish jobs.');
       return;
     }
 
@@ -103,209 +279,274 @@ const JobPostingPage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: form.title,
-          company: form.company,
-          companyLogo: form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-          location: form.location || 'Remote',
-          employmentType: form.type,
-          salary: form.salary,
-          skills: form.skills,
-          description: form.description,
+          ...form,
+          organizationId: selectedOrg._id,
+          company: selectedOrg.name,
+          companyLogo: selectedOrg.logo?.url,
         }),
       });
 
       const data = await res.json();
-      if (res.ok && data.job) {
-        setJobListings([data.job, ...jobListings]);
+
+      if (res.ok) {
+        showToast('🎉 Job opening posted successfully on the portal!');
         setForm({
           title: '',
-          company: '',
-          companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
           location: '',
-          type: 'Full-time',
+          workplaceType: 'Hybrid',
+          employmentType: 'Full-time',
           salary: '',
           skills: '',
           description: '',
         });
-        showToast('Job posting published successfully to Arcturus Jobs! 🎉');
+        await fetchMyListings();
         setActiveTab('manage');
-        return;
       } else {
-        showToast(data.error || 'Failed to publish job.');
+        showToast(data.error || 'Failed to publish job opening');
       }
     } catch (err) {
       console.error('Failed to post job:', err);
-      showToast('Error publishing job listing.');
+      showToast('Network error while posting job');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteJob = async (id) => {
-    if (!token) {
-      showToast('Please sign in to manage listings');
-      return;
-    }
-
-    if (!window.confirm('Are you sure you want to close and delete this job listing?')) {
-      return;
-    }
+  // Delete Job Listing
+  const handleDeleteListing = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to close and delete "${title}"?`)) return;
 
     try {
       const res = await fetch(buildApiUrl(`/jobs/${id}`), {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
-        setJobListings((prev) => prev.filter((j) => (j._id || j.id) !== id));
-        showToast('Job listing closed and deleted successfully.');
+        showToast('Job listing removed successfully');
+        await fetchMyListings();
       } else {
-        const data = await res.json();
-        showToast(data.error || 'Failed to delete listing.');
+        showToast('Failed to delete listing');
       }
     } catch (err) {
-      console.error('Delete job error:', err);
-      showToast('Failed to delete listing.');
+      showToast('Error removing job listing');
     }
   };
 
-  return (
-    <div className="jobPostingWrapper">
-      <div className="jobPostingContainer">
-        {/* Top Navigation */}
-        <div className="jobPostingTopBar">
-          <div className="topBarLeft">
-            <Link to="/jobs" className="jobBackBtn">
-              <FaArrowLeft size={13} /> <span>Back to Jobs</span>
-            </Link>
-            <h2>Job Posting & Recruiter Account</h2>
-          </div>
+  const approvedOrgs = organizations.filter((o) => o.status === 'approved');
+  const pendingOrgs = organizations.filter((o) => o.status === 'pending');
+  const rejectedOrgs = organizations.filter((o) => o.status === 'rejected');
+  const selectedOrg = organizations.find((o) => o._id === selectedOrgId) || approvedOrgs[0];
 
-          <div className="jobPostingTabs">
-            <button
-              type="button"
-              className={`jobTabBtn ${activeTab === 'post' ? 'active' : ''}`}
-              onClick={() => setActiveTab('post')}
-            >
-              <FaPlus size={12} /> <span>Post a Job</span>
-            </button>
-            <button
-              type="button"
-              className={`jobTabBtn ${activeTab === 'manage' ? 'active' : ''}`}
-              onClick={() => setActiveTab('manage')}
-            >
-              <FaBriefcase size={13} /> <span>Manage Listings ({jobListings.length})</span>
-            </button>
+  return (
+    <div className="jobPostingPageWrapper">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="jobPostingToast">
+          <FaCheckCircle size={16} /> <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Top Banner Navigation */}
+      <div className="jobPostingTopBar">
+        <div className="topBarLeft">
+          <Link to="/jobs" className="backToJobsBtn">
+            <FaArrowLeft size={13} /> <span>Back to Jobs</span>
+          </Link>
+          <div className="pageTitleGroup">
+            <h2>Recruiter & Organization Hub</h2>
+            <p>Publish job openings, manage candidates, and verify company credentials.</p>
           </div>
         </div>
 
-        {/* Toast Alert */}
-        {toastMessage && (
-          <div className="jobToast">
-            <FaCheckCircle size={15} /> <span>{toastMessage}</span>
-          </div>
-        )}
+        <div className="topBarTabs">
+          <button
+            type="button"
+            className={`tabBtn ${activeTab === 'post' ? 'active' : ''}`}
+            onClick={() => setActiveTab('post')}
+          >
+            <FaPlus size={12} /> <span>Post a Job</span>
+          </button>
+          <button
+            type="button"
+            className={`tabBtn ${activeTab === 'manage' ? 'active' : ''}`}
+            onClick={() => setActiveTab('manage')}
+          >
+            <FaBriefcase size={12} /> <span>Manage Listings ({jobListings.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`tabBtn ${activeTab === 'register_org' ? 'active' : ''}`}
+            onClick={() => setActiveTab('register_org')}
+          >
+            <FaBuilding size={12} /> <span>Create Company Page</span>
+          </button>
+        </div>
+      </div>
 
-        {/* Unauthorized State */}
-        {!token ? (
-          <div className="unauthorizedJobsCard">
-            <FaLock size={44} className="lockIcon" />
-            <h3>Recruiter Authentication Required</h3>
-            <p>You must be signed in with your Arcturus account to publish openings and manage your active job listings.</p>
-            <Link to="/login" className="authLoginBtn">
-              <FaSignInAlt size={14} /> <span>Sign In to Continue</span>
-            </Link>
-          </div>
-        ) : (
-          <>
-            {/* Tab 1: Post a Job Form */}
-            {activeTab === 'post' && (
-              <div className="jobPostCard">
-                <div className="jobCardHeader">
-                  <h3>Create a New Job Opening</h3>
-                  <p>Reach thousands of qualified professionals across the Arcturus network.</p>
+      {/* Not Signed In Guard */}
+      {!token && (
+        <div className="jobPostingAuthPrompt">
+          <FaLock size={36} color="#0a66c2" />
+          <h3>Authentication Required</h3>
+          <p>Sign in to register your Organization account and post job listings on Arcturus.</p>
+          <Link to="/login" className="postPrimaryActionBtn">
+            <FaSignInAlt size={14} /> <span>Sign In to Continue</span>
+          </Link>
+        </div>
+      )}
+
+      {/* MAIN CONTENT IF AUTHENTICATED */}
+      {token && (
+        <div className="jobPostingContentLayout">
+          {/* TAB 1: POST A JOB */}
+          {activeTab === 'post' && (
+            <div className="postJobTabPanel">
+              {/* CASE A: User has NO approved organization */}
+              {approvedOrgs.length === 0 ? (
+                <div className="orgRequiredNoticeCard">
+                  <div className="orgNoticeIconBox">
+                    <FaShieldAlt size={36} />
+                  </div>
+                  <h3>Organization Account Verification Required</h3>
+                  <p>
+                    To maintain trusted, legitimate job listings for job seekers on Arcturus, <strong>only verified Organization accounts</strong> are authorized to publish job openings.
+                  </p>
+
+                  {pendingOrgs.length > 0 ? (
+                    <div className="pendingReviewCallout">
+                      <FaHourglassHalf size={16} className="hourglassIcon" />
+                      <div>
+                        <strong>Verification Under Review</strong>
+                        <p>
+                          Your Organization "<strong>{pendingOrgs[0].name}</strong>" has been submitted with document proofs and is currently under review by <strong>Arcturus Admin</strong>.
+                        </p>
+                        <span className="pendingStatusPill">Status: Pending Admin Approval</span>
+                      </div>
+                    </div>
+                  ) : rejectedOrgs.length > 0 ? (
+                    <div className="rejectedCallout">
+                      <FaTimesCircle size={16} color="#dc2626" />
+                      <div>
+                        <strong>Registration Action Required</strong>
+                        <p>
+                          Your submission for "<strong>{rejectedOrgs[0].name}</strong>" was not approved: {rejectedOrgs[0].rejectionReason}
+                        </p>
+                        <button
+                          type="button"
+                          className="reSubmitOrgBtn"
+                          onClick={() => {
+                            setOrgForm((prev) => ({ ...prev, name: rejectedOrgs[0].name }));
+                            setActiveTab('register_org');
+                          }}
+                        >
+                          Submit Updated Verification Documents
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="createOrgCtaBox">
+                      <p>
+                        Create your company profile in under 2 minutes. Submit your incorporation or tax certificate to get verified.
+                      </p>
+                      <button
+                        type="button"
+                        className="postPrimaryActionBtn"
+                        onClick={() => setActiveTab('register_org')}
+                      >
+                        <FaBuilding size={14} /> <span>Register Your Organization Account</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
+              ) : (
+                /* CASE B: User HAS an approved Organization -> Render Posting Form */
+                <form className="jobPostingFormCard" onSubmit={handlePostJob}>
+                  {/* Organization Selector Header */}
+                  <div className="postingAsHeader">
+                    <div className="postingAsIdentity">
+                      <img
+                        src={selectedOrg?.logo?.url || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                        alt={selectedOrg?.name}
+                        className="postingAsLogo"
+                      />
+                      <div>
+                        <span className="postingAsLabel">Posting Job As:</span>
+                        <div className="postingAsOrgName">
+                          <strong>{selectedOrg?.name}</strong>
+                          <span className="verifiedCheckTag">
+                            <FaCheckCircle size={11} /> Verified Organization
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                <form onSubmit={handlePostJob} className="jobForm">
+                    {approvedOrgs.length > 1 && (
+                      <div className="switchOrgDropdownWrap">
+                        <label>Switch Organization:</label>
+                        <select
+                          value={selectedOrgId}
+                          onChange={(e) => setSelectedOrgId(e.target.value)}
+                        >
+                          {approvedOrgs.map((org) => (
+                            <option key={org._id} value={org._id}>
+                              {org.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="formSectionTitle">
+                    <h3>1. Job Overview</h3>
+                    <p>Specify the role title, workplace mode, and location.</p>
+                  </div>
+
                   <div className="jobFormGrid">
-                    <div className="formGroup">
-                      <label>Job Title *</label>
+                    <div className="formGroup fullWidth">
+                      <label htmlFor="jobTitle">Job Title *</label>
                       <input
+                        id="jobTitle"
                         type="text"
-                        placeholder="e.g. Lead React Engineer, Cloud Architect"
                         required
+                        placeholder="e.g. Senior Full-Stack Engineer, Lead Product Designer"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
                       />
                     </div>
 
                     <div className="formGroup">
-                      <label>Company / Organization *</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Arcturus Labs"
-                        required
-                        value={form.company}
-                        onChange={(e) => setForm({ ...form, company: e.target.value })}
-                      />
-                    </div>
-
-                    {/* Company Logo / Icon Field */}
-                    <div className="formGroup fullWidth">
-                      <label>Company Logo / Icon URL</label>
-                      <div className="logoInputWrapper">
-                        <div className="logoPreviewContainer">
-                          <img
-                            src={form.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
-                            alt="Company Logo Preview"
-                            className="logoPreviewImg"
-                            onError={(e) => {
-                              e.target.src = 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
-                            }}
-                          />
-                        </div>
-                        <div className="logoInputRight">
-                          <input
-                            type="url"
-                            placeholder="https://example.com/logo.png"
-                            value={form.companyLogo}
-                            onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
-                          />
-                          <div className="presetLogosRow">
-                            <span className="presetLabel">Presets:</span>
-                            {LOGO_PRESETS.map((preset, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                className={`presetLogoBtn ${form.companyLogo === preset.url ? 'active' : ''}`}
-                                onClick={() => setForm({ ...form, companyLogo: preset.url })}
-                                title={preset.label}
-                              >
-                                <img src={preset.url} alt={preset.label} />
-                                <span>{preset.label}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+                      <label htmlFor="workplaceType">Workplace Type</label>
+                      <select
+                        id="workplaceType"
+                        value={form.workplaceType}
+                        onChange={(e) => setForm({ ...form, workplaceType: e.target.value })}
+                      >
+                        <option value="On-site">On-site (In-office)</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Remote">Remote (Work from home)</option>
+                      </select>
                     </div>
 
                     <div className="formGroup">
-                      <label>Work Location & Workplace Type</label>
+                      <label htmlFor="jobLocation">Job Location (City / Country) *</label>
                       <input
+                        id="jobLocation"
                         type="text"
-                        placeholder="e.g. Bengaluru, India · Hybrid / Remote"
+                        required
+                        placeholder="e.g. San Francisco, CA or Remote, US"
                         value={form.location}
                         onChange={(e) => setForm({ ...form, location: e.target.value })}
                       />
                     </div>
 
                     <div className="formGroup">
-                      <label>Employment Type</label>
+                      <label htmlFor="employmentType">Employment Type</label>
                       <select
-                        value={form.type}
-                        onChange={(e) => setForm({ ...form, type: e.target.value })}
+                        id="employmentType"
+                        value={form.employmentType}
+                        onChange={(e) => setForm({ ...form, employmentType: e.target.value })}
                       >
                         <option value="Full-time">Full-time</option>
                         <option value="Part-time">Part-time</option>
@@ -315,125 +556,345 @@ const JobPostingPage = () => {
                     </div>
 
                     <div className="formGroup">
-                      <label>Estimated Compensation / Salary Range</label>
+                      <label htmlFor="salary">Salary Range (Optional)</label>
                       <input
+                        id="salary"
                         type="text"
-                        placeholder="e.g. ₹18,00,000 - ₹25,00,000 / yr"
+                        placeholder="e.g. $120,000 - $150,000 / yr"
                         value={form.salary}
                         onChange={(e) => setForm({ ...form, salary: e.target.value })}
                       />
                     </div>
 
-                    <div className="formGroup">
-                      <label>Required Skills (Comma-separated)</label>
+                    <div className="formGroup fullWidth">
+                      <label htmlFor="skills">Required Skills & Technologies (Comma-separated)</label>
                       <input
+                        id="skills"
                         type="text"
-                        placeholder="e.g. React, Node.js, MongoDB, TypeScript"
+                        placeholder="e.g. React, Node.js, TypeScript, GraphQL, AWS, Docker"
                         value={form.skills}
                         onChange={(e) => setForm({ ...form, skills: e.target.value })}
                       />
                     </div>
 
                     <div className="formGroup fullWidth">
-                      <label>Job Description & Responsibilities</label>
+                      <label htmlFor="description">Job Description & Responsibilities *</label>
                       <textarea
-                        rows={5}
-                        placeholder="Outline the responsibilities, qualifications, requirements, and benefits..."
+                        id="description"
+                        rows={6}
+                        required
+                        placeholder="Provide details about the role, key responsibilities, team structure, and qualifications..."
                         value={form.description}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                       />
                     </div>
                   </div>
 
-                  <div className="jobFormActions">
-                    <button type="submit" className="publishJobBtn" disabled={submitting}>
-                      <FaPlus size={13} /> <span>{submitting ? 'Publishing...' : 'Publish Job Listing'}</span>
+                  <div className="formSubmitRow">
+                    <button
+                      type="submit"
+                      className="postPrimaryActionBtn large"
+                      disabled={submitting}
+                    >
+                      <FaBriefcase size={14} />
+                      <span>{submitting ? 'Publishing Job...' : 'Publish Job Listing on Arcturus'}</span>
                     </button>
                   </div>
                 </form>
-              </div>
-            )}
+              )}
+            </div>
+          )}
 
-            {/* Tab 2: Manage Active Listings */}
-            {activeTab === 'manage' && (
-              <div className="jobManageContainer">
-                {loading ? (
-                  <div className="manageLoadingBox">
-                    <div className="jobsSpinner" />
-                    <p>Loading your job listings from database...</p>
-                  </div>
-                ) : jobListings.length === 0 ? (
-                  <div className="emptyJobsBox">
-                    <FaBriefcase size={36} />
-                    <h3>No active job listings</h3>
-                    <p>You haven't posted any jobs yet. Create your first opening to attract candidates.</p>
-                    <button type="button" className="publishJobBtn" onClick={() => setActiveTab('post')}>
-                      <FaPlus size={12} /> Post a Job
-                    </button>
-                  </div>
-                ) : (
-                  <div className="jobCardsList">
-                    {jobListings.map((job) => {
-                      const jobId = job._id || job.id;
-                      const applicantCount = Array.isArray(job.applicants) ? job.applicants.length : (job.applicants || 0);
-
-                      return (
-                        <div key={jobId} className="jobListingCard">
-                          <div className="jobCardTop">
-                            <img
-                              src={job.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
-                              alt={job.company}
-                              className="manageCompanyLogo"
-                            />
-                            <div className="jobPrimary">
-                              <h4>{job.title}</h4>
-                              <div className="jobMetaRow">
-                                <span><FaBuilding size={11} /> {job.company}</span>
-                                <span><FaMapMarkerAlt size={11} /> {job.location}</span>
-                                <span><FaClock size={11} /> {job.employmentType || job.type}</span>
-                                {job.salary && <span><FaMoneyBillWave size={11} /> {job.salary}</span>}
-                              </div>
-                            </div>
-
-                            <span className="statusBadge active">
-                              <span className="statusDot" /> {job.status || 'Active'}
-                            </span>
-                          </div>
-
-                          <p className="jobDescSnippet">{job.description}</p>
-
-                          {job.skills && job.skills.length > 0 && (
-                            <div className="jobSkillsPills">
-                              {(Array.isArray(job.skills) ? job.skills : job.skills.split(',')).map((s, idx) => (
-                                <span key={idx} className="skillPill">{typeof s === 'string' ? s.trim() : s}</span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="jobCardFooter">
-                            <div className="applicantCountBadge">
-                              <FaUsers size={13} /> <span>{applicantCount} candidates applied</span>
-                            </div>
-
-                            <button
-                              type="button"
-                              className="closeJobBtn"
-                              onClick={() => handleDeleteJob(jobId)}
-                              title="Close and delete job"
-                            >
-                              <FaTrashAlt size={12} /> <span>Close Job</span>
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+          {/* TAB 2: MANAGE LISTINGS */}
+          {activeTab === 'manage' && (
+            <div className="manageListingsTabPanel">
+              <div className="manageHeaderRow">
+                <div>
+                  <h3>Your Published Job Listings</h3>
+                  <p>Track candidate applications and active status for your company.</p>
+                </div>
+                {approvedOrgs.length > 0 && (
+                  <button
+                    type="button"
+                    className="postPrimaryActionBtn"
+                    onClick={() => setActiveTab('post')}
+                  >
+                    <FaPlus size={12} /> <span>Create New Job</span>
+                  </button>
                 )}
               </div>
-            )}
-          </>
-        )}
-      </div>
+
+              {jobListings.length === 0 ? (
+                <div className="noListingsCard">
+                  <FaBriefcase size={44} color="#94a3b8" />
+                  <h4>No job listings posted yet</h4>
+                  <p>Create your first job listing to start receiving qualified candidates.</p>
+                  {approvedOrgs.length > 0 ? (
+                    <button
+                      type="button"
+                      className="postPrimaryActionBtn"
+                      onClick={() => setActiveTab('post')}
+                    >
+                      <FaPlus size={12} /> <span>Post a Job Opening</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="postPrimaryActionBtn"
+                      onClick={() => setActiveTab('register_org')}
+                    >
+                      <FaBuilding size={12} /> <span>Register Organization First</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="myListingsGrid">
+                  {jobListings.map((job) => (
+                    <div key={job._id} className="myListingCard">
+                      <div className="myListingHeader">
+                        <div className="myListingTitleGroup">
+                          <h4>{job.title}</h4>
+                          <span className="myListingCompany">
+                            <FaBuilding size={12} /> {job.organizationId?.name || job.company}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="deleteListingBtn"
+                          onClick={() => handleDeleteListing(job._id, job.title)}
+                          title="Delete Listing"
+                        >
+                          <FaTrashAlt size={13} />
+                        </button>
+                      </div>
+
+                      <div className="myListingMeta">
+                        <span><FaMapMarkerAlt size={12} /> {job.location}</span>
+                        <span>{job.workplaceType} · {job.employmentType}</span>
+                        {job.salary && <span><FaMoneyBillWave size={12} /> {job.salary}</span>}
+                      </div>
+
+                      <div className="myListingApplicantsRow">
+                        <span className="applicantCountPill">
+                          <FaUsers size={12} /> {job.applicants?.length || 0} Applicants
+                        </span>
+                        <span className="postedDateText">
+                          <FaClock size={11} /> Posted {new Date(job.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: REGISTER AN ORGANIZATION PAGE */}
+          {activeTab === 'register_org' && (
+            <div className="registerOrgTabPanel">
+              <form className="registerOrgCard" onSubmit={handleRegisterOrgSubmit}>
+                <div className="formSectionTitle">
+                  <div className="orgTitleBadge">
+                    <FaBuilding size={20} />
+                  </div>
+                  <div>
+                    <h3>Create Organization Page</h3>
+                    <p>Register your company, business, or agency with verification documents for Arcturus Admin review.</p>
+                  </div>
+                </div>
+
+                <div className="jobFormGrid">
+                  <div className="formGroup">
+                    <label htmlFor="orgName">Organization / Company Name *</label>
+                    <input
+                      id="orgName"
+                      type="text"
+                      required
+                      placeholder="e.g. Acme Technologies Inc."
+                      value={orgForm.name}
+                      onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="orgIndustry">Industry *</label>
+                    <select
+                      id="orgIndustry"
+                      value={orgForm.industry}
+                      onChange={(e) => setOrgForm({ ...orgForm, industry: e.target.value })}
+                    >
+                      {INDUSTRIES.map((ind) => (
+                        <option key={ind} value={ind}>{ind}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="orgSize">Organization Size</label>
+                    <select
+                      id="orgSize"
+                      value={orgForm.organizationSize}
+                      onChange={(e) => setOrgForm({ ...orgForm, organizationSize: e.target.value })}
+                    >
+                      {ORG_SIZES.map((sz) => (
+                        <option key={sz} value={sz}>{sz} employees</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="orgType">Organization Type</label>
+                    <select
+                      id="orgType"
+                      value={orgForm.organizationType}
+                      onChange={(e) => setOrgForm({ ...orgForm, organizationType: e.target.value })}
+                    >
+                      {ORG_TYPES.map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="orgWebsite">Website URL</label>
+                    <input
+                      id="orgWebsite"
+                      type="url"
+                      placeholder="e.g. https://www.company.com"
+                      value={orgForm.website}
+                      onChange={(e) => setOrgForm({ ...orgForm, website: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label htmlFor="orgLocation">Headquarters / Primary Office *</label>
+                    <input
+                      id="orgLocation"
+                      type="text"
+                      required
+                      placeholder="e.g. San Francisco, CA, USA"
+                      value={orgForm.location}
+                      onChange={(e) => setOrgForm({ ...orgForm, location: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="formGroup fullWidth">
+                    <label htmlFor="orgTagline">Tagline / Motto</label>
+                    <input
+                      id="orgTagline"
+                      type="text"
+                      placeholder="e.g. Empowering developers worldwide through cloud technology"
+                      value={orgForm.tagline}
+                      onChange={(e) => setOrgForm({ ...orgForm, tagline: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="formGroup fullWidth">
+                    <label htmlFor="orgDesc">Company Description</label>
+                    <textarea
+                      id="orgDesc"
+                      rows={3}
+                      placeholder="Brief overview of the company mission, products, and culture..."
+                      value={orgForm.description}
+                      onChange={(e) => setOrgForm({ ...orgForm, description: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Logo Selector / Upload */}
+                  <div className="formGroup fullWidth">
+                    <label>Company Logo</label>
+                    <div className="logoPresetRow">
+                      {LOGO_PRESETS.map((p, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className={`logoPresetOption ${orgForm.logoUrl === p.url && !logoFile ? 'active' : ''}`}
+                          onClick={() => {
+                            setOrgForm({ ...orgForm, logoUrl: p.url });
+                            setLogoFile(null);
+                          }}
+                        >
+                          <img src={p.url} alt={p.label} />
+                          <span>{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* REQUIRED DOCUMENT SUBMISSION AREA */}
+                  <div className="formGroup fullWidth verificationUploadBox">
+                    <div className="verificationUploadHeader">
+                      <FaFileInvoice size={18} color="#0a66c2" />
+                      <div>
+                        <h4>Business Verification Document Proof (Required) *</h4>
+                        <p>
+                          Attach official documentation (Certificate of Incorporation, Tax Registration, Business License). Files are securely stored on MongoDB Atlas & Cloudinary and reviewed by Arcturus Admin.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="docUploadInputsRow">
+                      <div className="formGroup docTypeSelectGroup">
+                        <label htmlFor="docType">Document Type:</label>
+                        <select
+                          id="docType"
+                          value={orgForm.documentType}
+                          onChange={(e) => setOrgForm({ ...orgForm, documentType: e.target.value })}
+                        >
+                          {DOCUMENT_TYPES.map((dt) => (
+                            <option key={dt} value={dt}>{dt}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="formGroup fileUploadInputWrap">
+                        <label htmlFor="docFiles" className="customFileInputLabel">
+                          <FaFileUpload size={14} /> <span>Choose Image Files (PNG, JPG, WebP)</span>
+                        </label>
+                        <input
+                          id="docFiles"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          required
+                          onChange={handleDocFileChange}
+                          style={{ display: 'none' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Previews of attached document images */}
+                    {documentPreviews.length > 0 && (
+                      <div className="attachedDocsPreviewGrid">
+                        {documentPreviews.map((doc, idx) => (
+                          <div key={idx} className="attachedDocItem">
+                            <img src={doc.url} alt={doc.name} className="attachedDocThumb" />
+                            <div className="attachedDocInfo">
+                              <span className="attachedDocName">{doc.name}</span>
+                              <span className="attachedDocSize">{doc.size} MB</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="formSubmitRow">
+                  <button
+                    type="submit"
+                    className="postPrimaryActionBtn large"
+                    disabled={submitting}
+                  >
+                    <FaShieldAlt size={14} />
+                    <span>{submitting ? 'Uploading Documents to Cloudinary...' : 'Submit Organization for Admin Approval'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

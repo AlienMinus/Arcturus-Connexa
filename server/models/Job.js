@@ -19,6 +19,10 @@ const JobSchema = new mongoose.Schema(
     salary: { type: String, default: '' },
     skills: [{ type: String }],
     description: { type: String, required: true },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+    },
     recruiterId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
