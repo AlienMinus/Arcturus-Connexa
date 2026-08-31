@@ -16,6 +16,7 @@ import JobsPage from './pages/JobsPage/JobsPage';
 import JobPostingPage from './pages/JobPostingPage/JobPostingPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
+import BackToTop from './components/common/BackToTop/BackToTop';
 
 function AppRouter() {
   return (
@@ -57,6 +58,7 @@ function AppRouter() {
                 <Route path="/messaging" element={<MessegingPage />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
+              <BackToTop />
             </>
           }
         />
