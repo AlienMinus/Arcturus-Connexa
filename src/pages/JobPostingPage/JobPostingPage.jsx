@@ -350,8 +350,8 @@ const JobPostingPage = () => {
       {/* Top Banner Navigation */}
       <div className="jobPostingTopBar">
         <div className="topBarLeft">
-          <Link to="/jobs" className="backToJobsBtn">
-            <FaArrowLeft size={13} /> <span>Back to Jobs</span>
+          <Link to="/jobs" className="backToJobsBtn" title="Back to Jobs" aria-label="Back to Jobs">
+            <FaArrowLeft size={13} /> <span className="btnLabel">Back to Jobs</span>
           </Link>
           <div className="pageTitleGroup">
             <h2>Recruiter & Organization Hub</h2>
@@ -364,22 +364,28 @@ const JobPostingPage = () => {
             type="button"
             className={`tabBtn ${activeTab === 'post' ? 'active' : ''}`}
             onClick={() => setActiveTab('post')}
+            title="Post a Job"
+            aria-label="Post a Job"
           >
-            <FaPlus size={12} /> <span>Post a Job</span>
+            <FaPlus size={12} /> <span className="tabLabel">Post a Job</span>
           </button>
           <button
             type="button"
             className={`tabBtn ${activeTab === 'manage' ? 'active' : ''}`}
             onClick={() => setActiveTab('manage')}
+            title={`Manage Listings (${jobListings.length})`}
+            aria-label={`Manage Listings (${jobListings.length})`}
           >
-            <FaBriefcase size={12} /> <span>Manage Listings ({jobListings.length})</span>
+            <FaBriefcase size={12} /> <span className="tabLabel">Manage Listings ({jobListings.length})</span>
           </button>
           <button
             type="button"
             className={`tabBtn ${activeTab === 'register_org' ? 'active' : ''}`}
             onClick={() => setActiveTab('register_org')}
+            title="Create Company Page"
+            aria-label="Create Company Page"
           >
-            <FaBuilding size={12} /> <span>Create Company Page</span>
+            <FaBuilding size={12} /> <span className="tabLabel">Create Company Page</span>
           </button>
         </div>
       </div>

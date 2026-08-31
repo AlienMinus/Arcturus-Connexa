@@ -287,11 +287,11 @@ const AdminDashboard = () => {
         </div>
 
         <div className="adminHeaderActions">
-          <button type="button" className="adminRefreshBtn" onClick={reloadData} title="Refresh Live Data">
-            <FaSyncAlt size={13} /> <span>Refresh Stats</span>
+          <button type="button" className="adminRefreshBtn" onClick={reloadData} title="Refresh Stats" aria-label="Refresh Stats">
+            <FaSyncAlt size={13} /> <span className="btnLabel">Refresh Stats</span>
           </button>
-          <Link to="/jobs" className="adminLinkToPortal">
-            <FaBriefcase size={13} /> <span>Job Portal</span>
+          <Link to="/jobs" className="adminLinkToPortal" title="Job Portal" aria-label="Job Portal">
+            <FaBriefcase size={13} /> <span className="btnLabel">Job Portal</span>
           </Link>
         </div>
       </header>
@@ -309,9 +309,11 @@ const AdminDashboard = () => {
               setActiveTab('organizations');
               setSearchQuery('');
             }}
+            title="Organization Verifications"
+            aria-label="Organization Verifications"
           >
             <FaBuilding size={15} />
-            <span>Organization Verifications</span>
+            <span className="tabLabel">Organization Verifications</span>
             {stats?.pendingOrganizations > 0 && (
               <span className="tabCountPill pendingPill">{stats.pendingOrganizations}</span>
             )}
@@ -324,9 +326,11 @@ const AdminDashboard = () => {
               setActiveTab('jobs');
               setSearchQuery('');
             }}
+            title="Job Portal Moderation"
+            aria-label="Job Portal Moderation"
           >
             <FaBriefcase size={15} />
-            <span>Job Portal Moderation</span>
+            <span className="tabLabel">Job Portal Moderation</span>
             <span className="tabCountPill">{stats?.totalJobs || 0}</span>
           </button>
 
@@ -337,9 +341,11 @@ const AdminDashboard = () => {
               setActiveTab('users');
               setSearchQuery('');
             }}
+            title="User Accounts"
+            aria-label="User Accounts"
           >
             <FaUsers size={15} />
-            <span>User Accounts</span>
+            <span className="tabLabel">User Accounts</span>
             <span className="tabCountPill">{stats?.totalUsers || 0}</span>
           </button>
         </div>

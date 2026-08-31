@@ -35,29 +35,37 @@ const OrganizationApprovals = ({
             type="button"
             className={`filterPill ${statusFilter === 'pending' ? 'active' : ''}`}
             onClick={() => setStatusFilter('pending')}
+            title="Pending Review"
+            aria-label="Pending Review"
           >
-            <FaHourglassHalf size={12} /> Pending Review ({stats?.pendingOrganizations || 0})
+            <FaHourglassHalf size={12} /> <span className="filterText">Pending Review</span> <span className="pillCount">({stats?.pendingOrganizations || 0})</span>
           </button>
           <button
             type="button"
             className={`filterPill ${statusFilter === 'approved' ? 'active' : ''}`}
             onClick={() => setStatusFilter('approved')}
+            title="Approved"
+            aria-label="Approved"
           >
-            <FaCheckCircle size={12} /> Approved ({stats?.approvedOrganizations || 0})
+            <FaCheckCircle size={12} /> <span className="filterText">Approved</span> <span className="pillCount">({stats?.approvedOrganizations || 0})</span>
           </button>
           <button
             type="button"
             className={`filterPill ${statusFilter === 'rejected' ? 'active' : ''}`}
             onClick={() => setStatusFilter('rejected')}
+            title="Rejected"
+            aria-label="Rejected"
           >
-            <FaTimesCircle size={12} /> Rejected ({stats?.rejectedOrganizations || 0})
+            <FaTimesCircle size={12} /> <span className="filterText">Rejected</span> <span className="pillCount">({stats?.rejectedOrganizations || 0})</span>
           </button>
           <button
             type="button"
             className={`filterPill ${statusFilter === 'all' ? 'active' : ''}`}
             onClick={() => setStatusFilter('all')}
+            title="All Organizations"
+            aria-label="All Organizations"
           >
-            All Organizations ({stats?.totalOrganizations || 0})
+            <FaBuilding size={12} /> <span className="filterText">All</span> <span className="pillCount">({stats?.totalOrganizations || 0})</span>
           </button>
         </div>
       </div>
@@ -191,9 +199,11 @@ const OrganizationApprovals = ({
                     className="approveBtn"
                     onClick={() => onApprove(org._id, org.name)}
                     disabled={actionLoading === org._id}
+                    title="Approve Organization"
+                    aria-label="Approve Organization"
                   >
                     <FaCheck size={13} />
-                    <span>{actionLoading === org._id ? 'Approving...' : 'Approve Organization'}</span>
+                    <span className="btnLabel">{actionLoading === org._id ? 'Approving...' : 'Approve'}</span>
                   </button>
                 )}
 
@@ -203,9 +213,11 @@ const OrganizationApprovals = ({
                     className="rejectBtn"
                     onClick={() => onOpenRejectModal(org)}
                     disabled={actionLoading === org._id}
+                    title="Reject / Request Changes"
+                    aria-label="Reject / Request Changes"
                   >
                     <FaTimes size={13} />
-                    <span>Reject / Request Changes</span>
+                    <span className="btnLabel">Reject / Request Changes</span>
                   </button>
                 )}
 

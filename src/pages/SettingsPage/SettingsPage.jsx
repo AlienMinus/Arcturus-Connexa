@@ -220,45 +220,55 @@ const SettingsPage = () => {
                 type="button"
                 className={`settingsTabBtn ${activeTab === 'account' ? 'active' : ''}`}
                 onClick={() => setActiveTab('account')}
+                title="Account Preferences"
+                aria-label="Account Preferences"
               >
                 <FaUserCog className="tabIcon" />
-                <span>Account Preferences</span>
+                <span className="tabLabel">Account Preferences</span>
               </button>
 
               <button
                 type="button"
                 className={`settingsTabBtn ${activeTab === 'security' ? 'active' : ''}`}
                 onClick={() => setActiveTab('security')}
+                title="Sign in & Security"
+                aria-label="Sign in & Security"
               >
                 <FaShieldAlt className="tabIcon" />
-                <span>Sign in & Security</span>
+                <span className="tabLabel">Sign in & Security</span>
               </button>
 
               <button
                 type="button"
                 className={`settingsTabBtn ${activeTab === 'visibility' ? 'active' : ''}`}
                 onClick={() => setActiveTab('visibility')}
+                title="Visibility & Privacy"
+                aria-label="Visibility & Privacy"
               >
                 <FaEye className="tabIcon" />
-                <span>Visibility & Privacy</span>
+                <span className="tabLabel">Visibility & Privacy</span>
               </button>
 
               <button
                 type="button"
                 className={`settingsTabBtn ${activeTab === 'language' ? 'active' : ''}`}
                 onClick={() => setActiveTab('language')}
+                title="Language & Region"
+                aria-label="Language & Region"
               >
                 <FaGlobe className="tabIcon" />
-                <span>Language & Region</span>
+                <span className="tabLabel">Language & Region</span>
               </button>
 
               <button
                 type="button"
                 className={`settingsTabBtn ${activeTab === 'notifications' ? 'active' : ''}`}
                 onClick={() => setActiveTab('notifications')}
+                title="Notifications"
+                aria-label="Notifications"
               >
                 <FaBell className="tabIcon" />
-                <span>Notifications</span>
+                <span className="tabLabel">Notifications</span>
               </button>
             </nav>
           </aside>

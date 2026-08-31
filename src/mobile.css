@@ -828,12 +828,474 @@
     text-align: center;
     padding: 40px 20px;
   }
+
+  /* ===== SETTINGS PAGE (max-width: 768px) ===== */
+  .settingsPageWrapper {
+    padding: 8px 6px 85px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .settingsContainer {
+    gap: 12px;
+  }
+
+  .settingsTopBar {
+    padding: 10px 12px;
+  }
+
+  .settingsTopBar h2 {
+    font-size: 1.1rem;
+  }
+
+  .settingsLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .settingsSidebar {
+    position: sticky;
+    top: 60px;
+    z-index: 20;
+    padding: 6px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  .settingsNav {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+
+  .settingsNav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settingsTabBtn {
+    padding: 8px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.82rem;
+  }
+
+  .settingsCard {
+    padding: 16px 12px;
+  }
+
+  .settingsRowsList {
+    gap: 14px;
+  }
+
+  .settingsRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .settingsToggleBtn {
+    align-self: flex-start;
+  }
+
+  .passwordFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ===== ADMIN DASHBOARD (max-width: 768px) ===== */
+  .adminDashboardWrapper {
+    padding: 8px 6px 85px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .adminTopHeader {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .adminHeaderTitleRow {
+    gap: 10px;
+  }
+
+  .adminShieldBadge {
+    width: 36px;
+    height: 36px;
+  }
+
+  .adminHeaderTitleRow h1 {
+    font-size: 1.1rem;
+  }
+
+  .adminSubtitle {
+    font-size: 0.76rem;
+  }
+
+  .adminMetricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .metricCard {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .metricIconBox {
+    width: 36px;
+    height: 36px;
+  }
+
+  .metricValue {
+    font-size: 1.2rem;
+  }
+
+  .metricLabel {
+    font-size: 0.7rem;
+  }
+
+  .adminTabsContainer {
+    gap: 8px;
+  }
+
+  .adminTabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .adminTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .adminTabBtn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .adminSearchForm {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .adminSectionPanel {
+    padding: 14px 10px;
+  }
+
+  .filterPillsGroup {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .filterPillsGroup::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterPill {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .adminOrgCard {
+    padding: 12px 10px;
+    gap: 12px;
+  }
+
+  .adminOrgLogo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .orgTitleRow h3 {
+    font-size: 1rem;
+  }
+
+  .adminOrgMetaGrid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .docsThumbnailsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
+
+  .docImagePreviewBox {
+    height: 95px;
+  }
+
+  .adminOrgActions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .approveBtn,
+  .rejectBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 14px;
+  }
+
+  .adminTableContainer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .adminDataTable {
+    min-width: 580px;
+  }
+
+  .adminLightboxCard {
+    max-width: 95vw;
+    max-height: 92vh;
+  }
+
+  .lightboxImage {
+    max-height: 50vh;
+  }
+
+  .adminRejectionCard {
+    max-width: 95vw;
+    padding: 18px 14px;
+  }
+
+  /* ===== JOB POSTING PAGE (max-width: 768px) ===== */
+  .jobPostingPageWrapper {
+    padding: 8px 6px 85px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .jobPostingTopBar {
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .pageTitleGroup h2 {
+    font-size: 1.1rem;
+  }
+
+  .pageTitleGroup p {
+    font-size: 0.78rem;
+  }
+
+  .topBarTabs {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .topBarTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topBarTabs .tabBtn {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .postingAsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .switchOrgDropdownWrap {
+    width: 100%;
+  }
+
+  .switchOrgDropdownWrap select {
+    width: 100%;
+  }
+
+  .jobPostingFormCard,
+  .registerOrgCard,
+  .orgRequiredNoticeCard {
+    padding: 16px 10px;
+  }
+
+  .jobFormGrid,
+  .docUploadInputsRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .customFileInputLabel {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .logoPresetRow {
+    gap: 6px;
+  }
+
+  .logoPresetOption {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  .attachedDocsPreviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formSubmitRow {
+    width: 100%;
+  }
+
+  .postPrimaryActionBtn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .myListingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SMALL PHONES & COMPACT SCREENS (max-width: 600px)
+   Replace unnecessary texts with their respective icons only
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  /* Settings Page: Icon-Only Navigation */
+  .settingsBackBtn {
+    padding: 8px 10px;
+    border-radius: 50%;
+    min-width: 34px;
+    min-height: 34px;
+    justify-content: center;
+  }
+
+  .settingsBackBtn .btnLabel,
+  .settingsBackBtn span {
+    display: none !important;
+  }
+
+  .settingsTabBtn {
+    justify-content: center;
+    padding: 10px 14px;
+    flex: 1;
+    min-width: 44px;
+  }
+
+  .settingsTabBtn .tabLabel {
+    display: none !important;
+  }
+
+  .settingsTabBtn .tabIcon {
+    font-size: 18px;
+    margin: 0 auto;
+  }
+
+  /* Admin Dashboard: Icon Buttons & Tab Labels */
+  .adminRefreshBtn .btnLabel,
+  .adminLinkToPortal .btnLabel {
+    display: none !important;
+  }
+
+  .adminRefreshBtn,
+  .adminLinkToPortal {
+    padding: 8px 10px;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 8px;
+  }
+
+  .adminTabBtn .tabLabel {
+    display: none !important;
+  }
+
+  .adminTabBtn {
+    padding: 8px 12px;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .adminTabBtn svg {
+    font-size: 16px;
+  }
+
+  /* Job Posting Page: Icon Buttons & Tab Labels */
+  .backToJobsBtn {
+    padding: 6px 10px;
+    min-width: 32px;
+    min-height: 32px;
+    justify-content: center;
+  }
+
+  .backToJobsBtn .btnLabel,
+  .backToJobsBtn span {
+    display: none !important;
+  }
+
+  .topBarTabs .tabBtn .tabLabel {
+    display: none !important;
+  }
+
+  .topBarTabs .tabBtn {
+    padding: 10px 14px;
+    justify-content: center;
+    flex: 1;
+    min-height: 40px;
+  }
+
+  .topBarTabs .tabBtn svg {
+    font-size: 16px;
+  }
 }
 
 /* --------------------------------------------------------------------------
    SMALL PHONES (max-width: 480px)
    -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
+  /* Filter Pills: Icon + Count Only on ultra-small screens */
+  .filterPill .filterText {
+    display: none !important;
+  }
+
+  .filterPill {
+    padding: 6px 10px;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .metricCard {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .metricSubtext {
+    display: none !important;
+  }
+
+  .metricValue {
+    font-size: 1.15rem;
+  }
+
   .navbar {
     padding: 0 8px;
   }
