@@ -2126,3 +2126,58 @@ body.dark-mode .presetChipBtn:hover {
   background-color: var(--bg-hover) !important;
   color: #f8fafc !important;
 }
+
+[data-theme="dark"] .logoSelectorSection,
+body.dark-mode .logoSelectorSection,
+[data-theme="dark"] .customLogoUploadBox,
+body.dark-mode .customLogoUploadBox,
+[data-theme="dark"] .customLogoUrlBox,
+body.dark-mode .customLogoUrlBox,
+[data-theme="dark"] .activeLogoPreviewBadge,
+body.dark-mode .activeLogoPreviewBadge,
+[data-theme="dark"] .logoPresetOption,
+body.dark-mode .logoPresetOption {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .logoModeBtn,
+body.dark-mode .logoModeBtn {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .logoModeBtn:hover,
+body.dark-mode .logoModeBtn:hover {
+  background-color: var(--bg-hover) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .logoModeBtn.active,
+body.dark-mode .logoModeBtn.active {
+  background-color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .logoPresetOption span,
+body.dark-mode .logoPresetOption span,
+[data-theme="dark"] .uploadTextGroup strong,
+body.dark-mode .uploadTextGroup strong,
+[data-theme="dark"] .customLogoDetails strong,
+body.dark-mode .customLogoDetails strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .customLogoDropArea,
+body.dark-mode .customLogoDropArea {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .customLogoDropArea:hover,
+body.dark-mode .customLogoDropArea:hover {
+  background-color: var(--bg-hover) !important;
+  border-color: var(--accent-blue) !important;
+}

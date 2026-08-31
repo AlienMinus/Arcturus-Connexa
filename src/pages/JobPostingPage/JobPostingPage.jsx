@@ -29,11 +29,38 @@ import { buildApiUrl } from '../../utils/api';
 import './JobPostingPage.css';
 
 const LOGO_PRESETS = [
-  { label: 'Tech / Innovation', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png' },
-  { label: 'Web / Digital', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968292.png' },
-  { label: 'AI & Data', url: 'https://cdn-icons-png.flaticon.com/512/8637/8637105.png' },
-  { label: 'Cloud / DevOps', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968853.png' },
-  { label: 'Finance / Business', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
+  {
+    label: 'Tech & Software',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230284c7"/><path d="M18 22h28a2 2 0 012 2v16a2 2 0 01-2 2H18a2 2 0 01-2-2V24a2 2 0 012-2zm4 4v12h20V26H22zm4 18h12v2H26v-2zm-6 4h24v2H20v-2z" fill="%23ffffff"/></svg>',
+  },
+  {
+    label: 'AI & Intelligence',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%237c3aed"/><circle cx="32" cy="32" r="10" fill="%23ffffff"/><circle cx="18" cy="22" r="4" fill="%23ffffff"/><circle cx="46" cy="22" r="4" fill="%23ffffff"/><circle cx="18" cy="42" r="4" fill="%23ffffff"/><circle cx="46" cy="42" r="4" fill="%23ffffff"/><path d="M21 24l8 6m6 0l8-6m-22 16l8-6m6 0l8 6" stroke="%23ffffff" stroke-width="2.5"/></svg>',
+  },
+  {
+    label: 'Cloud & DevOps',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230a66c2"/><path d="M44 38a8 8 0 00-1.5-15.8A12 12 0 0020 28a7 7 0 000 14h24a8 8 0 000-4z" fill="%23ffffff"/></svg>',
+  },
+  {
+    label: 'Finance & Fintech',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%2316a34a"/><path d="M20 44V34m8 10V26m8 10V20m8 24V16m-24 6l8-6 8 4 8-8" stroke="%23ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  },
+  {
+    label: 'Startup & Ventures',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23ea580c"/><path d="M32 16c6 6 10 14 10 20a10 10 0 01-20 0c0-6 4-14 10-20zm0 14a4 4 0 100 8 4 4 0 000-8z" fill="%23ffffff"/><path d="M22 38l-4 4v4l6-2m18-6l4 4v4l-6-2" stroke="%23ffffff" stroke-width="2.5"/></svg>',
+  },
+  {
+    label: 'Enterprise & Corp',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23334155"/><path d="M20 18h16v28H20V18zm16 10h12v18H36V28zm-10 4h4v4h-4v-4zm0 8h4v4h-4v-4zm16-4h4v4h-4v-4zm0 8h4v4h-4v-4z" fill="%23ffffff"/></svg>',
+  },
+  {
+    label: 'Healthcare & Bio',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23e11d48"/><path d="M28 18h8v10h10v8H36v10h-8V36H18v-8h10V18z" fill="%23ffffff"/></svg>',
+  },
+  {
+    label: 'Education & EdTech',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%234f46e5"/><path d="M32 18L14 28l18 10 18-10-18-10zm-12 16v8c0 4 5.4 8 12 8s12-4 12-8v-8l-12 6-12-6z" fill="%23ffffff"/></svg>',
+  },
 ];
 
 const INDUSTRIES = [
@@ -105,16 +132,38 @@ const JobPostingPage = () => {
     organizationType: 'Privately Held',
     website: '',
     location: '',
-    logoUrl: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+    logoUrl: LOGO_PRESETS[0].url,
     documentType: 'Certificate of Incorporation',
   });
+  const [logoMode, setLogoMode] = useState('presets'); // 'presets' | 'upload' | 'url'
   const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [documentFiles, setDocumentFiles] = useState([]);
   const [documentPreviews, setDocumentPreviews] = useState([]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  const handleLogoFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Logo file must be smaller than 5MB');
+      return;
+    }
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const handleClearCustomLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    setOrgForm((prev) => ({
+      ...prev,
+      logoUrl: LOGO_PRESETS[0].url,
+    }));
   };
 
   const fetchOrganizations = async () => {
@@ -806,25 +855,136 @@ const JobPostingPage = () => {
                     />
                   </div>
 
-                  {/* Logo Selector / Upload */}
-                  <div className="formGroup fullWidth">
-                    <label>Company Logo</label>
-                    <div className="logoPresetRow">
-                      {LOGO_PRESETS.map((p, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          className={`logoPresetOption ${orgForm.logoUrl === p.url && !logoFile ? 'active' : ''}`}
-                          onClick={() => {
-                            setOrgForm({ ...orgForm, logoUrl: p.url });
-                            setLogoFile(null);
-                          }}
-                        >
-                          <img src={p.url} alt={p.label} />
-                          <span>{p.label}</span>
-                        </button>
-                      ))}
+                  {/* Company Logo Selection / Custom Upload */}
+                  <div className="formGroup fullWidth logoSelectorSection">
+                    <div className="logoSectionHeader">
+                      <div>
+                        <label>Company Logo *</label>
+                        <p className="fieldSubLabel">Choose an industry preset icon, upload your company brand logo, or provide an image URL.</p>
+                      </div>
+                      
+                      {/* Active Logo Live Preview */}
+                      <div className="activeLogoPreviewBadge">
+                        <img
+                          src={logoPreview || orgForm.logoUrl || LOGO_PRESETS[0].url}
+                          alt="Active Logo Preview"
+                          className="activeLogoPreviewImg"
+                        />
+                        <div>
+                          <span className="previewBadgeTitle">Selected Logo</span>
+                          <span className="previewBadgeSubtext">{logoFile ? 'Custom Upload' : logoMode === 'url' ? 'Custom URL' : 'Industry Preset'}</span>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Logo Mode Navigation */}
+                    <div className="logoModeNav">
+                      <button
+                        type="button"
+                        className={`logoModeBtn ${logoMode === 'presets' && !logoFile ? 'active' : ''}`}
+                        onClick={() => {
+                          setLogoMode('presets');
+                          setLogoFile(null);
+                          setLogoPreview(null);
+                        }}
+                      >
+                        <FaBuilding size={13} /> <span>Industry Presets</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`logoModeBtn ${logoMode === 'upload' || logoFile ? 'active' : ''}`}
+                        onClick={() => setLogoMode('upload')}
+                      >
+                        <FaFileUpload size={13} /> <span>Upload Custom Logo</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`logoModeBtn ${logoMode === 'url' && !logoFile ? 'active' : ''}`}
+                        onClick={() => {
+                          setLogoMode('url');
+                          setLogoFile(null);
+                          setLogoPreview(null);
+                        }}
+                      >
+                        <FaGlobe size={13} /> <span>Image URL</span>
+                      </button>
+                    </div>
+
+                    {/* Mode 1: Presets */}
+                    {logoMode === 'presets' && !logoFile && (
+                      <div className="logoPresetRow">
+                        {LOGO_PRESETS.map((p, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            className={`logoPresetOption ${orgForm.logoUrl === p.url && !logoFile ? 'active' : ''}`}
+                            onClick={() => {
+                              setOrgForm({ ...orgForm, logoUrl: p.url });
+                              setLogoFile(null);
+                              setLogoPreview(null);
+                            }}
+                          >
+                            <img src={p.url} alt={p.label} />
+                            <span>{p.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Mode 2: Custom File Upload */}
+                    {logoMode === 'upload' && (
+                      <div className="customLogoUploadBox">
+                        {logoFile && logoPreview ? (
+                          <div className="customLogoSelectedCard">
+                            <img src={logoPreview} alt="Uploaded logo" className="customLogoThumb" />
+                            <div className="customLogoDetails">
+                              <strong>{logoFile.name}</strong>
+                              <span>{(logoFile.size / 1024).toFixed(1)} KB · Ready to upload</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="clearLogoBtn"
+                              onClick={handleClearCustomLogo}
+                              title="Remove custom logo"
+                            >
+                              <FaTrashAlt size={12} /> <span>Change</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="customLogoDropArea">
+                            <label htmlFor="customLogoInput" className="customLogoUploadLabel">
+                              <FaFileUpload size={20} color="#0a66c2" />
+                              <div className="uploadTextGroup">
+                                <strong>Click to browse company logo image</strong>
+                                <span>Supports PNG, JPG, SVG, WebP (Max 5MB)</span>
+                              </div>
+                            </label>
+                            <input
+                              id="customLogoInput"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLogoFileChange}
+                              style={{ display: 'none' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Mode 3: Image URL */}
+                    {logoMode === 'url' && !logoFile && (
+                      <div className="customLogoUrlBox">
+                        <input
+                          type="url"
+                          placeholder="https://company.com/assets/logo.png"
+                          value={orgForm.logoUrl.startsWith('data:') ? '' : orgForm.logoUrl}
+                          onChange={(e) => setOrgForm({ ...orgForm, logoUrl: e.target.value })}
+                        />
+                        <span className="inputHelpText">Enter a direct image link to your organization logo.</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* REQUIRED DOCUMENT SUBMISSION AREA */}
