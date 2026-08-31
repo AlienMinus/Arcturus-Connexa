@@ -39,7 +39,8 @@ const Feed = () => {
           
           return {
             id: post._id,
-            authorName: getUserFullName(post.userId) || post.author || 'Anonymous',
+            userId: post.userId,
+            authorName: getUserFullName(post.userId) || post.authorName || post.author || 'Member',
             authorUsername: post.authorUsername || post.userId?.username || post.userId?.name || '',
             authorHeadline: post.userId?.headline || 'Member',
             time: (
@@ -60,7 +61,8 @@ const Feed = () => {
             commentsCount: post.comments?.length || 0,
             repostedFrom: post.repostedFrom ? {
               id: post.repostedFrom._id,
-              authorName: getUserFullName(post.repostedFrom.userId) || post.repostedFrom.author || 'Anonymous',
+              userId: post.repostedFrom.userId,
+              authorName: getUserFullName(post.repostedFrom.userId) || post.repostedFrom.authorName || post.repostedFrom.author || 'Member',
               authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
               authorHeadline: post.repostedFrom.userId?.headline || 'Member',
               content: post.repostedFrom.content || '',

@@ -250,7 +250,7 @@ const PostCard = ({ post }) => {
   const isRepost = !!post.repostedFrom;
   const authorSource = isRepost ? post.repostedFrom : post;
   const displayAvatar = authorSource?.authorAvatar || authorSource?.avatar || authorSource?.userId?.profilePicture?.url || null;
-  const displayName = getUserFullName(authorSource?.userId) || authorSource?.authorName || authorSource?.author || 'Anonymous';
+  const displayName = getUserFullName(authorSource?.userId) || authorSource?.authorName || authorSource?.author || authorSource?.authorUsername || 'Arcturus Member';
   const displayUsername = authorSource?.authorUsername || authorSource?.userId?.username || authorSource?.userId?.name || '';
   const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
   const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";
