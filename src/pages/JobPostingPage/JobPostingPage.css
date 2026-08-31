@@ -684,26 +684,63 @@
 .docUploadInputsRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
+  align-items: start;
+}
+
+.docTypeSelectGroup select {
+  height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
 .customFileInputLabel {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: #0a66c2;
-  color: #ffffff;
-  padding: 10px 16px;
+  gap: 10px;
+  background: #0a66c2 !important;
+  color: #ffffff !important;
+  height: 44px;
+  padding: 0 18px;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease;
+  box-shadow: 0 1px 3px rgba(10, 102, 194, 0.2);
+  transition: all 0.15s ease;
+  border: 1px solid #0a66c2;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.customFileInputLabel span {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.customFileInputLabel svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  font-size: 16px;
 }
 
 .customFileInputLabel:hover {
-  background: #004182;
+  background: #004182 !important;
+  border-color: #004182 !important;
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.35);
+  transform: translateY(-1px);
+}
+
+.customFileInputLabel:active {
+  transform: translateY(0);
 }
 
 .attachedDocsPreviewGrid {

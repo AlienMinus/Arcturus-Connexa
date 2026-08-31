@@ -2181,3 +2181,17 @@ body.dark-mode .customLogoDropArea:hover {
   background-color: var(--bg-hover) !important;
   border-color: var(--accent-blue) !important;
 }
+
+[data-theme="dark"] .customFileInputLabel,
+body.dark-mode .customFileInputLabel {
+  background-color: var(--accent-blue) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .customFileInputLabel span,
+body.dark-mode .customFileInputLabel span,
+[data-theme="dark"] .customFileInputLabel svg,
+body.dark-mode .customFileInputLabel svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}

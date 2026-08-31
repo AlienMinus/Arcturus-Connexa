@@ -1001,7 +1001,7 @@ const JobPostingPage = () => {
 
                     <div className="docUploadInputsRow">
                       <div className="formGroup docTypeSelectGroup">
-                        <label htmlFor="docType">Document Type:</label>
+                        <label htmlFor="docType">Document Type *</label>
                         <select
                           id="docType"
                           value={orgForm.documentType}
@@ -1014,8 +1014,9 @@ const JobPostingPage = () => {
                       </div>
 
                       <div className="formGroup fileUploadInputWrap">
+                        <label htmlFor="docFiles">Attach Verification Proof *</label>
                         <label htmlFor="docFiles" className="customFileInputLabel">
-                          <FaFileUpload size={14} /> <span>Choose Image Files (PNG, JPG, WebP)</span>
+                          <FaFileUpload size={15} /> <span>Choose Image Files (PNG, JPG, WebP)</span>
                         </label>
                         <input
                           id="docFiles"
