@@ -2481,3 +2481,102 @@ body.dark-mode .taleDrawerInputForm input:focus {
 body.dark-mode .emptyDrawerNotice {
   color: #94a3b8 !important;
 }
+
+/* Profile Network Modal Dark Mode (Followers, Following, Connections) */
+[data-theme="dark"] .networkModalContent,
+body.dark-mode .networkModalContent {
+  background-color: var(--bg-card, #1e293b) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .networkModalHeader,
+body.dark-mode .networkModalHeader {
+  background-color: var(--bg-card, #1e293b) !important;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1)) !important;
+}
+
+[data-theme="dark"] .networkTabBtn,
+body.dark-mode .networkTabBtn {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+[data-theme="dark"] .networkTabBtn:hover,
+body.dark-mode .networkTabBtn:hover {
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+[data-theme="dark"] .networkTabBtn.active,
+body.dark-mode .networkTabBtn.active {
+  color: var(--accent-blue, #38bdf8) !important;
+  border-bottom-color: var(--accent-blue, #38bdf8) !important;
+}
+
+[data-theme="dark"] .networkModalCloseBtn,
+body.dark-mode .networkModalCloseBtn {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+[data-theme="dark"] .networkModalCloseBtn:hover,
+body.dark-mode .networkModalCloseBtn:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+[data-theme="dark"] .networkModalBody,
+body.dark-mode .networkModalBody {
+  background-color: var(--bg-card, #1e293b) !important;
+}
+
+[data-theme="dark"] .networkUserRow,
+body.dark-mode .networkUserRow {
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06)) !important;
+}
+
+[data-theme="dark"] .networkUserRow:hover,
+body.dark-mode .networkUserRow:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .networkUserName,
+body.dark-mode .networkUserName {
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+[data-theme="dark"] .networkUserHeadline,
+body.dark-mode .networkUserHeadline {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+[data-theme="dark"] .networkUserAvatarFallback,
+body.dark-mode .networkUserAvatarFallback {
+  background-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .networkViewProfileBtn,
+body.dark-mode .networkViewProfileBtn {
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] .networkViewProfileBtn:hover,
+body.dark-mode .networkViewProfileBtn:hover {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .networkEmptyState h4,
+body.dark-mode .networkEmptyState h4 {
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+[data-theme="dark"] .networkEmptyState p,
+body.dark-mode .networkEmptyState p,
+[data-theme="dark"] .networkEmptyIcon,
+body.dark-mode .networkEmptyIcon {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
