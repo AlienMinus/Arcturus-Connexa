@@ -2195,3 +2195,83 @@ body.dark-mode .customFileInputLabel svg {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
+
+/* PostModal Enhanced Dark Mode */
+[data-theme="dark"] .postModal,
+body.dark-mode .postModal {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .postUser h4,
+body.dark-mode .postUser h4,
+[data-theme="dark"] .drawerTitle,
+body.dark-mode .drawerTitle,
+[data-theme="dark"] .docPreviewBadge strong,
+body.dark-mode .docPreviewBadge strong {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .postInputArea,
+body.dark-mode .postInputArea {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .audience-button,
+body.dark-mode .audience-button,
+[data-theme="dark"] .audience-menu,
+body.dark-mode .audience-menu,
+[data-theme="dark"] .postToolDrawer,
+body.dark-mode .postToolDrawer,
+[data-theme="dark"] .mediaPreviewCard,
+body.dark-mode .mediaPreviewCard,
+[data-theme="dark"] .emojiBtn,
+body.dark-mode .emojiBtn,
+[data-theme="dark"] .aiStyleBtn,
+body.dark-mode .aiStyleBtn,
+[data-theme="dark"] .promptChip,
+body.dark-mode .promptChip {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .audience-menu li:hover,
+body.dark-mode .audience-menu li:hover,
+[data-theme="dark"] .emojiBtn:hover,
+body.dark-mode .emojiBtn:hover,
+[data-theme="dark"] .promptChip:hover,
+body.dark-mode .promptChip:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .drawerForm input,
+body.dark-mode .drawerForm input,
+[data-theme="dark"] .drawerForm select,
+body.dark-mode .drawerForm select,
+[data-theme="dark"] .drawerForm textarea,
+body.dark-mode .drawerForm textarea {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .postTools,
+body.dark-mode .postTools {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .aiButton,
+body.dark-mode .aiButton {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--accent-blue) !important;
+}
+
+[data-theme="dark"] .scheduleBanner,
+body.dark-mode .scheduleBanner {
+  background-color: rgba(2, 132, 199, 0.15) !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+  color: #38bdf8 !important;
+}
