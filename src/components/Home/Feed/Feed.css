@@ -272,6 +272,48 @@
   font-size: 11px;
 }
 
+/* Post Document Attachment */
+.postDocumentAttachment {
+  padding: 0 16px 12px;
+}
+
+.postDocLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.postDocLink:hover {
+  background: #f1f5f9;
+  border-color: #0a66c2;
+}
+
+.postDocIcon {
+  font-size: 24px;
+}
+
+.postDocDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.postDocDetails strong {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.postDocDetails span {
+  font-size: 12px;
+  color: #0a66c2;
+  font-weight: 500;
+}
+
 /* Reactions Popup */
 .likeContainer {
   position: relative;

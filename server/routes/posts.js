@@ -52,65 +52,185 @@ const withRepostCount = async (post) => {
 };
 
 // Create post (requires authentication)
-router.post('/', authMiddleware, upload.single('media'), async (req, res) => {
+router.post(
+  '/',
+  authMiddleware,
+  upload.fields([
+    { name: 'media', maxCount: 1 },
+    { name: 'document', maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        content,
+        audience = 'Anyone',
+        poll,
+        event,
+        celebration,
+        hiring,
+        scheduledAt,
+        isScheduled,
+      } = req.body;
+      const userId = req.userId;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const media = [];
+      let documentData = null;
+
+      // Handle media file upload
+      if (req.files?.media?.[0]) {
+        const mediaFile = req.files.media[0];
+        const result = await streamUpload(mediaFile.buffer, {
+          folder: 'arcturus/posts',
+          resource_type: 'auto',
+        });
+        media.push({
+          url: result.secure_url,
+          public_id: result.public_id,
+          resource_type: result.resource_type,
+        });
+      }
+
+      // Handle document file upload
+      if (req.files?.document?.[0]) {
+        const docFile = req.files.document[0];
+        const result = await streamUpload(docFile.buffer, {
+          folder: 'arcturus/documents',
+          resource_type: 'auto',
+        });
+        documentData = {
+          url: result.secure_url,
+          name: docFile.originalname,
+          size: docFile.size,
+          public_id: result.public_id,
+        };
+      }
+
+      // Parse JSON sub-objects if passed as JSON string
+      let parsedPoll = null;
+      if (poll) {
+        try {
+          parsedPoll = typeof poll === 'string' ? JSON.parse(poll) : poll;
+          if (parsedPoll?.options && Array.isArray(parsedPoll.options)) {
+            parsedPoll.options = parsedPoll.options.map((opt) =>
+              typeof opt === 'string' ? { text: opt, votes: [] } : opt
+            );
+          }
+        } catch {
+          parsedPoll = null;
+        }
+      }
+
+      let parsedEvent = null;
+      if (event) {
+        try {
+          parsedEvent = typeof event === 'string' ? JSON.parse(event) : event;
+        } catch {
+          parsedEvent = null;
+        }
+      }
+
+      let parsedCelebration = null;
+      if (celebration) {
+        try {
+          parsedCelebration = typeof celebration === 'string' ? JSON.parse(celebration) : celebration;
+        } catch {
+          parsedCelebration = null;
+        }
+      }
+
+      let parsedHiring = null;
+      if (hiring) {
+        try {
+          parsedHiring = typeof hiring === 'string' ? JSON.parse(hiring) : hiring;
+        } catch {
+          parsedHiring = null;
+        }
+      }
+
+      const post = new Post({
+        userId,
+        author: getFullName(user) || 'Anonymous',
+        content,
+        audience,
+        media,
+        document: documentData,
+        poll: parsedPoll,
+        event: parsedEvent,
+        celebration: parsedCelebration,
+        hiring: parsedHiring,
+        isScheduled: Boolean(isScheduled === true || isScheduled === 'true'),
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
+      });
+      await post.save();
+
+      // Update the user's post list
+      await User.findByIdAndUpdate(
+        userId,
+        { $push: { posts: post._id } },
+        { new: true }
+      );
+
+      // Notify followers and connections about the new post
+      const author = await User.findById(userId).select('followers connections firstName middleName lastName');
+      const recipientIds = [
+        ...(author.followers || []),
+        ...(author.connections || []),
+      ]
+        .map((id) => id.toString())
+        .filter((id, index, arr) => id !== userId && arr.indexOf(id) === index);
+
+      await notifyUsers(recipientIds, {
+        type: 'post',
+        message: `${getFullName(author)} shared a new post.`,
+        fromUserId: author._id,
+        postId: post._id,
+        read: false,
+      });
+
+      // Populate user data for response
+      const postWithUser = await post.populate('userId', 'firstName middleName lastName name profilePicture username headline');
+      res.status(201).json(normalizePostResponse(postWithUser));
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to create post' });
+    }
+  }
+);
+
+// Vote on a poll inside a post
+router.post('/:id/poll/vote', authMiddleware, async (req, res) => {
   try {
-    const { content } = req.body;
+    const { optionIndex } = req.body;
     const userId = req.userId;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    const post = await Post.findById(req.params.id);
+    if (!post || !post.poll || !post.poll.options) {
+      return res.status(404).json({ error: 'Poll not found on this post' });
     }
 
-    const media = [];
-
-    if (req.file) {
-      const result = await streamUpload(req.file.buffer, { folder: 'arcturus' });
-      media.push({
-        url: result.secure_url,
-        public_id: result.public_id,
-        resource_type: result.resource_type,
-      });
+    if (optionIndex < 0 || optionIndex >= post.poll.options.length) {
+      return res.status(400).json({ error: 'Invalid poll option index' });
     }
 
-    const post = new Post({
-      userId,
-      author: getFullName(user) || 'Anonymous',
-      content,
-      media,
+    // Remove existing vote from this user across all options
+    post.poll.options.forEach((opt) => {
+      opt.votes = opt.votes.filter((v) => v.toString() !== userId.toString());
     });
+
+    // Add vote to the chosen option
+    post.poll.options[optionIndex].votes.push(userId);
     await post.save();
 
-    // Update the user's post list
-    await User.findByIdAndUpdate(
-      userId,
-      { $push: { posts: post._id } },
-      { new: true }
-    );
-
-    // Notify followers and connections about the new post
-    const author = await User.findById(userId).select('followers connections firstName middleName lastName');
-    const recipientIds = [
-      ...(author.followers || []),
-      ...(author.connections || []),
-    ]
-      .map((id) => id.toString())
-      .filter((id, index, arr) => id !== userId && arr.indexOf(id) === index);
-
-    await notifyUsers(recipientIds, {
-      type: 'post',
-      message: `${getFullName(author)} shared a new post.`,
-      fromUserId: author._id,
-      postId: post._id,
-      read: false,
-    });
-
-    // Populate user data for response
-    const postWithUser = await post.populate('userId', 'firstName middleName lastName name profilePicture username headline');
-    res.status(201).json(normalizePostResponse(postWithUser));
+    const populated = await post.populate('userId', 'firstName middleName lastName name profilePicture username headline');
+    res.json(normalizePostResponse(populated));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to create post' });
+    res.status(500).json({ error: 'Failed to vote on poll' });
   }
 });
 

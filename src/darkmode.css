@@ -2275,3 +2275,14 @@ body.dark-mode .scheduleBanner {
   border-color: rgba(2, 132, 199, 0.3) !important;
   color: #38bdf8 !important;
 }
+
+[data-theme="dark"] .postDocLink,
+body.dark-mode .postDocLink {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .postDocDetails strong,
+body.dark-mode .postDocDetails strong {
+  color: var(--text-primary) !important;
+}

@@ -368,11 +368,33 @@ const PostCard = ({ post }) => {
         </p>
       </div>
       {displayImage && (
-        <img 
-          className="postImage" 
-          src={displayImage} 
-          alt="Post visual content" 
-        />
+        displayImage.match(/\.(mp4|webm|mov)$/i) || post.media?.[0]?.resource_type === 'video' ? (
+          <video className="postImage postVideo" src={displayImage} controls />
+        ) : (
+          <img 
+            className="postImage" 
+            src={displayImage} 
+            alt="Post visual content" 
+          />
+        )
+      )}
+
+      {post.document?.url && (
+        <div className="postDocumentAttachment">
+          <a
+            href={post.document.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="postDocLink"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="postDocIcon">📄</div>
+            <div className="postDocDetails">
+              <strong>{post.document.name || 'Attached Document'}</strong>
+              <span>{post.document.size ? `${(post.document.size / 1024 / 1024).toFixed(2)} MB · Click to view` : 'Click to view file'}</span>
+            </div>
+          </a>
+        </div>
       )}
       <div className="postStats">
         <div className="likesDisplay">
