@@ -53,6 +53,7 @@ function AppRouter() {
                 <Route path="/profile/:username" element={<ProfilePage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/network" element={<NetworkPage />} />
+                <Route path="/mynetwork" element={<NetworkPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/:username/posts/:postId" element={<PostPage />} />
                 <Route path="/messaging" element={<MessegingPage />} />

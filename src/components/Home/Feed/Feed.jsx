@@ -41,7 +41,7 @@ const Feed = () => {
             id: post._id,
             userId: post.userId,
             authorName: getUserFullName(post.userId) || post.authorName || post.author || 'Member',
-            authorUsername: post.authorUsername || post.userId?.username || post.userId?.name || '',
+            authorUsername: post.userId?.username || post.authorUsername || '',
             authorHeadline: post.userId?.headline || 'Member',
             time: (
               <>
@@ -63,7 +63,7 @@ const Feed = () => {
               id: post.repostedFrom._id,
               userId: post.repostedFrom.userId,
               authorName: getUserFullName(post.repostedFrom.userId) || post.repostedFrom.authorName || post.repostedFrom.author || 'Member',
-              authorUsername: post.repostedFrom.authorUsername || post.repostedFrom.userId?.username || post.repostedFrom.userId?.name || '',
+              authorUsername: post.repostedFrom.userId?.username || post.repostedFrom.authorUsername || '',
               authorHeadline: post.repostedFrom.userId?.headline || 'Member',
               content: post.repostedFrom.content || '',
               image: post.repostedFrom.media?.[0]?.url,

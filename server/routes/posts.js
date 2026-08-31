@@ -36,11 +36,11 @@ const notifyUsers = async (userIds, notification) => {
 
 const normalizePostResponse = (post) => {
   const result = post.toObject ? post.toObject() : post;
-  result.authorUsername = result.userId?.username || result.userId?.name || result.authorUsername || '';
-  result.authorName = getFullName(result.userId) || result.author || 'Anonymous';
+  result.authorUsername = result.userId?.username || result.authorUsername || '';
+  result.authorName = getFullName(result.userId) || result.author || 'Member';
   if (result.repostedFrom) {
-    result.repostedFrom.authorUsername = result.repostedFrom.userId?.username || result.repostedFrom.userId?.name || result.repostedFrom.authorUsername || '';
-    result.repostedFrom.authorName = getFullName(result.repostedFrom.userId) || result.repostedFrom.author || 'Anonymous';
+    result.repostedFrom.authorUsername = result.repostedFrom.userId?.username || result.repostedFrom.authorUsername || '';
+    result.repostedFrom.authorName = getFullName(result.repostedFrom.userId) || result.repostedFrom.author || 'Member';
   }
   return result;
 };

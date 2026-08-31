@@ -98,7 +98,7 @@ const NotificationsPage = () => {
 
     // If connection request or network notification
     if (notification.type === 'request' || notification.type === 'connection') {
-      navigate('/mynetwork');
+      navigate('/network');
       return;
     }
 

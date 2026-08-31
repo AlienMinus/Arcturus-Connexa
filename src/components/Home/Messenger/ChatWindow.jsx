@@ -127,12 +127,13 @@ const ChatWindow = ({ contact, closeChat }) => {
   };
 
   if (!contact) return null;
+  const contactUsername = contact.username || contact.userId?.username || '';
 
   return (
     <div className="chatWindow">
       <div className="chatHeader">
         <Link
-          to={`/profile/${encodeURIComponent(contact.username || contact.name || '')}`}
+          to={contactUsername ? `/profile/${encodeURIComponent(contactUsername)}` : '#'}
           className="chatHeaderInfo"
           style={{ textDecoration: 'none', color: 'inherit' }}
           title={`View ${contact.name}'s profile`}

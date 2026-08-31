@@ -20,7 +20,8 @@ const CreatePost = ({ onPostCreated }) => {
     setModalTool(null);
   };
 
-  const profileLink = `/profile/${encodeURIComponent(profile?.username || profile?.name || '')}`;
+  const profileUsername = profile?.username || profile?.userId?.username || '';
+  const profileLink = profileUsername ? `/profile/${encodeURIComponent(profileUsername)}` : '/profile';
 
   return (
     <>

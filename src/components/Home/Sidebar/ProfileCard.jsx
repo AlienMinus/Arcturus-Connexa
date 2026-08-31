@@ -17,7 +17,8 @@ const getInitials = (name) =>
 
 const ProfileCard = () => {
   const { profile } = useProfile();
-  const profileLink = `/profile/${encodeURIComponent(profile?.username || profile?.name || '')}`;
+  const profileUsername = profile?.username || profile?.userId?.username || '';
+  const profileLink = profileUsername ? `/profile/${encodeURIComponent(profileUsername)}` : '/profile';
 
   return (
     <div className="card profileCard">

@@ -46,7 +46,7 @@ const NavLeft = ({ onSearchFocusChange }) => {
     setQuery("");
     setResults([]);
     setIsDropdownVisible(false);
-    navigate(`/profile/${username}`);
+    navigate(`/profile/${encodeURIComponent(username)}`);
   };
 
   return (
