@@ -3,7 +3,7 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   margin-bottom: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -13,7 +13,7 @@
   align-items: center;
   gap: 16px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 8px 4px 6px 4px;
   scrollbar-width: none; /* Firefox */
   -webkit-overflow-scrolling: touch;
 }
@@ -31,6 +31,7 @@
   cursor: pointer;
   flex-shrink: 0;
   width: 68px;
+  padding: 2px 0;
   transition: transform 0.15s ease;
 }
 
@@ -41,10 +42,10 @@
 /* Avatar Rings */
 .taleAvatarRing {
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  padding: 2px;
+  padding: 2.5px;
   background: transparent;
   border: none;
   display: flex;
@@ -52,26 +53,28 @@
   justify-content: center;
   cursor: pointer;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .taleAvatarImg {
-  width: 50px;
-  height: 50px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
   background: #f1f5f9;
   border: 2px solid #ffffff;
+  box-sizing: border-box;
 }
 
 .taleAvatarImg.fallback {
-  font-size: 50px;
+  font-size: 48px;
   color: #94a3b8;
 }
 
 /* Unviewed Story Glowing Gradient Ring */
 .unviewedStoryRing {
   background: linear-gradient(135deg, #0a66c2 0%, #00d2ff 100%);
-  box-shadow: 0 0 8px rgba(10, 102, 194, 0.35);
+  box-shadow: 0 0 6px rgba(10, 102, 194, 0.35);
 }
 
 /* Viewed Story Ring */
@@ -104,6 +107,7 @@
   font-size: 10px;
   cursor: pointer;
   transition: transform 0.15s ease;
+  z-index: 2;
 }
 
 .myTaleAddBadge:hover {
@@ -131,6 +135,7 @@
   align-items: center;
   justify-content: center;
   font-size: 10px;
+  z-index: 2;
 }
 
 /* Tale User Name */
@@ -144,4 +149,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
