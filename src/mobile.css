@@ -394,27 +394,181 @@
     flex-wrap: nowrap;
   }
 
-  /* ===== MODALS ===== */
+  /* ===== MODALS & POST CREATION ===== */
   .modal-overlay {
-    align-items: flex-end;
+    padding: 0 !important;
+    align-items: flex-end !important;
+    justify-content: center;
   }
 
   .postModal {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 16px 16px 0 0;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 14px;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 16px 16px 0 0 !important;
+    height: auto !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 14px 14px max(16px, env(safe-area-inset-bottom)) 14px !important;
+    box-sizing: border-box !important;
+    gap: 10px !important;
   }
 
-  .postTools {
+  .postHeader {
+    padding-bottom: 6px;
+  }
+
+  .postUser {
     gap: 8px;
   }
 
-  .postButton {
-    padding: 8px 18px;
+  .postUser h4 {
     font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .postInputArea {
+    font-size: 14px !important;
+    min-height: 80px !important;
+    max-height: 160px !important;
+    padding: 4px 0 !important;
+  }
+
+  /* Tool Drawers on Mobile */
+  .postToolDrawer {
+    padding: 10px !important;
+    gap: 8px !important;
+    max-height: 48vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .drawerHeader {
+    padding-bottom: 4px;
+  }
+
+  .drawerTitle {
+    font-size: 12px !important;
+  }
+
+  .drawerForm {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    gap: 8px !important;
+  }
+
+  .drawerForm input,
+  .drawerForm select,
+  .drawerForm textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 13px !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .drawerRow {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+    grid-template-columns: 1fr !important;
+    box-sizing: border-box !important;
+  }
+
+  .drawerRowBtns {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  .drawerSubmitBtn {
+    width: 100% !important;
+    padding: 9px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Emoji Drawer on Mobile */
+  .emojiCategoryTabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .emojiCategoryTabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .emojiCategoryTab {
+    padding: 3px 6px;
+    font-size: 10.5px;
+    white-space: nowrap;
+  }
+
+  .emojiGrid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 4px !important;
+    max-height: 120px !important;
+  }
+
+  .emojiBtn {
+    font-size: 18px !important;
+    padding: 4px 2px !important;
+  }
+
+  /* AI Drawer on Mobile */
+  .aiStyleButtonsRow {
+    gap: 4px !important;
+  }
+
+  .aiStyleBtn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* Poll Drawer on Mobile */
+  .pollOptionRow {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .pollOptionRow input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Toolbar on Mobile */
+  .postTools {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 6px 0 !important;
+  }
+
+  .aiButton {
+    padding: 4px 8px !important;
+    font-size: 11.5px !important;
+    gap: 4px !important;
+  }
+
+  .mediaInputLabel,
+  .toolIconBtn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 15px !important;
+  }
+
+  .postFooter {
+    padding-top: 6px !important;
+  }
+
+  .postButton {
+    padding: 8px 18px !important;
+    font-size: 13px !important;
   }
 
   /* ===== MESSENGER POPUPS ON MOBILE (Home / Global) ===== */
