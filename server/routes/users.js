@@ -50,7 +50,7 @@ const sendNotificationToUsers = async (userIds, notification) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.userId } })
-      .select('firstName lastName email headline profilePicture')
+      .select('firstName middleName lastName username email headline profilePicture')
       .limit(50)
       .lean();
 
@@ -70,7 +70,8 @@ router.get('/', authMiddleware, async (req, res) => {
 
       return {
         id: user._id,
-        name: `${user.firstName} ${user.lastName}`,
+        username: user.username,
+        name: getFullName(user) || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Anonymous',
         headline: user.headline || user.email,
         avatar: user.profilePicture || null,
         lastMessage: lastMessage ? lastMessage.content : null,
