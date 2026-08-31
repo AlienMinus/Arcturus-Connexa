@@ -84,10 +84,10 @@ const ChatWindow = ({ contact, closeChat }) => {
     }
   };
 
-  const renderMessageContent = (content) => {
-    if (!content) return null;
+  const renderTextWithLinks = (text) => {
+    if (!text) return null;
     const urlRegex = /((?:https?:\/\/|www\.)[^\s]+)/gi;
-    const parts = content.split(urlRegex);
+    const parts = text.split(urlRegex);
     return parts.map((part, i) => {
       if (part.match(urlRegex)) {
         const href = part.startsWith('www.') ? `https://${part}` : part;
@@ -105,6 +105,25 @@ const ChatWindow = ({ contact, closeChat }) => {
       }
       return part;
     });
+  };
+
+  const renderMessageContent = (content) => {
+    if (!content) return null;
+    const taleReplyMatch = content.match(/^\[(?:Replied to Tale|Tale Reply):\s*"?(.*?)"?\]\n?([\s\S]*)$/i);
+    if (taleReplyMatch) {
+      const taleSnippet = taleReplyMatch[1];
+      const replyBody = taleReplyMatch[2];
+      return (
+        <div className="taleReplyMessageWrapper">
+          <div className="taleReplyEmbeddedCard">
+            <span className="taleReplyEmbedBadge">📖 Tale Story</span>
+            <p className="taleReplyEmbedSnippet">{taleSnippet}</p>
+          </div>
+          {replyBody && <p className="taleReplyMessageText">{renderTextWithLinks(replyBody)}</p>}
+        </div>
+      );
+    }
+    return renderTextWithLinks(content);
   };
 
   if (!contact) return null;

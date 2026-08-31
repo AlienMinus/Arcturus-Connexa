@@ -28,24 +28,13 @@ const getFullName = (u) => {
 // GET /api/tales - List active (unexpired) tales grouped by user
 router.get('/', async (req, res) => {
   try {
-    const currentUserId = req.headers.authorization
-      ? (await import('../middleware/auth.js').then(m => {
-          try {
-            const token = req.headers.authorization.split(' ')[1];
-            const jwt = import('jsonwebtoken');
-            // We can optionally decode if auth present
-            return null;
-          } catch {
-            return null;
-          }
-        }))
-      : null;
-
     const activeTales = await Tale.find({
       expiresAt: { $gt: new Date() },
     })
       .populate('userId', 'firstName middleName lastName name profilePicture username headline')
       .populate('viewers.userId', 'firstName middleName lastName name profilePicture username')
+      .populate('reactions.userId', 'firstName middleName lastName name profilePicture username')
+      .populate('comments.userId', 'firstName middleName lastName name profilePicture username')
       .sort({ createdAt: 1 });
 
     // Group tales by user
@@ -169,23 +158,24 @@ router.post('/:id/react', authMiddleware, async (req, res) => {
     }
 
     const userId = req.userId;
-    tale.reactions = tale.reactions.filter((r) => r.userId.toString() !== userId.toString());
+    tale.reactions = (tale.reactions || []).filter((r) => r.userId.toString() !== userId.toString());
     tale.reactions.push({ userId, reaction, createdAt: new Date() });
     await tale.save();
 
-    res.json({ success: true, reactions: tale.reactions });
+    const populated = await tale.populate('reactions.userId', 'firstName middleName lastName name profilePicture username');
+    res.json({ success: true, reactions: populated.reactions });
   } catch (err) {
     console.error('Failed to react to tale', err);
     res.status(500).json({ error: 'Failed to react to tale' });
   }
 });
 
-// POST /api/tales/:id/reply - Reply to a tale via Direct Message
-router.post('/:id/reply', authMiddleware, async (req, res) => {
+// POST /api/tales/:id/comment - Post public comment on tale & send DM reply to author
+router.post('/:id/comment', authMiddleware, async (req, res) => {
   try {
-    const { message } = req.body;
-    if (!message?.trim()) {
-      return res.status(400).json({ error: 'Message cannot be empty' });
+    const { content } = req.body;
+    if (!content?.trim()) {
+      return res.status(400).json({ error: 'Comment cannot be empty' });
     }
 
     const tale = await Tale.findById(req.params.id).populate('userId', 'firstName lastName name username');
@@ -194,28 +184,38 @@ router.post('/:id/reply', authMiddleware, async (req, res) => {
     }
 
     const senderId = req.userId;
-    const recipientId = tale.userId._id;
+    const authorId = tale.userId._id;
 
-    if (senderId.toString() === recipientId.toString()) {
-      return res.status(400).json({ error: 'Cannot reply to your own tale' });
+    // 1. Save public comment on the Tale
+    tale.comments = tale.comments || [];
+    tale.comments.push({
+      userId: senderId,
+      content: content.trim(),
+      createdAt: new Date(),
+    });
+    await tale.save();
+
+    // 2. Also send as direct Message to author if commenter is not the author
+    if (senderId.toString() !== authorId.toString()) {
+      try {
+        const replyContent = `[Replied to Tale: "${tale.text || tale.caption || 'Media Tale'}"]\n${content.trim()}`;
+        const newMsg = new Message({
+          senderId: senderId,
+          receiverId: authorId,
+          content: replyContent,
+          read: false,
+        });
+        await newMsg.save();
+      } catch (msgErr) {
+        console.error('Failed to send direct message for tale comment', msgErr);
+      }
     }
 
-    const sender = await User.findById(senderId);
-    const replyContent = `[Replied to Tale: "${tale.text || tale.caption || 'Media story'}"]\n${message.trim()}`;
-
-    const newMsg = new Message({
-      sender: senderId,
-      recipient: recipientId,
-      content: replyContent,
-      read: false,
-    });
-
-    await newMsg.save();
-
-    res.json({ success: true, message: 'Reply sent successfully' });
+    const populated = await tale.populate('comments.userId', 'firstName middleName lastName name profilePicture username');
+    res.status(201).json({ success: true, comments: populated.comments });
   } catch (err) {
-    console.error('Failed to reply to tale', err);
-    res.status(500).json({ error: 'Failed to reply to tale' });
+    console.error('Failed to add tale comment', err);
+    res.status(500).json({ error: 'Failed to add tale comment' });
   }
 });
 
@@ -240,4 +240,3 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 export default router;
-

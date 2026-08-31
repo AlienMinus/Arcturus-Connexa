@@ -7,14 +7,16 @@ import {
   FaTrashAlt,
   FaEye,
   FaPaperPlane,
-  FaHeart,
   FaPause,
   FaPlay,
+  FaComments,
+  FaRegCommentDots,
 } from 'react-icons/fa';
 import { CgProfile } from 'react-icons/cg';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../context/ProfileContext';
 import { buildApiUrl } from '../../utils/api';
+import { getUserFullName } from '../../utils/user';
 import './TaleViewerModal.css';
 
 const STORY_DURATION_MS = 5000;
@@ -34,18 +36,21 @@ const TaleViewerModal = ({
   const [taleIndex, setTaleIndex] = useState(initialTaleIndex);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [replyText, setReplyText] = useState('');
-  const [isSendingReply, setIsSendingReply] = useState(false);
-  const [replyFeedback, setReplyFeedback] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [showViewersModal, setShowViewersModal] = useState(false);
   const [hasReacted, setHasReacted] = useState(null);
+  const [localComments, setLocalComments] = useState([]);
+  const [localReactions, setLocalReactions] = useState([]);
 
   const currentGroup = taleGroups[groupIndex] || null;
   const currentTale = currentGroup?.tales?.[taleIndex] || null;
-  const isMyTale = String(currentGroup?.userId) === String(user?._id || user?.id || profile?.userId);
+  const myUserId = String(user?._id || user?.id || profile?.userId || profile?._id || '');
+  const isMyTale = String(currentGroup?.userId) === myUserId;
 
-  const timerRef = useRef(null);
   const progressIntervalRef = useRef(null);
+  const commentsEndRef = useRef(null);
 
   // Time format helper
   const formatTimeAgo = (dateStr) => {
@@ -56,7 +61,7 @@ const TaleViewerModal = ({
     if (diffMins < 60) return `${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    return 'Expired soon';
+    return '1d ago';
   };
 
   // Mark tale as viewed
@@ -105,13 +110,19 @@ const TaleViewerModal = ({
     if (currentTale?._id) {
       markTaleViewed(currentTale._id);
       setProgress(0);
-      setHasReacted(null);
+      setLocalComments(currentTale.comments || []);
+      setLocalReactions(currentTale.reactions || []);
+
+      const existingReaction = currentTale.reactions?.find(
+        (r) => String(r.userId?._id || r.userId) === myUserId
+      );
+      setHasReacted(existingReaction ? existingReaction.reaction : null);
     }
-  }, [currentTale?._id, markTaleViewed]);
+  }, [currentTale?._id, markTaleViewed, myUserId]);
 
   // Auto-advancement timer & progress animation
   useEffect(() => {
-    if (isPaused || showViewersModal) {
+    if (isPaused || showViewersModal || showCommentsModal) {
       clearInterval(progressIntervalRef.current);
       return;
     }
@@ -131,11 +142,12 @@ const TaleViewerModal = ({
     }, intervalStep);
 
     return () => clearInterval(progressIntervalRef.current);
-  }, [isPaused, showViewersModal, handleNext]);
+  }, [isPaused, showViewersModal, showCommentsModal, handleNext]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (showCommentsModal || showViewersModal) return;
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
       if (e.key === 'Escape') onClose();
@@ -146,14 +158,21 @@ const TaleViewerModal = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handlePrev, onClose]);
+  }, [handleNext, handlePrev, onClose, showCommentsModal, showViewersModal]);
 
   // Send Reaction
   const handleReaction = async (reactionEmoji) => {
     if (!token || !currentTale?._id) return;
     setHasReacted(reactionEmoji);
+
+    // Optimistic reaction update
+    setLocalReactions((prev) => {
+      const filtered = prev.filter((r) => String(r.userId?._id || r.userId) !== myUserId);
+      return [...filtered, { userId: user || profile, reaction: reactionEmoji, createdAt: new Date() }];
+    });
+
     try {
-      await fetch(buildApiUrl(`/tales/${currentTale._id}/react`), {
+      const response = await fetch(buildApiUrl(`/tales/${currentTale._id}/react`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,36 +180,45 @@ const TaleViewerModal = ({
         },
         body: JSON.stringify({ reaction: reactionEmoji }),
       });
+      if (response.ok) {
+        const json = await response.json();
+        if (json.reactions) setLocalReactions(json.reactions);
+      }
     } catch (err) {
       console.error('Failed to react to tale', err);
     }
   };
 
-  // Send Reply via DM
-  const handleSendReply = async (e) => {
+  // Submit Comment on Tale (also dispatches DM to author)
+  const handleSubmitComment = async (e) => {
     e.preventDefault();
-    if (!replyText.trim() || !token || !currentTale?._id) return;
+    if (!commentText.trim() || !token || !currentTale?._id) return;
 
-    setIsSendingReply(true);
+    setIsSubmittingComment(true);
     try {
-      const response = await fetch(buildApiUrl(`/tales/${currentTale._id}/reply`), {
+      const response = await fetch(buildApiUrl(`/tales/${currentTale._id}/comment`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: replyText.trim() }),
+        body: JSON.stringify({ content: commentText.trim() }),
       });
 
       if (response.ok) {
-        setReplyFeedback('Message sent! 💬');
-        setReplyText('');
-        setTimeout(() => setReplyFeedback(''), 2500);
+        const data = await response.json();
+        if (data.comments) {
+          setLocalComments(data.comments);
+        }
+        setCommentText('');
+        setTimeout(() => {
+          commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       }
     } catch (err) {
-      console.error('Failed to send reply', err);
+      console.error('Failed to post comment on tale', err);
     } finally {
-      setIsSendingReply(false);
+      setIsSubmittingComment(false);
     }
   };
 
@@ -207,6 +235,14 @@ const TaleViewerModal = ({
     } catch (err) {
       console.error('Failed to delete tale', err);
     }
+  };
+
+  // Find reaction for a specific viewer
+  const getViewerReaction = (viewerUserId) => {
+    if (!viewerUserId) return null;
+    const vId = String(viewerUserId._id || viewerUserId);
+    const match = localReactions.find((r) => String(r.userId?._id || r.userId) === vId);
+    return match ? match.reaction : null;
   };
 
   if (!currentGroup || !currentTale) return null;
@@ -349,56 +385,245 @@ const TaleViewerModal = ({
           )}
         </div>
 
-        {/* STORY FOOTER (REACTIONS & DM REPLY OR VIEWERS COUNT) */}
+        {/* STORY FOOTER: REACTIONS BAR & COMMENTS CONTROLS */}
         <div className="talePlayerFooter">
-          {isMyTale ? (
-            <div className="myTaleFooterControls">
+          {/* Quick Reactions Bar */}
+          <div className="taleReactionsBar">
+            {REACTION_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                className={`taleReactionBtn ${hasReacted === emoji ? 'reacted' : ''}`}
+                onClick={() => handleReaction(emoji)}
+                title={`React ${emoji}`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+
+          {/* Bottom Actions Row */}
+          <div className="taleFooterActionsRow">
+            {isMyTale && (
               <button
                 type="button"
-                className="viewersCountBtn"
-                onClick={() => setShowViewersModal(true)}
+                className="taleFooterPillBtn"
+                onClick={() => {
+                  setShowCommentsModal(false);
+                  setShowViewersModal(true);
+                }}
               >
-                <FaEye /> <span>Seen by {currentTale.viewers?.length || 0} viewers</span>
+                <FaEye /> <span>{currentTale.viewers?.length || 0} Viewers</span>
               </button>
-            </div>
-          ) : (
-            <div className="networkTaleFooterControls">
-              {/* Quick Reactions Bar */}
-              <div className="taleReactionsBar">
-                {REACTION_EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    className={`taleReactionBtn ${hasReacted === emoji ? 'reacted' : ''}`}
-                    onClick={() => handleReaction(emoji)}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+            )}
+
+            <button
+              type="button"
+              className="taleFooterPillBtn commentsPillBtn"
+              onClick={() => {
+                setShowViewersModal(false);
+                setShowCommentsModal(true);
+              }}
+            >
+              <FaComments /> <span>{localComments.length} Comments</span>
+            </button>
+          </div>
+
+          {/* Quick Comment Input */}
+          <form className="taleQuickCommentForm" onSubmit={handleSubmitComment}>
+            <input
+              type="text"
+              placeholder={`Comment on ${currentGroup.userName}'s Tale...`}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="sendTaleCommentBtn"
+              disabled={!commentText.trim() || isSubmittingComment}
+              title="Post comment"
+            >
+              <FaPaperPlane />
+            </button>
+          </form>
+        </div>
+
+        {/* 1. VIEWERS MODAL (CONTAINED INSIDE STORY CARD) */}
+        {showViewersModal && (
+          <div className="taleInnerDrawerOverlay" onClick={() => setShowViewersModal(false)}>
+            <div className="taleInnerDrawerCard animateDrawerIn" onClick={(e) => e.stopPropagation()}>
+              <div className="taleDrawerHeader">
+                <div className="drawerHeaderTitle">
+                  <FaEye color="#0a66c2" />
+                  <h4>Tale Viewers ({currentTale.viewers?.length || 0})</h4>
+                </div>
+                <button type="button" className="closeDrawerBtn" onClick={() => setShowViewersModal(false)}>
+                  <FaTimes />
+                </button>
               </div>
 
-              {/* Reply Input Form */}
-              <form className="taleReplyForm" onSubmit={handleSendReply}>
+              <div className="taleDrawerScrollableList">
+                {currentTale.viewers && currentTale.viewers.length > 0 ? (
+                  currentTale.viewers.map((v, idx) => {
+                    const viewerReaction = getViewerReaction(v.userId);
+                    const viewerName = getUserFullName(v.userId) || 'Arcturus Member';
+                    const viewerUsername = v.userId?.username || '';
+                    const profileLink = viewerUsername ? `/profile/${encodeURIComponent(viewerUsername)}` : null;
+
+                    return (
+                      <div key={idx} className="taleViewerRow">
+                        <div className="viewerAvatarWrap">
+                          {profileLink ? (
+                            <Link to={profileLink} onClick={onClose}>
+                              {v.userId?.profilePicture?.url ? (
+                                <img src={v.userId.profilePicture.url} alt={viewerName} className="taleViewerAvatar" />
+                              ) : (
+                                <CgProfile className="taleViewerAvatar fallback" />
+                              )}
+                            </Link>
+                          ) : (
+                            v.userId?.profilePicture?.url ? (
+                              <img src={v.userId.profilePicture.url} alt={viewerName} className="taleViewerAvatar" />
+                            ) : (
+                              <CgProfile className="taleViewerAvatar fallback" />
+                            )
+                          )}
+                          {viewerReaction && (
+                            <span className="viewerReactionFloatBadge" title={`Reacted ${viewerReaction}`}>
+                              {viewerReaction}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="taleViewerInfo">
+                          {profileLink ? (
+                            <Link to={profileLink} onClick={onClose} className="viewerNameLink">
+                              <strong>{viewerName}</strong>
+                            </Link>
+                          ) : (
+                            <strong>{viewerName}</strong>
+                          )}
+                          <span className="viewerTimeMeta">{formatTimeAgo(v.viewedAt)}</span>
+                        </div>
+
+                        {viewerReaction && (
+                          <div className="viewerReactionBadgePill">
+                            <span>{viewerReaction}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="emptyDrawerNotice">No views yet. Share with your network!</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2. COMMENTS MODAL (CONTAINED INSIDE STORY CARD) */}
+        {showCommentsModal && (
+          <div className="taleInnerDrawerOverlay" onClick={() => setShowCommentsModal(false)}>
+            <div className="taleInnerDrawerCard animateDrawerIn" onClick={(e) => e.stopPropagation()}>
+              <div className="taleDrawerHeader">
+                <div className="drawerHeaderTitle">
+                  <FaRegCommentDots color="#0a66c2" />
+                  <h4>Tale Comments ({localComments.length})</h4>
+                </div>
+                <button type="button" className="closeDrawerBtn" onClick={() => setShowCommentsModal(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              {/* EMBEDDED TALE CARD PREVIEW */}
+              <div className="embeddedTaleSnippetCard">
+                <div
+                  className="embeddedTaleSnippetThumbnail"
+                  style={{
+                    background: currentTale.background || 'linear-gradient(135deg, #0a66c2, #004182)',
+                  }}
+                >
+                  {currentTale.media?.url ? (
+                    <img src={currentTale.media.url} alt="Tale Preview" className="embeddedThumbImg" />
+                  ) : (
+                    <span className="embeddedTextInitial">📖</span>
+                  )}
+                </div>
+                <div className="embeddedTaleSnippetMeta">
+                  <span className="embeddedTaleAuthorTag">Replying to {currentGroup.userName}'s Tale</span>
+                  <p className="embeddedTaleText">{currentTale.text || currentTale.caption || 'Media story'}</p>
+                </div>
+              </div>
+
+              {/* COMMENTS LIST */}
+              <div className="taleDrawerScrollableList">
+                {localComments && localComments.length > 0 ? (
+                  localComments.map((c, idx) => {
+                    const commenterName = getUserFullName(c.userId) || 'Member';
+                    const commenterUsername = c.userId?.username || '';
+                    const profileLink = commenterUsername ? `/profile/${encodeURIComponent(commenterUsername)}` : null;
+
+                    return (
+                      <div key={idx} className="taleCommentRow">
+                        {profileLink ? (
+                          <Link to={profileLink} onClick={onClose} style={{ flexShrink: 0 }}>
+                            {c.userId?.profilePicture?.url ? (
+                              <img src={c.userId.profilePicture.url} alt={commenterName} className="taleCommentAvatar" />
+                            ) : (
+                              <CgProfile className="taleCommentAvatar fallback" />
+                            )}
+                          </Link>
+                        ) : (
+                          c.userId?.profilePicture?.url ? (
+                            <img src={c.userId.profilePicture.url} alt={commenterName} className="taleCommentAvatar" />
+                          ) : (
+                            <CgProfile className="taleCommentAvatar fallback" />
+                          )
+                        )}
+
+                        <div className="taleCommentBubble">
+                          <div className="taleCommentBubbleHeader">
+                            {profileLink ? (
+                              <Link to={profileLink} onClick={onClose} className="commentAuthorLink">
+                                <strong>{commenterName}</strong>
+                              </Link>
+                            ) : (
+                              <strong>{commenterName}</strong>
+                            )}
+                            <span>{formatTimeAgo(c.createdAt)}</span>
+                          </div>
+                          <p className="taleCommentTextContent">{c.content}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="emptyDrawerNotice">No comments yet. Be the first to start the conversation!</div>
+                )}
+                <div ref={commentsEndRef} />
+              </div>
+
+              {/* DRAWER COMMENT INPUT */}
+              <form className="taleDrawerInputForm" onSubmit={handleSubmitComment}>
                 <input
                   type="text"
-                  placeholder={`Reply to ${currentGroup.userName}...`}
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Write a comment..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  autoFocus
                 />
                 <button
                   type="submit"
-                  className="sendReplyBtn"
-                  disabled={!replyText.trim() || isSendingReply}
-                  title="Send message"
+                  className="sendDrawerCommentBtn"
+                  disabled={!commentText.trim() || isSubmittingComment}
                 >
                   <FaPaperPlane />
                 </button>
               </form>
-
-              {replyFeedback && <span className="replyFeedbackText">{replyFeedback}</span>}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* NEXT GROUP BUTTON */}
@@ -412,47 +637,8 @@ const TaleViewerModal = ({
           <FaChevronRight />
         </button>
       )}
-
-      {/* VIEWERS MODAL (FOR AUTHOR) */}
-      {showViewersModal && (
-        <div className="viewersSheetOverlay" onClick={() => setShowViewersModal(false)}>
-          <div className="viewersSheetCard" onClick={(e) => e.stopPropagation()}>
-            <div className="viewersSheetHeader">
-              <h4>Tale Viewers ({currentTale.viewers?.length || 0})</h4>
-              <button type="button" className="closeSheetBtn" onClick={() => setShowViewersModal(false)}>
-                <FaTimes />
-              </button>
-            </div>
-
-            <div className="viewersList">
-              {currentTale.viewers && currentTale.viewers.length > 0 ? (
-                currentTale.viewers.map((v, idx) => (
-                  <div key={idx} className="viewerItem">
-                    {v.userId?.profilePicture?.url ? (
-                      <img src={v.userId.profilePicture.url} alt="Viewer" className="viewerAvatar" />
-                    ) : (
-                      <CgProfile className="viewerAvatar fallback" />
-                    )}
-                    <div className="viewerInfo">
-                      <strong>
-                        {v.userId?.firstName
-                          ? `${v.userId.firstName} ${v.userId.lastName}`
-                          : v.userId?.name || 'Member'}
-                      </strong>
-                      <span>{formatTimeAgo(v.viewedAt)}</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="emptyViewersNotice">No views yet. Share with your network!</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default TaleViewerModal;
-

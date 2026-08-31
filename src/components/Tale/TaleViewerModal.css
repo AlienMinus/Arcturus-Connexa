@@ -132,14 +132,14 @@
 }
 
 .taleAuthorMeta strong {
-  color: #ffffff;
+  color: #ffffff !important;
   font-size: 0.9rem;
   font-weight: 700;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .taleAuthorMeta span {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85) !important;
   font-size: 0.72rem;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
@@ -270,56 +270,27 @@
 /* Footer Section */
 .talePlayerFooter {
   position: relative;
-  padding: 12px 14px;
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   z-index: 2550;
-}
-
-/* My Tale Viewers Button */
-.myTaleFooterControls {
-  display: flex;
-  justify-content: center;
-}
-
-.viewersCountBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.viewersCountBtn:hover {
-  background: rgba(255, 255, 255, 0.28);
-  transform: translateY(-1px);
-}
-
-/* Network Tale Footer (Reactions & DM Reply) */
-.networkTaleFooterControls {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+/* Reactions Bar */
 .taleReactionsBar {
   display: flex;
   justify-content: space-around;
-  padding-bottom: 4px;
+  padding: 2px 0;
 }
 
 .taleReactionBtn {
   background: transparent;
   border: none;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -333,32 +304,412 @@
   filter: drop-shadow(0 0 6px #0a66c2);
 }
 
-.taleReplyForm {
+/* Footer Pill Actions Row */
+.taleFooterActionsRow {
   display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.taleFooterPillBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff !important;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.taleFooterPillBtn:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: #0a66c2;
+  transform: translateY(-1px);
+}
+
+.taleFooterPillBtn.commentsPillBtn {
+  background: rgba(10, 102, 194, 0.25);
+  border-color: rgba(10, 102, 194, 0.45);
+}
+
+/* Quick Comment Input Form in Footer */
+.taleQuickCommentForm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.taleQuickCommentForm input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 20px;
+  padding: 8px 14px;
+  color: #ffffff !important;
+  font-size: 0.82rem;
+  outline: none;
+  transition: border 0.15s ease;
+}
+
+.taleQuickCommentForm input::placeholder {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.taleQuickCommentForm input:focus {
+  border-color: #0a66c2;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sendTaleCommentBtn {
+  background: #0a66c2;
+  border: none;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sendTaleCommentBtn:hover:not(:disabled) {
+  background: #004182;
+  transform: scale(1.08);
+}
+
+.sendTaleCommentBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   CONTAINED INNER DRAWERS (VIEWERS & COMMENTS)
+========================================================= */
+.taleInnerDrawerOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 15, 29, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  z-index: 2600;
+  border-radius: 16px;
+  animation: fadeInDrawer 0.18s ease-out;
+}
+
+@keyframes fadeInDrawer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.taleInnerDrawerCard {
+  width: 100%;
+  max-height: 78%;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+  animation: slideUpDrawer 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpDrawer {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.taleDrawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.drawerHeaderTitle {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.taleReplyForm input {
+.drawerHeaderTitle h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.closeDrawerBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.closeDrawerBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Semi-blurred Rounded Corner Embedded Tale Snippet Card */
+.embeddedTaleSnippetCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.embeddedTaleSnippetThumbnail {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.embeddedThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.embeddedTextInitial {
+  font-size: 16px;
+}
+
+.embeddedTaleSnippetMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.embeddedTaleAuthorTag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0a66c2;
+}
+
+.embeddedTaleText {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Drawer Scrollable Content List */
+.taleDrawerScrollableList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 250px;
+  padding-right: 4px;
+}
+
+/* Viewers Row */
+.taleViewerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.viewerAvatarWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.taleViewerAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.taleViewerAvatar.fallback {
+  font-size: 36px;
+  color: #94a3b8;
+}
+
+.viewerReactionFloatBadge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 13px;
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 1px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  line-height: 1;
+}
+
+.taleViewerInfo {
   flex: 1;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.viewerNameLink {
+  text-decoration: none;
+}
+
+.viewerNameLink strong,
+.taleViewerInfo strong {
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+.viewerNameLink:hover strong {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.viewerTimeMeta {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.viewerReactionBadgePill {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Comment Row */
+.taleCommentRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.taleCommentAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.taleCommentAvatar.fallback {
+  font-size: 32px;
+  color: #94a3b8;
+}
+
+.taleCommentBubble {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.taleCommentBubbleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.commentAuthorLink {
+  text-decoration: none;
+}
+
+.commentAuthorLink strong,
+.taleCommentBubbleHeader strong {
+  font-size: 0.82rem;
+  color: #0f172a;
+}
+
+.commentAuthorLink:hover strong {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.taleCommentBubbleHeader span {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.taleCommentTextContent {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.emptyDrawerNotice {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #64748b;
+  padding: 20px 10px;
+}
+
+/* Drawer Input Form */
+.taleDrawerInputForm {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+}
+
+.taleDrawerInputForm input {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
   border-radius: 20px;
   padding: 8px 14px;
-  color: #ffffff;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  color: #0f172a;
   outline: none;
 }
 
-.taleReplyForm input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.taleReplyForm input:focus {
+.taleDrawerInputForm input:focus {
   border-color: #0a66c2;
-  background: rgba(255, 255, 255, 0.22);
+  background: #ffffff;
 }
 
-.sendReplyBtn {
+.sendDrawerCommentBtn {
   background: #0a66c2;
   border: none;
   color: #ffffff;
@@ -369,130 +720,15 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.sendReplyBtn:hover:not(:disabled) {
+.sendDrawerCommentBtn:hover:not(:disabled) {
   background: #004182;
+  transform: scale(1.08);
 }
 
-.sendReplyBtn:disabled {
-  opacity: 0.5;
+.sendDrawerCommentBtn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
-
-.replyFeedbackText {
-  text-align: center;
-  font-size: 0.75rem;
-  color: #38bdf8;
-  font-weight: 600;
-}
-
-/* Viewers Sheet (Modal inside Viewer) */
-.viewersSheetOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: flex-end;
-  z-index: 2600;
-  animation: fadeInSheet 0.15s ease-out;
-}
-
-@keyframes fadeInSheet {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.viewersSheetCard {
-  width: 100%;
-  max-height: 60%;
-  background: #ffffff;
-  border-radius: 16px 16px 0 0;
-  padding: 16px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  animation: slideUpSheet 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slideUpSheet {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-.viewersSheetHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 8px;
-}
-
-.viewersSheetHeader h4 {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #0f172a;
-}
-
-.closeSheetBtn {
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.viewersList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
-  max-height: 220px;
-}
-
-.viewerItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.viewerAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.viewerAvatar.fallback {
-  font-size: 32px;
-  color: #94a3b8;
-}
-
-.viewerInfo {
-  display: flex;
-  flex-direction: column;
-}
-
-.viewerInfo strong {
-  font-size: 0.85rem;
-  color: #0f172a;
-}
-
-.viewerInfo span {
-  font-size: 0.72rem;
-  color: #64748b;
-}
-
-.emptyViewersNotice {
-  text-align: center;
-  font-size: 0.8rem;
-  color: #64748b;
-  padding: 16px;
-}
-

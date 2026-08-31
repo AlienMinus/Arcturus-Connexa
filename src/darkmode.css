@@ -2394,7 +2394,90 @@ body.dark-mode .taleCaptionOverlay p {
   color: #ffffff !important;
 }
 
-[data-theme="dark"] .taleReplyForm input,
-body.dark-mode .taleReplyForm input {
-  color: #ffffff !important;
+[data-theme="dark"] .taleInnerDrawerCard,
+body.dark-mode .taleInnerDrawerCard {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .taleDrawerHeader,
+body.dark-mode .taleDrawerHeader,
+[data-theme="dark"] .taleDrawerInputForm,
+body.dark-mode .taleDrawerInputForm {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .drawerHeaderTitle h4,
+body.dark-mode .drawerHeaderTitle h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .closeDrawerBtn,
+body.dark-mode .closeDrawerBtn {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .closeDrawerBtn:hover,
+body.dark-mode .closeDrawerBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .embeddedTaleSnippetCard,
+body.dark-mode .embeddedTaleSnippetCard {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .embeddedTaleText,
+body.dark-mode .embeddedTaleText {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .viewerNameLink strong,
+body.dark-mode .viewerNameLink strong,
+[data-theme="dark"] .taleViewerInfo strong,
+body.dark-mode .taleViewerInfo strong {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .viewerReactionBadgePill,
+body.dark-mode .viewerReactionBadgePill {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .taleCommentBubble,
+body.dark-mode .taleCommentBubble {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .commentAuthorLink strong,
+body.dark-mode .commentAuthorLink strong,
+[data-theme="dark"] .taleCommentBubbleHeader strong,
+body.dark-mode .taleCommentBubbleHeader strong {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .taleCommentTextContent,
+body.dark-mode .taleCommentTextContent {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .taleDrawerInputForm input,
+body.dark-mode .taleDrawerInputForm input {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .taleDrawerInputForm input:focus,
+body.dark-mode .taleDrawerInputForm input:focus {
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .emptyDrawerNotice,
+body.dark-mode .emptyDrawerNotice {
+  color: #94a3b8 !important;
 }

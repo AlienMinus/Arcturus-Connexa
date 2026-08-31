@@ -1413,14 +1413,51 @@
   }
 }
 
-/* Larger touch targets for interactive elements on mobile */
 @media (hover: none) and (pointer: coarse) {
   .actionOption,
   .postOption,
   .navItem,
-  .linkItem,
-  .conversationItem,
-  .notificationItem {
-    min-height: 44px;
+  .quickActionBtn,
+  .panelTabBtn,
+  .taleReactionBtn,
+  .taleFooterPillBtn,
+  .sendTaleCommentBtn {
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+}
+
+/* ==========================================================================
+   TALE VIEWER MOBILE RESPONSIVENESS
+   ========================================================================== */
+@media (max-width: 768px) {
+  .taleViewerOverlay {
+    padding: 0;
+  }
+
+  .taleNavSideBtn {
+    display: none; /* Rely on tap left/right on mobile */
+  }
+
+  .talePlayerCard {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .taleInnerDrawerOverlay {
+    border-radius: 0;
+  }
+
+  .taleInnerDrawerCard {
+    max-height: 85%;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .talePlayerFooter {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
 }
