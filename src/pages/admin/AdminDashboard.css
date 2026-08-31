@@ -49,6 +49,8 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
 .adminHeaderTitleRow {
