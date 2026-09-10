@@ -200,6 +200,20 @@ router.get('/my', authMiddleware, async (req, res) => {
       .lean();
 
     res.json({ organizations });
+    const withJobCounts = await Promise.all(
+      organizations.map(async (org) => {
+        const activeJobsCount = await Job.countDocuments({
+          organizationId: org._id,
+          isActive: true,
+        });
+        return {
+          ...org,
+          activeJobsCount,
+        };
+      })
+    );
+
+    res.json({ organizations: withJobCounts });
   } catch (err) {
     console.error('Failed to fetch user organizations:', err);
     res.status(500).json({ error: 'Failed to retrieve your organizations' });

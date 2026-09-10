@@ -60,6 +60,16 @@ const ProfileCard = () => {
         <p className="organization">
           <FaUniversity />&nbsp;{profile?.headline || ''}
         </p>
+        {profile?.location && (
+          <p className="location">
+            <FaMapMarkerAlt />&nbsp;{profile.location}
+          </p>
+        )}
+        {(profile?.organization?.name || profile?.experience?.[0]?.subtitle || profile?.experience?.[0]?.title) && (
+          <p className="organization">
+            <FaUniversity />&nbsp;{profile?.organization?.name || profile?.experience?.[0]?.subtitle || profile?.experience?.[0]?.title}
+          </p>
+        )}
       </div>
     </div>
   );

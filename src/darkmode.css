@@ -2580,3 +2580,79 @@ body.dark-mode .networkEmptyIcon {
   color: var(--text-secondary, #94a3b8) !important;
 }
 
+/* CompanyCard Dark Mode */
+[data-theme="dark"] .companyName,
+body.dark-mode .companyName {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .companyTagline,
+body.dark-mode .companyTagline {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .companyStats,
+body.dark-mode .companyStats {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .companyStats div,
+body.dark-mode .companyStats div {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .companyStats div b,
+body.dark-mode .companyStats div b {
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .companyLogo,
+body.dark-mode .companyLogo {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .companyLogoFallback,
+body.dark-mode .companyLogoFallback {
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+[data-theme="dark"] .orgVerifiedBadge,
+body.dark-mode .orgVerifiedBadge {
+  background: rgba(22, 163, 74, 0.25) !important;
+  color: #4ade80 !important;
+  border-color: rgba(74, 222, 128, 0.3) !important;
+}
+
+[data-theme="dark"] .orgPendingBadge,
+body.dark-mode .orgPendingBadge {
+  background: rgba(234, 179, 8, 0.25) !important;
+  color: #facc15 !important;
+  border-color: rgba(250, 204, 21, 0.3) !important;
+}
+
+[data-theme="dark"] .companyActionBtn,
+body.dark-mode .companyActionBtn {
+  background: #334155 !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .companyActionBtn:hover,
+body.dark-mode .companyActionBtn:hover {
+  background: #475569 !important;
+}
+
+[data-theme="dark"] .companySecondaryBtn,
+body.dark-mode .companySecondaryBtn {
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .companySecondaryBtn:hover,
+body.dark-mode .companySecondaryBtn:hover {
+  background: rgba(56, 189, 248, 0.12) !important;
+}
+
+

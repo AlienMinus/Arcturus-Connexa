@@ -4,6 +4,7 @@ import cloudinary from '../utils/cloudinary.js';
 import Profile from '../models/Profile.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
+import Organization from '../models/Organization.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -129,6 +130,28 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
     profileData.nextUsernameChangeDate = null;
   }
 
+  const orgs = (targetUser.organizations || [])
+    .map((org) => {
+      if (typeof org === 'object' && org?.name) {
+        return {
+          id: org._id,
+          _id: org._id,
+          name: org.name,
+          slug: org.slug,
+          logo: org.logo,
+          industry: org.industry,
+          organizationSize: org.organizationSize,
+          status: org.status,
+          tagline: org.tagline,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  profileData.organizations = orgs;
+  profileData.organization = orgs.find((o) => o.status === 'approved') || orgs[0] || null;
+
   return profileData;
 };
 
@@ -140,6 +163,8 @@ const populateProfileUser = async (userId) =>
     .populate('connections', 'firstName middleName lastName username headline profilePicture')
     .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
     .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
+    .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture')
+    .populate('organizations', 'name slug logo industry organizationSize status tagline description website location');
 
 const createDefaultProfileForUser = async (user) => {
   const profile = new Profile({
@@ -306,6 +331,8 @@ router.get('/:username', authMiddleware, async (req, res) => {
       .populate('connections', 'firstName middleName lastName username headline profilePicture')
       .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
       .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
+      .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture')
+      .populate('organizations', 'name slug logo industry organizationSize status tagline description website location');
 
     if (!targetUser) {
       return res.status(404).json({ error: 'Profile not found' });
