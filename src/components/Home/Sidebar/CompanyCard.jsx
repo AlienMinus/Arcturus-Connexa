@@ -1,4 +1,3 @@
-import React from "react";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBuilding, FaCheckCircle, FaClock, FaPlus, FaBriefcase, FaCog } from "react-icons/fa";
@@ -7,32 +6,20 @@ import { useProfile } from "../../../context/ProfileContext";
 import { buildApiUrl } from "../../../utils/api";
 
 const CompanyCard = () => {
-  return (
-    <div className="card companyCard">
   const { token } = useAuth();
   const { profile } = useProfile();
   const [org, setOrg] = useState(null);
   const [loading, setLoading] = useState(true);
 
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/5968/5968705.png"
-        className="companyLogo"
-        alt=""
-      />
   useEffect(() => {
     let isMounted = true;
 
-      <h4>Aerial.Vue Corporation</h4>
     const fetchUserOrg = async () => {
       // 1. If profile context already has the populated organization, use it immediately
       if (profile?.organization) {
         setOrg(profile.organization);
       }
 
-      <div className="companyStats">
-        <div>
-          <span>Activity</span>
-          <b>0</b>
       // 2. Query /organizations/my to get full details including activeJobsCount
       if (!token) {
         setLoading(false);
@@ -80,9 +67,6 @@ const CompanyCard = () => {
     );
   }
 
-        <div>
-          <span>Page visitors</span>
-          <b>0</b>
   // CASE A: User HAS an associated organization (e.g. Arcturus Connexa)
   if (org) {
     const isVerified = org.status === 'approved';
@@ -144,7 +128,6 @@ const CompanyCard = () => {
     );
   }
 
-      <button className="btn">Try Premium Page</button>
   // CASE B: User has NO organization registered yet -> Show inviting CTA to create one
   return (
     <div className="card companyCard">
@@ -154,9 +137,6 @@ const CompanyCard = () => {
         </div>
       </div>
 
-      <button className="btnOutline">
-        Advertise on Arcturus
-      </button>
       <h4 className="companyName">Create Company Page</h4>
 
       <p className="companyTagline">
