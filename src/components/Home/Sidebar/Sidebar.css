@@ -120,7 +120,6 @@
 }
 
 .companyLogo {
-  width: 50px;
   width: 48px;
   height: 48px;
   object-fit: contain;
@@ -131,8 +130,6 @@
   box-sizing: border-box;
 }
 
-.companyCard h4 {
-  margin-top: 10px;
 .companyLogoFallback {
   width: 48px;
   height: 48px;
