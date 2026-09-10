@@ -54,12 +54,6 @@ const ProfileCard = () => {
           </div>
         </Link>
         <p className="description">{profile?.headline || ''}</p>
-        <p className="location">
-          <FaMapMarkerAlt />&nbsp;{profile?.location || ''}
-        </p>
-        <p className="organization">
-          <FaUniversity />&nbsp;{profile?.headline || ''}
-        </p>
         {profile?.location && (
           <p className="location">
             <FaMapMarkerAlt />&nbsp;{profile.location}
