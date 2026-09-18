@@ -1,0 +1,732 @@
+/* CAMPUSLINK Master Stylesheet */
+.campusLinkWrapper {
+  max-width: 1180px;
+  margin: 24px auto 80px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Toast */
+.campusToast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 12px 22px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  border: 1px solid #334155;
+  animation: slideUpCampus 0.3s ease-out;
+}
+
+@keyframes slideUpCampus {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hero Header Card */
+.campusHeroCard {
+  background: linear-gradient(135deg, #0a66c2 0%, #004182 60%, #1e293b 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 26px 30px;
+  box-shadow: 0 4px 20px rgba(10, 102, 194, 0.18);
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.campusHeroLeft h1 {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.3px;
+}
+
+.campusHeroTagline {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: #e0f2fe;
+  max-width: 620px;
+  line-height: 1.45;
+}
+
+.campusHeroBadges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.campusHeroBadge {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Navigation Tabs Bar */
+.campusTabsCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+  margin-bottom: 22px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.campusTabBtn {
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.campusTabBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.campusTabBtn.active {
+  background: #0a66c2;
+  color: #ffffff;
+}
+
+/* Main Content Panel Card */
+.campusPanel {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 26px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.campusPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+}
+
+.campusPanelHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campusPanelHeader p {
+  margin: 4px 0 0;
+  font-size: 0.86rem;
+  color: #64748b;
+}
+
+/* TAB 1: Analytics KPI Cards */
+.campusKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.campusKpiCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.campusKpiIconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.campusKpiMeta h5 {
+  margin: 0 0 3px;
+  font-size: 0.78rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.campusKpiMeta p {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Analytics Double Column */
+.campusAnalyticsSplit {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 22px;
+  margin-bottom: 26px;
+}
+
+@media (max-width: 900px) {
+  .campusAnalyticsSplit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.campusSubCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.campusSubCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Branch Conversion Progress Bars */
+.branchRow {
+  margin-bottom: 14px;
+}
+
+.branchRowHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 5px;
+}
+
+.branchBarTrack {
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.branchBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #0a66c2, #38bdf8);
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+/* At-Risk Students Table */
+.atRiskStudentCard {
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.atRiskMeta h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #9a3412;
+}
+
+.atRiskMeta p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #c2410c;
+}
+
+.escalateBtn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #ea580c;
+  color: #ffffff;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.escalateBtn:hover {
+  background: #c2410c;
+}
+
+/* TAB 2: Conflict Warning Banner */
+.conflictAlertBanner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 5px solid #ef4444;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+}
+
+.conflictAlertHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.conflictItemBox {
+  background: #ffffff;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.conflictResolveBtn {
+  padding: 6px 14px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.conflictResolveBtn:hover {
+  background: #b91c1c;
+}
+
+/* Drives Grid & Card */
+.drivesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 18px;
+}
+
+.driveCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.driveCard:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.driveCardTop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.driveLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.driveDetailsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 14px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.driveStagesRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.stagePill {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+/* TAB 3: Student Readiness Dial & Dimension Bars */
+.readinessHeaderGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 800px) {
+  .readinessHeaderGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.readinessDialBox {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.readinessScoreCircle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #0a66c2;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.25);
+}
+
+.readinessLevelBadge {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.readinessLevelBadge.highly-employable {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.readinessLevelBadge.ready {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.readinessLevelBadge.developing {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.readinessLevelBadge.not-ready {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Dimension Score Rows */
+.dimensionScoreRow {
+  margin-bottom: 12px;
+}
+
+.dimensionLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.dimensionTrack {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dimensionFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Skill Gap Cards */
+.skillGapCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  background: #ffffff;
+  margin-bottom: 14px;
+}
+
+.skillPillGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.skillPill {
+  font-size: 0.74rem;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.skillPill.matched {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.skillPill.missing {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* TAB 4: Explainable AI Match Pool */
+.candidatePoolCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  transition: all 0.2s;
+}
+
+.candidatePoolCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.explainableBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: #334155;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.explainableBox.eligible {
+  border-left: 3px solid #16a34a;
+}
+
+.explainableBox.ineligible {
+  border-left: 3px solid #dc2626;
+}
+
+/* TAB 5: Offers Table */
+.offerRowCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  background: #ffffff;
+}
+
+.hashBadge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+}
+
+/* TAB 6: Chatbot Interface */
+.campusChatWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.campusChatMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chatMsg {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.chatMsg.assistant {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-bottom-left-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.chatMsg.user {
+  align-self: flex-end;
+  background: #0a66c2;
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+.chatQuickPrompts {
+  padding: 10px 20px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.quickPromptChip {
+  padding: 5px 12px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.quickPromptChip:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.chatInputBar {
+  display: flex;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  gap: 10px;
+}
+
+.chatInput {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  background: #f8fafc;
+}
+
+.chatInput:focus {
+  border-color: #0a66c2;
+  background: #ffffff;
+}
+
+.chatSendBtn {
+  padding: 10px 20px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chatSendBtn:hover {
+  background: #084e96;
+}
+

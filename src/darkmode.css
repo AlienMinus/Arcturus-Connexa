@@ -2655,4 +2655,323 @@ body.dark-mode .companySecondaryBtn:hover {
   background: rgba(56, 189, 248, 0.12) !important;
 }
 
+/* ==========================================================================
+   19. SEARCH DROPDOWN & RESULTS PAGE (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .searchResults,
+body.dark-mode .searchResults {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .searchSectionHeader,
+body.dark-mode .searchSectionHeader,
+[data-theme="dark"] .searchSeeAllFooter,
+body.dark-mode .searchSeeAllFooter {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .searchSection,
+body.dark-mode .searchSection {
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .searchResultItem:hover,
+body.dark-mode .searchResultItem:hover,
+[data-theme="dark"] .searchSeeAllFooter:hover,
+body.dark-mode .searchSeeAllFooter:hover {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .searchOrgName,
+body.dark-mode .searchOrgName,
+[data-theme="dark"] .searchUserName,
+body.dark-mode .searchUserName,
+[data-theme="dark"] .searchJobTitle,
+body.dark-mode .searchJobTitle {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .searchOrgMeta,
+body.dark-mode .searchOrgMeta,
+[data-theme="dark"] .searchUserHeadline,
+body.dark-mode .searchUserHeadline,
+[data-theme="dark"] .searchJobMeta,
+body.dark-mode .searchJobMeta {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .searchHeaderCard,
+body.dark-mode .searchHeaderCard,
+[data-theme="dark"] .searchResultsBlock,
+body.dark-mode .searchResultsBlock,
+[data-theme="dark"] .searchZeroState,
+body.dark-mode .searchZeroState,
+[data-theme="dark"] .searchOrgCard,
+body.dark-mode .searchOrgCard,
+[data-theme="dark"] .searchUserCard,
+body.dark-mode .searchUserCard,
+[data-theme="dark"] .searchJobCard,
+body.dark-mode .searchJobCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .searchHeaderTitle,
+body.dark-mode .searchHeaderTitle,
+[data-theme="dark"] .searchResultsBlockTitle,
+body.dark-mode .searchResultsBlockTitle,
+[data-theme="dark"] .searchOrgCardName,
+body.dark-mode .searchOrgCardName,
+[data-theme="dark"] .searchUserCardName,
+body.dark-mode .searchUserCardName,
+[data-theme="dark"] .searchJobCardTitle,
+body.dark-mode .searchJobCardTitle,
+[data-theme="dark"] .searchZeroState h3,
+body.dark-mode .searchZeroState h3 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .searchHeaderInput,
+body.dark-mode .searchHeaderInput {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .searchTabBtn,
+body.dark-mode .searchTabBtn {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .searchTabBtn.active,
+body.dark-mode .searchTabBtn.active {
+  background: #0a66c2 !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   20. COMPANY PROFILE PAGE (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .companyHeroCard,
+body.dark-mode .companyHeroCard,
+[data-theme="dark"] .companyTabsCard,
+body.dark-mode .companyTabsCard,
+[data-theme="dark"] .companyTabSection,
+body.dark-mode .companyTabSection,
+[data-theme="dark"] .companyJobItemCard,
+body.dark-mode .companyJobItemCard,
+[data-theme="dark"] .companyMemberCard,
+body.dark-mode .companyMemberCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .companyMainTitle,
+body.dark-mode .companyMainTitle,
+[data-theme="dark"] .companySectionHeading,
+body.dark-mode .companySectionHeading,
+[data-theme="dark"] .companyJobItemTitle,
+body.dark-mode .companyJobItemTitle,
+[data-theme="dark"] .companyDetailItem p,
+body.dark-mode .companyDetailItem p {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .companyHeroTagline,
+body.dark-mode .companyHeroTagline,
+[data-theme="dark"] .companyDescriptionText,
+body.dark-mode .companyDescriptionText,
+[data-theme="dark"] .companyHeroMetaList,
+body.dark-mode .companyHeroMetaList,
+[data-theme="dark"] .companyJobItemMeta,
+body.dark-mode .companyJobItemMeta {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .companyHeroLogo,
+body.dark-mode .companyHeroLogo {
+  border-color: #334155 !important;
+  background: #0f172a !important;
+}
+
+/* ==========================================================================
+   21. CAMPAIGN MANAGER / ADVERTISE (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .advertiseHeaderBar,
+body.dark-mode .advertiseHeaderBar,
+[data-theme="dark"] .adMetricCard,
+body.dark-mode .adMetricCard,
+[data-theme="dark"] .adTableCard,
+body.dark-mode .adTableCard,
+[data-theme="dark"] .adWizardFormCard,
+body.dark-mode .adWizardFormCard,
+[data-theme="dark"] .adLivePreviewCard,
+body.dark-mode .adLivePreviewCard,
+[data-theme="dark"] .mockFeedAd,
+body.dark-mode .mockFeedAd,
+[data-theme="dark"] .mockSidebarAd,
+body.dark-mode .mockSidebarAd {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .advertiseHeaderLeft h1,
+body.dark-mode .advertiseHeaderLeft h1,
+[data-theme="dark"] .adMetricInfo p,
+body.dark-mode .adMetricInfo p,
+[data-theme="dark"] .adTableHeadingRow h2,
+body.dark-mode .adTableHeadingRow h2,
+[data-theme="dark"] .adFormStepTitle,
+body.dark-mode .adFormStepTitle,
+[data-theme="dark"] .adObjectiveTitle,
+body.dark-mode .adObjectiveTitle,
+[data-theme="dark"] .mockFeedHeadline,
+body.dark-mode .mockFeedHeadline,
+[data-theme="dark"] .mockFeedOrgName,
+body.dark-mode .mockFeedOrgName,
+[data-theme="dark"] .mockSidebarAd h4,
+body.dark-mode .mockSidebarAd h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .adInput,
+body.dark-mode .adInput,
+[data-theme="dark"] .adSelect,
+body.dark-mode .adSelect,
+[data-theme="dark"] .adTextarea,
+body.dark-mode .adTextarea {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .adObjectiveCard,
+body.dark-mode .adObjectiveCard,
+[data-theme="dark"] .mockFeedFooter,
+body.dark-mode .mockFeedFooter {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .adObjectiveCard.active,
+body.dark-mode .adObjectiveCard.active {
+  background: rgba(10, 102, 194, 0.2) !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .adTable td,
+body.dark-mode .adTable td {
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .adTable tr:hover td,
+body.dark-mode .adTable tr:hover td {
+  background: #334155 !important;
+}
+
+/* ==========================================================================
+   22. CAMPUSLINK PLACEMENT PLATFORM (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .campusTabsCard,
+body.dark-mode .campusTabsCard,
+[data-theme="dark"] .campusPanel,
+body.dark-mode .campusPanel,
+[data-theme="dark"] .campusSubCard,
+body.dark-mode .campusSubCard,
+[data-theme="dark"] .driveCard,
+body.dark-mode .driveCard,
+[data-theme="dark"] .skillGapCard,
+body.dark-mode .skillGapCard,
+[data-theme="dark"] .candidatePoolCard,
+body.dark-mode .candidatePoolCard,
+[data-theme="dark"] .offerRowCard,
+body.dark-mode .offerRowCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusKpiCard,
+body.dark-mode .campusKpiCard,
+[data-theme="dark"] .readinessDialBox,
+body.dark-mode .readinessDialBox,
+[data-theme="dark"] .driveDetailsRow,
+body.dark-mode .driveDetailsRow,
+[data-theme="dark"] .explainableBox,
+body.dark-mode .explainableBox {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .campusPanelHeader h2,
+body.dark-mode .campusPanelHeader h2,
+[data-theme="dark"] .campusKpiMeta p,
+body.dark-mode .campusKpiMeta p,
+[data-theme="dark"] .campusSubCard h3,
+body.dark-mode .campusSubCard h3,
+[data-theme="dark"] .candidatePoolCard strong,
+body.dark-mode .candidatePoolCard strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusTabBtn,
+body.dark-mode .campusTabBtn {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .campusTabBtn:hover,
+body.dark-mode .campusTabBtn:hover {
+  background: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusTabBtn.active,
+body.dark-mode .campusTabBtn.active {
+  background: #0a66c2 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .campusChatWrapper,
+body.dark-mode .campusChatWrapper,
+[data-theme="dark"] .chatQuickPrompts,
+body.dark-mode .chatQuickPrompts,
+[data-theme="dark"] .chatInputBar,
+body.dark-mode .chatInputBar {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .chatMsg.assistant,
+body.dark-mode .chatMsg.assistant {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .chatInput,
+body.dark-mode .chatInput {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .quickPromptChip,
+body.dark-mode .quickPromptChip {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+
 

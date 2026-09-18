@@ -11,6 +11,9 @@ import jobs from './jobs.js';
 import organizations from './organizations.js';
 import admin from './admin.js';
 import tales from './tales.js';
+import search from './search.js';
+import ads from './ads.js';
+import campuslink from './campuslink.js';
 
 const router = express.Router();
 
@@ -30,5 +33,8 @@ router.use('/jobs', jobs);
 router.use('/organizations', organizations);
 router.use('/admin', admin);
 router.use('/tales', tales);
+router.use('/search', search);
+router.use('/ads', ads);
+router.use('/campuslink', campuslink);
 
 export default router;

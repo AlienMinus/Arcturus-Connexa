@@ -199,7 +199,6 @@ router.get('/my', authMiddleware, async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    res.json({ organizations });
     const withJobCounts = await Promise.all(
       organizations.map(async (org) => {
         const activeJobsCount = await Job.countDocuments({

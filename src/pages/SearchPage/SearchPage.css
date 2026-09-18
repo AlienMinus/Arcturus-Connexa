@@ -1,0 +1,409 @@
+/* Search Results Page Styles */
+.searchPageWrapper {
+  max-width: 1040px;
+  margin: 24px auto 80px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header & Search Bar */
+.searchHeaderCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 20px 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.searchHeaderTitle {
+  margin: 0 0 16px 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.searchHeaderForm {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.searchHeaderInputWrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchHeaderIcon {
+  position: absolute;
+  left: 14px;
+  color: #64748b;
+}
+
+.searchHeaderInput {
+  width: 100%;
+  padding: 11px 16px 11px 40px;
+  font-size: 0.95rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.searchHeaderInput:focus {
+  border-color: #0a66c2;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.15);
+}
+
+.searchHeaderBtn {
+  padding: 11px 22px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.searchHeaderBtn:hover {
+  background: #084e96;
+}
+
+/* Category Filter Tabs */
+.searchTabsBar {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+  overflow-x: auto;
+}
+
+.searchTabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.searchTabBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.searchTabBtn.active {
+  background: #0a66c2;
+  color: #ffffff;
+  border-color: #0a66c2;
+}
+
+.searchTabCount {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.searchTabBtn.active .searchTabCount {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Results Content Area */
+.searchContentArea {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Section Card */
+.searchResultsBlock {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  padding: 20px 24px;
+}
+
+.searchResultsBlockTitle {
+  margin: 0 0 16px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 16px;
+}
+
+/* Organization Result Card */
+.searchOrgCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.searchOrgCard:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.searchOrgCardTop {
+  display: flex;
+  gap: 14px;
+}
+
+.searchOrgCardLogo {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 3px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.searchOrgCardLogoFallback {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.searchOrgCardMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.searchOrgCardNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.searchOrgCardName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.searchOrgCardName:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.searchOrgCardTagline {
+  margin: 4px 0 6px 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.searchOrgCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.searchOrgCardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.searchViewOrgBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #0a66c2;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.searchViewOrgBtn:hover {
+  background: #084e96;
+}
+
+/* User Result Card */
+.searchUserCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.searchUserCard:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.searchUserCardAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.searchUserCardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.searchUserCardName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.searchUserCardName:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.searchUserCardHeadline {
+  margin: 2px 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchUserCardLocation {
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+/* Job Result Card */
+.searchJobCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.searchJobCard:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+  border-color: #cbd5e1;
+}
+
+.searchJobCardTitle {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.searchJobCardTitle:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.searchJobCardCompany {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #0a66c2;
+  margin-top: 2px;
+}
+
+.searchJobCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+/* Empty State */
+.searchZeroState {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.searchZeroIcon {
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.searchZeroState h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.searchZeroState p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+

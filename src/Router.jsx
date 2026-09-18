@@ -15,6 +15,10 @@ import HelpPage from './pages/HelpPage/HelpPage';
 import JobsPage from './pages/JobsPage/JobsPage';
 import JobPostingPage from './pages/JobPostingPage/JobPostingPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import SearchPage from './pages/SearchPage/SearchPage';
+import CompanyPage from './pages/CompanyPage/CompanyPage';
+import AdvertisePage from './pages/AdvertisePage/AdvertisePage';
+import CampusLinkPage from './pages/CampusLink/CampusLinkPage';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
 import BackToTop from './components/common/BackToTop/BackToTop';
 
@@ -34,11 +38,15 @@ function AppRouter() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/campuslink" element={<CampusLinkPage />} />
+                <Route path="/company/:idOrSlug" element={<CompanyPage />} />
+                <Route path="/organization/:idOrSlug" element={<CompanyPage />} />
                 <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/jobs/manage" element={<JobPostingPage />} />
                 <Route path="/jobs/post" element={<JobPostingPage />} />
                 <Route path="/learning" element={<UnderConstruction title="Learning Hub is Under Construction" featureName="Courses & Certifications" />} />
-                <Route path="/advertise" element={<UnderConstruction title="Ad Platform is Under Construction" featureName="Campaigns & Ads" />} />
+                <Route path="/advertise" element={<AdvertisePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/settings/privacy" element={<SettingsPage />} />
                 <Route path="/settings/language" element={<SettingsPage />} />
