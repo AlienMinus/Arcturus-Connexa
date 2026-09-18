@@ -14,7 +14,13 @@ import {
   FaCheckCircle, 
   FaExternalLinkAlt, 
   FaRocket,
-  FaArrowLeft
+  FaArrowLeft,
+  FaPalette,
+  FaCalculator,
+  FaUsers,
+  FaGlobeAmericas,
+  FaFileInvoiceDollar,
+  FaCheck
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -41,7 +47,7 @@ const PRESET_CREATIVES = [
 
 const AdvertisePage = () => {
   const { token, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('campaigns'); // 'campaigns' | 'create'
+  const [activeTab, setActiveTab] = useState('campaigns'); // 'campaigns' | 'create' | 'studio' | 'estimator'
   const [campaigns, setCampaigns] = useState([]);
   const [summary, setSummary] = useState({
     totalImpressions: 0,
@@ -53,6 +59,12 @@ const AdvertisePage = () => {
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [previewType, setPreviewType] = useState('feed'); // 'feed' | 'sidebar'
+
+  // Estimator and Studio State
+  const [estimatorBudget, setEstimatorBudget] = useState(35);
+  const [estimatorIndustry, setEstimatorIndustry] = useState('Technology & Software');
+  const [estimatorLocation, setEstimatorLocation] = useState('Worldwide');
+  const [studioFormat, setStudioFormat] = useState('feed');
 
   // Organizations list for dropdown
   const [userOrgs, setUserOrgs] = useState([]);
@@ -240,6 +252,22 @@ const AdvertisePage = () => {
             onClick={() => setActiveTab('create')}
           >
             <FaPlus size={13} /> Create Campaign
+          </button>
+
+          <button
+            type="button"
+            className={`advertiseTabBtn ${activeTab === 'studio' ? 'active' : ''}`}
+            onClick={() => setActiveTab('studio')}
+          >
+            <FaPalette size={13} /> Ad Creative Studio
+          </button>
+
+          <button
+            type="button"
+            className={`advertiseTabBtn ${activeTab === 'estimator' ? 'active' : ''}`}
+            onClick={() => setActiveTab('estimator')}
+          >
+            <FaCalculator size={13} /> Audience & Budget Estimator
           </button>
         </div>
       </div>
@@ -747,6 +775,342 @@ const AdvertisePage = () => {
                   Audience: {formData.targetIndustry} ({formData.targetLocation})
                 </small>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: AD CREATIVE STUDIO & FORMATS */}
+      {activeTab === 'studio' && (
+        <div className="adStudioWrapper">
+          <div className="adStudioHeader">
+            <h2>
+              <FaPalette color="#0a66c2" /> Ad Creative Studio & Format Showcase
+            </h2>
+            <p>
+              Compare performance benchmarks, preview high-converting ad layouts, and discover optimal specifications for Arcturus sponsored content.
+            </p>
+          </div>
+
+          <div className="studioFormatTabs">
+            {[
+              { id: 'feed', title: 'Sponsored Feed Post', desc: 'Highest engagement in main stream' },
+              { id: 'sidebar', title: 'Right Sidebar Banner', desc: 'Persistent brand recognition' },
+              { id: 'inmail', title: 'Sponsored InMail', desc: 'Direct 1-on-1 personalized delivery' },
+              { id: 'talent', title: 'Organization Follower Ad', desc: 'Drive follower & talent community growth' },
+            ].map((fmt) => (
+              <div
+                key={fmt.id}
+                className={`studioFormatCard ${studioFormat === fmt.id ? 'active' : ''}`}
+                onClick={() => setStudioFormat(fmt.id)}
+              >
+                <strong>{fmt.title}</strong>
+                <span>{fmt.desc}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="studioGrid">
+            {/* Format Live Rendering */}
+            <div className="studioPreviewBox">
+              <div className="studioPreviewBadge">Interactive Format Mockup</div>
+
+              {studioFormat === 'feed' && (
+                <div className="mockFeedAd" style={{ maxWidth: 520, margin: '20px auto' }}>
+                  <div className="mockFeedHeader">
+                    <img
+                      src={formData.organizationLogo}
+                      alt="Logo"
+                      className="mockFeedOrgLogo"
+                    />
+                    <div className="mockFeedOrgMeta">
+                      <div className="mockFeedOrgName">
+                        {formData.organizationName}
+                        <FaCheckCircle size={11} color="#166534" />
+                      </div>
+                      <div className="mockFeedSponsored">Promoted · Single Image Sponsored Content</div>
+                    </div>
+                  </div>
+                  <div className="mockFeedBody">
+                    Discover cutting-edge career opportunities in cloud infrastructure, AI engineering, and distributed systems. Scale your potential with our global technical team.
+                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+                    alt="Creative Preview"
+                    className="mockFeedImage"
+                  />
+                  <div className="mockFeedFooter">
+                    <div className="mockFeedHeadline">Accelerate Your Engineering Career with Arcturus</div>
+                    <button type="button" className="mockFeedCtaBtn">Apply Now</button>
+                  </div>
+                </div>
+              )}
+
+              {studioFormat === 'sidebar' && (
+                <div className="mockSidebarAd" style={{ maxWidth: 300, margin: '40px auto' }}>
+                  <img
+                    src={formData.organizationLogo}
+                    alt="Logo"
+                    className="adLogo"
+                  />
+                  <h4>{formData.organizationName}</h4>
+                  <p>Hiring Senior Cloud Architects & SRE Engineers Worldwide</p>
+                  <button type="button" className="followBtn">Explore Roles</button>
+                </div>
+              )}
+
+              {studioFormat === 'inmail' && (
+                <div className="mockInMailAd">
+                  <div className="inmailHeader">
+                    <img
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                      alt="Talent Partner"
+                      className="inmailSenderAvatar"
+                    />
+                    <div>
+                      <strong>Elena Vance · VP of Global Talent</strong>
+                      <small>Arcturus Connexa Technologies</small>
+                    </div>
+                  </div>
+                  <div className="inmailSubject">Exclusive invitation: Senior Engineering Leadership Roles</div>
+                  <div className="inmailBody">
+                    Hi Alex, I was impressed by your work on distributed systems and microservice resiliency. Our team is expanding our core architecture division and we’d love to speak with you about our open Lead Architect position.
+                  </div>
+                  <button type="button" className="mockFeedCtaBtn" style={{ width: '100%', marginTop: 14 }}>
+                    Schedule Conversation
+                  </button>
+                </div>
+              )}
+
+              {studioFormat === 'talent' && (
+                <div className="mockFollowAd">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <img
+                      src={formData.organizationLogo}
+                      alt="Logo"
+                      style={{ width: 44, height: 44, borderRadius: 8 }}
+                    />
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '0.95rem' }}>{formData.organizationName}</strong>
+                      <span style={{ fontSize: '0.78rem', color: '#64748b' }}>54,200 followers · Technology</span>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '0.86rem', color: '#334155', margin: '0 0 14px' }}>
+                    Follow {formData.organizationName} to get timely industry analysis, engineering blogs, and career openings directly on your feed.
+                  </p>
+                  <button type="button" className="followBtn" style={{ width: '100%' }}>
+                    + Follow Organization
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Specifications & Best Practices */}
+            <div className="studioSpecsCard">
+              <h3>Technical Specifications & Best Practices</h3>
+              <div className="specsList">
+                <div className="specItem">
+                  <strong>Recommended Image Dimensions</strong>
+                  <span>1200 x 627 pixels (1.91:1 ratio for Feed) or 300 x 250 for Sidebar</span>
+                </div>
+                <div className="specItem">
+                  <strong>Headline Character Limit</strong>
+                  <span>Up to 70 characters (recommended 45 for mobile visibility)</span>
+                </div>
+                <div className="specItem">
+                  <strong>Body Copy Guidelines</strong>
+                  <span>Up to 150 characters for highest click-through rate</span>
+                </div>
+                <div className="specItem">
+                  <strong>Accepted File Types</strong>
+                  <span>JPG, PNG, GIF (max file size 5MB)</span>
+                </div>
+                <div className="specItem">
+                  <strong>Average Industry CTR Benchmark</strong>
+                  <span>0.65% - 1.85% across technical and B2B segments</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="adSubmitBtn"
+                style={{ marginTop: 24 }}
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    placement: studioFormat === 'sidebar' ? 'sidebar' : 'feed',
+                  }));
+                  setActiveTab('create');
+                }}
+              >
+                <FaRocket size={14} /> Create Campaign with this Format
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: AUDIENCE & BUDGET ESTIMATOR */}
+      {activeTab === 'estimator' && (
+        <div className="adEstimatorWrapper">
+          <div className="adEstimatorHeader">
+            <h2>
+              <FaCalculator color="#0a66c2" /> Audience Reach & Budget Forecasting Calculator
+            </h2>
+            <p>
+              Simulate expected impressions, clicks, and targeted professional reach based on your daily budget and industry criteria.
+            </p>
+          </div>
+
+          <div className="estimatorGrid">
+            {/* Left Column: Controls */}
+            <div className="estimatorControlsCard">
+              <h3>Campaign Parameters</h3>
+
+              <div className="adFormGroup">
+                <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Daily Budget ($)</span>
+                  <strong style={{ color: '#0a66c2', fontSize: '1.05rem' }}>${estimatorBudget}/day</strong>
+                </label>
+                <input
+                  type="range"
+                  min={10}
+                  max={250}
+                  step={5}
+                  value={estimatorBudget}
+                  onChange={(e) => setEstimatorBudget(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#0a66c2', cursor: 'pointer' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#64748b' }}>
+                  <span>$10/day (Starter)</span>
+                  <span>$100/day (Growth)</span>
+                  <span>$250/day (Scale)</span>
+                </div>
+              </div>
+
+              <div className="adFormGroup" style={{ marginTop: 18 }}>
+                <label>Target Industry</label>
+                <select
+                  className="adSelect"
+                  value={estimatorIndustry}
+                  onChange={(e) => setEstimatorIndustry(e.target.value)}
+                >
+                  <option value="Technology & Software">Technology & Software</option>
+                  <option value="Financial Services">Financial Services</option>
+                  <option value="Healthcare & Biotech">Healthcare & Biotech</option>
+                  <option value="Media & Creative">Media & Creative</option>
+                  <option value="All Industries">All Industries (Broad Reach)</option>
+                </select>
+              </div>
+
+              <div className="adFormGroup">
+                <label>Target Geography</label>
+                <select
+                  className="adSelect"
+                  value={estimatorLocation}
+                  onChange={(e) => setEstimatorLocation(e.target.value)}
+                >
+                  <option value="Worldwide">Worldwide (Global Audience)</option>
+                  <option value="United States & Canada">United States & Canada</option>
+                  <option value="Europe">Europe</option>
+                  <option value="Asia Pacific">Asia Pacific</option>
+                  <option value="Remote Only">Remote Only Professionals</option>
+                </select>
+              </div>
+
+              {/* Mock Corporate Billing Box */}
+              <div className="corporateBillingBox">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <FaFileInvoiceDollar size={20} color="#0a66c2" />
+                  <strong>Arcturus Corporate Invoicing</strong>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.78rem', color: '#475569' }}>
+                  Consolidated monthly billing available for verified enterprise organizations. Standard NET-30 terms apply.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Projected Results */}
+            <div className="estimatorResultsCard">
+              <h3>Forecasted 30-Day Performance</h3>
+
+              <div className="forecastCardsGrid">
+                <div className="forecastCard">
+                  <span className="forecastLabel">Estimated Monthly Reach</span>
+                  <strong className="forecastValue">
+                    {Math.round(estimatorBudget * 620).toLocaleString()}
+                  </strong>
+                  <span className="forecastMeta">Targeted Unique Professionals</span>
+                </div>
+
+                <div className="forecastCard">
+                  <span className="forecastLabel">Monthly Impressions</span>
+                  <strong className="forecastValue">
+                    {(estimatorBudget * 180 * 30).toLocaleString()}
+                  </strong>
+                  <span className="forecastMeta">Estimated Sponsored Views</span>
+                </div>
+
+                <div className="forecastCard">
+                  <span className="forecastLabel">Projected Clicks</span>
+                  <strong className="forecastValue" style={{ color: '#16a34a' }}>
+                    {Math.round(estimatorBudget * 180 * 30 * 0.024).toLocaleString()}
+                  </strong>
+                  <span className="forecastMeta">Avg. 2.4% Projected CTR</span>
+                </div>
+
+                <div className="forecastCard">
+                  <span className="forecastLabel">Monthly Estimated Spend</span>
+                  <strong className="forecastValue" style={{ color: '#0f172a' }}>
+                    ${(estimatorBudget * 30).toLocaleString()}
+                  </strong>
+                  <span className="forecastMeta">Avg. ~$0.42 Cost Per Click</span>
+                </div>
+              </div>
+
+              {/* Target Audience Distribution */}
+              <div className="audienceBreakdownSection">
+                <h4>Audience Seniority Distribution ({estimatorIndustry})</h4>
+                <div className="seniorityBarsList">
+                  {[
+                    { label: 'Senior Engineers & Leads', pct: 44, color: '#0a66c2' },
+                    { label: 'Entry to Mid-Level Specialists', pct: 24, color: '#38bdf8' },
+                    { label: 'Engineering Managers & Directors', pct: 20, color: '#6366f1' },
+                    { label: 'VP & C-Suite Executives', pct: 12, color: '#10b981' },
+                  ].map((s, idx) => (
+                    <div key={idx} className="seniorityBarItem">
+                      <div className="seniorityBarMeta">
+                        <span>{s.label}</span>
+                        <strong>{s.pct}%</strong>
+                      </div>
+                      <div className="seniorityBarTrack">
+                        <div
+                          className="seniorityBarFill"
+                          style={{ width: `${s.pct}%`, background: s.color }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="adSubmitBtn"
+                style={{ marginTop: 24 }}
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    dailyBudget: estimatorBudget,
+                    totalBudget: estimatorBudget * 10,
+                    targetIndustry: estimatorIndustry,
+                    targetLocation: estimatorLocation,
+                  }));
+                  setActiveTab('create');
+                }}
+              >
+                <FaRocket size={14} /> Launch Campaign with these Estimates
+              </button>
             </div>
           </div>
         </div>

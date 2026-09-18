@@ -192,7 +192,8 @@
   }
 
   .profileMenu,
-  .businessMenu {
+  .businessMenu,
+  .forBusinessTrigger {
     padding-left: 2px;
     padding-right: 2px;
   }
@@ -227,8 +228,9 @@
     max-width: none;
   }
 
-  /* Keep the "For Business" dropdown visible on mobile and hide "Advertise" */
-  .businessMenu {
+  /* Keep CampusLink and For Business dropdown visible on mobile and hide obsolete links */
+  .businessMenu,
+  .forBusinessTrigger {
     display: flex;
   }
 

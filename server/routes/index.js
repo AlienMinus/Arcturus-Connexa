@@ -14,6 +14,7 @@ import tales from './tales.js';
 import search from './search.js';
 import ads from './ads.js';
 import campuslink from './campuslink.js';
+import learning from './learning.js';
 
 const router = express.Router();
 
@@ -36,5 +37,6 @@ router.use('/tales', tales);
 router.use('/search', search);
 router.use('/ads', ads);
 router.use('/campuslink', campuslink);
+router.use('/learning', learning);
 
 export default router;

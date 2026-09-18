@@ -2973,5 +2973,85 @@ body.dark-mode .quickPromptChip {
   color: #cbd5e1 !important;
 }
 
+/* For Business Dropdown in Dark Mode */
+[data-theme="dark"] .for-business-dropdown,
+body.dark-mode .for-business-dropdown {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .for-business-header h4,
+body.dark-mode .for-business-header h4,
+[data-theme="dark"] .business-solutions-section h4,
+body.dark-mode .business-solutions-section h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .for-business-subtitle,
+body.dark-mode .for-business-subtitle {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .business-app-card,
+body.dark-mode .business-app-card {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .business-app-card:hover,
+body.dark-mode .business-app-card:hover {
+  background: #1e293b !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .business-app-info strong,
+body.dark-mode .business-app-info strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .business-app-info span,
+body.dark-mode .business-app-info span {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .for-business-divider,
+body.dark-mode .for-business-divider,
+[data-theme="dark"] .for-business-footer,
+body.dark-mode .for-business-footer {
+  background: #334155 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .business-solution-item:hover,
+body.dark-mode .business-solution-item:hover {
+  background: #0f172a !important;
+}
+
+[data-theme="dark"] .business-solution-item strong,
+body.dark-mode .business-solution-item strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .business-solution-item p,
+body.dark-mode .business-solution-item p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .create-company-btn,
+body.dark-mode .create-company-btn {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .create-company-btn:hover,
+body.dark-mode .create-company-btn:hover {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+
 
 

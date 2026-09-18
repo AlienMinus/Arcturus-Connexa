@@ -299,8 +299,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
-          <FaChartLine size={14} /> Command Center (Analytics)
-          <FaChartLine size={14} /> <span>Command Center</span>
+          <FaChartLine size={14} /> Command Center
         </button>
 
         <button
@@ -308,8 +307,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
           onClick={() => setActiveTab('drives')}
         >
-          <FaCalendarAlt size={14} /> Drives & Conflict Resolver
-          <FaCalendarAlt size={14} /> <span>Drives & Conflicts</span>
+          <FaCalendarAlt size={14} /> Drives & Conflicts
           {conflicts.length > 0 && (
             <span style={{ background: '#ef4444', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
               {conflicts.length}
@@ -322,8 +320,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
           onClick={() => setActiveTab('readiness')}
         >
-          <FaUserCheck size={14} /> Readiness & Skill-Gap Portal
-          <FaUserCheck size={14} /> <span>Readiness & Skills</span>
+          <FaUserCheck size={14} /> Readiness & Skills
         </button>
 
         <button
@@ -331,8 +328,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'matching' ? 'active' : ''}`}
           onClick={() => setActiveTab('matching')}
         >
-          <FaUsers size={14} /> Recruiter Matching & Explainable AI
-          <FaUsers size={14} /> <span>Recruiter Matching</span>
+          <FaUsers size={14} /> Recruiter Matching
         </button>
 
         <button
@@ -340,13 +336,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'offers' ? 'active' : ''}`}
           onClick={() => setActiveTab('offers')}
         >
-          <FaFileInvoiceDollar size={14} /> Offers & Documentation ({offers.length})
-          <FaFileInvoiceDollar size={14} /> <span>Offers & Documents</span>
-          {offers.length > 0 && (
-            <span style={{ background: 'rgba(0,0,0,0.08)', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
-              {offers.length}
-            </span>
-          )}
+          <FaFileInvoiceDollar size={14} /> Offers & Documents ({offers.length})
         </button>
 
         <button
@@ -354,8 +344,7 @@ const CampusLinkPage = () => {
           className={`campusTabBtn ${activeTab === 'assistant' ? 'active' : ''}`}
           onClick={() => setActiveTab('assistant')}
         >
-          <FaRobot size={14} /> CampusLink AI Assistant
-          <FaRobot size={14} /> <span>AI Assistant</span>
+          <FaRobot size={14} /> AI Assistant
         </button>
       </div>
 

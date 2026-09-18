@@ -605,3 +605,370 @@
   cursor: pointer;
 }
 
+/* ==========================================================================
+   AD CREATIVE STUDIO & FORMATS
+   ========================================================================== */
+.adStudioWrapper,
+.adEstimatorWrapper {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.adStudioHeader h2,
+.adEstimatorHeader h2 {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adStudioHeader p,
+.adEstimatorHeader p {
+  margin: 0 0 20px;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+
+.studioFormatTabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.studioFormatCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.studioFormatCard:hover {
+  background: #ffffff;
+  border-color: #0a66c2;
+}
+
+.studioFormatCard.active {
+  background: #eff6ff;
+  border-color: #0a66c2;
+}
+
+.studioFormatCard strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.studioFormatCard span {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.studioGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+
+.studioPreviewBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+
+.studioPreviewBadge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0a66c2;
+  background: #e0f2fe;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* InMail Mockup */
+.mockInMailAd {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 480px;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.inmailHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.inmailSenderAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.inmailHeader strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.inmailHeader small {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.inmailSubject {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.inmailBody {
+  font-size: 0.84rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* Follow Ad Mockup */
+.mockFollowAd {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 380px;
+  margin: 30px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.studioSpecsCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.studioSpecsCard h3 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.specsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.specItem {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.specItem strong {
+  font-size: 0.82rem;
+  color: #334155;
+  margin-bottom: 2px;
+}
+
+.specItem span {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   AUDIENCE REACH & BUDGET ESTIMATOR
+   ========================================================================== */
+.estimatorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+}
+
+.estimatorControlsCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.estimatorControlsCard h3,
+.estimatorResultsCard h3 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.corporateBillingBox {
+  margin-top: 24px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.estimatorResultsCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.forecastCardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.forecastCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.forecastLabel {
+  font-size: 0.76rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.forecastValue {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0a66c2;
+  margin-bottom: 2px;
+}
+
+.forecastMeta {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.audienceBreakdownSection h4 {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.seniorityBarsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seniorityBarItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seniorityBarMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: #475569;
+}
+
+.seniorityBarTrack {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.seniorityBarFill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .adStudioWrapper,
+body.dark-mode .adStudioWrapper,
+[data-theme="dark"] .adEstimatorWrapper,
+body.dark-mode .adEstimatorWrapper,
+[data-theme="dark"] .studioPreviewBox,
+body.dark-mode .studioPreviewBox,
+[data-theme="dark"] .studioSpecsCard,
+body.dark-mode .studioSpecsCard,
+[data-theme="dark"] .estimatorControlsCard,
+body.dark-mode .estimatorControlsCard,
+[data-theme="dark"] .estimatorResultsCard,
+body.dark-mode .estimatorResultsCard,
+[data-theme="dark"] .forecastCard,
+body.dark-mode .forecastCard,
+[data-theme="dark"] .mockInMailAd,
+body.dark-mode .mockInMailAd,
+[data-theme="dark"] .mockFollowAd,
+body.dark-mode .mockFollowAd {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .studioFormatCard,
+body.dark-mode .studioFormatCard {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .studioFormatCard:hover,
+body.dark-mode .studioFormatCard:hover {
+  background: #1e293b !important;
+}
+
+[data-theme="dark"] .studioFormatCard.active,
+body.dark-mode .studioFormatCard.active {
+  background: rgba(10, 102, 194, 0.2) !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .adStudioHeader h2,
+body.dark-mode .adStudioHeader h2,
+[data-theme="dark"] .adEstimatorHeader h2,
+body.dark-mode .adEstimatorHeader h2,
+[data-theme="dark"] .studioSpecsCard h3,
+body.dark-mode .studioSpecsCard h3,
+[data-theme="dark"] .estimatorControlsCard h3,
+body.dark-mode .estimatorControlsCard h3,
+[data-theme="dark"] .estimatorResultsCard h3,
+body.dark-mode .estimatorResultsCard h3,
+[data-theme="dark"] .inmailSubject,
+body.dark-mode .inmailSubject,
+[data-theme="dark"] .studioFormatCard strong,
+body.dark-mode .studioFormatCard strong {
+  color: #f8fafc !important;
+}
+
+@media (max-width: 768px) {
+  .studioGrid,
+  .estimatorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

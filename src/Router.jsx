@@ -19,6 +19,7 @@ import SearchPage from './pages/SearchPage/SearchPage';
 import CompanyPage from './pages/CompanyPage/CompanyPage';
 import AdvertisePage from './pages/AdvertisePage/AdvertisePage';
 import CampusLinkPage from './pages/CampusLink/CampusLinkPage';
+import LearningHubPage from './pages/Learning/LearningHubPage';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
 import BackToTop from './components/common/BackToTop/BackToTop';
 
@@ -45,7 +46,7 @@ function AppRouter() {
                 <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/jobs/manage" element={<JobPostingPage />} />
                 <Route path="/jobs/post" element={<JobPostingPage />} />
-                <Route path="/learning" element={<UnderConstruction title="Learning Hub is Under Construction" featureName="Courses & Certifications" />} />
+                <Route path="/learning" element={<LearningHubPage />} />
                 <Route path="/advertise" element={<AdvertisePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/settings/privacy" element={<SettingsPage />} />
