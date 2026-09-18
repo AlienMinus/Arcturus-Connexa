@@ -300,6 +300,7 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('analytics')}
         >
           <FaChartLine size={14} /> Command Center (Analytics)
+          <FaChartLine size={14} /> <span>Command Center</span>
         </button>
 
         <button
@@ -308,6 +309,7 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('drives')}
         >
           <FaCalendarAlt size={14} /> Drives & Conflict Resolver
+          <FaCalendarAlt size={14} /> <span>Drives & Conflicts</span>
           {conflicts.length > 0 && (
             <span style={{ background: '#ef4444', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
               {conflicts.length}
@@ -321,6 +323,7 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('readiness')}
         >
           <FaUserCheck size={14} /> Readiness & Skill-Gap Portal
+          <FaUserCheck size={14} /> <span>Readiness & Skills</span>
         </button>
 
         <button
@@ -329,6 +332,7 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('matching')}
         >
           <FaUsers size={14} /> Recruiter Matching & Explainable AI
+          <FaUsers size={14} /> <span>Recruiter Matching</span>
         </button>
 
         <button
@@ -337,6 +341,12 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('offers')}
         >
           <FaFileInvoiceDollar size={14} /> Offers & Documentation ({offers.length})
+          <FaFileInvoiceDollar size={14} /> <span>Offers & Documents</span>
+          {offers.length > 0 && (
+            <span style={{ background: 'rgba(0,0,0,0.08)', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
+              {offers.length}
+            </span>
+          )}
         </button>
 
         <button
@@ -345,6 +355,7 @@ const CampusLinkPage = () => {
           onClick={() => setActiveTab('assistant')}
         >
           <FaRobot size={14} /> CampusLink AI Assistant
+          <FaRobot size={14} /> <span>AI Assistant</span>
         </button>
       </div>
 

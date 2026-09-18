@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaHome, FaUserFriends, FaBriefcase, FaCommentDots, FaBell, FaGraduationCap } from "react-icons/fa";
+import { FaHome, FaUserFriends, FaBriefcase, FaCommentDots, FaBell } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { buildApiUrl } from "../../utils/api";
 import NavItem from "./NavItem";
@@ -61,7 +61,6 @@ const NavCenter = () => {
       <NavItem to="/" icon={<FaHome size={24} />} label="Home" />
       <NavItem to="/network" icon={<FaUserFriends size={24} />} label="My Network" />
       <NavItem to="/jobs" icon={<FaBriefcase size={24} />} label="Jobs" />
-      <NavItem to="/campuslink" icon={<FaGraduationCap size={24} />} label="CampusLink" />
       <NavItem 
         to="/messaging" 
         icon={<FaCommentDots size={24} />} 

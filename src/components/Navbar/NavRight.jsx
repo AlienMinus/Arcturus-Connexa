@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaBullhorn, FaCaretDown, FaTh } from "react-icons/fa";
+import { FaBullhorn, FaCaretDown, FaGraduationCap } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import { useProfile } from "../../context/ProfileContext";
@@ -76,13 +76,13 @@ const NavRight = () => {
           </span>
         </div>
 
-        {/* For Business Link */}
-        <Link to="/learning" className="businessMenu">
+        {/* CampusLink Navigation */}
+        <Link to="/campuslink" className="businessMenu" title="CampusLink Placement Platform">
           <span className="business-icon">
-            <FaTh size={20} color="#666" />
+            <FaGraduationCap size={20} color="#666" />
           </span>
           <span className="business-text">
-            For Business <FaCaretDown />
+            CampusLink
           </span>
         </Link>
 

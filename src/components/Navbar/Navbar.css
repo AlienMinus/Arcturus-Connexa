@@ -457,6 +457,13 @@
   gap: 2px;
   cursor: pointer;
   padding: 0 8px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.businessMenu:hover .business-text,
+.businessMenu:hover .business-icon svg {
+  color: #191919 !important;
 }
 
 .business-icon {
@@ -470,6 +477,7 @@
   gap: 4px;
   font-size: 12px;
   color: #666;
+  white-space: nowrap;
 }
 
 .advertise {
