@@ -12,6 +12,8 @@
 
 ## 📑 Table of Contents
 
+- [Database Schema & Dataflow](docs/DATABASE_SCHEMA_DATAFLOW.md)
+
 - [✨ Key Features](#-key-features)
 - [👥 Arcturus User Architecture, IDs & Dedicated Portals](#-arcturus-user-architecture-ids--dedicated-portals)
 - [🎓 CampusLink Ecosystem & Gemma-2 AI Diagnostics](#-campuslink-ecosystem--gemma-2-ai-diagnostics)
