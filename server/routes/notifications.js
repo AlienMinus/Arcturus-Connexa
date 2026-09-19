@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -63,15 +64,18 @@ router.get('/', authMiddleware, async (req, res) => {
 // Get unread notifications count
 router.get('/unread', authMiddleware, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({ unread: 0 });
+    }
     const user = await User.findById(req.userId).select('notifications');
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(200).json({ unread: 0 });
     }
     const unread = (user.notifications || []).filter((notification) => !notification.read).length;
     res.status(200).json({ unread });
   } catch (err) {
-    console.error('Failed to fetch unread count:', err);
-    res.status(500).json({ error: 'Failed to fetch unread count' });
+    console.error('Failed to fetch unread count:', err?.message || err);
+    res.status(200).json({ unread: 0 });
   }
 });
 

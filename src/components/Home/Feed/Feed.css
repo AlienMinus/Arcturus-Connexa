@@ -143,7 +143,8 @@
   gap: 10px;
 }
 
-.postHeaderLink {
+.postHeaderLink,
+.postHeaderUser {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -151,12 +152,23 @@
   color: inherit;
   flex: 1;
   width: 100%;
-  cursor: pointer;
-}
-.postHeaderLink:hover {
-  color: inherit;
 }
 
+.postAvatarLink {
+  text-decoration: none;
+  display: inline-flex;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.postAuthorNameLink {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+
+.postAuthorNameLink:hover h2,
 .postHeaderLink:hover .postInfo h2 {
   color: #0a66c2;
   text-decoration: underline;

@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Message from '../models/Message.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -7,14 +8,17 @@ const router = express.Router();
 // GET /api/messages/unread - Get total unread messages
 router.get('/unread', authMiddleware, async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({ unread: 0 });
+    }
     const unreadCount = await Message.countDocuments({
       receiverId: req.userId,
       read: false
     });
     res.status(200).json({ unread: unreadCount });
   } catch (error) {
-    console.error("Error fetching unread count:", error);
-    res.status(500).json({ error: 'Failed to fetch unread count' });
+    console.error("Error fetching unread count:", error?.message || error);
+    res.status(200).json({ unread: 0 });
   }
 });
 
