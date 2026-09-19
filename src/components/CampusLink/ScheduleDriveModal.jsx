@@ -52,7 +52,7 @@ export const ScheduleDriveModal = ({
           Define company details, CTC package, eligibility criteria, date, and venue. Our Conflict Engine will automatically audit schedule clashes.
         </p>
 
-        <form onSubmit={handleScheduleDrive} className="scheduleDriveForm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <form noValidate onSubmit={handleScheduleDrive} className="scheduleDriveForm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
               Company Name *

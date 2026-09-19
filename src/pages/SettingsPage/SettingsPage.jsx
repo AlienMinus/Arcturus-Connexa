@@ -107,6 +107,7 @@ const SettingsPage = () => {
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [submittingVerification, setSubmittingVerification] = useState(false);
   const [savingInstitute, setSavingInstitute] = useState(false);
+  const [instituteSaved, setInstituteSaved] = useState(false);
   const [approvedOrgs, setApprovedOrgs] = useState([]);
   const [officerApplication, setOfficerApplication] = useState({ status: 'none', organizationId: '', statement: '', rejectionReason: '' });
   const [officerSubmitting, setOfficerSubmitting] = useState(false);
@@ -334,6 +335,7 @@ const SettingsPage = () => {
       });
 
       if (res.ok) {
+        setInstituteSaved(true);
         showToast('Institute credentials saved and linked to your profile badge!');
         await refreshProfile();
         await fetchVerification();
@@ -1207,6 +1209,7 @@ const SettingsPage = () => {
                             onChange={(e) => {
                               const orgId = e.target.value;
                               const selected = approvedOrgs.find(o => o._id === orgId);
+                              setInstituteSaved(false);
                               setInstituteForm({
                                 ...instituteForm,
                                 organizationId: orgId,
@@ -1233,7 +1236,7 @@ const SettingsPage = () => {
                             className="settingsInput"
                             placeholder="College or University Name"
                             value={instituteForm.name}
-                            onChange={(e) => setInstituteForm({ ...instituteForm, name: e.target.value })}
+                            onChange={(e) => { setInstituteSaved(false); setInstituteForm({ ...instituteForm, name: e.target.value }); }}
                           />
                         </div>
                       </div>
@@ -1246,7 +1249,7 @@ const SettingsPage = () => {
                             className="settingsInput"
                             placeholder="e.g. Computer Science & Engineering"
                             value={instituteForm.department}
-                            onChange={(e) => setInstituteForm({ ...instituteForm, department: e.target.value })}
+                            onChange={(e) => { setInstituteSaved(false); setInstituteForm({ ...instituteForm, department: e.target.value }); }}
                           />
                         </div>
 
@@ -1257,7 +1260,7 @@ const SettingsPage = () => {
                             className="settingsInput"
                             placeholder="e.g. 21CS042"
                             value={instituteForm.studentId}
-                            onChange={(e) => setInstituteForm({ ...instituteForm, studentId: e.target.value })}
+                            onChange={(e) => { setInstituteSaved(false); setInstituteForm({ ...instituteForm, studentId: e.target.value }); }}
                           />
                         </div>
 
@@ -1268,19 +1271,19 @@ const SettingsPage = () => {
                             className="settingsInput"
                             placeholder="2026"
                             value={instituteForm.graduationYear}
-                            onChange={(e) => setInstituteForm({ ...instituteForm, graduationYear: e.target.value })}
+                            onChange={(e) => { setInstituteSaved(false); setInstituteForm({ ...instituteForm, graduationYear: e.target.value }); }}
                           />
                         </div>
                       </div>
 
                       <button
                         type="submit"
-                        className="saveBtn"
+                        className={`saveBtn ${instituteSaved ? 'isSaved' : ''}`}
                         style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                         disabled={savingInstitute}
                       >
                         <FaCheck size={14} />
-                        <span>{savingInstitute ? 'Saving...' : 'Save & Link Institute Badge'}</span>
+                        <span>{savingInstitute ? 'Saving...' : instituteSaved ? 'Saved & Linked' : 'Save & Link Institute Badge'}</span>
                       </button>
                     </form>
                   </div>

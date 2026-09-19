@@ -234,8 +234,8 @@ const CampusLinkPage = () => {
       showToast('Please sign in to schedule a placement drive');
       return;
     }
-    if (!driveForm.companyName.trim() || !driveForm.roleTitle.trim() || !driveForm.ctcLpa || !driveForm.driveDate) {
-      showToast('Please provide company name, role, CTC package, and drive date');
+    if (!driveForm.companyName.trim() || !driveForm.roleTitle.trim() || !driveForm.description.trim() || !driveForm.ctcLpa || !driveForm.driveDate) {
+      showToast('Please provide company name, role, job description, CTC package, and drive date');
       return;
     }
     if (driveForm.allowedBranches.includes('Other') && !driveForm.otherBranch.trim()) {

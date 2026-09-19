@@ -25,15 +25,6 @@ router.get('/', async (req, res) => {
 // POST /api/campuslink/drives - Create placement drive (Admin restricted)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const adminAccess = await isCampusLinkAdmin(req.userId);
-    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(req.userId);
-    const requestedOrganization = requestedOrganizationId ? await getManagedOrganization(req.userId, requestedOrganizationId) : null;
-    if (!adminAccess && !officerOrganization && !requestedOrganization) {
-      return res.status(403).json({
-        error: 'Access denied: Scheduling recruitment drives is restricted strictly to Arcturus Administrators.',
-      });
-    }
-
     const {
       organizationId: requestedOrganizationId,
       companyName,
@@ -54,6 +45,14 @@ router.post('/', authMiddleware, async (req, res) => {
       venue,
       totalOpenings,
     } = req.body;
+    const adminAccess = await isCampusLinkAdmin(req.userId);
+    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(req.userId);
+    const requestedOrganization = requestedOrganizationId ? await getManagedOrganization(req.userId, requestedOrganizationId) : null;
+    if (!adminAccess && !officerOrganization && !requestedOrganization) {
+      return res.status(403).json({
+        error: 'Access denied: an approved linked organization is required to schedule this drive.',
+      });
+    }
     const organizationId = adminAccess ? requestedOrganizationId : officerOrganization?._id || requestedOrganization?._id;
     if (!organizationId) return res.status(400).json({ error: 'An organization is required for this placement drive.' });
 

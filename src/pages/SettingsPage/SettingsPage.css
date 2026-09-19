@@ -724,6 +724,13 @@
   border-color: #166534;
 }
 
+.saveBtn.isSaved {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #86efac;
+  cursor: default;
+}
+
 .saveBtn:disabled {
   cursor: wait;
   opacity: 0.65;
