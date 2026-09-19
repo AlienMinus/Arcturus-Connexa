@@ -165,15 +165,17 @@ router.get('/:id/match', authMiddleware, async (req, res) => {
 
     const adminAccess = await isCampusLinkAdmin(req.userId);
     const officerOrganization = await getPlacementOfficerOrganization(req.userId);
+    const managedOrganization = drive.organizationId ? await getManagedOrganization(req.userId, drive.organizationId) : null;
     const officerAccess = officerOrganization && drive.organizationId?.toString() === officerOrganization._id.toString();
-    if (!adminAccess && !officerAccess) {
+    if (!adminAccess && !officerAccess && !managedOrganization) {
       return res.status(403).json({ error: 'Only Arcturus Admin or the linked Placement Officer can view candidate matching.' });
     }
 
     // Evaluate all registered student profiles
     const allProfiles = await PlacementProfile.find().populate('userId', 'firstName lastName email username profilePicture institute').lean();
-    const scopedProfiles = officerOrganization
-      ? allProfiles.filter((profile) => profile.userId?.institute?.organizationId?.toString() === officerOrganization._id.toString())
+    const candidateOrganization = officerOrganization || managedOrganization;
+    const scopedProfiles = candidateOrganization
+      ? allProfiles.filter((profile) => profile.userId?.institute?.organizationId?.toString() === candidateOrganization._id.toString())
       : allProfiles;
     const userIds = scopedProfiles.map((p) => p.userId?._id).filter(Boolean);
     const candidateProfiles = await Profile.find({ userId: { $in: userIds } }).lean();
