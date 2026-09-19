@@ -131,6 +131,48 @@
   border: 1px solid #cbd5e1;
 }
 
+.companyEditBtn {
+  padding: 8px 16px;
+  color: #0a66c2;
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.companyEditBtn:hover { background: #dbeafe; }
+
+.companyEditPanel {
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+}
+
+.companyEditHeader {
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.companyEditHeader h2 { margin: 0; color: #0f172a; font-size: 1.1rem; }
+.companyEditHeader p { margin: 4px 0 0; color: #64748b; font-size: 0.82rem; }
+.companyEditGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.companyEditGrid label { display: flex; flex-direction: column; gap: 5px; }
+.companyEditGrid label span { color: #334155; font-size: 0.78rem; font-weight: 700; }
+.companyEditGrid input,
+.companyEditGrid textarea { width: 100%; box-sizing: border-box; padding: 9px 11px; color: #0f172a; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 7px; outline: none; font: inherit; font-size: 0.84rem; resize: vertical; }
+.companyEditGrid input:focus,
+.companyEditGrid textarea:focus { border-color: #0a66c2; box-shadow: 0 0 0 3px #dbeafe; }
+.companyEditFullWidth { grid-column: 1 / -1; }
+.companyEditSaveBtn { padding: 9px 15px; margin-top: 16px; color: #ffffff; background: #0a66c2; border: 1px solid #0a66c2; border-radius: 7px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+.companyEditSaveBtn:hover:not(:disabled) { background: #004182; }
+.companyEditSaveBtn:disabled { cursor: wait; opacity: 0.65; }
+
 .companyWebsiteBtn,
 .companyPostJobBtn {
   padding: 8px 18px;
@@ -324,5 +366,11 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #e2e8f0;
+}
+
+@media (max-width: 640px) {
+  .companyEditPanel { padding: 18px 16px; }
+  .companyEditGrid { grid-template-columns: 1fr; }
+  .companyEditFullWidth { grid-column: auto; }
 }
 

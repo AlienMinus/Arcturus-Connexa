@@ -8,7 +8,8 @@ import {
   FaSearch, 
   FaSyncAlt, 
   FaCheckCircle, 
-  FaLock 
+  FaLock,
+  FaGraduationCap
 } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
@@ -26,7 +27,7 @@ const AdminDashboard = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('organizations'); // 'organizations', 'verifications', 'jobs', 'users'
+  const [activeTab, setActiveTab] = useState('organizations'); // 'organizations', 'verifications', 'officers', 'jobs', 'users'
   const [statusFilter, setStatusFilter] = useState('pending'); // 'all', 'pending', 'approved', 'rejected'
   const [verificationFilter, setVerificationFilter] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,6 +38,7 @@ const AdminDashboard = () => {
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [usersList, setUsersList] = useState([]);
+  const [officerApplications, setOfficerApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
@@ -158,10 +160,24 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchOfficerApplications = async () => {
+    if (!token || !isArcturusAdmin) return;
+    setLoading(true);
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/officers/admin/applications?status=pending'), { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setOfficerApplications((await res.json()).applications || []);
+    } catch (err) {
+      console.error('Failed to fetch Placement Officer applications:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const reloadData = () => {
     fetchStats();
     if (activeTab === 'organizations') fetchOrganizations();
     if (activeTab === 'verifications') fetchVerificationRequests();
+    if (activeTab === 'officers') fetchOfficerApplications();
     if (activeTab === 'jobs') fetchJobs();
     if (activeTab === 'users') fetchUsers();
   };
@@ -171,10 +187,27 @@ const AdminDashboard = () => {
       fetchStats();
       if (activeTab === 'organizations') fetchOrganizations();
       if (activeTab === 'verifications') fetchVerificationRequests();
+      if (activeTab === 'officers') fetchOfficerApplications();
       if (activeTab === 'jobs') fetchJobs();
       if (activeTab === 'users') fetchUsers();
     }
   }, [token, activeTab, statusFilter, verificationFilter]);
+
+  const reviewOfficerApplication = async (userId, approve) => {
+    setActionLoading(userId);
+    try {
+      const res = await fetch(buildApiUrl(`/campuslink/officers/admin/applications/${userId}/${approve ? 'approve' : 'reject'}`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reason: approve ? '' : 'Placement Officer criteria were not confirmed.' }),
+      });
+      const data = await res.json();
+      showToast(data.message || data.error);
+      if (res.ok) fetchOfficerApplications();
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   // Action: Approve Blue Tick Verification
   const handleApproveVerification = async (requestId) => {
@@ -422,6 +455,18 @@ const AdminDashboard = () => {
 
           <button
             type="button"
+            className={`adminTabBtn ${activeTab === 'officers' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('officers'); setSearchQuery(''); }}
+            title="Placement Officer Applications"
+            aria-label="Placement Officer Applications"
+          >
+            <FaGraduationCap size={15} />
+            <span className="tabLabel">Placement Officers</span>
+            {(stats?.pendingPlacementOfficers || officerApplications.length) > 0 && <span className="tabCountPill pendingPill">{stats?.pendingPlacementOfficers || officerApplications.length}</span>}
+          </button>
+
+          <button
+            type="button"
             className={`adminTabBtn ${activeTab === 'verifications' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('verifications');
@@ -524,6 +569,26 @@ const AdminDashboard = () => {
           onReject={handleRejectVerification}
           onRevoke={handleRevokeVerification}
         />
+      )}
+
+      {activeTab === 'officers' && (
+        <section className="adminSectionPanel">
+          <div className="adminSectionHeader"><h2>Placement Officer Applications</h2><p>Approve officers to manage drives for their linked educational organization.</p></div>
+          {loading ? <div className="adminLoadingState"><p>Loading applications...</p></div> : officerApplications.length === 0 ? <div className="adminEmptyState"><FaGraduationCap size={42} color="#94a3b8" /><h4>No pending Placement Officer applications</h4></div> : (
+            <div className="orgCardsGrid" style={{ gridTemplateColumns: '1fr' }}>
+              {officerApplications.map((application) => {
+                const applicant = application;
+                const name = [applicant.firstName, applicant.middleName, applicant.lastName].filter(Boolean).join(' ') || applicant.username;
+                return <div className="orgCardItem" key={applicant._id}>
+                  <div className="orgCardHeader"><div><h3>{name}</h3><p>{applicant.email} · @{applicant.username}</p></div><span className="statusTag pending">Pending Review</span></div>
+                  <p><strong>Organization:</strong> {applicant.placementOfficer?.organizationId?.name || 'Unknown'} </p>
+                  <p><strong>Statement:</strong> {applicant.placementOfficer?.statement || 'No statement provided.'}</p>
+                  <div className="orgCardActions"><button type="button" className="actionBtn approve" disabled={actionLoading === applicant._id} onClick={() => reviewOfficerApplication(applicant._id, true)}>Approve & Promote</button><button type="button" className="actionBtn reject" disabled={actionLoading === applicant._id} onClick={() => reviewOfficerApplication(applicant._id, false)}>Reject</button></div>
+                </div>;
+              })}
+            </div>
+          )}
+        </section>
       )}
 
       {/* TAB 3: JOB PORTAL MODERATION */}

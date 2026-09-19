@@ -11,6 +11,7 @@ import {
 
 export const DrivesTab = ({
   isArcturusAdmin,
+  canManageDrives = isArcturusAdmin,
   drives,
   conflicts,
   studentProfile,
@@ -26,15 +27,15 @@ export const DrivesTab = ({
         <div>
           <h2>
             <FaCalendarAlt color="#0a66c2" />{' '}
-            {isArcturusAdmin ? 'Placement Drives & Conflict Management' : 'Scheduled Placement Drives & Eligibility'}
+            {canManageDrives ? 'Placement Drives & Conflict Management' : 'Scheduled Placement Drives & Eligibility'}
           </h2>
           <p>
-            {isArcturusAdmin
+            {canManageDrives
               ? 'Manage recruiter schedules, venue allocations, and resolve drive collisions automatically.'
               : 'Browse active campus recruitment drives, review CGPA / backlog criteria, and test your readiness.'}
           </p>
         </div>
-        {isArcturusAdmin && (
+        {canManageDrives && (
           <button
             type="button"
             className="campusTabBtn active"
@@ -91,11 +92,11 @@ export const DrivesTab = ({
           <FaCalendarAlt size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
           <h3 style={{ color: '#1e293b' }}>No Active Placement Drives</h3>
           <p style={{ margin: '6px 0 18px', fontSize: '0.9rem' }}>
-            {isArcturusAdmin
+            {canManageDrives
               ? 'Schedule an upcoming campus recruitment drive to manage venues, dates, and detect real-time conflicts.'
               : 'No corporate placement drives are currently scheduled. Check back soon or visit the Readiness portal to benchmark your skills.'}
           </p>
-          {isArcturusAdmin && (
+          {canManageDrives && (
             <button
               type="button"
               className="campusTabBtn active"
@@ -117,7 +118,7 @@ export const DrivesTab = ({
                     <span style={{ fontSize: '0.85rem', color: '#0a66c2', fontWeight: 600 }}>{d.roleTitle}</span>
                     <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{d.jobCategory} · {d.packageTier}</div>
                   </div>
-                  {isArcturusAdmin && (
+                  {canManageDrives && (
                     <button
                       type="button"
                       className="driveCancelBtn"
@@ -137,7 +138,7 @@ export const DrivesTab = ({
                 </div>
 
                 {/* Student Eligibility Pill */}
-                {!isArcturusAdmin && studentProfile && (
+                {!canManageDrives && studentProfile && (
                   <div style={{ marginTop: 8 }}>
                     {(() => {
                       const studentCgpa = Number(studentProfile?.cgpa ?? 0);
@@ -167,7 +168,7 @@ export const DrivesTab = ({
               </div>
 
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                {isArcturusAdmin ? (
+                {canManageDrives ? (
                   <button
                     type="button"
                     className="campusTabBtn active"

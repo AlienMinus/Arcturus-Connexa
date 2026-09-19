@@ -20,14 +20,17 @@ import './CompanyPage.css';
 
 const CompanyPage = () => {
   const { idOrSlug } = useParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [org, setOrg] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
   const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(128);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', tagline: '', description: '', industry: '', website: '', location: '' });
 
   useEffect(() => {
     let isMounted = true;
@@ -43,8 +46,17 @@ const CompanyPage = () => {
         if (isMounted) {
           setOrg(data.organization);
           setJobs(data.jobs || []);
-          // Initial simulated followers
-          setFollowersCount(data.organization?.members?.length ? data.organization.members.length * 42 : 128);
+          const followerIds = data.organization?.followers || [];
+          setFollowersCount(followerIds.length);
+          setIsFollowing(Boolean(user?._id && followerIds.some((follower) => (follower?._id || follower) === user._id)));
+          setEditForm({
+            name: data.organization?.name || '',
+            tagline: data.organization?.tagline || '',
+            description: data.organization?.description || '',
+            industry: data.organization?.industry || '',
+            website: data.organization?.website || '',
+            location: data.organization?.location || '',
+          });
         }
       } catch (err) {
         if (isMounted) {
@@ -61,14 +73,43 @@ const CompanyPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [idOrSlug]);
+  }, [idOrSlug, user?._id]);
 
-  const toggleFollow = () => {
-    setIsFollowing((prev) => {
-      const next = !prev;
-      setFollowersCount((c) => (next ? c + 1 : Math.max(0, c - 1)));
-      return next;
-    });
+  const toggleFollow = async () => {
+    if (!token) return;
+    const method = isFollowing ? 'DELETE' : 'POST';
+    try {
+      const response = await fetch(buildApiUrl(`/organizations/${org._id}/follow`), {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setIsFollowing(data.following);
+      setFollowersCount(data.followersCount);
+    } catch (err) {
+      console.error('Failed to update organization follow state:', err);
+    }
+  };
+
+  const saveOrganization = async (event) => {
+    event.preventDefault();
+    setIsSaving(true);
+    try {
+      const response = await fetch(buildApiUrl(`/organizations/${org._id}`), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editForm),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to update organization');
+      setOrg((current) => ({ ...current, ...data.organization }));
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Failed to update organization profile:', err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -173,6 +214,12 @@ const CompanyPage = () => {
                 </a>
               )}
 
+              {isUserAdminOrMember && (
+                <button type="button" className="companyEditBtn" onClick={() => setIsEditing((current) => !current)}>
+                  {isEditing ? 'Close Editor' : 'Edit Company Page'}
+                </button>
+              )}
+
               {isUserAdminOrMember ? (
                 <Link to="/jobs/manage" className="companyPostJobBtn">
                   <FaPlus size={12} /> Post a Job
@@ -203,6 +250,38 @@ const CompanyPage = () => {
           </div>
         </div>
       </div>
+
+      {isEditing && (
+        <form className="companyEditPanel" onSubmit={saveOrganization}>
+          <div className="companyEditHeader">
+            <div>
+              <h2>Edit Company Page</h2>
+              <p>Update the public organization details shown to candidates and followers.</p>
+            </div>
+          </div>
+          <div className="companyEditGrid">
+            {[
+              ['name', 'Company name'],
+              ['tagline', 'Tagline'],
+              ['industry', 'Industry'],
+              ['location', 'Location'],
+              ['website', 'Website'],
+            ].map(([field, label]) => (
+              <label key={field}>
+                <span>{label}</span>
+                <input value={editForm[field]} onChange={(event) => setEditForm({ ...editForm, [field]: event.target.value })} />
+              </label>
+            ))}
+            <label className="companyEditFullWidth">
+              <span>Description</span>
+              <textarea rows="4" value={editForm.description} onChange={(event) => setEditForm({ ...editForm, description: event.target.value })} />
+            </label>
+          </div>
+          <button type="submit" className="companyEditSaveBtn" disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Company Page'}
+          </button>
+        </form>
+      )}
 
       {/* Navigation Tabs */}
       <div className="companyTabsCard">

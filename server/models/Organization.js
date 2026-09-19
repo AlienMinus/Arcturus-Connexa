@@ -112,10 +112,11 @@ const OrganizationSchema = new mongoose.Schema(
     members: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        role: { type: String, enum: ['Admin', 'Recruiter', 'Member'], default: 'Admin' },
+        role: { type: String, enum: ['Admin', 'Recruiter', 'Placement Officer', 'Member'], default: 'Admin' },
         joinedAt: { type: Date, default: Date.now },
       },
     ],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

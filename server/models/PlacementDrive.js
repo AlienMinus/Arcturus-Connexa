@@ -39,6 +39,7 @@ const DriveStageSchema = new mongoose.Schema(
 
 const PlacementDriveSchema = new mongoose.Schema(
   {
+    organizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
     companyName: { type: String, required: true, trim: true },
     companyLogo: {
       type: String,

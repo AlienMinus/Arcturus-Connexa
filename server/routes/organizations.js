@@ -253,6 +253,57 @@ router.get('/:idOrSlug', async (req, res) => {
   }
 });
 
+// PATCH /api/organizations/:id - Update organization profile details
+router.patch('/:id', authMiddleware, async (req, res) => {
+  try {
+    const organization = await Organization.findOne({
+      _id: req.params.id,
+      $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+    });
+    if (!organization) return res.status(403).json({ error: 'You are not authorized to edit this organization.' });
+
+    const editableFields = ['name', 'tagline', 'description', 'industry', 'website', 'location'];
+    editableFields.forEach((field) => {
+      if (typeof req.body[field] === 'string') organization[field] = req.body[field].trim();
+    });
+    await organization.save();
+    res.json({ organization });
+  } catch (err) {
+    console.error('Failed to update organization:', err);
+    res.status(500).json({ error: 'Failed to update organization profile' });
+  }
+});
+
+// POST /api/organizations/:id/follow - Follow an organization
+router.post('/:id/follow', authMiddleware, async (req, res) => {
+  try {
+    const organization = await Organization.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { followers: req.userId } },
+      { new: true, select: 'followers' }
+    );
+    if (!organization) return res.status(404).json({ error: 'Organization not found' });
+    res.json({ following: true, followersCount: organization.followers.length });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to follow organization' });
+  }
+});
+
+// DELETE /api/organizations/:id/follow - Unfollow an organization
+router.delete('/:id/follow', authMiddleware, async (req, res) => {
+  try {
+    const organization = await Organization.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { followers: req.userId } },
+      { new: true, select: 'followers' }
+    );
+    if (!organization) return res.status(404).json({ error: 'Organization not found' });
+    res.json({ following: false, followersCount: organization.followers.length });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to unfollow organization' });
+  }
+});
+
 // GET /api/organizations - List approved organizations (Directory / Search)
 router.get('/', async (req, res) => {
   try {

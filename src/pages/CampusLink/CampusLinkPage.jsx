@@ -21,20 +21,23 @@ const CampusLinkPage = () => {
   const { token, user, activeAccount } = useAuth();
   const isArcturusAdmin = user?.role === 'admin' || user?.username === 'arcturus_admin';
   const isOrganizationAccount = activeAccount?.type === 'organization';
+  const canManageDrives = isArcturusAdmin || isOrganizationAccount;
   const [activeTab, setActiveTab] = useState(() => 
     isOrganizationAccount ? 'organization' : (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
   );
   
   // Guard non-admins against administrative tabs
   useEffect(() => {
-    if (isOrganizationAccount && activeTab !== 'organization') {
+    if (isOrganizationAccount && canManageDrives && activeTab === 'matching') {
+      return;
+    } else if (isOrganizationAccount && activeTab !== 'organization') {
       setActiveTab('organization');
     } else if (!isOrganizationAccount && activeTab === 'organization') {
       setActiveTab(isArcturusAdmin ? 'analytics' : 'readiness');
     } else if (!isArcturusAdmin && (activeTab === 'analytics' || activeTab === 'matching')) {
       setActiveTab('readiness');
     }
-  }, [isArcturusAdmin, isOrganizationAccount, activeTab]);
+  }, [isArcturusAdmin, isOrganizationAccount, canManageDrives, activeTab]);
   
   // Data States
   const [analytics, setAnalytics] = useState(null);
@@ -127,7 +130,8 @@ const CampusLinkPage = () => {
       }
 
       // 2. Fetch Drives & Conflicts
-      const drivesRes = await fetch(buildApiUrl('/campuslink/drives'));
+      const driveQuery = isOrganizationAccount && activeAccount?.id ? `?organizationId=${encodeURIComponent(activeAccount.id)}` : '';
+      const drivesRes = await fetch(buildApiUrl(`/campuslink/drives${driveQuery}`), { headers });
       if (drivesRes.ok) {
         const drivesData = await drivesRes.json();
         setDrives(drivesData.drives || []);
@@ -178,7 +182,9 @@ const CampusLinkPage = () => {
   const fetchMatchingPool = async (driveId) => {
     if (!driveId) return;
     try {
-      const res = await fetch(buildApiUrl(`/campuslink/drives/${driveId}/match`));
+      const res = await fetch(buildApiUrl(`/campuslink/drives/${driveId}/match`), {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         setMatchingPool(data);
@@ -252,6 +258,7 @@ const CampusLinkPage = () => {
         endTime: driveForm.endTime || '01:30 PM',
         venue: driveForm.venue || 'Campus Auditorium - Hall A',
         totalOpenings: Number(driveForm.totalOpenings) || 10,
+        organizationId: isOrganizationAccount ? activeAccount?.id : undefined,
       };
 
       const res = await fetch(buildApiUrl('/campuslink/drives'), {
@@ -531,12 +538,38 @@ const CampusLinkPage = () => {
           <div className="campusOrganizationActions">
             <Link to="/jobs/manage" className="campusOrganizationPrimary">Manage jobs & applicants</Link>
             <Link to={activeAccount.slug ? `/company/${activeAccount.slug}` : `/organization/${activeAccount.id}`} className="campusOrganizationSecondary">View company page</Link>
+            {canManageDrives && <button type="button" className="campusOrganizationSecondary" onClick={() => setShowDriveModal(true)}>Schedule placement drive</button>}
           </div>
 
           <div className="campusOrganizationNotice">
             <strong>Recruiter workspace active</strong>
             <span>Switch to your Personal Profile from the account menu to view student readiness, eligible drives, and personal offers.</span>
           </div>
+          {canManageDrives && (
+            <DrivesTab
+              isArcturusAdmin={isArcturusAdmin}
+              canManageDrives
+              drives={drives}
+              conflicts={conflicts}
+              studentProfile={studentProfile}
+              setShowDriveModal={setShowDriveModal}
+              handleAutoResolveConflict={handleAutoResolveConflict}
+              handleDeleteDrive={handleDeleteDrive}
+              setSelectedDriveForMatch={setSelectedDriveForMatch}
+              setActiveTab={setActiveTab}
+            />
+          )}
+          {canManageDrives && activeTab === 'matching' && (
+            <MatchingTab
+              isArcturusAdmin={false}
+              drives={drives}
+              selectedDriveForMatch={selectedDriveForMatch}
+              setSelectedDriveForMatch={setSelectedDriveForMatch}
+              handleAutoShortlist={handleAutoShortlist}
+              matchingPool={matchingPool}
+              setActiveTab={setActiveTab}
+            />
+          )}
         </div>
       )}
       {!isOrganizationAccount && (

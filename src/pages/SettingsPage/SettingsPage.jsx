@@ -108,6 +108,8 @@ const SettingsPage = () => {
   const [submittingVerification, setSubmittingVerification] = useState(false);
   const [savingInstitute, setSavingInstitute] = useState(false);
   const [approvedOrgs, setApprovedOrgs] = useState([]);
+  const [officerApplication, setOfficerApplication] = useState({ status: 'none', organizationId: '', statement: '', rejectionReason: '' });
+  const [officerSubmitting, setOfficerSubmitting] = useState(false);
 
   const [verificationForm, setVerificationForm] = useState({
     fullName: user?.name || (user?.firstName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : ''),
@@ -167,6 +169,39 @@ const SettingsPage = () => {
       }
     } catch (err) {
       console.error('Failed to load organizations:', err);
+    }
+  };
+
+  const fetchOfficerApplication = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/officers/my-status'), { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setOfficerApplication((prev) => ({ ...prev, ...(data.application || {}) }));
+      }
+    } catch (err) {
+      console.error('Failed to load Placement Officer status:', err);
+    }
+  };
+
+  const handleOfficerApplication = async (event) => {
+    event.preventDefault();
+    setOfficerSubmitting(true);
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/officers/apply'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ organizationId: officerApplication.organizationId, statement: officerApplication.statement }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Application failed');
+      showToast(data.message);
+      setOfficerApplication((prev) => ({ ...prev, ...(data.application || {}), status: 'pending' }));
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      setOfficerSubmitting(false);
     }
   };
 
@@ -249,6 +284,7 @@ const SettingsPage = () => {
     fetchSettings();
     fetchVerification();
     fetchApprovedOrgs();
+    fetchOfficerApplication();
   }, [token]);
 
   const handleSubmitVerification = async (e) => {
@@ -872,6 +908,52 @@ const SettingsPage = () => {
             {/* Account Verification & Badges */}
             {activeTab === 'verification' && (
               <div className="settingsVerificationPanel" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="settingsCard placementOfficerCard">
+                  <div className="settingsCardHeader">
+                    <div>
+                      <h3>Placement Officer Access</h3>
+                      <p>Apply to manage placement drives for a linked educational organization. Arcturus Admin approval is required.</p>
+                    </div>
+                    <span className={`officerStatusBadge ${officerApplication.status}`}>
+                      {officerApplication.status === 'none' ? 'Not applied' : officerApplication.status}
+                    </span>
+                  </div>
+
+                  {officerApplication.status === 'approved' ? (
+                    <div className="officerApprovedNotice">Approved Placement Officer access is active for the linked organization.</div>
+                  ) : officerApplication.status === 'pending' ? (
+                    <div className="officerPendingNotice">Your application is waiting for Arcturus Admin review.</div>
+                  ) : (
+                    <form className="officerApplicationForm" onSubmit={handleOfficerApplication}>
+                      <div className="formGroup">
+                        <label>Linked educational organization *</label>
+                        <select
+                          className="settingsInput"
+                          required
+                          value={officerApplication.organizationId || ''}
+                          onChange={(event) => setOfficerApplication({ ...officerApplication, organizationId: event.target.value })}
+                        >
+                          <option value="">Select an approved linked organization</option>
+                          {approvedOrgs.map((org) => <option key={org._id} value={org._id}>{org.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="formGroup">
+                        <label>Why should you manage placement drives?</label>
+                        <textarea
+                          className="settingsInput officerStatementInput"
+                          rows="3"
+                          value={officerApplication.statement || ''}
+                          onChange={(event) => setOfficerApplication({ ...officerApplication, statement: event.target.value })}
+                          placeholder="Describe your placement-cell responsibility or institutional role."
+                        />
+                      </div>
+                      {officerApplication.rejectionReason && <p className="officerRejectionNotice">Previous review: {officerApplication.rejectionReason}</p>}
+                      <button type="submit" className="saveBtn" disabled={officerSubmitting}>
+                        {officerSubmitting ? 'Submitting...' : 'Apply for Placement Officer Access'}
+                      </button>
+                    </form>
+                  )}
+                </div>
                 {/* CARD 1: BLUE TICK VERIFICATION STATUS & REQUEST */}
                 <div className="settingsCard">
                   <div className="settingsCardHeader">

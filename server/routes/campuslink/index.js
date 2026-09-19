@@ -4,6 +4,7 @@ import drivesRoutes from './drivesRoutes.js';
 import profileRoutes from './profileRoutes.js';
 import offersRoutes from './offersRoutes.js';
 import assistantRoutes from './assistantRoutes.js';
+import officerRoutes from './officerRoutes.js';
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use('/drives', drivesRoutes);
 router.use('/profile', profileRoutes);
 router.use('/offers', offersRoutes);
 router.use('/ai-assistant', assistantRoutes);
+router.use('/officers', officerRoutes);
 
 export default router;
 

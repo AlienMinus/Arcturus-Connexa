@@ -76,8 +76,16 @@ const UserSchema = new mongoose.Schema(
     isAdmin: { type: Boolean, default: false },
     accountType: {
       type: String,
-      enum: ['individual', 'student', 'recruiter', 'organization', 'admin'],
+      enum: ['individual', 'student', 'recruiter', 'placement_officer', 'organization', 'admin'],
       default: 'individual',
+    },
+    placementOfficer: {
+      status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
+      organizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
+      statement: { type: String, default: '' },
+      reviewedAt: { type: Date },
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      rejectionReason: { type: String, default: '' },
     },
     institute: {
       organizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },

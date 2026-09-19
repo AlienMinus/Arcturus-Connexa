@@ -1,5 +1,6 @@
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
+import Organization from '../../models/Organization.js';
 
 // Dynamic skill gap analysis evaluated against real scheduled placement drives
 export const computeSkillGaps = (studentSkills = [], drives = []) => {
@@ -57,6 +58,21 @@ export const isCampusLinkAdmin = async (userId) => {
     user?.username?.toLowerCase() === 'arcturus_admin' ||
     user?.email?.toLowerCase()?.includes('admin@arcturus')
   );
+};
+
+export const getPlacementOfficerOrganization = async (userId) => {
+  const user = await User.findById(userId).select('placementOfficer').lean();
+  if (user?.placementOfficer?.status !== 'approved' || !user.placementOfficer.organizationId) return null;
+  return Organization.findOne({ _id: user.placementOfficer.organizationId, status: 'approved' });
+};
+
+export const getManagedOrganization = async (userId, organizationId) => {
+  if (!userId || !organizationId) return null;
+  return Organization.findOne({
+    _id: organizationId,
+    status: 'approved',
+    $or: [{ adminId: userId }, { 'members.userId': userId }],
+  });
 };
 
 // Extract and import all candidate individual profile data from Arcturus Profile & User models
