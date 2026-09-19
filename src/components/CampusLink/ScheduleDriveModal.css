@@ -119,6 +119,10 @@
   accent-color: #0a66c2;
 }
 
+.scheduleDriveForm .otherBranchInput {
+  margin-top: 10px;
+}
+
 .scheduleModalActions {
   display: flex;
   justify-content: flex-end;

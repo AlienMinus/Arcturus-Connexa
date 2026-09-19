@@ -253,6 +253,7 @@ export const ScheduleDriveModal = ({
                 'Electrical Engineering',
                 'Mechanical Engineering',
                 'Civil Engineering',
+                'Other',
               ].map((branch) => {
                 const isChecked = driveForm.allowedBranches.includes(branch);
                 return (
@@ -279,6 +280,16 @@ export const ScheduleDriveModal = ({
                 );
               })}
             </div>
+            {driveForm.allowedBranches.includes('Other') && (
+              <input
+                type="text"
+                className="chatInput otherBranchInput"
+                placeholder="Specify eligible branch or program"
+                value={driveForm.otherBranch}
+                onChange={(e) => setDriveForm({ ...driveForm, otherBranch: e.target.value })}
+                required
+              />
+            )}
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>

@@ -83,6 +83,7 @@ const CampusLinkPage = () => {
       'Information Technology',
       'Electronics & Communication',
     ],
+    otherBranch: '',
     requiredSkills: '',
     driveDate: '',
     startTime: '09:30 AM',
@@ -237,12 +238,19 @@ const CampusLinkPage = () => {
       showToast('Please provide company name, role, CTC package, and drive date');
       return;
     }
+    if (driveForm.allowedBranches.includes('Other') && !driveForm.otherBranch.trim()) {
+      showToast('Please specify the other eligible branch.');
+      return;
+    }
 
     try {
       const skillsArray = typeof driveForm.requiredSkills === 'string'
         ? driveForm.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean)
         : [];
 
+      const eligibleBranches = driveForm.allowedBranches
+        .map((branch) => branch === 'Other' ? driveForm.otherBranch.trim() : branch)
+        .filter(Boolean);
       const payload = {
         companyName: driveForm.companyName.trim(),
         companyLogo: driveForm.companyLogo.trim() || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
@@ -253,7 +261,7 @@ const CampusLinkPage = () => {
         baseStipend: Number(driveForm.baseStipend) || 0,
         minCgpa: Number(driveForm.minCgpa) || 6.0,
         maxBacklogs: Number(driveForm.maxBacklogs) || 0,
-        allowedBranches: driveForm.allowedBranches,
+        allowedBranches: eligibleBranches,
         requiredSkills: skillsArray.length > 0 ? skillsArray : ['Data Structures', 'Problem Solving'],
         driveDate: driveForm.driveDate,
         startTime: driveForm.startTime || '09:30 AM',
@@ -290,6 +298,7 @@ const CampusLinkPage = () => {
             'Information Technology',
             'Electronics & Communication',
           ],
+          otherBranch: '',
           requiredSkills: '',
           driveDate: '',
           startTime: '09:30 AM',
