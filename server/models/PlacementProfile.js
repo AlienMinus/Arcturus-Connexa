@@ -20,8 +20,8 @@ const PlacementProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    rollNumber: { type: String, default: '21CS042', trim: true },
-    collegeName: { type: String, default: 'Arcturus Institute of Technology' },
+    rollNumber: { type: String, required: true, trim: true },
+    collegeName: { type: String, required: true, trim: true },
     branch: {
       type: String,
       enum: [
@@ -34,32 +34,31 @@ const PlacementProfileSchema = new mongoose.Schema(
       ],
       default: 'Computer Science & Engineering',
     },
-    graduationYear: { type: Number, default: 2026 },
-    cgpa: { type: Number, default: 8.4, min: 0, max: 10 },
+    graduationYear: { type: Number, default: () => new Date().getFullYear() },
+    cgpa: { type: Number, required: true, min: 0, max: 10 },
     activeBacklogs: { type: Number, default: 0 },
     totalBacklogs: { type: Number, default: 0 },
-    tenthPercentage: { type: Number, default: 91.5 },
-    twelfthPercentage: { type: Number, default: 88.0 },
+    tenthPercentage: { type: Number },
+    twelfthPercentage: { type: Number },
     skills: [{ type: String }],
     targetRoles: [{ type: String }],
 
     // 4-Dimension Readiness Breakdown (0 - 100)
-    technicalScore: { type: Number, default: 82 },
-    aptitudeScore: { type: Number, default: 86 },
-    communicationScore: { type: Number, default: 78 },
-    projectScore: { type: Number, default: 85 },
-    overallReadiness: { type: Number, default: 83 },
+    technicalScore: { type: Number, default: 50 },
+    aptitudeScore: { type: Number, default: 50 },
+    communicationScore: { type: Number, default: 50 },
+    projectScore: { type: Number, default: 50 },
+    overallReadiness: { type: Number, default: 50 },
 
     // 4-Tier Categorization: Not Ready -> Developing -> Ready -> Highly Employable
     readinessLevel: {
       type: String,
       enum: ['Not Ready', 'Developing', 'Ready', 'Highly Employable'],
-      default: 'Ready',
+      default: 'Developing',
     },
     aiReadinessSummary: {
       type: String,
-      default:
-        'Strong technical core in Full Stack Development and Data Structures. Aptitude benchmark is solid; recommended to strengthen Cloud Orchestration and Mock System Design interviews.',
+      default: '',
     },
 
     skillGaps: [SkillGapItemSchema],
@@ -67,15 +66,15 @@ const PlacementProfileSchema = new mongoose.Schema(
     placementStatus: {
       type: String,
       enum: ['unplaced', 'shortlisted', 'interviewing', 'placed', 'opted_out'],
-      default: 'interviewing',
+      default: 'unplaced',
     },
 
     // Predictive At-Risk identification
     isAtRisk: { type: Boolean, default: false },
     riskReason: { type: String, default: '' },
-    assignedMentor: { type: String, default: 'Dr. S. K. Verma (Placement Dean)' },
+    assignedMentor: { type: String, default: '' },
 
-    mockInterviewsTaken: { type: Number, default: 4 },
+    mockInterviewsTaken: { type: Number, default: 0 },
     lastAssessmentDate: { type: Date, default: Date.now },
   },
   { timestamps: true }

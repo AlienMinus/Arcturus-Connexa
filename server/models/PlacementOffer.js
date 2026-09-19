@@ -45,7 +45,7 @@ const PlacementOfferSchema = new mongoose.Schema(
     verificationStatus: {
       type: String,
       enum: ['pending', 'verified', 'rejected'],
-      default: 'verified',
+      default: 'pending',
     },
     documentUrl: { type: String, default: '' },
     verificationHash: { type: String },

@@ -71,19 +71,19 @@ const AdvertisePage = () => {
 
   // Campaign Form State
   const [formData, setFormData] = useState({
-    name: 'Arcturus Growth & Talent Campaign',
-    organizationName: 'Arcturus Connexa',
-    organizationLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+    name: '',
+    organizationName: '',
+    organizationLogo: '',
     organizationId: '',
     objective: 'brand_awareness',
     targetIndustry: 'Technology & Software',
     targetLocation: 'Worldwide',
     placement: 'both',
-    headline: 'Accelerate Your Engineering Career with Arcturus Connexa',
-    description: 'Join the next generation of digital innovators. Explore high-impact roles, collaborate on distributed systems, and grow your career with us.',
-    mediaUrl: PRESET_CREATIVES[0].url,
+    headline: '',
+    description: '',
+    mediaUrl: '',
     callToAction: 'Learn More',
-    destinationUrl: '/jobs',
+    destinationUrl: '',
     dailyBudget: 25,
     totalBudget: 250,
   });

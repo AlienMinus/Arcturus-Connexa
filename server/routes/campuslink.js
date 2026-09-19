@@ -68,170 +68,12 @@ const computeSkillGaps = (studentSkills = []) => {
   });
 };
 
-// Seed demo data helper
-const seedDefaultPlacementData = async (currentUserId) => {
-  const driveCount = await PlacementDrive.countDocuments();
-  if (driveCount === 0) {
-    const today = new Date();
-    const driveDate1 = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000); // 2 days later
-    const driveDate2 = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000); // Same day (Conflict!)
-    const driveDate3 = new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000);
-
-    const drives = await PlacementDrive.create([
-      {
-        companyName: 'Google Cloud India',
-        companyLogo: 'https://cdn-icons-png.flaticon.com/512/2991/2991148.png',
-        roleTitle: 'Associate Cloud Engineer & SDE-1',
-        jobCategory: 'Cloud & DevOps',
-        ctcLpa: 22.0,
-        baseStipend: 75000,
-        eligibility: {
-          minCgpa: 7.5,
-          maxBacklogs: 0,
-          allowedBranches: ['Computer Science & Engineering', 'Information Technology'],
-          requiredSkills: ['Python', 'Docker', 'AWS', 'Data Structures', 'Linux'],
-          minReadinessScore: 75,
-        },
-        schedule: {
-          driveDate: driveDate1,
-          startTime: '09:30 AM',
-          endTime: '04:30 PM',
-          venue: 'Campus Auditorium - Hall A',
-          slotId: 'SLOT-MORNING-HALL_A',
-        },
-        stages: [
-          { name: 'Pre-Placement Talk (PPT)', time: '09:30 AM', venue: 'Auditorium', status: 'upcoming' },
-          { name: 'Online Coding Assessment', time: '11:00 AM', venue: 'Virtual Test Lab', status: 'upcoming' },
-          { name: 'Technical & System Round', time: '02:00 PM', venue: 'Interview Cabin A', status: 'upcoming' },
-          { name: 'HR & Cultural Alignment', time: '04:00 PM', venue: 'Interview Cabin A', status: 'upcoming' },
-        ],
-        status: 'upcoming',
-        totalOpenings: 12,
-        offersExtended: 0,
-      },
-      {
-        companyName: 'Microsoft Azure Systems',
-        companyLogo: 'https://cdn-icons-png.flaticon.com/512/732/732221.png',
-        roleTitle: 'Software Engineer - Distributed Systems',
-        jobCategory: 'Core Software',
-        ctcLpa: 19.5,
-        baseStipend: 65000,
-        eligibility: {
-          minCgpa: 7.0,
-          maxBacklogs: 0,
-          allowedBranches: ['Computer Science & Engineering', 'Information Technology', 'Electronics & Communication'],
-          requiredSkills: ['C++', 'Java', 'Data Structures', 'Algorithms', 'Distributed Systems'],
-          minReadinessScore: 70,
-        },
-        schedule: {
-          driveDate: driveDate2, // Same day & venue! Triggers real-time conflict detector
-          startTime: '10:00 AM',
-          endTime: '05:00 PM',
-          venue: 'Campus Auditorium - Hall A',
-          slotId: 'SLOT-MORNING-HALL_A',
-        },
-        stages: [
-          { name: 'Pre-Placement Presentation', time: '10:00 AM', venue: 'Auditorium', status: 'upcoming' },
-          { name: 'DSA & Problem Solving Test', time: '12:00 PM', venue: 'Lab 2', status: 'upcoming' },
-          { name: 'Technical Round 1', time: '03:00 PM', venue: 'Virtual Room', status: 'upcoming' },
-        ],
-        status: 'upcoming',
-        totalOpenings: 18,
-        offersExtended: 0,
-      },
-      {
-        companyName: 'Arcturus Connexa Technologies',
-        companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-        roleTitle: 'Full Stack Engineering Lead',
-        jobCategory: 'Product Engineering',
-        ctcLpa: 18.5,
-        baseStipend: 60000,
-        eligibility: {
-          minCgpa: 6.8,
-          maxBacklogs: 0,
-          allowedBranches: ['Computer Science & Engineering', 'Information Technology', 'Electronics & Communication'],
-          requiredSkills: ['React', 'Node.js', 'MongoDB', 'Docker', 'REST APIs'],
-          minReadinessScore: 65,
-        },
-        schedule: {
-          driveDate: driveDate3,
-          startTime: '09:00 AM',
-          endTime: '04:00 PM',
-          venue: 'Seminar Hall B',
-          slotId: 'SLOT-DAY3-HALL_B',
-        },
-        stages: [
-          { name: 'Company Overview & Orientation', time: '09:00 AM', venue: 'Seminar Hall B', status: 'upcoming' },
-          { name: 'Hands-on Coding Sprint', time: '11:00 AM', venue: 'Lab A', status: 'upcoming' },
-          { name: 'Architecture Review & HR', time: '02:30 PM', venue: 'Seminar Hall B', status: 'upcoming' },
-        ],
-        status: 'upcoming',
-        totalOpenings: 10,
-        offersExtended: 2,
-      },
-    ]);
-  }
-
-  // Seed sample student profile if none exists for current user
-  if (currentUserId) {
-    let profile = await PlacementProfile.findOne({ userId: currentUserId });
-    if (!profile) {
-      const user = await User.findById(currentUserId);
-      const studentSkills = ['React', 'Node.js', 'JavaScript', 'MongoDB', 'Python', 'Data Structures', 'Docker'];
-      const skillGaps = computeSkillGaps(studentSkills);
-
-      profile = await PlacementProfile.create({
-        userId: currentUserId,
-        rollNumber: '21CS042',
-        collegeName: 'Arcturus Institute of Technology',
-        branch: 'Computer Science & Engineering',
-        graduationYear: 2026,
-        cgpa: 8.7,
-        activeBacklogs: 0,
-        totalBacklogs: 0,
-        tenthPercentage: 92.4,
-        twelfthPercentage: 89.0,
-        skills: studentSkills,
-        targetRoles: ['Full Stack Cloud Engineer', 'Cloud Solutions Architect & SDE'],
-        technicalScore: 86,
-        aptitudeScore: 88,
-        communicationScore: 80,
-        projectScore: 90,
-        overallReadiness: 86,
-        readinessLevel: 'Highly Employable',
-        skillGaps,
-        placementStatus: 'shortlisted',
-        isAtRisk: false,
-      });
-
-      // Also create a sample verified offer
-      await PlacementOffer.create({
-        studentId: currentUserId,
-        studentName: `${user?.firstName || 'Student'} ${user?.lastName || 'Scholar'}`.trim(),
-        rollNumber: '21CS042',
-        branch: 'Computer Science & Engineering',
-        companyName: 'Arcturus Connexa Technologies',
-        companyLogo: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-        role: 'Full Stack Engineering Associate',
-        ctcLpa: 18.5,
-        packageTier: 'Super Dream (> 12 LPA)',
-        offerType: 'Full-Time',
-        status: 'offered',
-        verificationStatus: 'verified',
-        bondDetails: 'None / Direct Permanent Offer',
-      });
-    }
-  }
-};
-
 // GET /api/campuslink/profile/me - Get student's placement readiness profile
 router.get('/profile/me', authMiddleware, async (req, res) => {
   try {
-    await seedDefaultPlacementData(req.userId);
-
     let profile = await PlacementProfile.findOne({ userId: req.userId }).lean();
     if (!profile) {
-      return res.status(404).json({ error: 'Placement profile not found' });
+      return res.json({ profile: null });
     }
 
     // Refresh dynamic skill gap recommendations
@@ -241,6 +83,101 @@ router.get('/profile/me', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Failed to get student placement profile:', err);
     res.status(500).json({ error: 'Failed to load placement profile' });
+  }
+});
+
+// POST /api/campuslink/profile - Create or update student placement profile with real data
+router.post('/profile', authMiddleware, async (req, res) => {
+  try {
+    const {
+      rollNumber,
+      collegeName,
+      branch,
+      graduationYear,
+      cgpa,
+      activeBacklogs,
+      skills,
+      targetRoles,
+    } = req.body;
+
+    if (!rollNumber || !collegeName || !branch || cgpa === undefined) {
+      return res.status(400).json({ error: 'Roll number, college name, branch, and CGPA are required.' });
+    }
+
+    const studentSkills = Array.isArray(skills)
+      ? skills
+      : typeof skills === 'string'
+      ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
+    const numCgpa = Number(cgpa) || 0;
+    const numBacklogs = Number(activeBacklogs) || 0;
+    const numGradYear = Number(graduationYear) || new Date().getFullYear();
+
+    // Compute realistic score dimensions based on inputs
+    const technicalScore = Math.min(100, Math.max(30, studentSkills.length * 12 + Math.round(numCgpa * 4)));
+    const aptitudeScore = Math.min(100, Math.max(35, Math.round(numCgpa * 9) - numBacklogs * 5));
+    const communicationScore = 75; // Baseline behavioral score
+    const projectScore = Math.min(100, Math.max(40, studentSkills.length * 10 + 20));
+
+    const overallReadiness = Math.round(
+      technicalScore * 0.4 + aptitudeScore * 0.25 + communicationScore * 0.15 + projectScore * 0.2
+    );
+
+    let readinessLevel = 'Developing';
+    if (overallReadiness >= 85) readinessLevel = 'Highly Employable';
+    else if (overallReadiness >= 70) readinessLevel = 'Ready';
+    else if (overallReadiness < 50) readinessLevel = 'Not Ready';
+
+    const isAtRisk = numCgpa < 6.5 || numBacklogs > 0 || overallReadiness < 50;
+    const skillGaps = computeSkillGaps(studentSkills);
+
+    let profile = await PlacementProfile.findOne({ userId: req.userId });
+    if (profile) {
+      profile.rollNumber = rollNumber.trim();
+      profile.collegeName = collegeName.trim();
+      profile.branch = branch.trim();
+      profile.graduationYear = numGradYear;
+      profile.cgpa = numCgpa;
+      profile.activeBacklogs = numBacklogs;
+      profile.skills = studentSkills;
+      profile.targetRoles = targetRoles || profile.targetRoles;
+      profile.technicalScore = technicalScore;
+      profile.aptitudeScore = aptitudeScore;
+      profile.communicationScore = communicationScore;
+      profile.projectScore = projectScore;
+      profile.overallReadiness = overallReadiness;
+      profile.readinessLevel = readinessLevel;
+      profile.skillGaps = skillGaps;
+      profile.isAtRisk = isAtRisk;
+      await profile.save();
+    } else {
+      profile = await PlacementProfile.create({
+        userId: req.userId,
+        rollNumber: rollNumber.trim(),
+        collegeName: collegeName.trim(),
+        branch: branch.trim(),
+        graduationYear: numGradYear,
+        cgpa: numCgpa,
+        activeBacklogs: numBacklogs,
+        totalBacklogs: numBacklogs,
+        skills: studentSkills,
+        targetRoles: targetRoles || ['Full Stack Cloud Engineer', 'Cloud Solutions Architect & SDE'],
+        technicalScore,
+        aptitudeScore,
+        communicationScore,
+        projectScore,
+        overallReadiness,
+        readinessLevel,
+        skillGaps,
+        isAtRisk,
+      });
+    }
+
+    res.json({ message: 'Placement profile saved successfully!', profile });
+  } catch (err) {
+    console.error('Failed to save placement profile:', err);
+    res.status(500).json({ error: 'Failed to save placement profile' });
   }
 });
 
@@ -275,8 +212,6 @@ router.post('/profile/assessment', authMiddleware, async (req, res) => {
 // GET /api/campuslink/drives - Get all drives and real-time conflicts
 router.get('/drives', async (req, res) => {
   try {
-    await seedDefaultPlacementData();
-
     const drives = await PlacementDrive.find().sort({ 'schedule.driveDate': 1 }).lean();
     const conflicts = detectDriveConflicts(drives);
 
@@ -370,6 +305,20 @@ router.patch('/drives/:id/resolve-conflict', authMiddleware, async (req, res) =>
   } catch (err) {
     console.error('Failed to resolve conflict:', err);
     res.status(500).json({ error: 'Conflict resolution failed' });
+  }
+});
+
+// DELETE /api/campuslink/drives/:id - Delete or cancel a placement drive
+router.delete('/drives/:id', authMiddleware, async (req, res) => {
+  try {
+    const drive = await PlacementDrive.findByIdAndDelete(req.params.id);
+    if (!drive) {
+      return res.status(404).json({ error: 'Drive not found' });
+    }
+    res.json({ message: 'Placement drive removed successfully' });
+  } catch (err) {
+    console.error('Failed to delete drive:', err);
+    res.status(500).json({ error: 'Failed to delete drive' });
   }
 });
 
@@ -473,92 +422,141 @@ router.post('/drives/:id/auto-shortlist', authMiddleware, async (req, res) => {
     const drive = await PlacementDrive.findById(req.params.id);
     if (!drive) return res.status(404).json({ error: 'Drive not found' });
 
-    // Mark eligible candidates as shortlisted
-    const updatedCount = 14;
+    // Find eligible profiles meeting drive criteria
+    const filter = {
+      cgpa: { $gte: drive.eligibility.minCgpa || 0 },
+      activeBacklogs: { $lte: drive.eligibility.maxBacklogs || 0 },
+    };
+    if (drive.eligibility.allowedBranches && drive.eligibility.allowedBranches.length > 0) {
+      filter.branch = { $in: drive.eligibility.allowedBranches };
+    }
+
+    const result = await PlacementProfile.updateMany(filter, { $set: { placementStatus: 'shortlisted' } });
+    const count = result.modifiedCount || 0;
+
     res.json({
-      message: `Successfully auto-shortlisted ${updatedCount} eligible candidates meeting CGPA and skill benchmarks!`,
+      message: `Successfully auto-shortlisted ${count} candidate(s) meeting CGPA & branch criteria for ${drive.companyName}!`,
+      count,
     });
   } catch (err) {
     res.status(500).json({ error: 'Auto-shortlisting failed' });
   }
 });
 
-// GET /api/campuslink/analytics - Placement Command Center Insights
+// GET /api/campuslink/analytics - Placement Command Center Insights (Real Dynamic Aggregation)
 router.get('/analytics', async (req, res) => {
   try {
-    await seedDefaultPlacementData();
+    const totalRegisteredStudents = await PlacementProfile.countDocuments();
+    const placementReadyCount = await PlacementProfile.countDocuments({ overallReadiness: { $gte: 70 } });
+    const activeDrivesCount = await PlacementDrive.countDocuments({ status: { $ne: 'completed' } });
+    const totalOffersExtended = await PlacementOffer.countDocuments();
+    const totalOffersAccepted = await PlacementOffer.countDocuments({ status: 'accepted' });
+    const placementRatePercentage = totalRegisteredStudents > 0 
+      ? Number(((totalOffersAccepted / totalRegisteredStudents) * 100).toFixed(1)) 
+      : 0;
 
-    const totalStudents = await PlacementProfile.countDocuments() || 240;
-    const totalDrives = await PlacementDrive.countDocuments() || 18;
-    const totalOffers = await PlacementOffer.countDocuments() || 86;
+    // Calculate real average and highest CTC from offers (or drives if no offers)
+    let averageCtcLpa = 0;
+    let highestPackageLpa = 0;
+    const offerStats = await PlacementOffer.aggregate([
+      { $group: { _id: null, avgCtc: { $avg: '$ctcLpa' }, maxCtc: { $max: '$ctcLpa' } } }
+    ]);
+    if (offerStats.length > 0 && offerStats[0].avgCtc != null) {
+      averageCtcLpa = Number((offerStats[0].avgCtc || 0).toFixed(1));
+      highestPackageLpa = Number((offerStats[0].maxCtc || 0).toFixed(1));
+    } else {
+      const driveStats = await PlacementDrive.aggregate([
+        { $group: { _id: null, avgCtc: { $avg: '$ctcLpa' }, maxCtc: { $max: '$ctcLpa' } } }
+      ]);
+      if (driveStats.length > 0 && driveStats[0].avgCtc != null) {
+        averageCtcLpa = Number((driveStats[0].avgCtc || 0).toFixed(1));
+        highestPackageLpa = Number((driveStats[0].maxCtc || 0).toFixed(1));
+      }
+    }
+
+    // Real Branch Conversion aggregated from student profiles
+    const branchAgg = await PlacementProfile.aggregate([
+      {
+        $group: {
+          _id: '$branch',
+          total: { $sum: 1 },
+          placed: {
+            $sum: {
+              $cond: [{ $in: ['$placementStatus', ['placed', 'offer_accepted']] }, 1, 0]
+            }
+          }
+        }
+      }
+    ]);
+    const branchConversion = branchAgg.map((b) => ({
+      branch: b._id || 'General Engineering',
+      total: b.total,
+      placed: b.placed,
+      placedPercent: b.total > 0 ? Number(((b.placed / b.total) * 100).toFixed(1)) : 0,
+    }));
+
+    // Real Package Tiers from Offers
+    const packageTiersAgg = await PlacementOffer.aggregate([
+      {
+        $group: {
+          _id: '$packageTier',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    const totalOffersCount = packageTiersAgg.reduce((acc, curr) => acc + curr.count, 0);
+    const packageTiers = packageTiersAgg.map((pt) => ({
+      tier: pt._id || 'Standard (< 6 LPA)',
+      count: pt.count,
+      percentage: totalOffersCount > 0 ? Math.round((pt.count / totalOffersCount) * 100) : 0,
+    }));
+
+    // Real At-Risk Students from Database
+    const atRiskProfiles = await PlacementProfile.find({
+      $or: [
+        { isAtRisk: true },
+        { activeBacklogs: { $gt: 0 } },
+        { cgpa: { $lt: 6.5 } },
+        { overallReadiness: { $lt: 50 } }
+      ]
+    }).populate('userId', 'firstName lastName email').limit(20).lean();
+
+    const atRiskStudents = atRiskProfiles.map((p) => {
+      const studentName = p.userId ? `${p.userId.firstName} ${p.userId.lastName}`.trim() : `Student ${p.rollNumber}`;
+      let riskReason = 'Readiness score below benchmark';
+      if (p.activeBacklogs > 0 && p.cgpa < 6.5) {
+        riskReason = `Active backlogs (${p.activeBacklogs}) & CGPA below 6.5`;
+      } else if (p.activeBacklogs > 0) {
+        riskReason = `${p.activeBacklogs} active backlog(s) flagged`;
+      } else if (p.cgpa < 6.5) {
+        riskReason = `CGPA (${p.cgpa}) below institutional benchmark (6.5)`;
+      }
+      return {
+        id: p._id.toString(),
+        name: studentName,
+        rollNumber: p.rollNumber,
+        branch: p.branch,
+        cgpa: p.cgpa,
+        activeBacklogs: p.activeBacklogs,
+        readiness: p.overallReadiness,
+        readinessLevel: p.readinessLevel,
+        riskReason,
+        mentor: 'Department Faculty Advisor',
+      };
+    });
 
     const stats = {
-      totalRegisteredStudents: 420,
-      placementReadyCount: 365,
-      placementRatePercentage: 86.9,
-      activeDrivesCount: totalDrives,
-      totalOffersExtended: 184,
-      totalOffersAccepted: 162,
-      averageCtcLpa: 14.8,
-      medianCtcLpa: 12.5,
-      highestPackageLpa: 44.0,
-
-      // Branch-wise Conversion Rates
-      branchConversion: [
-        { branch: 'Computer Science & Engineering', placedPercent: 94.2, total: 140, placed: 132, avgCtc: 18.2 },
-        { branch: 'Information Technology', placedPercent: 91.5, total: 95, placed: 87, avgCtc: 16.5 },
-        { branch: 'Electronics & Communication', placedPercent: 82.0, total: 80, placed: 66, avgCtc: 12.8 },
-        { branch: 'Electrical & Electronics', placedPercent: 76.5, total: 45, placed: 34, avgCtc: 9.4 },
-        { branch: 'Mechanical Engineering', placedPercent: 68.0, total: 40, placed: 27, avgCtc: 8.2 },
-        { branch: 'Civil Engineering', placedPercent: 62.5, total: 20, placed: 12, avgCtc: 7.5 },
-      ],
-
-      // Salary Tier Breakdown
-      packageTiers: [
-        { tier: 'Super Dream (> 12 LPA)', count: 68, percentage: 37 },
-        { tier: 'Dream (6 - 12 LPA)', count: 84, percentage: 46 },
-        { tier: 'Standard (< 6 LPA)', count: 32, percentage: 17 },
-      ],
-
-      // Predictive At-Risk Students requiring Mentor Escalation
-      atRiskStudents: [
-        {
-          id: '1',
-          name: 'Rahul Sen',
-          rollNumber: '21CS089',
-          branch: 'Computer Science',
-          cgpa: 6.2,
-          activeBacklogs: 1,
-          readiness: 48,
-          readinessLevel: 'Not Ready',
-          riskReason: 'Active backlog in OS & CGPA below 6.5 cutoff',
-          mentor: 'Prof. Anirudh Bose',
-        },
-        {
-          id: '2',
-          name: 'Pooja Nair',
-          rollNumber: '21EC034',
-          branch: 'Electronics & Communication',
-          cgpa: 6.4,
-          activeBacklogs: 0,
-          readiness: 52,
-          readinessLevel: 'Developing',
-          riskReason: 'Repeated aptitude test bottlenecks across 3 drives',
-          mentor: 'Dr. Meera Swaminathan',
-        },
-        {
-          id: '3',
-          name: 'Amit Vikram',
-          rollNumber: '21ME012',
-          branch: 'Mechanical Engineering',
-          cgpa: 6.1,
-          activeBacklogs: 2,
-          readiness: 42,
-          readinessLevel: 'Not Ready',
-          riskReason: '2 active backlogs; requires remedial programming sprint',
-          mentor: 'Prof. K. R. Sharma',
-        },
-      ],
+      totalRegisteredStudents,
+      placementReadyCount,
+      placementRatePercentage,
+      activeDrivesCount,
+      totalOffersExtended,
+      totalOffersAccepted,
+      averageCtcLpa,
+      highestPackageLpa,
+      branchConversion,
+      packageTiers,
+      atRiskStudents,
     };
 
     res.json({ stats });
@@ -597,7 +595,7 @@ router.post('/offers/:id/respond', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /api/campuslink/ai-assistant - Conversational Placement Assistant
+// POST /api/campuslink/ai-assistant - Conversational Placement Assistant (Real Context)
 router.post('/ai-assistant', async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -608,16 +606,31 @@ router.post('/ai-assistant', async (req, res) => {
     const lower = prompt.toLowerCase();
     let reply = '';
 
-    if (lower.includes('google') || lower.includes('eligible')) {
-      reply = `🔍 **Eligibility Analysis for Google Cloud India:**\n- **Role:** Associate Cloud Engineer (22.0 LPA)\n- **Cutoff:** Minimum 7.5 CGPA with 0 active backlogs.\n- **Skills Required:** Python, Docker, AWS/GCP, Data Structures.\n- **Your Status:** Your profile (8.7 CGPA, 0 backlogs, Full Stack background) exceeds the eligibility threshold! Make sure to review Docker containerization and Mock System Design before the PPT.`;
+    // Fetch active drives for real context
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).limit(5).lean();
+
+    if (lower.includes('eligible') || lower.includes('drive')) {
+      if (activeDrives.length > 0) {
+        const driveList = activeDrives
+          .map((d) => `- **${d.companyName}** (${d.roleTitle}): Min CGPA ${d.eligibility?.minCgpa || 7.0}, Max ${d.eligibility?.maxBacklogs || 0} backlogs, Package: ${d.ctcLpa} LPA.`)
+          .join('\n');
+        reply = `🔍 **Active Placement Drives Eligibility Criteria:**\n${driveList}\n\nReview your profile in the **Readiness & Skills** tab to check if your CGPA and technical skills match these recruiter thresholds.`;
+      } else {
+        reply = `🔍 **Placement Drives Status:**\nThere are currently no active placement drives scheduled. Once the Placement Cell publishes recruitment drives, I will evaluate your eligibility and cutoff match in real-time.`;
+      }
     } else if (lower.includes('skill gap') || lower.includes('gap')) {
-      reply = `📊 **Target Role Skill-Gap Analysis:**\n- For **Full Stack Cloud Engineer**, your top missing competencies are **AWS ECS Orchestration** and **Microservices Architecture**.\n- We recommend completing the *Full Stack Cloud Architecture* module on Arcturus Learning to increase your fit score from 84% to 96%.`;
+      reply = `📊 **Target Role Skill-Gap Diagnostics:**\n- For **Full Stack Cloud Engineer**, high-priority industry competencies include **Docker Containerization**, **AWS/Cloud Orchestration**, and **Microservices Architecture**.\n- For **Cloud Solutions Architect**, focus on **Distributed System Design** and **Kubernetes**.\n- Check your personal diagnostic recommendations under the **Readiness & Skills** tab.`;
     } else if (lower.includes('interview') || lower.includes('question') || lower.includes('prep')) {
-      reply = `💡 **Top Technical Interview Questions for SDE Drives:**\n1. *Explain how Database Indexing works under the hood (B-Trees vs Hash).* \n2. *How do you prevent race conditions in distributed systems using locks or message queues?* \n3. *Implement an LRU Cache with O(1) get and put operations.* \nTake the **Interactive Mock Assessment** in your profile tab to practice!`;
+      reply = `💡 **Core Technical Interview Focus Areas:**\n1. *Data Structures & Algorithms:* Time/Space complexity, Hash Maps, Trees, Graphs, and Dynamic Programming.\n2. *System Design:* Load balancing, horizontal scaling, caching strategies (Redis), and database indexing (B-Trees).\n3. *Backend Engineering:* RESTful API design, authentication (JWT/OAuth), and asynchronous messaging.\nPractice using the **Mock Assessment Booster** in the Readiness tab!`;
     } else if (lower.includes('conflict') || lower.includes('schedule')) {
-      reply = `⚠️ **Placement Drive Schedule Notice:**\nWe detected a date/venue conflict on Day 2 between **Google Cloud India** and **Microsoft Azure Systems** in Auditorium Hall A. The Placement Cell has activated the auto-resolver to shift Microsoft Azure to the Afternoon Slot (02:00 PM) so students can attend both!`;
+      const conflicts = detectDriveConflicts(activeDrives);
+      if (conflicts.length > 0) {
+        reply = `⚠️ **Placement Drive Schedule Notice:**\nWe detected ${conflicts.length} scheduling collision(s) among upcoming drives. The Placement Cell can use the **1-Click Auto-Resolve** button in the **Drives & Conflicts** tab to stagger slots and clear venue clashes.`;
+      } else {
+        reply = `✅ **Placement Schedule Status:**\nAll scheduled drives currently have distinct venues and non-overlapping time slots. No schedule conflicts detected.`;
+      }
     } else {
-      reply = `🎓 **CampusLink AI Assistant:**\nI can help you analyze drive eligibility, diagnose technical skill gaps, review your 4-tier readiness score, or simulate technical interview questions. What would you like to prepare for today?`;
+      reply = `🎓 **CampusLink AI Assistant:**\nI can help you review upcoming drive eligibility, diagnose technical skill gaps, evaluate your 4-tier readiness score, or practice technical interview questions. What would you like assistance with today?`;
     }
 
     res.json({ reply });

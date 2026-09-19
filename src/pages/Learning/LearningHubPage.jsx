@@ -268,7 +268,7 @@ const LearningHubPage = () => {
             certificateId: data.certificateId || `ARC-CERT-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
             courseTitle: playerCourse.title,
             instructorName: playerCourse.instructor?.name || 'Arcturus Senior Faculty',
-            recipientName: user?.name || 'Verified Professional',
+            recipientName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username || 'Verified Scholar',
             date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
           });
         }
@@ -316,23 +316,23 @@ const LearningHubPage = () => {
         {/* Hero Highlights */}
         <div className="learningHeroStats">
           <div className="heroStatItem">
-            <strong>120+</strong>
-            <span>Curated Courses</span>
+            <strong>{courses.length}</strong>
+            <span>Active Courses</span>
           </div>
           <div className="heroStatDivider" />
           <div className="heroStatItem">
-            <strong>45k+</strong>
-            <span>Active Learners</span>
+            <strong>{myLearning.enrolled?.length || 0}</strong>
+            <span>Your Enrollments</span>
           </div>
           <div className="heroStatDivider" />
           <div className="heroStatItem">
-            <strong>4.9 ★</strong>
-            <span>Learner Rating</span>
+            <strong>{myLearning.certificates?.length || 0}</strong>
+            <span>Certificates Earned</span>
           </div>
           <div className="heroStatDivider" />
           <div className="heroStatItem">
             <strong>100%</strong>
-            <span>Verifiable Certificates</span>
+            <span>Verified Credentials</span>
           </div>
         </div>
       </div>

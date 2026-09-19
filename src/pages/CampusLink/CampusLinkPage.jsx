@@ -19,7 +19,9 @@ import {
   FaSyncAlt,
   FaShieldAlt,
   FaExternalLinkAlt,
-  FaArrowRight
+  FaArrowRight,
+  FaPlus,
+  FaTrash
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -104,6 +106,42 @@ const CampusLinkPage = () => {
   const [assessmentStep, setAssessmentStep] = useState(1);
   const [assessmentAnswers, setAssessmentAnswers] = useState({ q1: 'b', q2: 'a', q3: 'c' });
 
+  // Placement Profile Form State
+  const [profileForm, setProfileForm] = useState({
+    collegeName: '',
+    rollNumber: '',
+    branch: 'Computer Science & Engineering',
+    graduationYear: 2026,
+    cgpa: '',
+    activeBacklogs: 0,
+    skills: '',
+  });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Drive Scheduling Modal State
+  const [showDriveModal, setShowDriveModal] = useState(false);
+  const [driveForm, setDriveForm] = useState({
+    companyName: '',
+    companyLogo: '',
+    roleTitle: '',
+    jobCategory: 'Core Software',
+    ctcLpa: '',
+    baseStipend: '',
+    minCgpa: 7.0,
+    maxBacklogs: 0,
+    allowedBranches: [
+      'Computer Science & Engineering',
+      'Information Technology',
+      'Electronics & Communication',
+    ],
+    requiredSkills: '',
+    driveDate: '',
+    startTime: '09:30 AM',
+    endTime: '01:30 PM',
+    venue: 'Campus Auditorium - Hall A',
+    totalOpenings: 10,
+  });
+
   // Chatbot State & Refs
   const chatScrollRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -167,6 +205,17 @@ const CampusLinkPage = () => {
         if (profRes.ok) {
           const profData = await profRes.json();
           setStudentProfile(profData.profile);
+          if (profData.profile) {
+            setProfileForm({
+              collegeName: profData.profile.collegeName || '',
+              rollNumber: profData.profile.rollNumber || '',
+              branch: profData.profile.branch || 'Computer Science & Engineering',
+              graduationYear: profData.profile.graduationYear || 2026,
+              cgpa: profData.profile.cgpa ?? '',
+              activeBacklogs: profData.profile.activeBacklogs ?? 0,
+              skills: Array.isArray(profData.profile.skills) ? profData.profile.skills.join(', ') : '',
+            });
+          }
         }
       }
     } catch (err) {
@@ -222,6 +271,140 @@ const CampusLinkPage = () => {
       }
     } catch (err) {
       console.error('Failed to auto-resolve conflict:', err);
+    }
+  };
+
+  // Schedule a new recruitment drive
+  const handleScheduleDrive = async (e) => {
+    e?.preventDefault();
+    if (!token) {
+      showToast('Please sign in to schedule a placement drive');
+      return;
+    }
+    if (!driveForm.companyName.trim() || !driveForm.roleTitle.trim() || !driveForm.ctcLpa || !driveForm.driveDate) {
+      showToast('Please provide company name, role, CTC package, and drive date');
+      return;
+    }
+    try {
+      const skillsArray = typeof driveForm.requiredSkills === 'string'
+        ? driveForm.requiredSkills.split(',').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+      const payload = {
+        companyName: driveForm.companyName.trim(),
+        companyLogo: driveForm.companyLogo.trim() || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
+        roleTitle: driveForm.roleTitle.trim(),
+        jobCategory: driveForm.jobCategory,
+        ctcLpa: Number(driveForm.ctcLpa),
+        baseStipend: Number(driveForm.baseStipend) || 0,
+        minCgpa: Number(driveForm.minCgpa) || 6.0,
+        maxBacklogs: Number(driveForm.maxBacklogs) || 0,
+        allowedBranches: driveForm.allowedBranches,
+        requiredSkills: skillsArray.length > 0 ? skillsArray : ['Data Structures', 'Problem Solving'],
+        driveDate: driveForm.driveDate,
+        startTime: driveForm.startTime || '09:30 AM',
+        endTime: driveForm.endTime || '01:30 PM',
+        venue: driveForm.venue || 'Campus Auditorium - Hall A',
+        totalOpenings: Number(driveForm.totalOpenings) || 10,
+      };
+
+      const res = await fetch(buildApiUrl('/campuslink/drives'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showToast('🎯 Recruitment drive scheduled successfully!');
+        setShowDriveModal(false);
+        setDriveForm({
+          companyName: '',
+          companyLogo: '',
+          roleTitle: '',
+          jobCategory: 'Core Software',
+          ctcLpa: '',
+          baseStipend: '',
+          minCgpa: 7.0,
+          maxBacklogs: 0,
+          allowedBranches: [
+            'Computer Science & Engineering',
+            'Information Technology',
+            'Electronics & Communication',
+          ],
+          requiredSkills: '',
+          driveDate: '',
+          startTime: '09:30 AM',
+          endTime: '01:30 PM',
+          venue: 'Campus Auditorium - Hall A',
+          totalOpenings: 10,
+        });
+        loadCampusData();
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to schedule drive');
+      }
+    } catch (err) {
+      console.error('Drive scheduling error:', err);
+      showToast('Network error scheduling placement drive');
+    }
+  };
+
+  // Cancel / Delete a placement drive
+  const handleDeleteDrive = async (driveId, companyName) => {
+    if (!window.confirm(`Are you sure you want to cancel the recruitment drive for ${companyName}?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(buildApiUrl(`/campuslink/drives/${driveId}`), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        showToast(`🗑️ Placement drive for ${companyName} cancelled`);
+        loadCampusData();
+      }
+    } catch (err) {
+      console.error('Failed to delete drive:', err);
+      showToast('Failed to cancel placement drive');
+    }
+  };
+
+  // Save / Update Student Placement Profile
+  const handleSaveProfile = async (e) => {
+    e?.preventDefault();
+    if (!token) {
+      showToast('Please sign in to save your placement profile');
+      return;
+    }
+    if (!profileForm.collegeName.trim() || !profileForm.rollNumber.trim() || profileForm.cgpa === '') {
+      showToast('Please provide your college name, roll number, and CGPA');
+      return;
+    }
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/profile'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileForm),
+      });
+      if (res.ok) {
+        showToast('🎯 Placement profile saved and readiness calculated!');
+        setIsEditingProfile(false);
+        loadCampusData();
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to save profile');
+      }
+    } catch (err) {
+      console.error('Save profile error:', err);
+      showToast('Network error saving placement profile');
     }
   };
 
@@ -363,10 +546,10 @@ const CampusLinkPage = () => {
 
         <div className="campusHeroBadges">
           <div className="campusHeroBadge">
-            <FaAward color="#facc15" /> Placement Rate: <strong>86.9%</strong>
+            <FaAward color="#facc15" /> Placement Rate: <strong>{analytics?.totalRegisteredStudents > 0 ? `${analytics.placementRatePercentage}%` : '0%'}</strong>
           </div>
           <div className="campusHeroBadge">
-            <FaDollarSign color="#4ade80" /> Avg CTC: <strong>14.8 LPA</strong>
+            <FaDollarSign color="#4ade80" /> Avg CTC: <strong>{analytics?.averageCtcLpa ? `${analytics.averageCtcLpa} LPA` : '—'}</strong>
           </div>
           <div className="campusHeroBadge">
             <FaBriefcase color="#38bdf8" /> Active Drives: <strong>{drives.length}</strong>
@@ -454,7 +637,7 @@ const CampusLinkPage = () => {
               </div>
               <div className="campusKpiMeta">
                 <h5>Registered Students</h5>
-                <p>{analytics?.totalRegisteredStudents || 420}</p>
+                <p>{analytics?.totalRegisteredStudents || 0}</p>
               </div>
             </div>
 
@@ -464,7 +647,7 @@ const CampusLinkPage = () => {
               </div>
               <div className="campusKpiMeta">
                 <h5>Placement Rate</h5>
-                <p>{analytics?.placementRatePercentage || 86.9}%</p>
+                <p>{analytics?.totalRegisteredStudents > 0 ? `${analytics.placementRatePercentage}%` : '0%'}</p>
               </div>
             </div>
 
@@ -474,7 +657,7 @@ const CampusLinkPage = () => {
               </div>
               <div className="campusKpiMeta">
                 <h5>Average Package</h5>
-                <p>{analytics?.averageCtcLpa || 14.8} LPA</p>
+                <p>{analytics?.averageCtcLpa ? `${analytics.averageCtcLpa} LPA` : '—'}</p>
               </div>
             </div>
 
@@ -484,7 +667,7 @@ const CampusLinkPage = () => {
               </div>
               <div className="campusKpiMeta">
                 <h5>Highest Package</h5>
-                <p>{analytics?.highestPackageLpa || 44.0} LPA</p>
+                <p>{analytics?.highestPackageLpa ? `${analytics.highestPackageLpa} LPA` : '—'}</p>
               </div>
             </div>
           </div>
@@ -494,39 +677,51 @@ const CampusLinkPage = () => {
             {/* Branch Conversion Rates */}
             <div className="campusSubCard">
               <h3><FaGraduationCap color="#0a66c2" /> Branch-Wise Placement Conversion Rates</h3>
-              {analytics?.branchConversion?.map((b) => (
-                <div key={b.branch} className="branchRow">
-                  <div className="branchRowHeader">
-                    <span>{b.branch}</span>
-                    <span>{b.placedPercent}% ({b.placed}/{b.total} placed)</span>
+              {analytics?.branchConversion?.length > 0 ? (
+                analytics.branchConversion.map((b) => (
+                  <div key={b.branch} className="branchRow">
+                    <div className="branchRowHeader">
+                      <span>{b.branch}</span>
+                      <span>{b.placedPercent}% ({b.placed}/{b.total} placed)</span>
+                    </div>
+                    <div className="branchBarTrack">
+                      <div className="branchBarFill" style={{ width: `${b.placedPercent}%` }} />
+                    </div>
                   </div>
-                  <div className="branchBarTrack">
-                    <div className="branchBarFill" style={{ width: `${b.placedPercent}%` }} />
-                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '30px 16px', color: '#64748b' }}>
+                  <p style={{ margin: 0, fontSize: '0.88rem' }}>No student placement data recorded yet.</p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Salary Package Tiers */}
             <div className="campusSubCard">
               <h3><FaDollarSign color="#16a34a" /> Salary Package Tier Distribution</h3>
-              {analytics?.packageTiers?.map((t) => (
-                <div key={t.tier} style={{ marginBottom: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.86rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                    <span>{t.tier}</span>
-                    <span>{t.count} offers ({t.percentage}%)</span>
+              {analytics?.packageTiers?.length > 0 ? (
+                analytics.packageTiers.map((t) => (
+                  <div key={t.tier} style={{ marginBottom: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.86rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                      <span>{t.tier}</span>
+                      <span>{t.count} offers ({t.percentage}%)</span>
+                    </div>
+                    <div className="branchBarTrack">
+                      <div
+                        className="branchBarFill"
+                        style={{
+                          width: `${t.percentage}%`,
+                          background: t.tier.includes('Super') ? '#7e22ce' : t.tier.includes('Dream') ? '#0284c7' : '#64748b',
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="branchBarTrack">
-                    <div
-                      className="branchBarFill"
-                      style={{
-                        width: `${t.percentage}%`,
-                        background: t.tier.includes('Super') ? '#7e22ce' : t.tier.includes('Dream') ? '#0284c7' : '#64748b',
-                      }}
-                    />
-                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '30px 16px', color: '#64748b' }}>
+                  <p style={{ margin: 0, fontSize: '0.88rem' }}>No offers recorded yet.</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -539,23 +734,31 @@ const CampusLinkPage = () => {
               <small style={{ color: '#c2410c' }}>Identified via Low CGPA, Backlogs, or Readiness Bottlenecks</small>
             </div>
 
-            {analytics?.atRiskStudents?.map((s) => (
-              <div key={s.id} className="atRiskStudentCard">
-                <div className="atRiskMeta">
-                  <h4>{s.name} ({s.rollNumber}) · {s.branch}</h4>
-                  <p>CGPA: <strong>{s.cgpa}</strong> · Backlogs: <strong>{s.activeBacklogs}</strong> · Readiness: <strong>{s.readiness}% ({s.readinessLevel})</strong></p>
-                  <p style={{ color: '#b45309', marginTop: 3 }}><em>Trigger: {s.riskReason}</em></p>
-                </div>
+            {analytics?.atRiskStudents?.length > 0 ? (
+              analytics.atRiskStudents.map((s) => (
+                <div key={s.id} className="atRiskStudentCard">
+                  <div className="atRiskMeta">
+                    <h4>{s.name} ({s.rollNumber}) · {s.branch}</h4>
+                    <p>CGPA: <strong>{s.cgpa}</strong> · Backlogs: <strong>{s.activeBacklogs}</strong> · Readiness: <strong>{s.readiness}% ({s.readinessLevel})</strong></p>
+                    <p style={{ color: '#b45309', marginTop: 3 }}><em>Trigger: {s.riskReason}</em></p>
+                  </div>
 
-                <button
-                  type="button"
-                  className="escalateBtn"
-                  onClick={() => showToast(`Escalated ${s.name} to mentor ${s.mentor} for remedial coaching.`)}
-                >
-                  Escalate to Mentor: {s.mentor.split(' ')[0]}
-                </button>
+                  <button
+                    type="button"
+                    className="escalateBtn"
+                    onClick={() => showToast(`Escalated ${s.name} for mentor review.`)}
+                  >
+                    Escalate to Mentor
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '24px 16px', color: '#166534', background: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>
+                  🎉 All registered students currently meet academic benchmarks and eligibility criteria. Zero at-risk students flagged.
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
@@ -570,6 +773,13 @@ const CampusLinkPage = () => {
               <h2><FaCalendarAlt color="#0a66c2" /> Placement Drives & Conflict Management</h2>
               <p>Manage recruiter schedules, venue allocations, and resolve drive collisions automatically.</p>
             </div>
+            <button
+              type="button"
+              className="campusTabBtn active"
+              onClick={() => setShowDriveModal(true)}
+            >
+              <FaPlus size={12} /> Schedule Recruitment Drive
+            </button>
           </div>
 
           {/* Real-time Conflict Alert Banner */}
@@ -585,11 +795,18 @@ const CampusLinkPage = () => {
 
               {conflicts.map((c) => (
                 <div key={c.id} className="conflictItemBox">
-                  <div>
-                    <strong style={{ color: '#991b1b', display: 'block', fontSize: '0.9rem' }}>{c.title}</strong>
-                    <span style={{ fontSize: '0.82rem', color: '#4b5563' }}>{c.description}</span>
-                    <div style={{ marginTop: 4, fontSize: '0.78rem', color: '#166534', fontWeight: 600 }}>
-                      💡 Recommended: {c.recommendation}
+                  <div style={{ flex: 1, minWidth: 260 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span className={`conflictSeverityBadge ${c.severity?.toLowerCase() || 'critical'}`}>
+                        {c.severity || 'CRITICAL'}
+                      </span>
+                      <strong style={{ color: '#991b1b', fontSize: '0.92rem' }}>{c.title}</strong>
+                    </div>
+                    <span style={{ fontSize: '0.82rem', color: '#4b5563', display: 'block', lineHeight: 1.4 }}>
+                      {c.description}
+                    </span>
+                    <div style={{ marginTop: 6, fontSize: '0.78rem', color: '#166534', fontWeight: 600 }}>
+                      💡 Recommendation: {c.recommendation}
                     </div>
                   </div>
 
@@ -606,49 +823,74 @@ const CampusLinkPage = () => {
           )}
 
           {/* Drives Grid */}
-          <div className="drivesGrid">
-            {drives.map((d) => (
-              <div key={d._id} className="driveCard">
-                <div>
-                  <div className="driveCardTop">
-                    <img src={d.companyLogo} alt={d.companyName} className="driveLogo" />
-                    <div>
-                      <strong style={{ fontSize: '1.05rem', color: '#0f172a', display: 'block' }}>{d.companyName}</strong>
-                      <span style={{ fontSize: '0.85rem', color: '#0a66c2', fontWeight: 600 }}>{d.roleTitle}</span>
-                      <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{d.jobCategory} · {d.packageTier}</div>
+          {drives.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
+              <FaCalendarAlt size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
+              <h3 style={{ color: '#1e293b' }}>No Active Placement Drives</h3>
+              <p style={{ margin: '6px 0 18px', fontSize: '0.9rem' }}>
+                Schedule an upcoming campus recruitment drive to manage venues, dates, and detect real-time conflicts.
+              </p>
+              <button
+                type="button"
+                className="campusTabBtn active"
+                onClick={() => setShowDriveModal(true)}
+              >
+                <FaPlus size={12} /> Schedule First Placement Drive
+              </button>
+            </div>
+          ) : (
+            <div className="drivesGrid">
+              {drives.map((d) => (
+                <div key={d._id} className="driveCard">
+                  <div>
+                    <div className="driveCardTop">
+                      <img src={d.companyLogo} alt={d.companyName} className="driveLogo" />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <strong style={{ fontSize: '1.05rem', color: '#0f172a', display: 'block' }}>{d.companyName}</strong>
+                        <span style={{ fontSize: '0.85rem', color: '#0a66c2', fontWeight: 600 }}>{d.roleTitle}</span>
+                        <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{d.jobCategory} · {d.packageTier}</div>
+                      </div>
+                      <button
+                        type="button"
+                        className="driveCancelBtn"
+                        title={`Cancel ${d.companyName} recruitment drive`}
+                        onClick={() => handleDeleteDrive(d._id, d.companyName)}
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
+
+                    <div className="driveDetailsRow">
+                      <div><strong>Package:</strong> {d.ctcLpa} LPA (Stipend: ₹{Number(d.baseStipend || 0).toLocaleString()}/mo)</div>
+                      <div><strong>Eligibility:</strong> Min CGPA {d.eligibility?.minCgpa} · Max {d.eligibility?.maxBacklogs} Backlogs</div>
+                      <div><strong>Date & Time:</strong> {new Date(d.schedule?.driveDate).toLocaleDateString()} ({d.schedule?.startTime} - {d.schedule?.endTime})</div>
+                      <div><strong>Venue:</strong> {d.schedule?.venue}</div>
+                    </div>
+
+                    <div className="driveStagesRow">
+                      {d.stages?.map((st, i) => (
+                        <span key={i} className="stagePill">{st.name}</span>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="driveDetailsRow">
-                    <div><strong>Package:</strong> {d.ctcLpa} LPA (Stipend: ₹{d.baseStipend.toLocaleString()}/mo)</div>
-                    <div><strong>Eligibility:</strong> Min CGPA {d.eligibility?.minCgpa} · Max {d.eligibility?.maxBacklogs} Backlogs</div>
-                    <div><strong>Date & Time:</strong> {new Date(d.schedule?.driveDate).toLocaleDateString()} ({d.schedule?.startTime} - {d.schedule?.endTime})</div>
-                    <div><strong>Venue:</strong> {d.schedule?.venue}</div>
-                  </div>
-
-                  <div className="driveStagesRow">
-                    {d.stages?.map((st, i) => (
-                      <span key={i} className="stagePill">{st.name}</span>
-                    ))}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    <button
+                      type="button"
+                      className="campusTabBtn active"
+                      style={{ flex: 1, justifyContent: 'center' }}
+                      onClick={() => {
+                        setSelectedDriveForMatch(d._id);
+                        setActiveTab('matching');
+                      }}
+                    >
+                      View Ranked Candidates
+                    </button>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                  <button
-                    type="button"
-                    className="campusTabBtn active"
-                    style={{ flex: 1, justifyContent: 'center' }}
-                    onClick={() => {
-                      setSelectedDriveForMatch(d._id);
-                      setActiveTab('matching');
-                    }}
-                  >
-                    View Ranked Candidates
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -662,131 +904,294 @@ const CampusLinkPage = () => {
               <h2><FaUserCheck color="#0a66c2" /> Student Employability & Skill-Gap Profiling</h2>
               <p>4-tier continuous employability scoring, dimension benchmarks, and AI gap diagnostics.</p>
             </div>
-            <button
-              type="button"
-              className="campusTabBtn active"
-              onClick={() => setShowAssessmentModal(true)}
-            >
-              <FaAward size={14} /> Take Mock Assessment Booster
-            </button>
-          </div>
-
-          {/* Top Readiness Score Dial & Dimension Breakdown */}
-          <div className="readinessHeaderGrid">
-            {/* Dial Card */}
-            <div className="readinessDialBox">
-              <div className="readinessScoreCircle">
-                {studentProfile?.overallReadiness || 86}%
-              </div>
-              <span className={`readinessLevelBadge ${(studentProfile?.readinessLevel || 'ready').toLowerCase().replace(' ', '-')}`}>
-                {studentProfile?.readinessLevel || 'Ready'}
-              </span>
-              <h4 style={{ margin: '12px 0 4px', color: '#0f172a' }}>
-                {studentProfile?.collegeName || 'Arcturus Institute of Technology'}
-              </h4>
-              <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
-                Branch: {studentProfile?.branch || 'Computer Science & Engineering'} · Roll: {studentProfile?.rollNumber || '21CS042'}
-              </p>
-              <p style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600, marginTop: 8 }}>
-                CGPA: {studentProfile?.cgpa || 8.7} · Active Backlogs: {studentProfile?.activeBacklogs || 0}
-              </p>
-            </div>
-
-            {/* 4-Dimension Scores Breakdown */}
-            <div className="campusSubCard">
-              <h3>Dimension Breakdown</h3>
-
-              <div className="dimensionScoreRow">
-                <div className="dimensionLabelRow">
-                  <span>Technical Competency (DSA, Web & Systems)</span>
-                  <span>{studentProfile?.technicalScore || 86}%</span>
-                </div>
-                <div className="dimensionTrack">
-                  <div className="dimensionFill" style={{ width: `${studentProfile?.technicalScore || 86}%`, background: '#0a66c2' }} />
-                </div>
-              </div>
-
-              <div className="dimensionScoreRow">
-                <div className="dimensionLabelRow">
-                  <span>Aptitude & Quantitative Problem Solving</span>
-                  <span>{studentProfile?.aptitudeScore || 88}%</span>
-                </div>
-                <div className="dimensionTrack">
-                  <div className="dimensionFill" style={{ width: `${studentProfile?.aptitudeScore || 88}%`, background: '#16a34a' }} />
-                </div>
-              </div>
-
-              <div className="dimensionScoreRow">
-                <div className="dimensionLabelRow">
-                  <span>Communication & Behavioral Interview Skills</span>
-                  <span>{studentProfile?.communicationScore || 80}%</span>
-                </div>
-                <div className="dimensionTrack">
-                  <div className="dimensionFill" style={{ width: `${studentProfile?.communicationScore || 80}%`, background: '#7e22ce' }} />
-                </div>
-              </div>
-
-              <div className="dimensionScoreRow">
-                <div className="dimensionLabelRow">
-                  <span>Projects & Practical Experience Depth</span>
-                  <span>{studentProfile?.projectScore || 90}%</span>
-                </div>
-                <div className="dimensionTrack">
-                  <div className="dimensionFill" style={{ width: `${studentProfile?.projectScore || 90}%`, background: '#ea580c' }} />
-                </div>
-              </div>
-
-              <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', marginTop: 14, fontSize: '0.82rem', color: '#475569', lineHeight: 1.4 }}>
-                <strong>AI Diagnostic Rationale:</strong> {studentProfile?.aiReadinessSummary}
-              </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              {studentProfile && !isEditingProfile && (
+                <button
+                  type="button"
+                  className="campusTabBtn"
+                  onClick={() => setIsEditingProfile(true)}
+                >
+                  Edit Profile
+                </button>
+              )}
+              {studentProfile && (
+                <button
+                  type="button"
+                  className="campusTabBtn active"
+                  onClick={() => setShowAssessmentModal(true)}
+                >
+                  <FaAward size={14} /> Take Mock Assessment Booster
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Skill-Gap Analysis against Target Roles */}
-          <div>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#0f172a' }}>
-              Skill-Gap Diagnostics Against Target Recruiter Roles
-            </h3>
+          {!studentProfile || isEditingProfile ? (
+            <div className="campusSubCard" style={{ maxWidth: 720, margin: '0 auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div>
+                  <h3 style={{ margin: 0, color: '#0f172a' }}>
+                    {studentProfile ? '✏️ Update Placement Profile' : '🎓 Setup Your Placement Profile'}
+                  </h3>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.84rem', color: '#64748b' }}>
+                    Enter your academic records and technical skills to compute your real employability readiness score and match with campus recruitment drives.
+                  </p>
+                </div>
+                {studentProfile && (
+                  <button
+                    type="button"
+                    className="escalateBtn"
+                    style={{ background: '#64748b' }}
+                    onClick={() => setIsEditingProfile(false)}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
 
-            {studentProfile?.skillGaps?.map((gap, i) => (
-              <div key={i} className="skillGapCard">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                  <strong style={{ fontSize: '1rem', color: '#0a66c2' }}>{gap.targetRole}</strong>
-                  <span style={{ fontSize: '0.86rem', fontWeight: 700, color: gap.matchPercentage >= 75 ? '#166534' : '#b45309' }}>
-                    Match: {gap.matchPercentage}%
+              <form onSubmit={handleSaveProfile} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    College / University Name *
+                  </label>
+                  <input
+                    type="text"
+                    className="chatInput"
+                    placeholder="Enter your college or university"
+                    value={profileForm.collegeName}
+                    onChange={(e) => setProfileForm({ ...profileForm, collegeName: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Roll Number / Student ID *
+                  </label>
+                  <input
+                    type="text"
+                    className="chatInput"
+                    placeholder="Enter your student roll number"
+                    value={profileForm.rollNumber}
+                    onChange={(e) => setProfileForm({ ...profileForm, rollNumber: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Branch / Department *
+                  </label>
+                  <select
+                    className="chatInput"
+                    value={profileForm.branch}
+                    onChange={(e) => setProfileForm({ ...profileForm, branch: e.target.value })}
+                    required
+                  >
+                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Communication">Electronics & Communication</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Graduation Year *
+                  </label>
+                  <input
+                    type="number"
+                    className="chatInput"
+                    placeholder="2026"
+                    value={profileForm.graduationYear}
+                    onChange={(e) => setProfileForm({ ...profileForm, graduationYear: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Current CGPA (out of 10) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    className="chatInput"
+                    placeholder="e.g. 8.2"
+                    value={profileForm.cgpa}
+                    onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Active Backlogs
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="chatInput"
+                    value={profileForm.activeBacklogs}
+                    onChange={(e) => setProfileForm({ ...profileForm, activeBacklogs: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                    Key Technical Skills (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    className="chatInput"
+                    placeholder="e.g. React, Node.js, Python, DSA, SQL, System Design"
+                    value={profileForm.skills}
+                    onChange={(e) => setProfileForm({ ...profileForm, skills: e.target.value })}
+                  />
+                </div>
+
+                <div style={{ gridColumn: '1 / -1', marginTop: 10 }}>
+                  <button
+                    type="submit"
+                    className="campusTabBtn active"
+                    style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
+                  >
+                    <FaCheckCircle size={14} /> Save Profile & Calculate Employability Score
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <>
+              {/* Top Readiness Score Dial & Dimension Breakdown */}
+              <div className="readinessHeaderGrid">
+                {/* Dial Card */}
+                <div className="readinessDialBox">
+                  <div className="readinessScoreCircle">
+                    {studentProfile.overallReadiness}%
+                  </div>
+                  <span className={`readinessLevelBadge ${(studentProfile.readinessLevel || 'ready').toLowerCase().replace(' ', '-')}`}>
+                    {studentProfile.readinessLevel}
                   </span>
+                  <h4 style={{ margin: '12px 0 4px', color: '#0f172a' }}>
+                    {studentProfile.collegeName}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
+                    Branch: {studentProfile.branch} · Roll: {studentProfile.rollNumber}
+                  </p>
+                  <p style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600, marginTop: 8 }}>
+                    CGPA: {studentProfile.cgpa} · Active Backlogs: {studentProfile.activeBacklogs || 0}
+                  </p>
                 </div>
 
-                <div className="skillPillGroup">
-                  {gap.matchedSkills?.map((s) => (
-                    <span key={s} className="skillPill matched">✓ {s}</span>
-                  ))}
-                  {gap.missingSkills?.map((s) => (
-                    <span key={s} className="skillPill missing">✗ Gap: {s}</span>
-                  ))}
+                {/* 4-Dimension Scores Breakdown */}
+                <div className="campusSubCard">
+                  <h3>Dimension Breakdown</h3>
+
+                  <div className="dimensionScoreRow">
+                    <div className="dimensionLabelRow">
+                      <span>Technical Competency (DSA, Web & Systems)</span>
+                      <span>{studentProfile.technicalScore}%</span>
+                    </div>
+                    <div className="dimensionTrack">
+                      <div className="dimensionFill" style={{ width: `${studentProfile.technicalScore}%`, background: '#0a66c2' }} />
+                    </div>
+                  </div>
+
+                  <div className="dimensionScoreRow">
+                    <div className="dimensionLabelRow">
+                      <span>Aptitude & Quantitative Problem Solving</span>
+                      <span>{studentProfile.aptitudeScore}%</span>
+                    </div>
+                    <div className="dimensionTrack">
+                      <div className="dimensionFill" style={{ width: `${studentProfile.aptitudeScore}%`, background: '#16a34a' }} />
+                    </div>
+                  </div>
+
+                  <div className="dimensionScoreRow">
+                    <div className="dimensionLabelRow">
+                      <span>Communication & Behavioral Interview Skills</span>
+                      <span>{studentProfile.communicationScore}%</span>
+                    </div>
+                    <div className="dimensionTrack">
+                      <div className="dimensionFill" style={{ width: `${studentProfile.communicationScore}%`, background: '#7e22ce' }} />
+                    </div>
+                  </div>
+
+                  <div className="dimensionScoreRow">
+                    <div className="dimensionLabelRow">
+                      <span>Projects & Practical Experience Depth</span>
+                      <span>{studentProfile.projectScore}%</span>
+                    </div>
+                    <div className="dimensionTrack">
+                      <div className="dimensionFill" style={{ width: `${studentProfile.projectScore}%`, background: '#ea580c' }} />
+                    </div>
+                  </div>
+
+                  {studentProfile.aiReadinessSummary && (
+                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', marginTop: 14, fontSize: '0.82rem', color: '#475569', lineHeight: 1.4 }}>
+                      <strong>AI Diagnostic Rationale:</strong> {studentProfile.aiReadinessSummary}
+                    </div>
+                  )}
                 </div>
+              </div>
 
-                <p style={{ margin: '8px 0', fontSize: '0.84rem', color: '#475569' }}>
-                  <strong>Recommendation:</strong> {gap.recommendation}
-                </p>
+              {/* Skill-Gap Analysis against Target Roles */}
+              <div>
+                <h3 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#0f172a' }}>
+                  Skill-Gap Diagnostics Against Target Recruiter Roles
+                </h3>
 
-                {gap.suggestedCourses?.length > 0 && (
-                  <div style={{ marginTop: 8, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                    {gap.suggestedCourses.map((c, idx) => (
-                      <a
-                        key={idx}
-                        href={c.url}
-                        className="quickPromptChip"
-                        style={{ textDecoration: 'none', color: '#0a66c2' }}
-                      >
-                        📚 {c.title} ({c.provider}) <FaExternalLinkAlt size={10} style={{ marginLeft: 4 }} />
-                      </a>
-                    ))}
+                {studentProfile.skillGaps?.length > 0 ? (
+                  studentProfile.skillGaps.map((gap, i) => (
+                    <div key={i} className="skillGapCard">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                        <strong style={{ fontSize: '1rem', color: '#0a66c2' }}>{gap.targetRole}</strong>
+                        <span style={{ fontSize: '0.86rem', fontWeight: 700, color: gap.matchPercentage >= 75 ? '#166534' : '#b45309' }}>
+                          Match: {gap.matchPercentage}%
+                        </span>
+                      </div>
+
+                      <div className="skillPillGroup">
+                        {gap.matchedSkills?.map((s) => (
+                          <span key={s} className="skillPill matched">✓ {s}</span>
+                        ))}
+                        {gap.missingSkills?.map((s) => (
+                          <span key={s} className="skillPill missing">✗ Gap: {s}</span>
+                        ))}
+                      </div>
+
+                      <p style={{ margin: '8px 0', fontSize: '0.84rem', color: '#475569' }}>
+                        <strong>Recommendation:</strong> {gap.recommendation}
+                      </p>
+
+                      {gap.suggestedCourses?.length > 0 && (
+                        <div style={{ marginTop: 8, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                          {gap.suggestedCourses.map((c, idx) => (
+                            <a
+                              key={idx}
+                              href={c.url}
+                              className="quickPromptChip"
+                              style={{ textDecoration: 'none', color: '#0a66c2' }}
+                            >
+                              📚 {c.title} ({c.provider}) <FaExternalLinkAlt size={10} style={{ marginLeft: 4 }} />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '10px', textAlign: 'center', color: '#64748b' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>No skill gaps identified against currently scheduled recruiter criteria.</p>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       )}
 
@@ -801,91 +1206,109 @@ const CampusLinkPage = () => {
               <p>Rank and evaluate candidate pools with transparent, natural-language shortlisting rationale.</p>
             </div>
 
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <select
-                className="chatInput"
-                style={{ padding: '8px 12px' }}
-                value={selectedDriveForMatch}
-                onChange={(e) => setSelectedDriveForMatch(e.target.value)}
-              >
-                {drives.map((d) => (
-                  <option key={d._id} value={d._id}>
-                    {d.companyName} - {d.roleTitle}
-                  </option>
-                ))}
-              </select>
+            {drives.length > 0 && (
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <select
+                  className="chatInput"
+                  style={{ padding: '8px 12px' }}
+                  value={selectedDriveForMatch}
+                  onChange={(e) => setSelectedDriveForMatch(e.target.value)}
+                >
+                  {drives.map((d) => (
+                    <option key={d._id} value={d._id}>
+                      {d.companyName} - {d.roleTitle}
+                    </option>
+                  ))}
+                </select>
 
-              <button
-                type="button"
-                className="campusTabBtn active"
-                onClick={handleAutoShortlist}
-              >
-                1-Click Auto-Shortlist
-              </button>
-            </div>
+                <button
+                  type="button"
+                  className="campusTabBtn active"
+                  onClick={handleAutoShortlist}
+                >
+                  1-Click Auto-Shortlist
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Drive Match Pool Summary */}
-          {matchingPool && (
-            <div style={{ background: '#f8fafc', padding: '14px 18px', borderRadius: '10px', marginBottom: 20, border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                <div>
-                  <strong style={{ fontSize: '1.05rem', color: '#0f172a' }}>{matchingPool.driveTitle}</strong>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.84rem', color: '#64748b' }}>
-                    Criteria: Min CGPA {matchingPool.eligibility?.minCgpa} · Allowed Branches: {matchingPool.eligibility?.allowedBranches?.join(', ')}
-                  </p>
-                </div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0a66c2' }}>
-                  {matchingPool.candidates?.length} Evaluated Candidates · {matchingPool.shortlistedCount} Shortlisted
-                </div>
-              </div>
+          {drives.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
+              <FaUsers size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
+              <h3 style={{ color: '#1e293b' }}>No Active Drives Available for Candidate Matching</h3>
+              <p style={{ margin: '6px 0 0', fontSize: '0.9rem' }}>Recruiter matching evaluates candidates once placement drives are created.</p>
             </div>
+          ) : (
+            <>
+              {/* Drive Match Pool Summary */}
+              {matchingPool && (
+                <div style={{ background: '#f8fafc', padding: '14px 18px', borderRadius: '10px', marginBottom: 20, border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                      <strong style={{ fontSize: '1.05rem', color: '#0f172a' }}>{matchingPool.driveTitle}</strong>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.84rem', color: '#64748b' }}>
+                        Criteria: Min CGPA {matchingPool.eligibility?.minCgpa} · Allowed Branches: {matchingPool.eligibility?.allowedBranches?.join(', ')}
+                      </p>
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0a66c2' }}>
+                      {matchingPool.candidates?.length || 0} Evaluated Candidates · {matchingPool.shortlistedCount || 0} Shortlisted
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Ranked Candidates List */}
+              <div>
+                {matchingPool?.candidates?.length > 0 ? (
+                  matchingPool.candidates.map((c, i) => (
+                    <div key={i} className="candidatePoolCard">
+                      <div style={{ flex: 1, minWidth: 260 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <strong style={{ fontSize: '1rem', color: '#0f172a' }}>{c.studentName}</strong>
+                          <span style={{ fontSize: '0.78rem', color: '#64748b' }}>({c.rollNumber})</span>
+                          <span className={`readinessLevelBadge ${(c.readinessLevel || 'ready').toLowerCase().replace(' ', '-')}`}>
+                            {c.readinessLevel}
+                          </span>
+                        </div>
+
+                        <p style={{ margin: '3px 0 0', fontSize: '0.82rem', color: '#475569' }}>
+                          Branch: {c.branch} · CGPA: <strong>{c.cgpa}</strong> · Readiness: <strong>{c.overallReadiness}%</strong>
+                        </p>
+
+                        {/* Explainable AI Rationale Box */}
+                        <div className={`explainableBox ${c.isEligible ? 'eligible' : 'ineligible'}`}>
+                          <strong>🤖 Explainable AI Rationale:</strong> {c.fitRationale}
+                        </div>
+                      </div>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: c.fitScore >= 75 ? '#166534' : '#b45309' }}>
+                          {c.fitScore}%
+                        </div>
+                        <small style={{ color: '#64748b', display: 'block' }}>Fit Score</small>
+                        <span style={{
+                          display: 'inline-block',
+                          marginTop: 6,
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: '10px',
+                          background: c.status === 'shortlisted' ? '#dcfce7' : '#f1f5f9',
+                          color: c.status === 'shortlisted' ? '#166534' : '#64748b',
+                        }}>
+                          {c.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b', background: '#f8fafc', borderRadius: '10px' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>No student profiles currently evaluated for this drive.</p>
+                  </div>
+                )}
+              </div>
+            </>
           )}
-
-          {/* Ranked Candidates List */}
-          <div>
-            {matchingPool?.candidates?.map((c, i) => (
-              <div key={i} className="candidatePoolCard">
-                <div style={{ flex: 1, minWidth: 260 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <strong style={{ fontSize: '1rem', color: '#0f172a' }}>{c.studentName}</strong>
-                    <span style={{ fontSize: '0.78rem', color: '#64748b' }}>({c.rollNumber})</span>
-                    <span className={`readinessLevelBadge ${(c.readinessLevel || 'ready').toLowerCase().replace(' ', '-')}`}>
-                      {c.readinessLevel}
-                    </span>
-                  </div>
-
-                  <p style={{ margin: '3px 0 0', fontSize: '0.82rem', color: '#475569' }}>
-                    Branch: {c.branch} · CGPA: <strong>{c.cgpa}</strong> · Readiness: <strong>{c.overallReadiness}%</strong>
-                  </p>
-
-                  {/* Explainable AI Rationale Box */}
-                  <div className={`explainableBox ${c.isEligible ? 'eligible' : 'ineligible'}`}>
-                    <strong>🤖 Explainable AI Rationale:</strong> {c.fitRationale}
-                  </div>
-                </div>
-
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: c.fitScore >= 75 ? '#166534' : '#b45309' }}>
-                    {c.fitScore}%
-                  </div>
-                  <small style={{ color: '#64748b', display: 'block' }}>Fit Score</small>
-                  <span style={{
-                    display: 'inline-block',
-                    marginTop: 6,
-                    fontSize: '0.76rem',
-                    fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: '10px',
-                    background: c.status === 'shortlisted' ? '#dcfce7' : '#f1f5f9',
-                    color: c.status === 'shortlisted' ? '#166534' : '#64748b',
-                  }}>
-                    {c.status.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 
@@ -932,7 +1355,7 @@ const CampusLinkPage = () => {
 
                   <div>
                     <div className="hashBadge" title="Cryptographic verification hash">
-                      🔐 Hash: {o.verificationHash || '0x7f8a9b2c'}
+                      🔐 Hash: {o.verificationHash || 'Pending Verification'}
                     </div>
                     <span style={{
                       display: 'inline-block',
@@ -1040,8 +1463,8 @@ const CampusLinkPage = () => {
             {/* Quick Prompts Chips */}
             <div className="chatQuickPrompts floatingPrompts">
               {[
-                'Am I eligible for Google Cloud India drive?',
-                'Diagnose my skill gaps for SDE role',
+                'Am I eligible for current active drives?',
+                'Diagnose my skill gaps for target roles',
                 'Top technical interview questions',
                 'Check drive schedule conflicts',
               ].map((chip) => (
@@ -1161,6 +1584,276 @@ const CampusLinkPage = () => {
                 Submit & Boost Readiness
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Recruitment Drive Modal */}
+      {showDriveModal && (
+        <div className="modalOverlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.55)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '16px',
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '24px',
+            maxWidth: '640px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 12px 30px rgba(0,0,0,0.22)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FaCalendarAlt color="#0a66c2" /> Schedule Campus Recruitment Drive
+              </h3>
+              <FaTimes style={{ cursor: 'pointer' }} onClick={() => setShowDriveModal(false)} />
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 16px 0' }}>
+              Define company details, CTC package, eligibility criteria, date, and venue. Our Conflict Engine will automatically audit schedule clashes.
+            </p>
+
+            <form onSubmit={handleScheduleDrive} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  className="chatInput"
+                  placeholder="e.g. Google, Microsoft, Adobe"
+                  value={driveForm.companyName}
+                  onChange={(e) => setDriveForm({ ...driveForm, companyName: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Role Title *
+                </label>
+                <input
+                  type="text"
+                  className="chatInput"
+                  placeholder="e.g. Software Development Engineer"
+                  value={driveForm.roleTitle}
+                  onChange={(e) => setDriveForm({ ...driveForm, roleTitle: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Package CTC (LPA) *
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1"
+                  className="chatInput"
+                  placeholder="e.g. 18.5"
+                  value={driveForm.ctcLpa}
+                  onChange={(e) => setDriveForm({ ...driveForm, ctcLpa: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Monthly Stipend (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="chatInput"
+                  placeholder="e.g. 50000"
+                  value={driveForm.baseStipend}
+                  onChange={(e) => setDriveForm({ ...driveForm, baseStipend: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Job Category
+                </label>
+                <select
+                  className="chatInput"
+                  value={driveForm.jobCategory}
+                  onChange={(e) => setDriveForm({ ...driveForm, jobCategory: e.target.value })}
+                >
+                  <option value="Core Software">Core Software</option>
+                  <option value="Cloud & DevOps">Cloud & DevOps</option>
+                  <option value="FinTech & Analytics">FinTech & Analytics</option>
+                  <option value="AI & Data Science">AI & Data Science</option>
+                  <option value="Product Engineering">Product Engineering</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Drive Date *
+                </label>
+                <input
+                  type="date"
+                  className="chatInput"
+                  value={driveForm.driveDate}
+                  onChange={(e) => setDriveForm({ ...driveForm, driveDate: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Start Time
+                </label>
+                <input
+                  type="text"
+                  className="chatInput"
+                  placeholder="09:30 AM"
+                  value={driveForm.startTime}
+                  onChange={(e) => setDriveForm({ ...driveForm, startTime: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  End Time
+                </label>
+                <input
+                  type="text"
+                  className="chatInput"
+                  placeholder="01:30 PM"
+                  value={driveForm.endTime}
+                  onChange={(e) => setDriveForm({ ...driveForm, endTime: e.target.value })}
+                />
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Campus Venue *
+                </label>
+                <select
+                  className="chatInput"
+                  value={driveForm.venue}
+                  onChange={(e) => setDriveForm({ ...driveForm, venue: e.target.value })}
+                >
+                  <option value="Campus Auditorium - Hall A">Campus Auditorium - Hall A</option>
+                  <option value="Campus Auditorium - Hall B">Campus Auditorium - Hall B</option>
+                  <option value="Seminar Hall B">Seminar Hall B</option>
+                  <option value="Tech Center Lab 101">Tech Center Lab 101</option>
+                  <option value="Placement Cell Boardroom">Placement Cell Boardroom</option>
+                  <option value="Virtual Assessment Lab">Virtual Assessment Lab (Online)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Minimum CGPA Cutoff
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  className="chatInput"
+                  value={driveForm.minCgpa}
+                  onChange={(e) => setDriveForm({ ...driveForm, minCgpa: Number(e.target.value) })}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Maximum Allowed Backlogs
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="chatInput"
+                  value={driveForm.maxBacklogs}
+                  onChange={(e) => setDriveForm({ ...driveForm, maxBacklogs: Number(e.target.value) })}
+                />
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Eligible Branches
+                </label>
+                <div className="branchCheckboxGrid">
+                  {[
+                    'Computer Science & Engineering',
+                    'Information Technology',
+                    'Electronics & Communication',
+                    'Electrical Engineering',
+                    'Mechanical Engineering',
+                    'Civil Engineering',
+                  ].map((branch) => {
+                    const isChecked = driveForm.allowedBranches.includes(branch);
+                    return (
+                      <label key={branch} className="branchCheckboxItem">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setDriveForm({
+                                ...driveForm,
+                                allowedBranches: [...driveForm.allowedBranches, branch],
+                              });
+                            } else {
+                              setDriveForm({
+                                ...driveForm,
+                                allowedBranches: driveForm.allowedBranches.filter((b) => b !== branch),
+                              });
+                            }
+                          }}
+                        />
+                        <span>{branch}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Required Skills (comma separated)
+                </label>
+                <input
+                  type="text"
+                  className="chatInput"
+                  placeholder="e.g. React, Node.js, Python, DSA, System Design"
+                  value={driveForm.requiredSkills}
+                  onChange={(e) => setDriveForm({ ...driveForm, requiredSkills: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, gridColumn: '1 / -1', marginTop: 12 }}>
+                <button
+                  type="button"
+                  className="campusTabBtn"
+                  onClick={() => setShowDriveModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="campusTabBtn active"
+                >
+                  <FaPlus size={12} /> Schedule Drive & Check Conflicts
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

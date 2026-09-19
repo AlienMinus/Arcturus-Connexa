@@ -12,44 +12,6 @@ router.get('/my', authMiddleware, async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    // If user has 0 campaigns, let's create a default starter showcase campaign for their organization if one exists
-    if (campaigns.length === 0) {
-      const userOrg = await Organization.findOne({
-        $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
-        status: 'approved',
-      });
-
-      const starterOrgName = userOrg?.name || 'Arcturus Connexa';
-      const starterLogo = userOrg?.logo?.url || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
-
-      const starter = await Campaign.create({
-        name: `${starterOrgName} Talent & Brand Launch`,
-        organizationId: userOrg?._id || null,
-        organizationName: starterOrgName,
-        organizationLogo: starterLogo,
-        userId: req.userId,
-        objective: 'brand_awareness',
-        targetIndustry: userOrg?.industry || 'Technology & Software',
-        targetLocation: userOrg?.location || 'Worldwide',
-        placement: 'both',
-        headline: `Innovate Faster with ${starterOrgName}`,
-        description: `Connect with high-impact professionals and explore world-class career opportunities at ${starterOrgName}. Join our expanding network today!`,
-        mediaUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-        callToAction: 'Learn More',
-        destinationUrl: userOrg ? `/company/${userOrg.slug}` : '/jobs',
-        dailyBudget: 25,
-        totalBudget: 350,
-        status: 'active',
-        metrics: {
-          impressions: 4820,
-          clicks: 312,
-          spend: 84.5,
-        },
-      });
-
-      campaigns.push(starter.toObject());
-    }
-
     const summary = campaigns.reduce(
       (acc, c) => {
         acc.totalImpressions += c.metrics?.impressions || 0;
