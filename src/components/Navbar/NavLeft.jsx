@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaSearch, FaBuilding, FaCheckCircle, FaBriefcase, FaArrowRight } from "react-icons/fa";
+import { FaSearch, FaBuilding, FaCheckCircle, FaBriefcase, FaArrowRight, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { buildApiUrl } from "../../utils/api";
 import { getUserFullName } from "../../utils/user";
 
-const NavLeft = ({ onSearchFocusChange }) => {
+const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
   const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [userResults, setUserResults] = useState([]);
@@ -13,8 +13,47 @@ const NavLeft = ({ onSearchFocusChange }) => {
   const [jobResults, setJobResults] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const navigate = useNavigate();
   const searchRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const handleOpenMobileSearch = () => {
+    setIsMobileSearchOpen(true);
+    onMobileSearchChange?.(true);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCloseMobileSearch = () => {
+    setIsMobileSearchOpen(false);
+    onMobileSearchChange?.(false);
+    setQuery("");
+    setIsDropdownVisible(false);
+  };
+
+  const handleSearchIconClick = (e) => {
+    if (window.innerWidth <= 768) {
+      if (!isMobileSearchOpen) {
+        e.stopPropagation();
+        handleOpenMobileSearch();
+      }
+    } else {
+      inputRef.current?.focus();
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && isMobileSearchOpen) {
+        setIsMobileSearchOpen(false);
+        onMobileSearchChange?.(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isMobileSearchOpen, onMobileSearchChange]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -62,17 +101,27 @@ const NavLeft = ({ onSearchFocusChange }) => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsDropdownVisible(false);
+        if (window.innerWidth <= 768 && isMobileSearchOpen) {
+          setIsMobileSearchOpen(false);
+          onMobileSearchChange?.(false);
+        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
-  }, []);
+  }, [isMobileSearchOpen, onMobileSearchChange]);
 
   const closeDropdown = () => {
     setIsDropdownVisible(false);
+    if (window.innerWidth <= 768) {
+      setIsMobileSearchOpen(false);
+      onMobileSearchChange?.(false);
+    }
   };
 
   const handleUserClick = (username) => {
@@ -100,6 +149,8 @@ const NavLeft = ({ onSearchFocusChange }) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSeeAll();
+    } else if (e.key === "Escape") {
+      handleCloseMobileSearch();
     }
   };
 
@@ -108,14 +159,27 @@ const NavLeft = ({ onSearchFocusChange }) => {
 
   return (
     <div className="navLeft" ref={searchRef}>
-      <Link to="/">
+      <Link to="/" className="arcturusLogoLink">
         <img src="/logo.png" className="arcturusLogo" alt="Arcturus" />
       </Link>
-      <div className="searchBox">
-        <span className="searchIcon">
-          <FaSearch color="#666" size={14} />
-        </span>
+      <div
+        className={`searchBox ${isMobileSearchOpen ? "expanded" : ""}`}
+        onClick={() => {
+          if (!isMobileSearchOpen && window.innerWidth <= 768) {
+            handleOpenMobileSearch();
+          }
+        }}
+      >
+        <button
+          type="button"
+          className="searchIconBtn"
+          onClick={handleSearchIconClick}
+          aria-label="Search"
+        >
+          <FaSearch className="searchIconSvg" size={14} />
+        </button>
         <input
+          ref={inputRef}
           type="text"
           placeholder="Search people, companies, jobs..."
           value={query}
@@ -127,6 +191,19 @@ const NavLeft = ({ onSearchFocusChange }) => {
           }}
           onBlur={() => onSearchFocusChange?.(false)}
         />
+        {isMobileSearchOpen && (
+          <button
+            type="button"
+            className="searchCloseBtn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCloseMobileSearch();
+            }}
+            aria-label="Close search"
+          >
+            <FaTimes size={16} />
+          </button>
+        )}
 
         {isDropdownVisible && (
           <div className="searchResults">

@@ -157,27 +157,191 @@
     padding: 1px 4px;
   }
 
-  /* Top bar: logo, search, profile */
+  /* Top bar: logo, search icon, profile */
   .navLeft {
-    flex: 1;
+    flex: 0 0 auto;
     gap: 8px;
     min-width: 0;
   }
 
+  .arcturusLogoLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
   .arcturusLogo {
     width: 30px;
+    height: 30px;
+    object-fit: contain;
     flex-shrink: 0;
   }
 
-  .searchBox {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
+  /* On small screens, convert nav searchbox to a search icon button */
+  .searchBox:not(.expanded) {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
   }
 
-  .searchBox input {
+  .searchBox:not(.expanded):hover,
+  .searchBox:not(.expanded):active {
+    background-color: #e2e8f0;
+  }
+
+  .searchBox:not(.expanded) input {
+    display: none !important;
+  }
+
+  .searchBox:not(.expanded) .searchCloseBtn {
+    display: none !important;
+  }
+
+  .searchBox:not(.expanded) .searchIconBtn {
     width: 100%;
-    font-size: 13px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+  }
+
+  /* When mobile search is expanded, it covers the entire navbar */
+  .navbar.mobileSearchActive {
+    position: sticky;
+  }
+
+  .navbar.mobileSearchActive .hamburgerMenu,
+  .navbar.mobileSearchActive .arcturusLogoLink,
+  .navbar.mobileSearchActive .arcturusLogo,
+  .navbar.mobileSearchActive .navRightContainer,
+  .navbar.mobileSearchActive .navRight {
+    display: none !important;
+  }
+
+  .navbar.mobileSearchActive .navLeft {
+    position: static;
+    width: 100%;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .searchBox.expanded {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    z-index: 2100;
+    background: #ffffff;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    margin: 0;
+    padding: 0 12px;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    cursor: default;
+  }
+
+  .searchBox.expanded .searchIconBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0a66c2;
+    flex-shrink: 0;
+    cursor: default;
+  }
+
+  .searchBox.expanded input {
+    display: block !important;
+    flex: 1;
+    min-width: 0;
+    width: 100% !important;
+    height: 38px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: #0f172a;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .searchBox.expanded input:focus {
+    background: #ffffff;
+    border-color: #0a66c2;
+    box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.15);
+  }
+
+  /* Right-most cross cut button */
+  .searchBox.expanded .searchCloseBtn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .searchBox.expanded .searchCloseBtn:hover,
+  .searchBox.expanded .searchCloseBtn:active {
+    background-color: #e2e8f0;
+    color: #0f172a;
+  }
+
+  /* Search results dropdown on mobile - fixed below navbar */
+  .searchBox.expanded .searchResults {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-width: 100vw;
+    max-height: calc(100vh - 56px - 60px);
+    border-radius: 0 0 16px 16px;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+    z-index: 2200;
+    background: #ffffff;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Keep account and business controls anchored at the right edge. */
@@ -200,25 +364,6 @@
 
   .business-text {
     display: none;
-  }
-
-  /* Search temporarily owns the top bar while the input is active. */
-  .navbar.searchFocused .hamburgerMenu,
-  .navbar.searchFocused .arcturusLogo,
-  .navbar.searchFocused .navRightContainer {
-    display: none;
-  }
-
-  .navbar.searchFocused .navLeft,
-  .navbar.searchFocused .searchBox {
-    flex: 1;
-    width: 100%;
-  }
-
-  .navbar.searchFocused .searchResults {
-    left: 10px;
-    right: 10px;
-    width: auto;
   }
 
   .searchResults {
@@ -1458,12 +1603,16 @@
     padding: 0 8px;
   }
 
-  .searchBox {
-    padding: 5px 8px;
+  .searchBox:not(.expanded) {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    max-width: 34px;
+    padding: 0;
   }
 
-  .searchBox input {
-    font-size: 12px;
+  .searchBox.expanded input {
+    font-size: 13px;
   }
 
   .navItem {

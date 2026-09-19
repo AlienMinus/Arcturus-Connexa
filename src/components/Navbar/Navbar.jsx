@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import NavLeft from "./NavLeft";
 import NavCenter from "./NavCenter";
@@ -10,13 +10,18 @@ import "./Navbar.css";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   // Hamburger menu is only needed on small screens (where the sidebar
   // and right sidebar are hidden and accessible via the drawer).
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
   return (
-    <div className={`navbar ${isSearchFocused ? "searchFocused" : ""}`}>
-      {isSmallScreen && (
+    <div
+      className={`navbar ${isSearchFocused ? "searchFocused" : ""} ${
+        isMobileSearchOpen ? "mobileSearchActive" : ""
+      }`}
+    >
+      {isSmallScreen && !isMobileSearchOpen && (
         <button
           className="hamburgerMenu"
           onClick={() => setMenuOpen(true)}
@@ -26,7 +31,10 @@ const Navbar = () => {
         </button>
       )}
 
-      <NavLeft onSearchFocusChange={setIsSearchFocused} />
+      <NavLeft
+        onSearchFocusChange={setIsSearchFocused}
+        onMobileSearchChange={setIsMobileSearchOpen}
+      />
 
       <NavCenter />
 
