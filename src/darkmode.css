@@ -132,6 +132,59 @@ body.dark-mode .profile-dropdown {
   box-shadow: var(--shadow-card) !important;
 }
 
+/* For Business Dropdown & Mobile Drawer */
+[data-theme="dark"] .for-business-dropdown,
+body.dark-mode .for-business-dropdown {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .for-business-header h4,
+body.dark-mode .for-business-header h4,
+[data-theme="dark"] .business-solutions-section h4,
+body.dark-mode .business-solutions-section h4,
+[data-theme="dark"] .business-app-info strong,
+body.dark-mode .business-app-info strong,
+[data-theme="dark"] .business-solution-item strong,
+body.dark-mode .business-solution-item strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .business-app-card,
+body.dark-mode .business-app-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .business-app-card:hover,
+body.dark-mode .business-app-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .business-solution-item:hover,
+body.dark-mode .business-solution-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .for-business-close-btn,
+body.dark-mode .for-business-close-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .for-business-close-btn:hover,
+body.dark-mode .for-business-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .for-business-drag-handle,
+body.dark-mode .for-business-drag-handle {
+  background: #475569 !important;
+}
+
 [data-theme="dark"] .profile-dropdown-header,
 body.dark-mode .profile-dropdown-header,
 [data-theme="dark"] .profile-dropdown-body,

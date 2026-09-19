@@ -95,50 +95,6 @@
 .switchBtnPrimary:hover { background: #004182; }
 .switchBtnSecondary:hover { background: #eff6ff; }
 
-.appKpiGrid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.appKpiCard {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 11px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
-  cursor: pointer;
-}
-
-.appKpiCard:hover,
-.appKpiCard.kpiActive { border-color: #93c5fd; background: #eff6ff; }
-.appKpiNumber { color: #0f172a; font-size: 1.25rem; font-weight: 800; }
-.appKpiLabel { color: #64748b; font-size: 0.7rem; font-weight: 700; }
-
-.appTrackingCard {
-  padding: 16px;
-  margin-top: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #ffffff;
-}
-
-.appTrackingCard.in-review { border-left: 3px solid #f59e0b; }
-.appTrackingCard.shortlisted { border-left: 3px solid #0a66c2; }
-.appTrackingCard.hired { border-left: 3px solid #16a34a; }
-.appTrackingCard.rejected { border-left: 3px solid #ef4444; }
-
-@media (max-width: 700px) {
-  .currentAccountCard,
-  .accountsCard .settingsCardHeader,
-  .appTrackerCard .settingsCardHeader { align-items: stretch; flex-direction: column; }
-  .currentAccountRight { width: 100%; }
-  .switchBtnPrimary, .switchBtnSecondary { flex: 1; }
-  .appKpiGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
 
 /* Job applications and organization management */
 .appTrackerHeader {
@@ -1834,46 +1790,385 @@
 
 @media (max-width: 768px) {
   .settingsPageWrapper {
-    padding: 8px 4px 85px;
+    padding: 10px 8px calc(85px + env(safe-area-inset-bottom));
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .settingsContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .settingsTopBar {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+    padding-bottom: 12px;
+  }
+
+  .settingsTopBar h2 {
+    font-size: 1.25rem;
   }
 
   .settingsLayout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
+    width: 100%;
   }
 
   .settingsSidebar {
     position: static;
-    padding: 6px;
+    width: 100%;
+    padding: 2px 0 6px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
   .settingsNav {
+    display: flex;
     flex-direction: row;
-    gap: 6px;
+    gap: 8px;
     overflow-x: auto;
-    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 2px 6px;
+  }
+
+  .settingsNav::-webkit-scrollbar {
+    display: none;
   }
 
   .settingsTabBtn {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    min-height: 40px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .settingsTabBtn.active {
+    background: #0a66c2 !important;
+    border-color: #0a66c2 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(10, 102, 194, 0.25) !important;
+  }
+
+  .settingsTabBtn.active .tabIcon,
+  .settingsTabBtn.active .tabLabel {
+    color: #ffffff !important;
+  }
+
+  .settingsTabBtn.active .tabCountBadge {
+    background: #ffffff !important;
+    color: #0a66c2 !important;
   }
 
   .settingsCard {
-    padding: 16px 12px;
+    padding: 14px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
   }
 
+  .settingsCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .settingsCardHeader h3 {
+    font-size: 1.12rem;
+  }
+
+  .profileDashboardWidgets {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+  }
+
+  .dashboardWidgetCard {
+    padding: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .dashboardWidgetCard .widgetActionBtn {
+    width: 100%;
+    text-align: right;
+    padding-top: 4px;
+  }
+
+  /* Job Application Tracker Mobile */
+  .appTrackerCard .settingsCardHeader,
+  .appTrackerHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .appRefreshBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 38px;
+  }
+
+  .appKpiGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .appKpiCard {
+    padding: 10px 6px;
+    min-height: 52px;
+  }
+
+  .appKpiNumber {
+    font-size: 1.2rem;
+  }
+
+  .appKpiLabel {
+    font-size: 0.68rem;
+  }
+
+  .appFilterToolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 14px;
+  }
+
+  .appSearchBox {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .appStatusPills {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 3px;
+  }
+
+  .appStatusPills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .appStatusPill {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 0.74rem;
+    padding: 6px 11px;
+  }
+
+  .appTrackingCard {
+    padding: 12px;
+  }
+
+  .appCardTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .appCompanyBlock {
+    width: 100%;
+  }
+
+  .appTitleInfo h4 {
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+
+  .appStatusTagBlock {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .appMetaRow {
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 0.72rem;
+  }
+
+  .appStepperContainer {
+    margin: 12px 0 10px;
+    padding: 10px 4px 4px;
+    overflow-x: hidden;
+  }
+
+  .appStepperTrack {
+    margin: 0 6px;
+  }
+
+  .stepCircle {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .stepLabel {
+    font-size: 0.64rem;
+    max-width: 58px;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .appCardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .appActionLink,
+  .appWithdrawBtn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    min-height: 38px;
+  }
+
+  /* Accounts & Organizations Tab Mobile */
+  .currentAccountCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .currentAccountRight {
+    width: 100%;
+  }
+
+  .switchBtnPrimary,
+  .switchBtnSecondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .orgSectionTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .createOrgBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 38px;
+  }
+
+  .orgCardsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .orgManagedCard {
+    padding: 12px;
+  }
+
+  .orgCardMain {
+    gap: 10px;
+  }
+
+  .orgCardActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .switchOrgBtn,
+  .manageJobsBtn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    min-height: 38px;
+  }
+
+  /* Forms & Settings Rows */
   .settingsRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .settingsRow .rowControl {
+    align-self: flex-start;
   }
 
   .formRowGrid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .saveBtn,
+  .changePasswordBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
   }
 }
+
+@media (max-width: 480px) {
+  .appKpiGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .appKpiCard {
+    padding: 8px 6px;
+  }
+
+  .appKpiNumber {
+    font-size: 1.1rem;
+  }
+
+  .appKpiLabel {
+    font-size: 0.62rem;
+  }
+
+  .stepCircle {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+
+  .stepLabel {
+    font-size: 0.6rem;
+    max-width: 50px;
+  }
+}
+
 

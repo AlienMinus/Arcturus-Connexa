@@ -12,7 +12,8 @@ import {
   FaBuilding,
   FaExchangeAlt,
   FaCheck,
-  FaUserCheck
+  FaUserCheck,
+  FaTimes
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
@@ -432,11 +433,28 @@ const NavRight = () => {
 
       {/* For Business Dropdown Panel */}
       {isBusinessOpen && (
-        <div className="for-business-dropdown">
-          <div className="for-business-header">
-            <h4>My Business Apps</h4>
-            <span className="for-business-subtitle">Explore enterprise tools and growth platforms</span>
-          </div>
+        <>
+          <div
+            className="for-business-backdrop"
+            onClick={() => setBusinessOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="for-business-dropdown">
+            <div className="for-business-drag-handle" />
+            <div className="for-business-header">
+              <div className="for-business-header-text">
+                <h4>My Business Apps</h4>
+                <span className="for-business-subtitle">Explore enterprise tools and growth platforms</span>
+              </div>
+              <button
+                type="button"
+                className="for-business-close-btn"
+                onClick={() => setBusinessOpen(false)}
+                aria-label="Close Business Menu"
+              >
+                <FaTimes size={16} />
+              </button>
+            </div>
 
           <div className="business-apps-grid">
             <Link
@@ -557,6 +575,7 @@ const NavRight = () => {
             </Link>
           </div>
         </div>
+        </>
       )}
     </div>
   );

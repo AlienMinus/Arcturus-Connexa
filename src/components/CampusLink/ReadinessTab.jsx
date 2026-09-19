@@ -77,7 +77,7 @@ export const ReadinessTab = ({
             )}
           </div>
 
-          <form onSubmit={handleSaveProfile} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleSaveProfile} className="campusProfileForm">
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
                 College / University Name *

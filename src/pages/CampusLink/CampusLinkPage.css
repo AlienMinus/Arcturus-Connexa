@@ -268,20 +268,16 @@
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  padding: 6px 12px;
-  padding: 6px;
   padding: 8px;
   margin-bottom: 22px;
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  gap: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .campusTabsCard::-webkit-scrollbar {
@@ -290,25 +286,19 @@
 
 .campusTabBtn {
   padding: 10px 16px;
-  border: none;
-  flex: 1 1 auto;
-  justify-content: center;
-  padding: 10px 14px;
-  padding: 10px 16px;
   border: 1px solid transparent;
   background: transparent;
   color: #64748b;
-  font-size: 0.88rem;
-  font-size: 0.85rem;
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   white-space: nowrap;
-  transition: all 0.2s;
+  flex: 0 0 auto;
   transition: all 0.2s ease;
 }
 
@@ -1291,19 +1281,27 @@ body.dark-mode .typingDots span {
 
 @media (max-width: 600px) {
   .campusFloatingAssistantContainer {
-    bottom: 16px;
-    left: 16px;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    right: 14px;
+    left: auto;
+    z-index: 2050;
   }
 
   .campusFloatingChatWidget {
-    width: calc(100vw - 32px);
-    height: 480px;
-    max-height: calc(100vh - 90px);
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    z-index: 10002;
+    border: none;
   }
 
   .campusFloatingRoundBtn {
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 4px 16px rgba(10, 102, 194, 0.4);
   }
 }
 
@@ -1538,6 +1536,321 @@ body.dark-mode .typingDots span {
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 14px;
+}
+
+/* ==========================================================================
+   CAMPUSLINK MOBILE RESPONSIVENESS (max-width: 768px & max-width: 480px)
+   ========================================================================== */
+.campusProfileForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .campusLinkWrapper {
+    padding: 10px 8px calc(85px + env(safe-area-inset-bottom));
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .workspaceIdentityStrip {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* Organization Workspace Mobile */
+  .campusOrganizationHero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 14px;
+    gap: 12px;
+  }
+
+  .campusOrganizationStats {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .campusOrganizationActions {
+    flex-direction: column;
+    padding: 0 14px 14px;
+    gap: 8px;
+  }
+
+  .campusOrganizationPrimary,
+  .campusOrganizationSecondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+  }
+
+  .campusOrganizationNotice {
+    margin: 0 14px 14px;
+    padding: 12px 14px;
+  }
+
+  /* Hero Card Mobile */
+  .campusHeroCard {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 14px;
+    gap: 14px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+  }
+
+  .campusHeroLeft h1 {
+    font-size: 1.35rem;
+  }
+
+  .campusHeroTagline {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .campusHeroBadges {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .campusHeroBadge {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Tabs Bar Horizontal Scroll Pill Strip */
+  .campusTabsCard {
+    padding: 6px 4px;
+    gap: 6px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+  }
+
+  .campusTabBtn {
+    padding: 8px 13px;
+    font-size: 0.82rem;
+    min-height: 38px;
+    border-radius: 20px;
+  }
+
+  /* Main Panel Mobile */
+  .campusPanel {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .campusPanelHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .campusPanelHeader h2 {
+    font-size: 1.12rem;
+  }
+
+  .campusPanelHeader > div {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .campusPanelHeader .campusTabBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* KPI Grid */
+  .campusKpiGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .campusKpiCard {
+    padding: 14px;
+  }
+
+  .campusKpiMeta p {
+    font-size: 1.3rem;
+  }
+
+  /* Drives Grid */
+  .drivesGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .driveCard {
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .driveCardTop {
+    gap: 10px;
+  }
+
+  .driveLogo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .driveDetailsRow {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+
+  /* Student Readiness Dial & Dimension Bars */
+  .readinessHeaderGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .readinessDialBox {
+    padding: 16px 12px;
+  }
+
+  .readinessScoreCircle {
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+  }
+
+  .campusProfileForm {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Gemma AI Risk Card */
+  .gemmaInsightCard {
+    padding: 14px 12px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+
+  .gemmaHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .gemmaHeaderLeft {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .gemmaRunBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  .gemmaGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Candidate Pool Cards */
+  .candidatePoolCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .candidatePoolCard > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+    text-align: left;
+  }
+
+  /* Offer Rows */
+  .offerRowCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .offerRowCard > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+  }
+
+  /* Conflict Item Box */
+  .conflictItemBox {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .conflictResolveBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 38px;
+  }
+
+  /* Chatbot Interface in Tab */
+  .campusChatWrapper {
+    height: calc(100vh - 280px);
+    min-height: 380px;
+  }
+
+  .campusChatMessages {
+    padding: 12px;
+  }
+
+  .chatMsg {
+    max-width: 92%;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .campusOrganizationStats {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .campusOrganizationStats div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .campusToast {
+    left: 12px;
+    right: 12px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    font-size: 0.82rem;
+    padding: 10px 16px;
+  }
 }
 
 

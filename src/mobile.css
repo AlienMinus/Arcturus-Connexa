@@ -271,7 +271,9 @@
   .networkPage,
   .notificationsPage,
   .activity-page,
-  .post-page-container {
+  .post-page-container,
+  .settingsPageWrapper,
+  .campusLinkWrapper {
     padding-bottom: 85px;
   }
 
@@ -1563,7 +1565,9 @@
     .networkPage,
     .notificationsPage,
     .activity-page,
-    .post-page-container {
+    .post-page-container,
+    .settingsPageWrapper,
+    .campusLinkWrapper {
       padding-bottom: calc(70px + env(safe-area-inset-bottom));
     }
   }
