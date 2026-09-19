@@ -25,83 +25,82 @@ import './LearningHubPage.css';
 
 const CATEGORIES = [
   'All',
-  'Cloud & DevOps',
-  'AI & Machine Learning',
-  'Full Stack Development',
-  'System Design',
-  'Leadership & Management',
-  'Data Engineering',
+  'Communication',
+  'Vocal Mastery',
+  'Public Speaking',
+  'Storytelling',
+  'Executive Presence',
 ];
 
 const CAREER_TRACKS = [
   {
-    id: 'cloud-architect',
-    title: 'Enterprise Cloud Solutions Architect',
-    description: 'Master microservice orchestration, Kubernetes clusters, resilient failover systems, and high-throughput cloud infrastructure.',
-    coursesCount: 3,
-    totalHours: '15.5 Hours',
-    level: 'Advanced',
+    id: 'vocal-mastery',
+    title: 'Executive Voice & Public Speaking Track',
+    description: 'Master the 5 foundations of human voice: vocal melody, rate of speech, volume, projection, and strategic pausing with Vinh Giang.',
+    coursesCount: 1,
+    totalHours: '1.5 Hours',
+    level: 'All Levels',
     iconColor: '#0284c7',
     iconBg: '#e0f2fe',
-    badge: 'Trending Career Track',
-    targetRoles: ['Cloud Architect', 'Principal DevOps Specialist', 'Site Reliability Lead'],
+    badge: 'Masterclass Track',
+    targetRoles: ['Keynote Speaker', 'Engineering Leader', 'Product Executive', 'Startup Founder'],
   },
   {
-    id: 'ai-engineer',
-    title: 'Generative AI & Autonomous Agent Specialist',
-    description: 'Design enterprise RAG architectures, vector database indexing, dynamic tool-calling agent loops, and evaluation frameworks.',
-    coursesCount: 3,
-    totalHours: '14.0 Hours',
-    level: 'Intermediate to Advanced',
+    id: 'clear-explaining',
+    title: 'The CLEAR Explaining & Influence Framework',
+    description: 'Simplify complex technical and abstract concepts with structured analogies, contextual anchors, and subtext listening.',
+    coursesCount: 1,
+    totalHours: '1.2 Hours',
+    level: 'All Levels',
     iconColor: '#7e22ce',
     iconBg: '#f3e8ff',
-    badge: 'Highest Industry Demand',
-    targetRoles: ['AI Systems Engineer', 'LLM Application Developer', 'MLOps Specialist'],
+    badge: 'High Impact Track',
+    targetRoles: ['Technical Lead', 'Solutions Architect', 'Sales Engineer', 'Consultant'],
   },
   {
-    id: 'fullstack-lead',
-    title: 'Modern Full-Stack Lead Engineer',
-    description: 'Lead engineering teams with React 19 concurrent architectures, TypeScript type contracts, high-performance APIs, and scalable caching.',
-    coursesCount: 4,
-    totalHours: '19.0 Hours',
-    level: 'Intermediate',
+    id: 'high-pressure-presence',
+    title: 'High-Pressure Presence & Q&A Mastery',
+    description: 'Conquer speaking anxiety and imposter syndrome when all eyes are on you. Handle difficult boardroom questions with calm poise.',
+    coursesCount: 1,
+    totalHours: '1.0 Hours',
+    level: 'All Levels',
     iconColor: '#16a34a',
     iconBg: '#dcfce7',
-    badge: 'Foundational Mastery',
-    targetRoles: ['Lead Full Stack Developer', 'Staff Frontend Architect', 'Engineering Manager'],
+    badge: 'Leadership Mastery',
+    targetRoles: ['Senior Manager', 'Director of Engineering', 'Executive', 'Interview Candidate'],
   },
 ];
 
 const MOCK_QUIZ_QUESTIONS = [
   {
-    question: 'What is the primary benefit of Domain-Driven Design when decomposing a monolith?',
+    question: 'According to Vinh Giang, what is the single most powerful vocal tool to build anticipation, project confidence, and eliminate filler words?',
     options: [
-      'It creates strict bounded contexts that decouple business domain boundaries',
-      'It automatically reduces database storage requirements by 50%',
-      'It eliminates the need for unit testing across all services',
-      'It forces all microservices to use the exact same programming language'
+      'The strategic and intentional Pause',
+      'Speaking as fast as possible to convey urgency',
+      'Speaking in a high pitch monotone whisper',
+      'Repeating words continuously'
     ],
     correctIndex: 0
   },
   {
-    question: 'In modern RAG systems, why is Hybrid Search (Dense + Sparse) favored?',
+    question: 'In Vinh Giang\'s Vocal Instrument concept, why do most people sound monotonous or unengaging?',
     options: [
-      'It requires zero memory usage on the vector index',
-      'It combines semantic vector similarity with exact keyword lexical matching',
-      'It completely avoids chunking text embeddings',
-      'It converts text directly to raw SQL without embeddings'
+      'Because they only play 2 or 3 notes on a piano that has 88 keys',
+      'Because their microphone volume is too low',
+      'Because they speak with too much melody and emotion',
+      'Because their rate of speech is constantly changing'
     ],
-    correctIndex: 1
+    correctIndex: 0
   },
   {
-    question: 'How do circuit breakers safeguard microservices during cascading downstream outages?',
+    question: 'When asked a high-pressure question during a presentation or interview that you do not immediately know the answer to, what does Vinh Giang recommend?',
     options: [
-      'By re-routing all traffic to unauthenticated endpoints',
-      'By failing fast and shedding load when error thresholds are exceeded',
-      'By permanently shutting down the cluster container daemon',
-      'By multiplying database connection pool timeouts'
+      'Pause, acknowledge the question calmly, and structure your thought before answering',
+      'Make up an immediate answer so there is never silence in the room',
+      'Apologize and immediately conclude the meeting',
+      'Avoid eye contact and talk faster'
     ],
-    correctIndex: 1
+    correctIndex: 0
   }
 ];
 
@@ -294,22 +293,22 @@ const LearningHubPage = () => {
       <div className="learningHeroBanner">
         <div className="learningHeroContent">
           <div className="learningHeroBadge">
-            <FaGraduationCap size={14} /> Arcturus Learning & Professional Certifications
+            <FaGraduationCap size={14} /> Arcturus Executive Masterclasses
           </div>
-          <h1>Advance Your Technical Career with Certified Industry Masterclasses</h1>
+          <h1>Master Executive Communication, Public Speaking & Vocal Dynamics</h1>
           <p>
-            Learn distributed cloud architecture, modern full-stack development, generative AI systems, and engineering leadership from world-class practitioners.
+            Learn the world-renowned frameworks of Vinh Giang. Master vocal melody, rate of speech, the power of the pause, and storytelling to captivate any audience with authority and warmth.
           </p>
 
           <form className="learningSearchBox" onSubmit={handleSearchSubmit}>
             <FaSearch className="learningSearchIcon" />
             <input
               type="text"
-              placeholder="Search courses, skills (e.g. Kubernetes, React 19, RAG, System Design)..."
+              placeholder="Search communication skills, vocal techniques, storytelling frameworks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button type="submit" className="learningSearchBtn">Find Courses</button>
+            <button type="submit" className="learningSearchBtn">Find Lessons</button>
           </form>
         </div>
 
@@ -409,11 +408,18 @@ const LearningHubPage = () => {
                 return (
                   <div key={course._id} className="courseCard">
                     <div className="courseThumbnailWrapper">
-                      <img src={course.thumbnail} alt={course.title} className="courseThumbnail" />
+                      <img
+                        src={course.thumbnail || 'https://img.youtube.com/vi/FsxorSNJBaA/hqdefault.jpg'}
+                        alt={course.title}
+                        className="courseThumbnail"
+                        onError={(e) => {
+                          e.target.src = 'https://img.youtube.com/vi/FsxorSNJBaA/hqdefault.jpg';
+                        }}
+                      />
                       <span className="courseDurationBadge">
                         <FaClock size={11} /> {course.duration}
                       </span>
-                      <span className={`courseLevelBadge ${course.level?.toLowerCase()}`}>
+                      <span className={`courseLevelBadge ${course.level?.toLowerCase().replace(/\s+/g, '-')}`}>
                         {course.level}
                       </span>
                     </div>
@@ -523,7 +529,14 @@ const LearningHubPage = () => {
                 {myLearning.enrolled.map((course) => (
                   <div key={course._id} className="courseCard">
                     <div className="courseThumbnailWrapper">
-                      <img src={course.thumbnail} alt={course.title} className="courseThumbnail" />
+                      <img
+                        src={course.thumbnail || 'https://img.youtube.com/vi/FsxorSNJBaA/hqdefault.jpg'}
+                        alt={course.title}
+                        className="courseThumbnail"
+                        onError={(e) => {
+                          e.target.src = 'https://img.youtube.com/vi/FsxorSNJBaA/hqdefault.jpg';
+                        }}
+                      />
                       <span className="courseDurationBadge">
                         <FaClock size={11} /> {course.duration}
                       </span>
@@ -711,17 +724,28 @@ const LearningHubPage = () => {
               {/* Left Column: Simulated Interactive Player */}
               <div className="playerScreenWrapper">
                 <div className="playerSimulatorScreen">
-                  <div className="videoScreenSimulation">
-                    <FaPlayCircle size={54} color="#ffffff" className="playSimulationIcon" />
-                    <span className="videoSimulationText">Interactive Course Video Player</span>
-                    <span className="currentLessonTitle">Current: {activeLesson?.title}</span>
-                  </div>
-                  <div className="playerControlBar">
-                    <div className="simulatedProgressBar">
-                      <div className="simulatedProgressFill" />
+                  {activeLesson?.videoUrl ? (
+                    <div className="videoEmbedContainer">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${activeLesson.videoUrl}?autoplay=1&rel=0`}
+                        title={activeLesson.title}
+                        className="courseVideoIframe"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
                     </div>
-                    <div className="playerControlsRow">
-                      <span>04:15 / {activeLesson?.duration || '18:00'}</span>
+                  ) : (
+                    <div className="videoScreenSimulation">
+                      <FaPlayCircle size={54} color="#ffffff" className="playSimulationIcon" />
+                      <span className="videoSimulationText">Interactive Course Video Player</span>
+                      <span className="currentLessonTitle">Current: {activeLesson?.title}</span>
+                    </div>
+                  )}
+                  <div className="playerControlBar">
+                    <div className="playerControlsRow" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f8fafc', fontSize: '0.84rem' }}>
+                        <FaPlayCircle size={14} color="#38bdf8" /> Duration: {activeLesson?.duration || '20m'} · Vinh Giang Masterclass
+                      </span>
                       <button
                         type="button"
                         className="markCompleteBtn"

@@ -33,6 +33,7 @@ const CourseSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: [
+        'Communication',
         'Cloud & DevOps',
         'AI & Machine Learning',
         'Full Stack Development',
@@ -40,12 +41,12 @@ const CourseSchema = new mongoose.Schema(
         'Leadership & Management',
         'Data Engineering',
       ],
-      default: 'Cloud & DevOps',
+      default: 'Communication',
     },
     level: {
       type: String,
-      enum: ['Beginner', 'Intermediate', 'Advanced'],
-      default: 'Intermediate',
+      enum: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'],
+      default: 'All Levels',
     },
     duration: {
       type: String,

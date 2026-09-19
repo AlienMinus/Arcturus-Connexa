@@ -58,19 +58,20 @@
 }
 
 .learningHeroContent h1 {
-  font-size: 2.1rem;
+  font-size: clamp(1.8rem, 3.5vw, 2.3rem);
   font-weight: 800;
   margin: 0 0 12px;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  color: #ffffff !important;
 }
 
 .learningHeroContent p {
   font-size: 1.05rem;
   margin: 0 0 24px;
   max-width: 780px;
-  opacity: 0.92;
-  line-height: 1.5;
+  color: #e0f2fe !important;
+  line-height: 1.6;
 }
 
 .learningSearchBox {
@@ -81,12 +82,14 @@
   padding: 6px 8px 6px 16px;
   max-width: 640px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  gap: 8px;
 }
 
 .learningSearchIcon {
   color: #64748b;
   font-size: 16px;
-  margin-right: 12px;
+  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .learningSearchBox input {
@@ -95,6 +98,8 @@
   outline: none;
   font-size: 0.95rem;
   color: #0f172a;
+  min-width: 0;
+  background: transparent;
 }
 
 .learningSearchBtn {
@@ -104,12 +109,14 @@
   border-radius: 8px;
   padding: 10px 20px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .learningSearchBtn:hover {
@@ -133,13 +140,14 @@
 }
 
 .heroStatItem strong {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff !important;
 }
 
 .heroStatItem span {
   font-size: 0.82rem;
-  opacity: 0.85;
+  color: #bae6fd !important;
 }
 
 .heroStatDivider {
@@ -742,11 +750,21 @@
   border-right: 1px solid #e2e8f0;
 }
 
-.playerSimulatorScreen {
-  background: #0f172a;
-  border-radius: 12px;
+.videoEmbedContainer {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000000;
   overflow: hidden;
-  margin-bottom: 20px;
+}
+
+.courseVideoIframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 .videoScreenSimulation {
