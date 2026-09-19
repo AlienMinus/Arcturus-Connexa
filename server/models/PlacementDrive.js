@@ -46,6 +46,7 @@ const PlacementDriveSchema = new mongoose.Schema(
       default: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
     },
     roleTitle: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
     jobCategory: {
       type: String,
       enum: ['Core Software', 'Cloud & DevOps', 'FinTech & Analytics', 'AI & Data Science', 'Product Engineering'],

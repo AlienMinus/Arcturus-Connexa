@@ -79,6 +79,19 @@ export const ScheduleDriveModal = ({
             />
           </div>
 
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+              Company Logo URL
+            </label>
+            <input
+              type="url"
+              className="chatInput"
+              placeholder="https://example.com/company-logo.png"
+              value={driveForm.companyLogo}
+              onChange={(e) => setDriveForm({ ...driveForm, companyLogo: e.target.value })}
+            />
+          </div>
+
           <div>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
               Package CTC (LPA) *
@@ -181,6 +194,21 @@ export const ScheduleDriveModal = ({
               <option value="Placement Cell Boardroom">Placement Cell Boardroom</option>
               <option value="Virtual Assessment Lab">Virtual Assessment Lab (Online)</option>
             </select>
+          </div>
+
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+              Job Description (JD) *
+            </label>
+            <textarea
+              className="chatInput"
+              rows="5"
+              placeholder="Describe responsibilities, qualifications, and interview expectations..."
+              value={driveForm.description}
+              onChange={(e) => setDriveForm({ ...driveForm, description: e.target.value })}
+              required
+              style={{ resize: 'vertical', minHeight: 110 }}
+            />
           </div>
 
           <div>

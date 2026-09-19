@@ -39,6 +39,7 @@ router.post('/', authMiddleware, async (req, res) => {
       companyName,
       companyLogo,
       roleTitle,
+      description,
       jobCategory,
       ctcLpa,
       baseStipend,
@@ -56,8 +57,8 @@ router.post('/', authMiddleware, async (req, res) => {
     const organizationId = adminAccess ? requestedOrganizationId : officerOrganization?._id || requestedOrganization?._id;
     if (!organizationId) return res.status(400).json({ error: 'An organization is required for this placement drive.' });
 
-    if (!companyName || !roleTitle || !ctcLpa || !driveDate) {
-      return res.status(400).json({ error: 'Company name, role, CTC, and drive date are required.' });
+    if (!companyName || !roleTitle || !description || !ctcLpa || !driveDate) {
+      return res.status(400).json({ error: 'Company name, role, job description, CTC, and drive date are required.' });
     }
 
     const drive = await PlacementDrive.create({
@@ -65,6 +66,7 @@ router.post('/', authMiddleware, async (req, res) => {
       companyName: companyName.trim(),
       companyLogo: companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
       roleTitle: roleTitle.trim(),
+      description: description.trim(),
       jobCategory: jobCategory || 'Core Software',
       ctcLpa: Number(ctcLpa),
       baseStipend: Number(baseStipend) || 45000,
