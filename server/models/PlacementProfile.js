@@ -75,6 +75,8 @@ const PlacementProfileSchema = new mongoose.Schema(
     assignedMentor: { type: String, default: '' },
     mentorActionRecommendation: { type: String, default: '' },
     gemmaDiagnosticTimestamp: { type: Date, default: Date.now },
+    gemmaModel: { type: String, default: 'google/gemma-3-4b-it' },
+    gemmaProvider: { type: String, default: 'Hugging Face Gemma' },
 
     mockInterviewsTaken: { type: Number, default: 0 },
     lastAssessmentDate: { type: Date, default: Date.now },

@@ -16,7 +16,19 @@ import {
   FaUniversity,
   FaHourglassHalf,
   FaExclamationTriangle,
-  FaExternalLinkAlt
+  FaExternalLinkAlt,
+  FaBriefcase,
+  FaBuilding,
+  FaSearch,
+  FaTrashAlt,
+  FaPaperPlane,
+  FaClock,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaExchangeAlt,
+  FaPlus,
+  FaSyncAlt,
+  FaTimesCircle
 } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
@@ -39,12 +51,14 @@ const LANGUAGES = [
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token, activeAccount, switchAccount, userOrganizations, refreshOrganizations } = useAuth();
   const { profile, refreshProfile } = useProfile();
   const { theme, setTheme, toggleTheme } = useTheme();
 
-  // Determine initial tab from pathname (e.g. /settings/language -> 'language')
+  // Determine initial tab from pathname (e.g. /settings/applications -> 'applications')
   const getInitialTab = () => {
+    if (location.pathname.includes('/applications')) return 'applications';
+    if (location.pathname.includes('/accounts') || location.pathname.includes('/organizations')) return 'accounts';
     if (location.pathname.includes('/verification')) return 'verification';
     if (location.pathname.includes('/language')) return 'language';
     if (location.pathname.includes('/privacy') || location.pathname.includes('/visibility')) return 'visibility';
@@ -57,6 +71,13 @@ const SettingsPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(() => {
     return localStorage.getItem('arcturus_lang') || 'en';
   });
+
+  // Job Application Tracking State
+  const [applications, setApplications] = useState([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [appSearchQuery, setAppSearchQuery] = useState('');
+  const [appStatusFilter, setAppStatusFilter] = useState('All');
+  const [withdrawingJobId, setWithdrawingJobId] = useState(null);
 
   // Settings states
   const [settings, setSettings] = useState({
@@ -148,6 +169,58 @@ const SettingsPage = () => {
       console.error('Failed to load organizations:', err);
     }
   };
+
+  const fetchApplications = async () => {
+    if (!token) return;
+    try {
+      setApplicationsLoading(true);
+      const res = await fetch(buildApiUrl('/jobs/my-applications'), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setApplications(data.applications || []);
+      }
+    } catch (err) {
+      console.error('Failed to load applications:', err);
+    } finally {
+      setApplicationsLoading(false);
+    }
+  };
+
+  const handleWithdrawApplication = async (jobId, jobTitle) => {
+    if (!window.confirm(`Are you sure you want to withdraw your application for "${jobTitle}"?`)) {
+      return;
+    }
+    try {
+      setWithdrawingJobId(jobId);
+      const res = await fetch(buildApiUrl(`/jobs/${jobId}/withdraw`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || 'Application withdrawn successfully! 📋');
+        setApplications((prev) => prev.filter((a) => a.jobId !== jobId));
+      } else {
+        showToast(data.error || 'Failed to withdraw application');
+      }
+    } catch (err) {
+      console.error('Failed to withdraw application:', err);
+      showToast('Network error while withdrawing application');
+    } finally {
+      setWithdrawingJobId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'applications' || activeTab === 'account') {
+      fetchApplications();
+    }
+    if (activeTab === 'accounts') {
+      if (refreshOrganizations) refreshOrganizations();
+    }
+  }, [activeTab, token]);
 
   // Load user settings from backend
   useEffect(() => {
@@ -407,6 +480,34 @@ const SettingsPage = () => {
 
               <button
                 type="button"
+                className={`settingsTabBtn ${activeTab === 'applications' ? 'active' : ''}`}
+                onClick={() => setActiveTab('applications')}
+                title="Job Applications Tracker"
+                aria-label="Job Applications Tracker"
+              >
+                <FaBriefcase className="tabIcon" />
+                <span className="tabLabel">Job Applications</span>
+                {applications.length > 0 && (
+                  <span className="tabCountBadge">{applications.length}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className={`settingsTabBtn ${activeTab === 'accounts' ? 'active' : ''}`}
+                onClick={() => setActiveTab('accounts')}
+                title="Accounts & Organizations"
+                aria-label="Accounts & Organizations"
+              >
+                <FaBuilding className="tabIcon" />
+                <span className="tabLabel">Accounts & Organizations</span>
+                {userOrganizations.length > 0 && (
+                  <span className="tabCountBadge orgBadge">{userOrganizations.length}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
                 className={`settingsTabBtn ${activeTab === 'verification' ? 'active' : ''}`}
                 onClick={() => setActiveTab('verification')}
                 title="Account Verification & Badges"
@@ -424,7 +525,44 @@ const SettingsPage = () => {
               <div className="settingsCard">
                 <div className="settingsCardHeader">
                   <h3>Account Preferences</h3>
-                  <p>Manage your display options, themes, and general experience on Arcturus.</p>
+                  <p>Manage your display options, identity mode, and profile dashboard on Arcturus.</p>
+                </div>
+
+                {/* Individual Profile Quick Dashboard Widgets */}
+                <div className="profileDashboardWidgets">
+                  <div className="dashboardWidgetCard" onClick={() => setActiveTab('applications')}>
+                    <div className="widgetIconBox appWidgetIcon">
+                      <FaBriefcase size={20} />
+                    </div>
+                    <div className="widgetDetails">
+                      <h4>Job Applications Tracker</h4>
+                      <p>
+                        {applications.length > 0
+                          ? `You have ${applications.length} active application${applications.length > 1 ? 's' : ''} (${applications.filter(a => a.status === 'In Review' || a.status === 'Shortlisted').length} in progress)`
+                          : 'Track recruiter review stages and interview status'}
+                      </p>
+                    </div>
+                    <button type="button" className="widgetActionBtn">
+                      View Tracker →
+                    </button>
+                  </div>
+
+                  <div className="dashboardWidgetCard" onClick={() => setActiveTab('accounts')}>
+                    <div className="widgetIconBox orgWidgetIcon">
+                      <FaBuilding size={20} />
+                    </div>
+                    <div className="widgetDetails">
+                      <h4>Active Identity & Accounts</h4>
+                      <p>
+                        {activeAccount?.type === 'organization'
+                          ? `Acting as ${activeAccount.name} (${activeAccount.role || 'Admin'})`
+                          : `Personal Profile (${userOrganizations.length} organization${userOrganizations.length !== 1 ? 's' : ''} connected)`}
+                      </p>
+                    </div>
+                    <button type="button" className="widgetActionBtn">
+                      Switch Account →
+                    </button>
+                  </div>
                 </div>
 
                 <div className="settingsRowsList">
@@ -1064,6 +1202,430 @@ const SettingsPage = () => {
                       </button>
                     </form>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Job Applications Tracking System */}
+            {activeTab === 'applications' && (
+              <div className="settingsCard appTrackerCard">
+                <div className="settingsCardHeader appTrackerHeader">
+                  <div className="appHeaderTitle">
+                    <h3>Job Applications Tracking System</h3>
+                    <p>Monitor your job submissions, track recruiter review stages in real-time, and manage applications.</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    className="appRefreshBtn" 
+                    onClick={fetchApplications}
+                    disabled={applicationsLoading}
+                    title="Refresh application status"
+                  >
+                    <FaSyncAlt className={applicationsLoading ? 'spinIcon' : ''} />
+                    <span>{applicationsLoading ? 'Refreshing...' : 'Refresh'}</span>
+                  </button>
+                </div>
+
+                {/* Application Analytics / KPI Counters */}
+                <div className="appKpiGrid">
+                  <div 
+                    className={`appKpiCard ${appStatusFilter === 'All' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('All')}
+                  >
+                    <span className="appKpiNumber">{applications.length}</span>
+                    <span className="appKpiLabel">Total Applied</span>
+                  </div>
+
+                  <div 
+                    className={`appKpiCard kpiApplied ${appStatusFilter === 'Applied' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('Applied')}
+                  >
+                    <span className="appKpiNumber">{applications.filter(a => a.status === 'Applied').length}</span>
+                    <span className="appKpiLabel">Submitted</span>
+                  </div>
+
+                  <div 
+                    className={`appKpiCard kpiReview ${appStatusFilter === 'In Review' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('In Review')}
+                  >
+                    <span className="appKpiNumber">{applications.filter(a => a.status === 'In Review').length}</span>
+                    <span className="appKpiLabel">In Review</span>
+                  </div>
+
+                  <div 
+                    className={`appKpiCard kpiShortlisted ${appStatusFilter === 'Shortlisted' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('Shortlisted')}
+                  >
+                    <span className="appKpiNumber">{applications.filter(a => a.status === 'Shortlisted').length}</span>
+                    <span className="appKpiLabel">Shortlisted</span>
+                  </div>
+
+                  <div 
+                    className={`appKpiCard kpiHired ${appStatusFilter === 'Hired' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('Hired')}
+                  >
+                    <span className="appKpiNumber">{applications.filter(a => a.status === 'Hired').length}</span>
+                    <span className="appKpiLabel">Offers / Hired</span>
+                  </div>
+
+                  <div 
+                    className={`appKpiCard kpiRejected ${appStatusFilter === 'Rejected' ? 'kpiActive' : ''}`}
+                    onClick={() => setAppStatusFilter('Rejected')}
+                  >
+                    <span className="appKpiNumber">{applications.filter(a => a.status === 'Rejected').length}</span>
+                    <span className="appKpiLabel">Archived</span>
+                  </div>
+                </div>
+
+                {/* Filter & Search Bar */}
+                <div className="appFilterToolbar">
+                  <div className="appSearchBox">
+                    <FaSearch className="appSearchIcon" />
+                    <input
+                      type="text"
+                      placeholder="Filter by job title, company, or skills..."
+                      value={appSearchQuery}
+                      onChange={(e) => setAppSearchQuery(e.target.value)}
+                    />
+                    {appSearchQuery && (
+                      <button type="button" className="appClearSearch" onClick={() => setAppSearchQuery('')}>
+                        <FaTimesCircle size={14} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="appStatusPills">
+                    {['All', 'Applied', 'In Review', 'Shortlisted', 'Hired', 'Rejected'].map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        className={`appStatusPill ${appStatusFilter === status ? 'pillActive' : ''}`}
+                        onClick={() => setAppStatusFilter(status)}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Applications List */}
+                {applicationsLoading && applications.length === 0 ? (
+                  <div className="appLoadingState">
+                    <div className="appSpinner"></div>
+                    <p>Loading your job applications...</p>
+                  </div>
+                ) : (
+                  (() => {
+                    const filteredApps = applications.filter((app) => {
+                      const q = appSearchQuery.toLowerCase().trim();
+                      const matchesSearch =
+                        !q ||
+                        app.title?.toLowerCase().includes(q) ||
+                        app.company?.toLowerCase().includes(q) ||
+                        app.location?.toLowerCase().includes(q) ||
+                        app.skills?.some((s) => s.toLowerCase().includes(q));
+
+                      const matchesStatus =
+                        appStatusFilter === 'All' || app.status?.toLowerCase() === appStatusFilter.toLowerCase();
+
+                      return matchesSearch && matchesStatus;
+                    });
+
+                    if (filteredApps.length === 0) {
+                      return (
+                        <div className="appEmptyState">
+                          <div className="appEmptyIcon">
+                            <FaBriefcase size={44} />
+                          </div>
+                          <h4>No applications match your criteria</h4>
+                          <p>
+                            {applications.length === 0
+                              ? "You haven't submitted any job applications on Arcturus yet."
+                              : 'Try adjusting your search keywords or status filter.'}
+                          </p>
+                          <Link to="/jobs" className="browseJobsBtn">
+                            Explore Available Jobs →
+                          </Link>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="applicationsList">
+                        {filteredApps.map((app) => {
+                          const getStageProgress = (status) => {
+                            switch (status) {
+                              case 'Applied': return 1;
+                              case 'In Review': return 2;
+                              case 'Shortlisted': return 3;
+                              case 'Hired': return 4;
+                              case 'Rejected': return 4;
+                              default: return 1;
+                            }
+                          };
+
+                          const currentStageNum = getStageProgress(app.status);
+                          const isRejected = app.status === 'Rejected';
+                          const isHired = app.status === 'Hired';
+
+                          return (
+                            <div key={app.jobId} className={`appTrackingCard ${app.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                              {/* Top: Company Logo + Title + Status Pill */}
+                              <div className="appCardTop">
+                                <div className="appCompanyBlock">
+                                  <img
+                                    src={app.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                                    alt={app.company}
+                                    className="appCompanyLogo"
+                                  />
+                                  <div className="appTitleInfo">
+                                    <h4>{app.title}</h4>
+                                    <div className="appCompanyMeta">
+                                      <span className="appCompanyName">{app.company}</span>
+                                      <span className="appDot">•</span>
+                                      <span className="appLocation">
+                                        <FaMapMarkerAlt size={11} /> {app.location}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="appStatusTagBlock">
+                                  <span className={`appStatusBadge status-${app.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                                    {app.status === 'Hired' ? '🎉 Hired / Offered' : app.status === 'Rejected' ? '✕ Not Selected' : app.status}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Meta Pills: Workplace, Employment Type, Salary, Applied Date */}
+                              <div className="appMetaRow">
+                                <span className="appMetaPill">{app.workplaceType}</span>
+                                <span className="appMetaPill">{app.employmentType}</span>
+                                {app.salary && (
+                                  <span className="appMetaPill appSalaryPill">
+                                    <FaMoneyBillWave size={11} /> {app.salary}
+                                  </span>
+                                )}
+                                <span className="appAppliedTime">
+                                  <FaClock size={11} /> Applied {new Date(app.appliedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </span>
+                              </div>
+
+                              {/* Visual 4-Stage Progress Stepper */}
+                              <div className="appStepperContainer">
+                                <div className="appStepperTrack">
+                                  <div 
+                                    className={`appStepperBar ${isRejected ? 'stepperRejected' : isHired ? 'stepperHired' : ''}`}
+                                    style={{
+                                      width: `${((currentStageNum - 1) / 3) * 100}%`
+                                    }}
+                                  ></div>
+
+                                  {/* Step 1: Applied */}
+                                  <div className={`appStepPoint ${currentStageNum >= 1 ? 'stepCompleted' : ''}`}>
+                                    <div className="stepCircle">✓</div>
+                                    <span className="stepLabel">Applied</span>
+                                  </div>
+
+                                  {/* Step 2: In Review */}
+                                  <div className={`appStepPoint ${currentStageNum >= 2 ? (currentStageNum === 2 ? 'stepCurrent' : 'stepCompleted') : ''}`}>
+                                    <div className="stepCircle">{currentStageNum > 2 ? '✓' : '2'}</div>
+                                    <span className="stepLabel">In Review</span>
+                                  </div>
+
+                                  {/* Step 3: Shortlisted */}
+                                  <div className={`appStepPoint ${currentStageNum >= 3 ? (currentStageNum === 3 ? 'stepCurrent' : 'stepCompleted') : ''}`}>
+                                    <div className="stepCircle">{currentStageNum > 3 ? '✓' : '3'}</div>
+                                    <span className="stepLabel">Shortlisted</span>
+                                  </div>
+
+                                  {/* Step 4: Decision */}
+                                  <div className={`appStepPoint ${currentStageNum === 4 ? (isRejected ? 'stepRejected' : 'stepCompleted') : ''}`}>
+                                    <div className="stepCircle">
+                                      {isRejected ? '✕' : isHired ? '🎉' : '4'}
+                                    </div>
+                                    <span className="stepLabel">
+                                      {isRejected ? 'Not Selected' : isHired ? 'Offer Extended' : 'Decision'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Skills tags */}
+                              {app.skills && app.skills.length > 0 && (
+                                <div className="appSkillsList">
+                                  {app.skills.slice(0, 6).map((skill, idx) => (
+                                    <span key={idx} className="appSkillTag">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Footer Actions */}
+                              <div className="appCardFooter">
+                                <Link to={`/jobs`} className="appActionLink">
+                                  <FaExternalLinkAlt size={12} /> View Job Listing
+                                </Link>
+
+                                {app.status !== 'Hired' && (
+                                  <button
+                                    type="button"
+                                    className="appWithdrawBtn"
+                                    disabled={withdrawingJobId === app.jobId}
+                                    onClick={() => handleWithdrawApplication(app.jobId, app.title)}
+                                    title="Withdraw your application for this position"
+                                  >
+                                    <FaTrashAlt size={12} />
+                                    <span>{withdrawingJobId === app.jobId ? 'Withdrawing...' : 'Withdraw Application'}</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()
+                )}
+              </div>
+            )}
+
+            {/* Accounts & Organizations View */}
+            {activeTab === 'accounts' && (
+              <div className="settingsCard accountsCard">
+                <div className="settingsCardHeader">
+                  <h3>Accounts & Organizations</h3>
+                  <p>Manage your account identities, switch active profiles, and manage connected organizations.</p>
+                </div>
+
+                {/* Current Active Account Card */}
+                <div className="currentAccountCard">
+                  <div className="currentAccountLeft">
+                    <span className="currentAccountPill">
+                      Currently Active
+                    </span>
+                    <div className="currentAccountBody">
+                      {activeAccount?.type === 'organization' ? (
+                        activeAccount.logo ? (
+                          <img src={activeAccount.logo} alt="" className="currentAccountAvatar orgLogo" />
+                        ) : (
+                          <div className="currentAccountAvatar orgFallback"><FaBuilding size={24} /></div>
+                        )
+                      ) : profile?.avatar?.url ? (
+                        <img src={profile.avatar.url} alt="" className="currentAccountAvatar" />
+                      ) : (
+                        <div className="currentAccountAvatar"><FaUserCog size={24} /></div>
+                      )}
+                      <div>
+                        <h4>
+                          {activeAccount?.type === 'organization' ? activeAccount.name : profile?.name || user?.name || 'Personal Profile'}
+                        </h4>
+                        <p>
+                          {activeAccount?.type === 'organization'
+                            ? `Acting as Organization • ${activeAccount.role || 'Admin'}`
+                            : `Personal Profile • ${profile?.headline || 'Arcturus Member'}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="currentAccountRight">
+                    {activeAccount?.type === 'organization' ? (
+                      <button
+                        type="button"
+                        className="switchBtnPrimary"
+                        onClick={() => {
+                          switchAccount('personal');
+                          showToast('Switched to Personal Profile!');
+                        }}
+                      >
+                        <FaExchangeAlt size={13} /> Switch to Personal Profile
+                      </button>
+                    ) : (
+                      <span className="actingLabel">Browsing as Personal Profile</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Managed Organizations List */}
+                <div className="organizationsSection">
+                  <div className="orgSectionTop">
+                    <div>
+                      <h4>Your Registered Organizations</h4>
+                      <p>Organizations and institutions where you have management or recruiter privileges.</p>
+                    </div>
+                    <Link to="/company/create" className="createOrgBtn">
+                      <FaPlus size={12} /> Register New Organization
+                    </Link>
+                  </div>
+
+                  {userOrganizations && userOrganizations.length > 0 ? (
+                    <div className="orgCardsGrid">
+                      {userOrganizations.map((org) => {
+                        const isCurrentOrg = activeAccount?.type === 'organization' && (activeAccount.id === org._id || activeAccount.orgId === org._id);
+                        const myMembership = org.members?.find((m) => m.userId === user?._id || m.userId?._id === user?._id);
+                        const roleTitle = myMembership?.role || (org.adminId === user?._id ? 'Admin' : 'Member');
+
+                        return (
+                          <div key={org._id} className={`orgManagedCard ${isCurrentOrg ? 'orgCardActive' : ''}`}>
+                            <div className="orgCardMain">
+                              <img
+                                src={org.logo?.url || org.logo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                                alt={org.name}
+                                className="orgCardLogo"
+                              />
+                              <div className="orgCardDetails">
+                                <h5>{org.name}</h5>
+                                <span className="orgMetaLine">
+                                  {org.industry || 'Business'} • {org.location || 'Headquarters'}
+                                </span>
+                                <div className="orgStatusBadges">
+                                  <span className={`orgStatusPill status-${org.status}`}>
+                                    {org.status === 'approved' ? '✓ Verified Organization' : org.status === 'pending' ? '⏳ Pending Approval' : 'Rejected'}
+                                  </span>
+                                  <span className="orgRolePill">{roleTitle}</span>
+                                  {org.activeJobsCount > 0 && (
+                                    <span className="orgJobsPill">{org.activeJobsCount} Active Job{org.activeJobsCount > 1 ? 's' : ''}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="orgCardActions">
+                              {isCurrentOrg ? (
+                                <span className="currentActiveTag">✓ Current Active</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="switchOrgBtn"
+                                  onClick={() => {
+                                    switchAccount(org);
+                                    showToast(`Switched account to ${org.name}!`);
+                                  }}
+                                >
+                                  <FaExchangeAlt size={12} /> Switch to this Org
+                                </button>
+                              )}
+
+                              <Link to="/jobs/manage" className="manageJobsBtn">
+                                Talent & Jobs Dashboard →
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="emptyOrgsBox">
+                      <FaBuilding size={36} color="#94a3b8" />
+                      <h5>No organizations registered yet</h5>
+                      <p>Register your company, startup, or educational institution to publish jobs, access recruiter dashboards, and verify students.</p>
+                      <Link to="/company/create" className="registerNowBtn">
+                        Register Organization Now
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

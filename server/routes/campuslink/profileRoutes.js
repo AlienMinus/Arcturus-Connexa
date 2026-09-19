@@ -138,6 +138,8 @@ router.post('/', authMiddleware, async (req, res) => {
       profile.riskReason = gemmaAnalysis.riskReason;
       profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
       profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
+      profile.gemmaModel = gemmaAnalysis.model || 'google/gemma-3-4b-it';
+      profile.gemmaProvider = gemmaAnalysis.provider || 'Hugging Face Gemma';
       profile.gemmaDiagnosticTimestamp = new Date();
       await profile.save();
     } else {
@@ -163,6 +165,8 @@ router.post('/', authMiddleware, async (req, res) => {
         riskReason: gemmaAnalysis.riskReason,
         aiReadinessSummary: gemmaAnalysis.aiReadinessSummary,
         mentorActionRecommendation: gemmaAnalysis.mentorActionRecommendation,
+        gemmaModel: gemmaAnalysis.model || 'google/gemma-3-4b-it',
+        gemmaProvider: gemmaAnalysis.provider || 'Hugging Face Gemma',
         gemmaDiagnosticTimestamp: new Date(),
       });
     }
@@ -230,6 +234,8 @@ router.post('/diagnose-ai', authMiddleware, async (req, res) => {
     profile.isAtRisk = gemmaAnalysis.isAtRisk;
     profile.riskReason = gemmaAnalysis.riskReason;
     profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
+    profile.gemmaModel = gemmaAnalysis.model || 'google/gemma-3-4b-it';
+    profile.gemmaProvider = gemmaAnalysis.provider || 'Hugging Face Gemma';
     profile.gemmaDiagnosticTimestamp = new Date();
     profile.skillGaps = computeSkillGaps(combinedSkills, activeDrives);
 

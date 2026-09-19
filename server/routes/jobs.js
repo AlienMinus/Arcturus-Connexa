@@ -69,6 +69,91 @@ router.get('/my-listings', authMiddleware, async (req, res) => {
   }
 });
 
+// GET /api/jobs/my-applications - Get applications submitted by authenticated candidate
+router.get('/my-applications', authMiddleware, async (req, res) => {
+  try {
+    const jobs = await Job.find({
+      $or: [
+        { 'applicants.applicantId': req.userId },
+        { 'applicants.userId': req.userId },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .populate('organizationId', 'name logo slug industry location status')
+      .lean();
+
+    const applications = [];
+
+    for (const job of jobs) {
+      const myApp = job.applicants?.find(
+        (a) =>
+          a.applicantId?.toString() === req.userId ||
+          a.userId?.toString() === req.userId ||
+          a._id?.toString() === req.userId
+      );
+
+      if (myApp) {
+        applications.push({
+          applicationId: myApp._id,
+          jobId: job._id,
+          title: job.title,
+          company: job.company,
+          companyLogo: job.organizationId?.logo?.url || job.companyLogo,
+          organizationId: job.organizationId?._id || null,
+          organizationSlug: job.organizationId?.slug || null,
+          location: job.location,
+          workplaceType: job.workplaceType || 'Hybrid',
+          employmentType: job.employmentType || 'Full-time',
+          salary: job.salary || '',
+          skills: job.skills || [],
+          description: job.description || '',
+          isActive: job.isActive,
+          appliedAt: myApp.appliedAt || job.createdAt,
+          status: myApp.status || 'Applied',
+          candidateName: myApp.name || '',
+          candidateHeadline: myApp.headline || '',
+        });
+      }
+    }
+
+    // Sort by appliedAt descending
+    applications.sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+
+    res.json({ applications, total: applications.length });
+  } catch (err) {
+    console.error('Failed to fetch user applications:', err);
+    res.status(500).json({ error: 'Failed to retrieve job applications' });
+  }
+});
+
+// DELETE /api/jobs/:id/withdraw - Withdraw candidate application
+router.delete('/:id/withdraw', authMiddleware, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ error: 'Job opening not found' });
+    }
+
+    const applicationIndex = job.applicants.findIndex(
+      (a) =>
+        a.applicantId?.toString() === req.userId ||
+        a.userId?.toString() === req.userId
+    );
+
+    if (applicationIndex === -1) {
+      return res.status(400).json({ error: 'No active application found for this job opening' });
+    }
+
+    job.applicants.splice(applicationIndex, 1);
+    await job.save();
+
+    res.json({ message: 'Application withdrawn successfully! 📋', jobId: job._id });
+  } catch (err) {
+    console.error('Failed to withdraw application:', err);
+    res.status(500).json({ error: 'Failed to withdraw job application' });
+  }
+});
+
 // GET /api/jobs/:id - Get specific job details
 router.get('/:id', async (req, res) => {
   try {

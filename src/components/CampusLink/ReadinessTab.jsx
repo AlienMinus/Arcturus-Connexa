@@ -396,12 +396,12 @@ export const ReadinessTab = ({
             )}
           </div>
 
-          {/* HUGGING FACE GEMMA-2 AI RISK & RECOMMENDATION SECTION */}
+          {/* HUGGING FACE GEMMA AI RISK & RECOMMENDATION SECTION */}
           <div className="gemmaInsightCard">
             <div className="gemmaHeader">
               <div className="gemmaHeaderLeft">
                 <span className="gemmaBadge">
-                  <FaRobot size={13} /> Hugging Face Gemma-2 AI Engine
+                  <FaRobot size={13} /> Hugging Face Gemma AI Engine
                 </span>
                 {studentProfile.isAtRisk ? (
                   <span className="gemmaRiskStatusBadge danger">
@@ -419,7 +419,7 @@ export const ReadinessTab = ({
                 className="gemmaRunBtn"
                 onClick={handleRunGemmaDiagnostics}
                 disabled={isDiagnosingGemma}
-                title="Refresh AI risk diagnostics using Hugging Face Gemma-2-2B-IT"
+                title="Refresh AI risk diagnostics using Hugging Face Gemma"
               >
                 <FaSyncAlt size={12} className={isDiagnosingGemma ? 'fa-spin' : ''} />
                 {isDiagnosingGemma ? 'Diagnosing with Gemma...' : 'Re-Run Gemma AI Diagnostics'}
@@ -483,7 +483,7 @@ export const ReadinessTab = ({
             {/* Footer Metadata */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, fontSize: '0.74rem', color: '#94a3b8', flexWrap: 'wrap', gap: 8 }}>
               <span>
-                Inference Model: <strong>google/gemma-2-2b-it</strong> · Hosted via Hugging Face API
+                Inference Model: <strong>{studentProfile.gemmaModel || 'google/gemma-3-4b-it'}</strong> · Hosted via Hugging Face API
               </span>
               {studentProfile.gemmaDiagnosticTimestamp && (
                 <span>

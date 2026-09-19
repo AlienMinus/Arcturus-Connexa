@@ -8,7 +8,11 @@ import {
   FaBriefcase, 
   FaShieldAlt, 
   FaPlus,
-  FaChevronRight 
+  FaChevronRight,
+  FaBuilding,
+  FaExchangeAlt,
+  FaCheck,
+  FaUserCheck
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
@@ -20,11 +24,12 @@ const NavRight = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isBusinessOpen, setBusinessOpen] = useState(false);
   const { profile } = useProfile();
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, activeAccount, switchAccount, userOrganizations } = useAuth();
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
   const isAuthenticated = Boolean(token);
+  const isOrgActive = activeAccount?.type === 'organization';
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,14 +73,37 @@ const NavRight = () => {
   return (
     <div className="navRightContainer" ref={containerRef}>
       <div className="navRight">
+        {/* Active Organization Context Pill (if acting as organization) */}
+        {isOrgActive && (
+          <div 
+            className="navOrgActivePill" 
+            title={`Acting as ${activeAccount.name}. Click to switch back.`}
+            onClick={() => switchAccount('personal')}
+          >
+            <span className="orgPillDot"></span>
+            <span className="orgPillText">Acting as <strong>{activeAccount.name}</strong></span>
+            <span className="orgPillAction">Personal ↺</span>
+          </div>
+        )}
+
         {/* Profile Nav Trigger */}
         <div
-          className={`profileMenu ${isDropdownOpen ? "activeMenu" : ""}`}
+          className={`profileMenu ${isDropdownOpen ? "activeMenu" : ""} ${isOrgActive ? "orgProfileActive" : ""}`}
           onClick={toggleDropdown}
           role="button"
           tabIndex={0}
         >
-          {isAuthenticated && profile?.avatar?.url ? (
+          {isOrgActive ? (
+            activeAccount.logo ? (
+              <img
+                src={activeAccount.logo}
+                alt={activeAccount.name}
+                className="profileAvatar orgNavAvatar"
+              />
+            ) : (
+              <FaBuilding className="profileAvatar profileAvatarFallback orgNavAvatar" />
+            )
+          ) : isAuthenticated && profile?.avatar?.url ? (
             <img
               src={profile.avatar.url}
               alt={profile?.name || "Profile"}
@@ -86,10 +114,13 @@ const NavRight = () => {
           )}
           <span className="profile-text">
             {isAuthenticated
-              ? profile?.name
-                ? `${profile.name.split(" ")[0]}`
-                : "Me"
+              ? isOrgActive
+                ? `${activeAccount.name.slice(0, 8)}${activeAccount.name.length > 8 ? '...' : ''}`
+                : profile?.name
+                  ? `${profile.name.split(" ")[0]}`
+                  : "Me"
               : "Sign In"}{" "}
+            {isOrgActive && <span className="orgBadgeMini">Org</span>}
             <FaCaretDown />
           </span>
         </div>
@@ -125,8 +156,20 @@ const NavRight = () => {
       {isDropdownOpen && (
         <div className="profile-dropdown">
           {/* Header with Avatar & Name */}
-          <div className="profile-dropdown-header">
-            {isAuthenticated && profile?.avatar?.url ? (
+          <div className={`profile-dropdown-header ${isOrgActive ? 'orgDropdownHeader' : ''}`}>
+            {isOrgActive ? (
+              activeAccount.logo ? (
+                <img
+                  src={activeAccount.logo}
+                  alt={activeAccount.name}
+                  className="dropdownAvatar orgDropdownAvatar"
+                />
+              ) : (
+                <div className="dropdownAvatar dropdownAvatarFallback orgDropdownAvatar">
+                  <FaBuilding size={22} color="#0a66c2" />
+                </div>
+              )
+            ) : isAuthenticated && profile?.avatar?.url ? (
               <img
                 src={profile.avatar.url}
                 alt={profile?.name || "Profile"}
@@ -138,12 +181,16 @@ const NavRight = () => {
             <div className="user-info">
               <h4>
                 {isAuthenticated
-                  ? profile?.name || user?.name || "Member"
+                  ? isOrgActive
+                    ? activeAccount.name
+                    : profile?.name || user?.name || "Member"
                   : "Guest Visitor"}
               </h4>
               <p>
                 {isAuthenticated
-                  ? profile?.headline || "Arcturus Member"
+                  ? isOrgActive
+                    ? `${activeAccount.role || 'Admin'} • Organization Account`
+                    : profile?.headline || "Arcturus Member"
                   : "Sign in to access your network"}
               </p>
             </div>
@@ -152,13 +199,23 @@ const NavRight = () => {
           {/* View Profile or Sign In CTA */}
           <div className="profile-dropdown-body">
             {isAuthenticated ? (
-              <Link
-                to={userProfileUrl}
-                className="view-profile-btn"
-                onClick={() => setDropdownOpen(false)}
-              >
-                View Profile
-              </Link>
+              isOrgActive ? (
+                <Link
+                  to={activeAccount.slug ? `/company/${activeAccount.slug}` : `/organization/${activeAccount.id}`}
+                  className="view-profile-btn org-profile-cta"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  View Company Page
+                </Link>
+              ) : (
+                <Link
+                  to={userProfileUrl}
+                  className="view-profile-btn"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  View Profile
+                </Link>
+              )
             ) : (
               <Link
                 to="/login"
@@ -170,6 +227,128 @@ const NavRight = () => {
             )}
           </div>
 
+          {/* Account Switcher Section (Personal vs Organization) */}
+          {isAuthenticated && (
+            <div className="profile-dropdown-section account-switcher-section">
+              <div className="account-switcher-header">
+                <h5>Switch Account</h5>
+                <Link 
+                  to="/settings/accounts" 
+                  className="manage-accounts-link"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Manage
+                </Link>
+              </div>
+
+              <div className="account-switcher-list">
+                {/* Personal Profile Option */}
+                <div 
+                  className={`account-switch-row ${!isOrgActive ? 'active-account' : ''}`}
+                  onClick={() => {
+                    if (isOrgActive) {
+                      switchAccount('personal');
+                      setDropdownOpen(false);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="account-switch-avatar">
+                    {profile?.avatar?.url ? (
+                      <img src={profile.avatar.url} alt="" />
+                    ) : (
+                      <CgProfile size={26} />
+                    )}
+                  </div>
+                  <div className="account-switch-info">
+                    <span className="account-switch-name">
+                      {profile?.name || user?.name || 'Personal Profile'}
+                    </span>
+                    <span className="account-switch-sub">Personal Account</span>
+                  </div>
+                  {!isOrgActive ? (
+                    <span className="account-active-tag">Active</span>
+                  ) : (
+                    <button 
+                      type="button" 
+                      className="account-switch-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        switchAccount('personal');
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      Switch
+                    </button>
+                  )}
+                </div>
+
+                {/* Organization Accounts List */}
+                {userOrganizations && userOrganizations.length > 0 && (
+                  <div className="orgs-switch-group">
+                    <span className="orgs-switch-heading">Organizations</span>
+                    {userOrganizations.map((org) => {
+                      const isSelected = isOrgActive && (activeAccount.id === org._id || activeAccount.orgId === org._id);
+                      const orgLogoUrl = org.logo?.url || org.logo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+                      const myMembership = org.members?.find((m) => m.userId === user?._id || m.userId?._id === user?._id);
+                      const roleTitle = myMembership?.role || (org.adminId === user?._id ? 'Admin' : 'Member');
+
+                      return (
+                        <div 
+                          key={org._id}
+                          className={`account-switch-row ${isSelected ? 'active-account' : ''}`}
+                          onClick={() => {
+                            if (!isSelected) {
+                              switchAccount(org);
+                              setDropdownOpen(false);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <div className="account-switch-avatar org-avatar-box">
+                            <img src={orgLogoUrl} alt={org.name} />
+                          </div>
+                          <div className="account-switch-info">
+                            <span className="account-switch-name">{org.name}</span>
+                            <span className="account-switch-sub">
+                              {roleTitle} • <span className={`org-status-pill ${org.status}`}>{org.status}</span>
+                            </span>
+                          </div>
+                          {isSelected ? (
+                            <span className="account-active-tag org-tag">Active</span>
+                          ) : (
+                            <button 
+                              type="button" 
+                              className="account-switch-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                switchAccount(org);
+                                setDropdownOpen(false);
+                              }}
+                            >
+                              Switch
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Quick Add / Register Company Link */}
+                <Link 
+                  to="/company/create" 
+                  className="create-org-action-link"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  <FaPlus size={11} /> Register / Add Organization
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Account Section */}
           <div className="profile-dropdown-section">
             <h5>Account</h5>
@@ -177,6 +356,11 @@ const NavRight = () => {
               <li>
                 <Link to="/settings" onClick={() => setDropdownOpen(false)}>
                   Settings & Privacy
+                </Link>
+              </li>
+              <li>
+                <Link to="/settings/accounts" onClick={() => setDropdownOpen(false)}>
+                  Accounts & Organizations
                 </Link>
               </li>
               <li>
@@ -206,6 +390,11 @@ const NavRight = () => {
                   onClick={() => setDropdownOpen(false)}
                 >
                   Posts & Activity
+                </Link>
+              </li>
+              <li>
+                <Link to="/settings/applications" onClick={() => setDropdownOpen(false)} style={{ color: '#0a66c2', fontWeight: '600' }}>
+                  💼 Job Applications Tracker
                 </Link>
               </li>
               <li>

@@ -51,6 +51,8 @@ function AppRouter() {
                 <Route path="/learning" element={<LearningHubPage />} />
                 <Route path="/advertise" element={<AdvertisePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/settings/applications" element={<SettingsPage />} />
+                <Route path="/settings/accounts" element={<SettingsPage />} />
                 <Route path="/settings/verification" element={<SettingsPage />} />
                 <Route path="/settings/privacy" element={<SettingsPage />} />
                 <Route path="/settings/language" element={<SettingsPage />} />

@@ -201,6 +201,69 @@ body.dark-mode .sign-out-btn:hover {
   color: #f87171 !important;
 }
 
+/* Dark Mode: Account Switcher & Org Pill */
+[data-theme="dark"] .account-switcher-section,
+body.dark-mode .account-switcher-section {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .account-switch-row,
+body.dark-mode .account-switch-row {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .account-switch-row:hover,
+body.dark-mode .account-switch-row:hover {
+  border-color: #38bdf8 !important;
+  background-color: #1e293b !important;
+}
+
+[data-theme="dark"] .account-switch-row.active-account,
+body.dark-mode .account-switch-row.active-account {
+  border-color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.15) !important;
+}
+
+[data-theme="dark"] .account-switch-name,
+body.dark-mode .account-switch-name {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .account-switch-sub,
+body.dark-mode .account-switch-sub {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .account-switch-btn,
+body.dark-mode .account-switch-btn {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .create-org-action-link,
+body.dark-mode .create-org-action-link {
+  background: #0f172a !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .navOrgActivePill,
+body.dark-mode .navOrgActivePill {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .orgPillAction,
+body.dark-mode .orgPillAction {
+  background: #1e293b !important;
+  color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+}
+
 /* ==========================================================================
    3. FEED, SIDEBARS & POST CAPTIONS
    ========================================================================== */
