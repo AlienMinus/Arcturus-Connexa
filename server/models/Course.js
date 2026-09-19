@@ -75,7 +75,7 @@ const CourseSchema = new mongoose.Schema(
       role: { type: String, default: 'Distinguished Cloud Architect & Author' },
       avatar: {
         type: String,
-        default: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        default: 'https://assets-global.website-files.com/6188a89516ba2d18dfc2dcd4/6296c0ff410c40fd2eaf196c_giang_1.png',
       },
     },
     skills: [String],
