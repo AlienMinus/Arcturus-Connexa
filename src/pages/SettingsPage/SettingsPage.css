@@ -260,10 +260,13 @@
 .appSalaryPill { color: #166534; background: #ecfdf5; }
 .appAppliedTime { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; color: #64748b; font-size: 0.72rem; }
 
-.appStepperContainer { padding: 22px 8px 12px; }
+.appStepperContainer {
+  padding: 22px 8px 30px;
+  margin-bottom: 2px;
+}
 .appStepperTrack { position: relative; display: flex; justify-content: space-between; height: 3px; background: #e2e8f0; }
 .appStepperBar { position: absolute; inset: 0 auto 0 0; max-width: 100%; background: #0a66c2; }
-.appStepPoint { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; transform: translateY(-9px); }
+.appStepPoint { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; transform: translateY(-9px); }
 .stepCircle { display: grid; place-items: center; width: 21px; height: 21px; color: #64748b; background: #ffffff; border: 2px solid #cbd5e1; border-radius: 50%; font-size: 0.65rem; font-weight: 800; }
 .stepCompleted .stepCircle,
 .stepCurrent .stepCircle { color: #ffffff; background: #0a66c2; border-color: #0a66c2; }
