@@ -42,9 +42,29 @@
 .infoPageFooter a { color: #0a66c2; font-weight: 700; text-decoration: none; }
 .infoPageFooter a:hover { text-decoration: underline; }
 
+.infoRelatedNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 14px 18px;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #dbe5ef;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.infoRelatedNav > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.infoRelatedNav a { display: inline-flex; align-items: center; gap: 5px; padding: 6px 8px; color: #0a66c2; border-radius: 6px; text-decoration: none; }
+.infoRelatedNav a:hover, .infoRelatedNav a.active { background: #eff6ff; text-decoration: underline; }
+
 @media (max-width: 720px) {
   .infoPageWrapper { padding: 18px 12px 60px; }
   .infoPageHero { padding: 26px 22px 30px; }
   .infoSectionGrid { grid-template-columns: 1fr; }
   .infoPageFooter { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .infoRelatedNav { align-items: flex-start; flex-direction: column; }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FaAd, FaArrowLeft, FaCheckCircle, FaInfoCircle, FaMobileAlt, FaUniversalAccess } from 'react-icons/fa';
+import { FaAd, FaArrowLeft, FaCheckCircle, FaInfoCircle, FaMobileAlt, FaUniversalAccess, FaArrowRight } from 'react-icons/fa';
 import './InfoPage.css';
 
 const pageContent = {
@@ -61,6 +61,14 @@ const pageContent = {
   },
 };
 
+const relatedLinks = [
+  ['about', 'About'],
+  ['accessibility', 'Accessibility'],
+  ['ad-choices', 'Ad Choices'],
+  ['app', 'Mobile app'],
+  ['more', 'More tools'],
+];
+
 const InfoPage = ({ page: pageProp }) => {
   const { page: routePage } = useParams();
   const page = pageProp || routePage || 'about';
@@ -84,6 +92,17 @@ const InfoPage = ({ page: pageProp }) => {
           </article>
         ))}
       </section>
+
+      <nav className="infoRelatedNav" aria-label="Arcturus information pages">
+        <span>Explore this section</span>
+        <div>
+          {relatedLinks.map(([key, label]) => (
+            <Link key={key} to={`/${key}`} className={page === key ? 'active' : ''}>
+              {label} <FaArrowRight size={10} />
+            </Link>
+          ))}
+        </div>
+      </nav>
 
       <section className="infoPageFooter">
         <strong>Need more help?</strong>
