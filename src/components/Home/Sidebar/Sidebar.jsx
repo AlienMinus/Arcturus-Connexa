@@ -3,6 +3,7 @@ import ProfileCard from "./ProfileCard";
 import AnalyticsCard from "./AnalyticsCard";
 import CompanyCard from "./CompanyCard";
 import QuickLinksCard from "./QuickLinksCard";
+import SidebarAd from "./SidebarAd";
 import "./Sidebar.css";
 
 const Sidebar = () => {
@@ -16,6 +17,8 @@ const Sidebar = () => {
       <CompanyCard />
 
       <QuickLinksCard />
+
+      <SidebarAd />
 
     </div>
   );
