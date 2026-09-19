@@ -386,13 +386,16 @@ const CampusLinkPage = () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
         },
       });
       if (res.ok) {
         const data = await res.json();
-        setStudentProfile(data.profile);
+        if (data.profile) {
+          setStudentProfile({ ...data.profile });
+        }
         showToast('✨ Hugging Face Gemma AI diagnostic complete! Risk & recommendations updated.');
-        loadCampusData();
       } else {
         const err = await res.json();
         showToast(err.error || 'Failed to complete Gemma diagnostics');
