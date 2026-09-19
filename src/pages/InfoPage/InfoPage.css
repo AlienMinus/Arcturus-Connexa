@@ -1,0 +1,50 @@
+.infoPageWrapper {
+  max-width: 1040px;
+  min-height: calc(100vh - 120px);
+  margin: 0 auto;
+  padding: 34px 18px 80px;
+  color: #0f172a;
+}
+
+.infoPageHero {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 38px 40px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0a66c2, #123b67);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(10, 102, 194, 0.18);
+}
+
+.infoBackLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #dbeafe;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.infoBackLink:hover { color: #ffffff; text-decoration: underline; }
+.infoPageIcon { margin-top: 28px; color: #bfdbfe; font-size: 2rem; }
+.infoEyebrow { display: block; margin-top: 10px; color: #bfdbfe; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.infoPageHero h1 { max-width: 700px; margin: 8px 0 10px; font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1.08; }
+.infoPageHero p { max-width: 720px; margin: 0; color: #e0f2fe; font-size: 1rem; line-height: 1.6; }
+
+.infoSectionGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+.infoSectionCard { padding: 22px; background: #ffffff; border: 1px solid #dbe5ef; border-radius: 10px; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04); }
+.infoSectionCard h2 { margin: 0 0 8px; color: #1e293b; font-size: 1rem; }
+.infoSectionCard p { margin: 0; color: #64748b; font-size: 0.86rem; line-height: 1.55; }
+
+.infoPageFooter { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; padding: 18px 22px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; color: #475569; font-size: 0.84rem; }
+.infoPageFooter strong { color: #1e293b; }
+.infoPageFooter a { color: #0a66c2; font-weight: 700; text-decoration: none; }
+.infoPageFooter a:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .infoPageWrapper { padding: 18px 12px 60px; }
+  .infoPageHero { padding: 26px 22px 30px; }
+  .infoSectionGrid { grid-template-columns: 1fr; }
+  .infoPageFooter { align-items: flex-start; flex-direction: column; gap: 8px; }
+}

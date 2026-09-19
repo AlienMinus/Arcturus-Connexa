@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   FaInfoCircle,
   FaWheelchair,
@@ -12,46 +13,34 @@ import {
 } from "react-icons/fa";
 
 const FooterLinks = () => {
+  const footerLink = (to, icon, label) => (
+    <Link to={to} className="quickFooterLink">
+      {icon} {label}
+    </Link>
+  );
+
   return (
     <div className="footerLinks">
 
       <div className="linksRow">
-        <span>
-          <FaInfoCircle /> About
-        </span>
-        <span>
-          <FaWheelchair /> Accessibility
-        </span>
-        <span>
-          <FaQuestionCircle /> Help Center
-        </span>
+        {footerLink('/about', <FaInfoCircle />, 'About')}
+        {footerLink('/accessibility', <FaWheelchair />, 'Accessibility')}
+        {footerLink('/help', <FaQuestionCircle />, 'Help Center')}
       </div>
 
       <div className="linksRow">
-        <span>
-          <FaShieldAlt /> Privacy & Terms
-        </span>
-        <span>
-          <FaUserShield /> Ad Choices
-        </span>
+        {footerLink('/settings/privacy', <FaShieldAlt />, 'Privacy & Terms')}
+        {footerLink('/ad-choices', <FaUserShield />, 'Ad Choices')}
       </div>
 
       <div className="linksRow">
-        <span>
-          <FaAd /> Advertising
-        </span>
-        <span>
-          <FaBriefcase /> Business Services
-        </span>
+        {footerLink('/advertise', <FaAd />, 'Advertising')}
+        {footerLink('/learning', <FaBriefcase />, 'Business Services')}
       </div>
 
       <div className="linksRow">
-        <span>
-          <FaMobileAlt /> Get the Arcturus app
-        </span>
-        <span>
-          <FaEllipsisH /> More
-        </span>
+        {footerLink('/app', <FaMobileAlt />, 'Get the Arcturus app')}
+        {footerLink('/more', <FaEllipsisH />, 'More')}
       </div>
 
       <p className="copyright">

@@ -127,15 +127,24 @@
   margin-bottom: 6px;
 }
 
-.linksRow span {
+.linksRow span,
+.quickFooterLink {
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.quickFooterLink:hover {
+  color: #0a66c2;
+  text-decoration: underline;
 }
 
 /* subtle footer icons */
-.linksRow span svg {
+.linksRow span svg,
+.quickFooterLink svg {
   color: #888;
 }
 
