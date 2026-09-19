@@ -9,6 +9,7 @@ import CreatePost from "./CreatePost";
 import PostCard from "./PostCard";
 import FeedSort from "./FeedSort";
 import TaleTray from "../../Tale/TaleTray";
+import SponsoredFeedCard from "./SponsoredFeedCard";
 import "./Feed.css";
 
 const POSTS_PER_PAGE = 4;
@@ -127,9 +128,19 @@ const Feed = () => {
       <FeedSort />
 
       {displayedPosts.length > 0 ? (
-        displayedPosts.map((post) => <PostCard key={post.id} post={post} />)
+        displayedPosts.map((post, idx) => (
+          <React.Fragment key={post.id}>
+            <PostCard post={post} />
+            {((displayedPosts.length === 1 && idx === 0) || (displayedPosts.length > 1 && idx === 1)) && (
+              <SponsoredFeedCard />
+            )}
+          </React.Fragment>
+        ))
       ) : (
-        <div className="emptyFeedMessage">No posts yet. Create the first post!</div>
+        <>
+          <SponsoredFeedCard />
+          <div className="emptyFeedMessage">No posts yet. Create the first post!</div>
+        </>
       )}
 
       {/* Progressive scroll loader sentinel */}

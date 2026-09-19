@@ -1,0 +1,264 @@
+.sponsoredFeedCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.sponsoredFeedCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sponsoredFeedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.sponsoredOrgMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sponsoredOrgLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.sponsoredOrgInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sponsoredOrgNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sponsoredOrgName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sponsoredTagline {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sponsoredDot {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.sponsoredMenuWrapper {
+  position: relative;
+}
+
+.sponsoredMenuBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.sponsoredMenuBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sponsoredDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  min-width: 190px;
+  z-index: 50;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sponsoredDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: #334155;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.sponsoredDropdownItem:hover {
+  background: #f8fafc;
+  color: #0a66c2;
+}
+
+.sponsoredFeedBody p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #334155;
+  white-space: pre-line;
+}
+
+.sponsoredMediaContainer {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  max-height: 380px;
+  background: #f8fafc;
+}
+
+.sponsoredMediaImg {
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.sponsoredMediaContainer:hover .sponsoredMediaImg {
+  transform: scale(1.01);
+}
+
+.sponsoredFeedFooter {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sponsoredFeedFooter:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.sponsoredHeadlineCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sponsoredHeadline {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sponsoredDomain {
+  font-size: 0.74rem;
+  color: #64748b;
+  text-transform: lowercase;
+}
+
+.sponsoredCtaButton {
+  padding: 7px 16px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.sponsoredCtaButton:hover {
+  background: #004182;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .sponsoredFeedCard,
+.dark-theme .sponsoredFeedCard {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .sponsoredOrgName,
+.dark-theme .sponsoredOrgName {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .sponsoredTagline,
+.dark-theme .sponsoredTagline {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sponsoredFeedBody p,
+.dark-theme .sponsoredFeedBody p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .sponsoredFeedFooter,
+.dark-theme .sponsoredFeedFooter {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .sponsoredHeadline,
+.dark-theme .sponsoredHeadline {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .sponsoredDomain,
+.dark-theme .sponsoredDomain {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sponsoredDropdown,
+.dark-theme .sponsoredDropdown {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .sponsoredDropdownItem,
+.dark-theme .sponsoredDropdownItem {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .sponsoredDropdownItem:hover,
+.dark-theme .sponsoredDropdownItem:hover {
+  background: #334155;
+  color: #38bdf8;
+}
+
