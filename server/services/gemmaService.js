@@ -2,9 +2,14 @@
  * Hugging Face Gemma service for CampusLink placement diagnostics and chat.
  */
 
-const GEMMA_MODEL = 'google/gemma-3-4b-it';
+const PRIMARY_GEMMA_MODEL = 'google/gemma-3-4b-it';
+const CANDIDATE_MODELS = [
+  'google/gemma-3-4b-it',
+  'google/gemma-3-12b-it',
+  'meta-llama/Llama-3.1-8B-Instruct',
+];
 const HF_CHAT_URL = 'https://router.huggingface.co/v1/chat/completions';
-const REQUEST_TIMEOUT_MS = 14000;
+const REQUEST_TIMEOUT_MS = 25000;
 
 export async function queryHuggingFaceGemma(messages, maxTokens = 600, temperature = 0.85) {
   const token = process.env.HF_TOKEN || '';
@@ -13,35 +18,48 @@ export async function queryHuggingFaceGemma(messages, maxTokens = 600, temperatu
   }
 
   const msgPayload = Array.isArray(messages) ? messages : [{ role: 'user', content: messages }];
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  try {
-    const response = await fetch(HF_CHAT_URL, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: GEMMA_MODEL, messages: msgPayload, max_tokens: maxTokens, temperature }),
-      signal: controller.signal,
-    });
+  for (const model of CANDIDATE_MODELS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const start = Date.now();
 
-    if (!response.ok) {
-      const details = await response.text().catch(() => '');
-      return { success: false, text: null, isLive: false, status: response.status, reason: details || `HTTP ${response.status}` };
+    try {
+      const response = await fetch(HF_CHAT_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, messages: msgPayload, max_tokens: maxTokens, temperature }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      const elapsed = Date.now() - start;
+
+      if (!response.ok) {
+        const details = await response.text().catch(() => '');
+        console.warn(`[HF Inference] ${model} returned HTTP ${response.status} (${details.slice(0, 100)}), trying next candidate...`);
+        continue;
+      }
+
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content?.trim() || '';
+      if (text) {
+        console.log(`[HF Inference] Generated with ${model} in ${elapsed}ms (${text.length} chars)`);
+        return { success: true, text, isLive: true, model };
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      const elapsed = Date.now() - start;
+      console.warn(`[HF Inference] ${model} error (${error.name === 'AbortError' ? 'Timed out' : error.message}) after ${elapsed}ms, trying next...`);
     }
-
-    const data = await response.json();
-    const text = data.choices?.[0]?.message?.content?.trim() || '';
-    return { success: Boolean(text), text: text || null, isLive: Boolean(text), model: GEMMA_MODEL };
-  } catch (error) {
-    return {
-      success: false,
-      text: null,
-      isLive: false,
-      reason: error.name === 'AbortError' ? 'HF Request timed out' : error.message,
-    };
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  return {
+    success: false,
+    text: null,
+    isLive: false,
+    reason: 'All inference model candidates timed out or were unreachable.',
+  };
 }
 
 export async function analyzePlacementRiskAndGuidance(profileData) {
@@ -108,7 +126,7 @@ Target roles: ${Array.isArray(targetRoles) ? targetRoles.join(', ') : 'General p
       ? 'Clear eligibility blockers and complete targeted mock technical interviews with a faculty mentor.'
       : 'Continue system-design preparation and polish project demonstrations for priority recruitment drives.',
     topSkillRecommendations: ['Data Structures & Algorithms', 'System Design', 'REST API Security'],
-    model: GEMMA_MODEL,
+    model: PRIMARY_GEMMA_MODEL,
     provider: 'Gemma Placement Intelligence Engine',
     status: 'fallback-active',
   };

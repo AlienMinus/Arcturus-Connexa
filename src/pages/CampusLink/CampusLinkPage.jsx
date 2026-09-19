@@ -98,7 +98,7 @@ const CampusLinkPage = () => {
   const [chatMessages, setChatMessages] = useState([
     {
       sender: 'assistant',
-      text: '🎓 **Hello! I am your CAMPUSLINK Placement AI Assistant, powered by Hugging Face Gemma-2.**\n\nI can help you evaluate corporate placement risk, diagnose technical skill gaps, review active drive cutoffs, or simulate technical interview questions. How can I assist you today?',
+      text: '🎓 **Hello! I am your CAMPUSLINK Placement AI Assistant, powered by Hugging Face Gemma.**\n\nI can help you evaluate corporate placement risk, diagnose technical skill gaps, review active drive cutoffs, or simulate technical interview questions. How can I assist you today?',
       isTyping: false,
     },
   ]);

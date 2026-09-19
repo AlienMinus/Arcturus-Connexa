@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
 
     res.json({
       reply,
-      engine: 'Hugging Face Gemma-2-2B-IT',
+      engine: 'Hugging Face Gemma-3-4B-IT',
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

@@ -34,7 +34,7 @@ export const CampusHero = ({ isArcturusAdmin, analytics, drivesCount }) => {
         <p className="campusHeroTagline">
           {isArcturusAdmin
             ? 'Arcturus Enterprise Placement Command Center. Oversee institutional analytics, coordinate corporate drives, eliminate venue collisions, and evaluate candidate matching.'
-            : 'AI-Powered Campus-to-Corporate Placement Portal. Benchmark technical readiness against scheduled drives, diagnose placement risks with Gemma-2, and explore corporate opportunities.'}
+            : 'AI-Powered Campus-to-Corporate Placement Portal. Benchmark technical readiness against scheduled drives, diagnose placement risks with Gemma, and explore corporate opportunities.'}
         </p>
       </div>
 

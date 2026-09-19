@@ -25,7 +25,7 @@ export const FloatingAIAssistant = ({
               </div>
               <div>
                 <strong>CampusLink AI Assistant</strong>
-                <small>Online · Powered by Hugging Face Gemma-2</small>
+                <small>Online · Powered by Hugging Face Gemma</small>
               </div>
             </div>
             <button
@@ -66,7 +66,7 @@ export const FloatingAIAssistant = ({
                   <span />
                 </div>
                 <span style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                  CampusLink AI (Gemma-2) is analyzing placement data...
+                  CampusLink AI (Gemma) is analyzing placement data...
                 </span>
               </div>
             )}

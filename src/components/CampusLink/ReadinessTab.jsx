@@ -275,7 +275,7 @@ export const ReadinessTab = ({
                   <FaBriefcase color="#0284c7" /> Imported Candidate Profile Portfolio
                 </h3>
                 <p style={{ margin: '3px 0 0', fontSize: '0.82rem', color: '#64748b' }}>
-                  Imported directly from candidate's individual profile page for Gemma-2 placement risk & readiness analysis
+                  Imported directly from candidate's individual profile page for Gemma placement risk & readiness analysis
                 </p>
               </div>
               {user?.username && (
@@ -344,7 +344,7 @@ export const ReadinessTab = ({
               ) : (
                 <div style={{ background: '#ffffff', padding: '12px 14px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
                   <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
-                    No technical projects added to your Arcturus profile yet. Adding projects with descriptions and tech stacks significantly improves your Gemma-2 placement score.
+                    No technical projects added to your Arcturus profile yet. Adding projects with descriptions and tech stacks significantly improves your Gemma placement score.
                   </p>
                 </div>
               )}

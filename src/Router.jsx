@@ -21,7 +21,6 @@ import AdvertisePage from './pages/AdvertisePage/AdvertisePage';
 import CampusLinkPage from './pages/CampusLink/CampusLinkPage';
 import LearningHubPage from './pages/Learning/LearningHubPage';
 import UnderConstruction from './components/UnderConstruction/UnderConstruction';
-import InfoPage from './pages/InfoPage/InfoPage';
 import BackToTop from './components/common/BackToTop/BackToTop';
 
 function AppRouter() {
@@ -61,11 +60,6 @@ function AppRouter() {
                 <Route path="/settings/notifications" element={<SettingsPage />} />
                 <Route path="/help" element={<HelpPage />} />
                 <Route path="/help-support" element={<HelpPage />} />
-                <Route path="/about" element={<InfoPage page="about" />} />
-                <Route path="/accessibility" element={<InfoPage page="accessibility" />} />
-                <Route path="/ad-choices" element={<InfoPage page="ad-choices" />} />
-                <Route path="/app" element={<InfoPage page="app" />} />
-                <Route path="/more" element={<InfoPage page="more" />} />
                 <Route path="/profile/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/:username/edit" element={<ProfileEditPage />} />
                 <Route path="/profile/activity" element={<ActivityPage />} />

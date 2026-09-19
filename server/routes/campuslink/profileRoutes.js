@@ -245,7 +245,7 @@ router.post('/diagnose-ai', authMiddleware, async (req, res) => {
     profileObj.candidateProfile = candidateProfile;
 
     res.json({
-      message: 'Hugging Face Gemma-2 AI Diagnostics completed successfully!',
+      message: 'Hugging Face Gemma-3 AI Diagnostics completed successfully!',
       profile: profileObj,
       gemmaAnalysis,
     });
