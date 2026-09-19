@@ -162,7 +162,6 @@ const populateProfileUser = async (userId) =>
     .populate('following', 'firstName middleName lastName username headline profilePicture')
     .populate('connections', 'firstName middleName lastName username headline profilePicture')
     .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
-    .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
     .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture')
     .populate('organizations', 'name slug logo industry organizationSize status tagline description website location');
 
@@ -330,7 +329,6 @@ router.get('/:username', authMiddleware, async (req, res) => {
       .populate('following', 'firstName middleName lastName username headline profilePicture')
       .populate('connections', 'firstName middleName lastName username headline profilePicture')
       .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
-      .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture');
       .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture')
       .populate('organizations', 'name slug logo industry organizationSize status tagline description website location');
 
