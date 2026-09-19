@@ -279,6 +279,7 @@ const CampusLinkPage = () => {
           companyName: '',
           companyLogo: '',
           roleTitle: '',
+          description: '',
           jobCategory: 'Core Software',
           ctcLpa: '',
           baseStipend: '',
