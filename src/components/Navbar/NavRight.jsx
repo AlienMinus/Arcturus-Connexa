@@ -351,7 +351,7 @@ const NavRight = () => {
 
           <div className="for-business-footer">
             <Link
-              to="/network"
+              to="/company/create"
               className="create-company-btn"
               onClick={() => setBusinessOpen(false)}
             >

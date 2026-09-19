@@ -149,6 +149,29 @@ const buildProfileResponse = (targetUser, profile, currentUser) => {
     })
     .filter(Boolean);
 
+  profileData.isVerified = !!targetUser.isVerified;
+  profileData.role = targetUser.role || 'user';
+  profileData.isAdmin = !!targetUser.isAdmin || targetUser.role === 'admin';
+  profileData.accountType = targetUser.accountType || 'individual';
+
+  // Populated or resolved institute
+  if (targetUser.institute) {
+    const orgObj = targetUser.institute.organizationId;
+    const hasOrg = orgObj && typeof orgObj === 'object' && orgObj.name;
+    profileData.institute = {
+      name: hasOrg ? orgObj.name : (targetUser.institute.name || ''),
+      slug: hasOrg ? orgObj.slug : '',
+      logo: hasOrg ? (orgObj.logo?.url || orgObj.logo) : null,
+      organizationId: hasOrg ? orgObj._id : (targetUser.institute.organizationId || null),
+      verified: !!targetUser.institute.verified || (hasOrg && orgObj.status === 'approved'),
+      studentId: targetUser.institute.studentId || '',
+      graduationYear: targetUser.institute.graduationYear,
+      department: targetUser.institute.department || '',
+    };
+  } else {
+    profileData.institute = null;
+  }
+
   profileData.organizations = orgs;
   profileData.organization = orgs.find((o) => o.status === 'approved') || orgs[0] || null;
 
@@ -163,7 +186,8 @@ const populateProfileUser = async (userId) =>
     .populate('connections', 'firstName middleName lastName username headline profilePicture')
     .populate('pendingConnectionRequests', 'firstName middleName lastName username headline profilePicture')
     .populate('sentConnectionRequests', 'firstName middleName lastName username headline profilePicture')
-    .populate('organizations', 'name slug logo industry organizationSize status tagline description website location');
+    .populate('organizations', 'name slug logo industry organizationSize status tagline description website location')
+    .populate('institute.organizationId', 'name slug logo industry status');
 
 const createDefaultProfileForUser = async (user) => {
   const profile = new Profile({
@@ -654,7 +678,36 @@ const handleProfileUpdate = async (req, res) => {
     if (projects !== undefined) updateData.projects = parseJSONField(projects) || [];
     if (skills !== undefined) updateData.skills = parseJSONField(skills) || [];
     if (honors !== undefined) updateData.honors = normalizeHonors(honors) || [];
-    if (interests !== undefined) updateData.interests = parseJSONField(interests) || [];
+    // Institute & Account Type handling
+    const { institute, accountType } = req.body;
+    if (accountType && ['individual', 'student', 'recruiter', 'organization', 'admin'].includes(accountType)) {
+      user.accountType = accountType;
+    }
+
+    if (institute !== undefined) {
+      let instData = institute;
+      if (typeof institute === 'string') {
+        try {
+          instData = JSON.parse(institute);
+        } catch {
+          instData = { name: institute };
+        }
+      }
+      if (instData && typeof instData === 'object') {
+        user.institute = user.institute || {};
+        if (instData.name !== undefined) user.institute.name = instData.name;
+        if (instData.organizationId !== undefined) user.institute.organizationId = instData.organizationId || null;
+        if (instData.studentId !== undefined) user.institute.studentId = instData.studentId;
+        if (instData.graduationYear !== undefined) user.institute.graduationYear = Number(instData.graduationYear) || undefined;
+        if (instData.department !== undefined) user.institute.department = instData.department;
+        if (instData.organizationId) {
+          const org = await Organization.findById(instData.organizationId);
+          if (org && org.status === 'approved') {
+            user.institute.verified = true;
+          }
+        }
+      }
+    }
 
     // Save user document
     await user.save();
@@ -668,7 +721,8 @@ const handleProfileUpdate = async (req, res) => {
     Object.assign(profile, updateData);
     await profile.save();
 
-    const profileData = buildProfileResponse(user, profile, user);
+    const populatedUser = await populateProfileUser(user._id);
+    const profileData = buildProfileResponse(populatedUser, profile, populatedUser);
     res.json(profileData);
   } catch (err) {
     console.error('Failed to update profile:', err);

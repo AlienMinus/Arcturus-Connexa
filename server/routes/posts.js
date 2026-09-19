@@ -38,9 +38,24 @@ const normalizePostResponse = (post) => {
   const result = post.toObject ? post.toObject() : post;
   result.authorUsername = result.userId?.username || result.authorUsername || '';
   result.authorName = getFullName(result.userId) || result.author || 'Member';
+  result.authorIsVerified = !!result.userId?.isVerified;
+  result.authorInstitute = result.userId?.institute ? {
+    name: result.userId.institute.organizationId?.name || result.userId.institute.name || '',
+    slug: result.userId.institute.organizationId?.slug || '',
+    logo: result.userId.institute.organizationId?.logo?.url || null,
+    verified: !!result.userId.institute.verified,
+  } : null;
+
   if (result.repostedFrom) {
     result.repostedFrom.authorUsername = result.repostedFrom.userId?.username || result.repostedFrom.authorUsername || '';
     result.repostedFrom.authorName = getFullName(result.repostedFrom.userId) || result.repostedFrom.author || 'Member';
+    result.repostedFrom.authorIsVerified = !!result.repostedFrom.userId?.isVerified;
+    result.repostedFrom.authorInstitute = result.repostedFrom.userId?.institute ? {
+      name: result.repostedFrom.userId.institute.organizationId?.name || result.repostedFrom.userId.institute.name || '',
+      slug: result.repostedFrom.userId.institute.organizationId?.slug || '',
+      logo: result.repostedFrom.userId.institute.organizationId?.logo?.url || null,
+      verified: !!result.repostedFrom.userId.institute.verified,
+    } : null;
   }
   return result;
 };
@@ -238,14 +253,19 @@ router.post('/:id/poll/vote', authMiddleware, async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('userId', 'firstName middleName lastName name profilePicture username headline')
+      .populate({
+        path: 'userId',
+        select: 'firstName middleName lastName name profilePicture username headline isVerified institute',
+        populate: { path: 'institute.organizationId', select: 'name slug logo' },
+      })
       .populate('likes.userId', 'firstName middleName lastName name username')
       .populate({
         path: 'repostedFrom',
         populate: {
           path: 'userId',
-          select: 'firstName middleName lastName name profilePicture username headline'
-        }
+          select: 'firstName middleName lastName name profilePicture username headline isVerified institute',
+          populate: { path: 'institute.organizationId', select: 'name slug logo' },
+        },
       })
       .sort({ createdAt: -1 })
       .limit(50);

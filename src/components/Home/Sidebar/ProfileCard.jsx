@@ -50,7 +50,7 @@ const ProfileCard = () => {
         <Link to={profileLink} className="profileNameLink" style={{ textDecoration: 'none' }}>
           <div className="profile-name-container">
             <h3 className="profile-name">{profile?.name || ''}</h3>
-            <MdVerified className="verified-icon" />
+            {profile?.isVerified && <MdVerified className="verified-icon" title="Arcturus Verified Account" />}
           </div>
         </Link>
         <p className="description">{profile?.headline || ''}</p>
@@ -59,7 +59,24 @@ const ProfileCard = () => {
             <FaMapMarkerAlt />&nbsp;{profile.location}
           </p>
         )}
-        {(profile?.organization?.name || profile?.experience?.[0]?.subtitle || profile?.experience?.[0]?.title) && (
+        {profile?.institute?.organizationId && (
+          <p className="organization">
+            {profile.institute.logo ? (
+              <img src={profile.institute.logo} alt="" style={{ width: '13px', height: '13px', borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <FaUniversity />
+            )}
+            &nbsp;
+            <Link
+              to={`/company/${profile.institute.slug || profile.institute.organizationId}`}
+              style={{ color: 'inherit', textDecoration: 'none', fontWeight: 600 }}
+            >
+              {profile.institute.name}
+            </Link>
+            {profile.institute.verified && <span style={{ color: '#16a34a', marginLeft: '4px', fontSize: '11px' }}>✓</span>}
+          </p>
+        )}
+        {!profile?.institute?.organizationId && (profile?.organization?.name || profile?.experience?.[0]?.subtitle || profile?.experience?.[0]?.title) && (
           <p className="organization">
             <FaUniversity />&nbsp;{profile?.organization?.name || profile?.experience?.[0]?.subtitle || profile?.experience?.[0]?.title}
           </p>

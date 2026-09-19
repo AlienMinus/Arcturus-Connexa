@@ -89,7 +89,17 @@ const TypewriterMarkdown = ({ text, isTyping, scrollRef, onComplete }) => {
 
 const CampusLinkPage = () => {
   const { token, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'drives' | 'readiness' | 'matching' | 'offers' | 'assistant'
+  const isArcturusAdmin = user?.role === 'admin' || user?.username === 'arcturus_admin';
+  const [activeTab, setActiveTab] = useState(() => 
+    (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
+  );
+  
+  // Guard non-admins against administrative tabs
+  useEffect(() => {
+    if (!isArcturusAdmin && (activeTab === 'analytics' || activeTab === 'matching')) {
+      setActiveTab('readiness');
+    }
+  }, [isArcturusAdmin, activeTab]);
   
   // Data States
   const [analytics, setAnalytics] = useState(null);
@@ -571,13 +581,30 @@ const CampusLinkPage = () => {
       {/* Hero Header */}
       <div className="campusHeroCard">
         <div className="campusHeroLeft">
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 12px',
+            borderRadius: '16px',
+            background: isArcturusAdmin ? '#fef3c7' : '#e0f2fe',
+            color: isArcturusAdmin ? '#92400e' : '#0369a1',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            marginBottom: 10,
+            width: 'fit-content'
+          }}>
+            <FaShieldAlt size={12} />
+            {isArcturusAdmin ? '👑 Institutional Command Center • Arcturus Admin' : '🎓 Student Placement & Readiness Portal'}
+          </div>
           <h1>
             <FaGraduationCap size={28} />
             CAMPUSLINK
           </h1>
           <p className="campusHeroTagline">
-            AI-Powered Campus-to-Corporate Placement Management & Analytics Platform.
-            Streamlining readiness profiling, recruiter matching, drive conflict detection, and institutional analytics.
+            {isArcturusAdmin
+              ? 'Arcturus Enterprise Placement Command Center. Oversee institutional analytics, coordinate corporate drives, eliminate venue collisions, and evaluate candidate matching.'
+              : 'AI-Powered Campus-to-Corporate Placement Portal. Benchmark technical readiness against scheduled drives, diagnose placement risks with Gemma-2, and explore corporate opportunities.'}
           </p>
         </div>
 
@@ -596,49 +623,73 @@ const CampusLinkPage = () => {
 
       {/* Navigation Tabs Bar */}
       <div className="campusTabsCard">
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analytics')}
-        >
-          <FaChartLine size={14} /> Command Center
-        </button>
+        {isArcturusAdmin && (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <FaChartLine size={14} /> Command Center
+          </button>
+        )}
 
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
-          onClick={() => setActiveTab('drives')}
-        >
-          <FaCalendarAlt size={14} /> Drives & Conflicts
-          {conflicts.length > 0 && (
-            <span style={{ background: '#ef4444', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
-              {conflicts.length}
-            </span>
-          )}
-        </button>
+        {isArcturusAdmin ? (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
+            onClick={() => setActiveTab('drives')}
+          >
+            <FaCalendarAlt size={14} /> Drives & Conflicts
+            {conflicts.length > 0 && (
+              <span style={{ background: '#ef4444', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
+                {conflicts.length}
+              </span>
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
+            onClick={() => setActiveTab('readiness')}
+          >
+            <FaUserCheck size={14} /> My Readiness & AI Risk
+          </button>
+        )}
 
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
-          onClick={() => setActiveTab('readiness')}
-        >
-          <FaUserCheck size={14} /> Readiness & Skills
-        </button>
+        {isArcturusAdmin ? (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
+            onClick={() => setActiveTab('readiness')}
+          >
+            <FaUserCheck size={14} /> Student Readiness Engine
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
+            onClick={() => setActiveTab('drives')}
+          >
+            <FaCalendarAlt size={14} /> Eligible Drives ({drives.length})
+          </button>
+        )}
 
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'matching' ? 'active' : ''}`}
-          onClick={() => setActiveTab('matching')}
-        >
-          <FaUsers size={14} /> Recruiter Matching
-        </button>
+        {isArcturusAdmin && (
+          <button
+            type="button"
+            className={`campusTabBtn ${activeTab === 'matching' ? 'active' : ''}`}
+            onClick={() => setActiveTab('matching')}
+          >
+            <FaUsers size={14} /> Recruiter Matching
+          </button>
+        )}
 
         <button
           type="button"
           className={`campusTabBtn ${activeTab === 'offers' ? 'active' : ''}`}
           onClick={() => setActiveTab('offers')}
         >
-          <FaFileInvoiceDollar size={14} /> Offers & Documents ({offers.length})
+          <FaFileInvoiceDollar size={14} /> {isArcturusAdmin ? 'All Offers & Compliance' : 'My Offers'} ({offers.length})
         </button>
 
         <button
@@ -654,7 +705,25 @@ const CampusLinkPage = () => {
       {/* ========================================================
           TAB 1: PLACEMENT COMMAND CENTER (ANALYTICS)
           ======================================================== */}
-      {activeTab === 'analytics' && (
+      {activeTab === 'analytics' && (!isArcturusAdmin ? (
+        <div className="campusPanel">
+          <div className="campusSubCard" style={{ textAlign: 'center', padding: '60px 24px', borderColor: '#fde68a', background: '#fffbeb', margin: '20px auto', maxWidth: 680 }}>
+            <FaShieldAlt size={52} color="#d97706" style={{ marginBottom: 16 }} />
+            <h2 style={{ color: '#92400e', margin: '0 0 10px', fontSize: '1.4rem' }}>Institutional Command Center Restricted</h2>
+            <p style={{ color: '#78350f', margin: '0 auto 24px', fontSize: '0.94rem', lineHeight: 1.6 }}>
+              The Placement Command Center, macro institutional metrics, and risk escalations are restricted exclusively to authorized <strong>Arcturus Platform Administrators</strong>.
+            </p>
+            <button
+              type="button"
+              className="campusTabBtn active"
+              style={{ margin: '0 auto', display: 'inline-flex' }}
+              onClick={() => setActiveTab('readiness')}
+            >
+              <FaUserCheck size={14} /> Open My Student Readiness Portal
+            </button>
+          </div>
+        </div>
+      ) : (
         <div className="campusPanel">
           <div className="campusPanelHeader">
             <div>
@@ -808,7 +877,7 @@ const CampusLinkPage = () => {
             )}
           </div>
         </div>
-      )}
+      ))}
 
       {/* ========================================================
           TAB 2: DRIVES & CONFLICT RESOLVER
@@ -817,20 +886,22 @@ const CampusLinkPage = () => {
         <div className="campusPanel">
           <div className="campusPanelHeader">
             <div>
-              <h2><FaCalendarAlt color="#0a66c2" /> Placement Drives & Conflict Management</h2>
-              <p>Manage recruiter schedules, venue allocations, and resolve drive collisions automatically.</p>
+              <h2><FaCalendarAlt color="#0a66c2" /> {isArcturusAdmin ? 'Placement Drives & Conflict Management' : 'Scheduled Placement Drives & Eligibility'}</h2>
+              <p>{isArcturusAdmin ? 'Manage recruiter schedules, venue allocations, and resolve drive collisions automatically.' : 'Browse active campus recruitment drives, review CGPA / backlog criteria, and test your readiness.'}</p>
             </div>
-            <button
-              type="button"
-              className="campusTabBtn active"
-              onClick={() => setShowDriveModal(true)}
-            >
-              <FaPlus size={12} /> Schedule Recruitment Drive
-            </button>
+            {isArcturusAdmin && (
+              <button
+                type="button"
+                className="campusTabBtn active"
+                onClick={() => setShowDriveModal(true)}
+              >
+                <FaPlus size={12} /> Schedule Recruitment Drive
+              </button>
+            )}
           </div>
 
-          {/* Real-time Conflict Alert Banner */}
-          {conflicts.length > 0 && (
+          {/* Real-time Conflict Alert Banner - ADMIN EXCLUSIVE */}
+          {isArcturusAdmin && conflicts.length > 0 && (
             <div className="conflictAlertBanner">
               <div className="conflictAlertHeader">
                 <FaExclamationTriangle size={18} />
@@ -875,15 +946,19 @@ const CampusLinkPage = () => {
               <FaCalendarAlt size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
               <h3 style={{ color: '#1e293b' }}>No Active Placement Drives</h3>
               <p style={{ margin: '6px 0 18px', fontSize: '0.9rem' }}>
-                Schedule an upcoming campus recruitment drive to manage venues, dates, and detect real-time conflicts.
+                {isArcturusAdmin
+                  ? 'Schedule an upcoming campus recruitment drive to manage venues, dates, and detect real-time conflicts.'
+                  : 'No corporate placement drives are currently scheduled. Check back soon or visit the Readiness portal to benchmark your skills.'}
               </p>
-              <button
-                type="button"
-                className="campusTabBtn active"
-                onClick={() => setShowDriveModal(true)}
-              >
-                <FaPlus size={12} /> Schedule First Placement Drive
-              </button>
+              {isArcturusAdmin && (
+                <button
+                  type="button"
+                  className="campusTabBtn active"
+                  onClick={() => setShowDriveModal(true)}
+                >
+                  <FaPlus size={12} /> Schedule First Placement Drive
+                </button>
+              )}
             </div>
           ) : (
             <div className="drivesGrid">
@@ -897,14 +972,16 @@ const CampusLinkPage = () => {
                         <span style={{ fontSize: '0.85rem', color: '#0a66c2', fontWeight: 600 }}>{d.roleTitle}</span>
                         <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{d.jobCategory} · {d.packageTier}</div>
                       </div>
-                      <button
-                        type="button"
-                        className="driveCancelBtn"
-                        title={`Cancel ${d.companyName} recruitment drive`}
-                        onClick={() => handleDeleteDrive(d._id, d.companyName)}
-                      >
-                        <FaTrash size={12} />
-                      </button>
+                      {isArcturusAdmin && (
+                        <button
+                          type="button"
+                          className="driveCancelBtn"
+                          title={`Cancel ${d.companyName} recruitment drive`}
+                          onClick={() => handleDeleteDrive(d._id, d.companyName)}
+                        >
+                          <FaTrash size={12} />
+                        </button>
+                      )}
                     </div>
 
                     <div className="driveDetailsRow">
@@ -914,6 +991,29 @@ const CampusLinkPage = () => {
                       <div><strong>Venue:</strong> {d.schedule?.venue}</div>
                     </div>
 
+                    {/* Student Eligibility Pill */}
+                    {!isArcturusAdmin && studentProfile && (
+                      <div style={{ marginTop: 8 }}>
+                        {(() => {
+                          const studentCgpa = Number(studentProfile?.cgpa ?? 0);
+                          const studentBacklogs = Number(studentProfile?.activeBacklogs ?? 0);
+                          const minCgpa = Number(d.eligibility?.minCgpa || 0);
+                          const maxBacklogs = Number(d.eligibility?.maxBacklogs ?? 0);
+                          const eligible = studentCgpa >= minCgpa && studentBacklogs <= maxBacklogs;
+
+                          return eligible ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#dcfce7', color: '#15803d', padding: '4px 9px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <FaCheckCircle size={11} /> Eligible to Apply (Your CGPA: {studentCgpa} ≥ Cutoff: {minCgpa})
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#fee2e2', color: '#b91c1c', padding: '4px 9px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <FaTimes size={11} /> Cutoff Not Met (Min {minCgpa} CGPA, Max {maxBacklogs} Backlogs)
+                            </span>
+                          );
+                        })()}
+                      </div>
+                    )}
+
                     <div className="driveStagesRow">
                       {d.stages?.map((st, i) => (
                         <span key={i} className="stagePill">{st.name}</span>
@@ -922,17 +1022,28 @@ const CampusLinkPage = () => {
                   </div>
 
                   <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                    <button
-                      type="button"
-                      className="campusTabBtn active"
-                      style={{ flex: 1, justifyContent: 'center' }}
-                      onClick={() => {
-                        setSelectedDriveForMatch(d._id);
-                        setActiveTab('matching');
-                      }}
-                    >
-                      View Ranked Candidates
-                    </button>
+                    {isArcturusAdmin ? (
+                      <button
+                        type="button"
+                        className="campusTabBtn active"
+                        style={{ flex: 1, justifyContent: 'center' }}
+                        onClick={() => {
+                          setSelectedDriveForMatch(d._id);
+                          setActiveTab('matching');
+                        }}
+                      >
+                        View Ranked Candidates
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="campusTabBtn active"
+                        style={{ flex: 1, justifyContent: 'center' }}
+                        onClick={() => setActiveTab('readiness')}
+                      >
+                        <FaUserCheck size={13} /> Check Skill Gaps For This Role
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1345,7 +1456,25 @@ const CampusLinkPage = () => {
       {/* ========================================================
           TAB 4: RECRUITER MATCHING & EXPLAINABLE AI
           ======================================================== */}
-      {activeTab === 'matching' && (
+      {activeTab === 'matching' && (!isArcturusAdmin ? (
+        <div className="campusPanel">
+          <div className="campusSubCard" style={{ textAlign: 'center', padding: '60px 24px', borderColor: '#fde68a', background: '#fffbeb', margin: '20px auto', maxWidth: 680 }}>
+            <FaShieldAlt size={52} color="#d97706" style={{ marginBottom: 16 }} />
+            <h2 style={{ color: '#92400e', margin: '0 0 10px', fontSize: '1.4rem' }}>Recruiter Candidate Matching Restricted</h2>
+            <p style={{ color: '#78350f', margin: '0 auto 24px', fontSize: '0.94rem', lineHeight: 1.6 }}>
+              Candidate pool ranking, automated shortlisting, and candidate fit rationales are restricted exclusively to authorized <strong>Arcturus Administrators</strong> and corporate hiring partners.
+            </p>
+            <button
+              type="button"
+              className="campusTabBtn active"
+              style={{ margin: '0 auto', display: 'inline-flex' }}
+              onClick={() => setActiveTab('readiness')}
+            >
+              <FaUserCheck size={14} /> Open My Student Readiness Portal
+            </button>
+          </div>
+        </div>
+      ) : (
         <div className="campusPanel">
           <div className="campusPanelHeader">
             <div>
@@ -1457,7 +1586,7 @@ const CampusLinkPage = () => {
             </>
           )}
         </div>
-      )}
+      ))}
 
       {/* ========================================================
           TAB 5: OFFERS & DOCUMENT TRACKING

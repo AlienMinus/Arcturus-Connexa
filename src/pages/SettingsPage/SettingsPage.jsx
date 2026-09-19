@@ -12,8 +12,13 @@ import {
   FaCheckCircle, 
   FaLock, 
   FaToggleOn, 
-  FaToggleOff 
+  FaToggleOff,
+  FaUniversity,
+  FaHourglassHalf,
+  FaExclamationTriangle,
+  FaExternalLinkAlt
 } from 'react-icons/fa';
+import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import { useProfile } from '../../context/ProfileContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -35,11 +40,12 @@ const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, token } = useAuth();
-  const { profile } = useProfile();
+  const { profile, refreshProfile } = useProfile();
   const { theme, setTheme, toggleTheme } = useTheme();
 
   // Determine initial tab from pathname (e.g. /settings/language -> 'language')
   const getInitialTab = () => {
+    if (location.pathname.includes('/verification')) return 'verification';
     if (location.pathname.includes('/language')) return 'language';
     if (location.pathname.includes('/privacy') || location.pathname.includes('/visibility')) return 'visibility';
     if (location.pathname.includes('/security')) return 'security';
@@ -75,9 +81,73 @@ const SettingsPage = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
+  // Verification & Institute States
+  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [submittingVerification, setSubmittingVerification] = useState(false);
+  const [savingInstitute, setSavingInstitute] = useState(false);
+  const [approvedOrgs, setApprovedOrgs] = useState([]);
+
+  const [verificationForm, setVerificationForm] = useState({
+    fullName: user?.name || (user?.firstName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : ''),
+    category: 'Student / Scholar',
+    affiliation: '',
+    organizationId: '',
+    evidenceUrl: '',
+    reason: '',
+  });
+
+  const [instituteForm, setInstituteForm] = useState({
+    name: '',
+    organizationId: '',
+    studentId: '',
+    department: '',
+    graduationYear: 2026,
+  });
+
   useEffect(() => {
     setActiveTab(getInitialTab());
   }, [location.pathname]);
+
+  const fetchVerification = async () => {
+    if (!token) return;
+    try {
+      setVerificationLoading(true);
+      const res = await fetch(buildApiUrl('/verification/my-status'), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setVerificationStatus(data);
+        if (data.institute) {
+          setInstituteForm((prev) => ({
+            ...prev,
+            name: data.institute.name || '',
+            organizationId: data.institute.organizationId?._id || data.institute.organizationId || '',
+            studentId: data.institute.studentId || '',
+            department: data.institute.department || '',
+            graduationYear: data.institute.graduationYear || 2026,
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch verification status:', err);
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
+
+  const fetchApprovedOrgs = async () => {
+    try {
+      const res = await fetch(buildApiUrl('/organizations'));
+      if (res.ok) {
+        const data = await res.json();
+        setApprovedOrgs(data.organizations || []);
+      }
+    } catch (err) {
+      console.error('Failed to load organizations:', err);
+    }
+  };
 
   // Load user settings from backend
   useEffect(() => {
@@ -104,7 +174,71 @@ const SettingsPage = () => {
       }
     };
     fetchSettings();
+    fetchVerification();
+    fetchApprovedOrgs();
   }, [token]);
+
+  const handleSubmitVerification = async (e) => {
+    e.preventDefault();
+    if (!verificationForm.fullName || !verificationForm.affiliation || !verificationForm.reason) {
+      showToast('Please fill in your name, affiliation, and statement.');
+      return;
+    }
+
+    try {
+      setSubmittingVerification(true);
+      const res = await fetch(buildApiUrl('/verification/request'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(verificationForm),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showToast('Verification request submitted successfully to Arcturus Admin!');
+        await fetchVerification();
+      } else {
+        showToast(data.error || 'Failed to submit verification request');
+      }
+    } catch (err) {
+      console.error('Failed to submit verification:', err);
+      showToast('Network error while submitting verification');
+    } finally {
+      setSubmittingVerification(false);
+    }
+  };
+
+  const handleSaveInstitute = async (e) => {
+    e.preventDefault();
+    try {
+      setSavingInstitute(true);
+      const res = await fetch(buildApiUrl('/profile'), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ institute: instituteForm }),
+      });
+
+      if (res.ok) {
+        showToast('Institute credentials saved and linked to your profile badge!');
+        await refreshProfile();
+        await fetchVerification();
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to update institute details');
+      }
+    } catch (err) {
+      console.error('Failed to save institute:', err);
+      showToast('Network error while saving institute');
+    } finally {
+      setSavingInstitute(false);
+    }
+  };
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -269,6 +403,17 @@ const SettingsPage = () => {
               >
                 <FaBell className="tabIcon" />
                 <span className="tabLabel">Notifications</span>
+              </button>
+
+              <button
+                type="button"
+                className={`settingsTabBtn ${activeTab === 'verification' ? 'active' : ''}`}
+                onClick={() => setActiveTab('verification')}
+                title="Account Verification & Badges"
+                aria-label="Account Verification & Badges"
+              >
+                <FaCheckCircle className="tabIcon" />
+                <span className="tabLabel">Verification & Badges</span>
               </button>
             </nav>
           </aside>
@@ -581,6 +726,343 @@ const SettingsPage = () => {
                         {settings.soundEffects ? <FaToggleOn size={28} className="toggleActive" /> : <FaToggleOff size={28} className="toggleInactive" />}
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Account Verification & Badges */}
+            {activeTab === 'verification' && (
+              <div className="settingsVerificationPanel" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* CARD 1: BLUE TICK VERIFICATION STATUS & REQUEST */}
+                <div className="settingsCard">
+                  <div className="settingsCardHeader">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <MdVerified size={22} color="#0a66c2" />
+                      <div>
+                        <h3>Arcturus Blue Tick Verification</h3>
+                        <p>Authenticate your profile with the official verified badge approved by Arcturus Admin.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="settingsCardBody" style={{ padding: '20px' }}>
+                    {/* CASE 1: ALREADY VERIFIED */}
+                    {(user?.isVerified || verificationStatus?.isVerified) ? (
+                      <div className="verificationStatusBox verified" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '16px',
+                        background: '#eff6ff',
+                        border: '1px solid #bfdbfe',
+                        padding: '18px 20px',
+                        borderRadius: '12px',
+                        marginBottom: '16px',
+                      }}>
+                        <MdVerified size={38} color="#0a66c2" style={{ flexShrink: 0 }} />
+                        <div>
+                          <h4 style={{ margin: '0 0 4px 0', color: '#1e3a8a', fontSize: '1.05rem' }}>
+                            Your Account is Officially Verified
+                          </h4>
+                          <p style={{ margin: 0, color: '#3b82f6', fontSize: '0.86rem' }}>
+                            Your identity credentials have been authenticated by the Arcturus Administration Team.
+                            The blue checkmark is displayed prominently beside your name on your profile, feed publications, and searches.
+                          </p>
+                        </div>
+                      </div>
+                    ) : verificationStatus?.request?.status === 'pending' ? (
+                      /* CASE 2: PENDING REVIEW */
+                      <div className="verificationStatusBox pending" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '16px',
+                        background: '#fffbeb',
+                        border: '1px solid #fde68a',
+                        padding: '18px 20px',
+                        borderRadius: '12px',
+                        marginBottom: '16px',
+                      }}>
+                        <FaHourglassHalf size={32} color="#d97706" style={{ flexShrink: 0 }} />
+                        <div>
+                          <h4 style={{ margin: '0 0 4px 0', color: '#92400e', fontSize: '1.05rem' }}>
+                            Verification Request Under Review
+                          </h4>
+                          <p style={{ margin: '0 0 6px 0', color: '#b45309', fontSize: '0.86rem' }}>
+                            Your Blue Tick application submitted on {new Date(verificationStatus.request.createdAt).toLocaleDateString()} is currently pending review by Arcturus Governance Admins.
+                          </p>
+                          <span style={{ fontSize: '0.78rem', color: '#78350f', background: '#fef3c7', padding: '2px 8px', borderRadius: '8px' }}>
+                            Category: <strong>{verificationStatus.request.category}</strong> · Affiliation: <strong>{verificationStatus.request.affiliation}</strong>
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      /* CASE 3: NOT VERIFIED OR REJECTED -> SHOW APPLICATION FORM */
+                      <div>
+                        {verificationStatus?.request?.status === 'rejected' && (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            background: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            padding: '14px 16px',
+                            borderRadius: '10px',
+                            marginBottom: '20px',
+                          }}>
+                            <FaExclamationTriangle size={20} color="#dc2626" style={{ flexShrink: 0 }} />
+                            <div>
+                              <strong style={{ color: '#991b1b', display: 'block', fontSize: '0.88rem' }}>
+                                Previous Application Not Approved
+                              </strong>
+                              <span style={{ color: '#b91c1c', fontSize: '0.82rem' }}>
+                                Admin Notes: {verificationStatus.request.adminNotes || 'Verification criteria could not be confirmed.'} You may update your evidence and re-apply below.
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        <form onSubmit={handleSubmitVerification} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          <div className="formRowGrid">
+                            <div className="formGroup">
+                              <label>Legal Full Name *</label>
+                              <input
+                                type="text"
+                                className="settingsInput"
+                                required
+                                placeholder="Your full name as per official identification"
+                                value={verificationForm.fullName}
+                                onChange={(e) => setVerificationForm({ ...verificationForm, fullName: e.target.value })}
+                              />
+                            </div>
+
+                            <div className="formGroup">
+                              <label>Verification Category *</label>
+                              <select
+                                className="settingsInput"
+                                value={verificationForm.category}
+                                onChange={(e) => setVerificationForm({ ...verificationForm, category: e.target.value })}
+                              >
+                                <option value="Student / Scholar">Student / Scholar</option>
+                                <option value="Academic / Researcher">Academic / Researcher</option>
+                                <option value="Software Engineer / Tech">Software Engineer / Tech</option>
+                                <option value="Creator / Thought Leader">Creator / Thought Leader</option>
+                                <option value="Executive / Business Leader">Executive / Business Leader</option>
+                                <option value="Organization Representative">Organization Representative</option>
+                                <option value="Public Figure">Public Figure</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="formRowGrid">
+                            <div className="formGroup">
+                              <label>Primary Affiliation (University, Company, Institute) *</label>
+                              <input
+                                type="text"
+                                className="settingsInput"
+                                required
+                                placeholder="e.g. Stanford University, Google, MIT"
+                                value={verificationForm.affiliation}
+                                onChange={(e) => setVerificationForm({ ...verificationForm, affiliation: e.target.value })}
+                              />
+                            </div>
+
+                            <div className="formGroup">
+                              <label>Link to Arcturus Organization (Optional)</label>
+                              <select
+                                className="settingsInput"
+                                value={verificationForm.organizationId}
+                                onChange={(e) => setVerificationForm({ ...verificationForm, organizationId: e.target.value })}
+                              >
+                                <option value="">-- Select Registered Organization --</option>
+                                {approvedOrgs.map((org) => (
+                                  <option key={org._id} value={org._id}>
+                                    {org.name} ({org.industry})
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="formGroup">
+                            <label>Verification Proof / Evidence Link (URL)</label>
+                            <input
+                              type="url"
+                              className="settingsInput"
+                              placeholder="e.g. Student Portal, LinkedIn, Google Scholar, GitHub, or Portfolio"
+                              value={verificationForm.evidenceUrl}
+                              onChange={(e) => setVerificationForm({ ...verificationForm, evidenceUrl: e.target.value })}
+                            />
+                            <span style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                              Provide a verifiable public link, institutional faculty page, or online credentials verifying your affiliation.
+                            </span>
+                          </div>
+
+                          <div className="formGroup">
+                            <label>Statement / Why should this profile be verified? *</label>
+                            <textarea
+                              className="settingsInput"
+                              rows={3}
+                              required
+                              placeholder="Briefly state your role, university/company standing, achievements, or justification for Arcturus blue tick verification..."
+                              value={verificationForm.reason}
+                              onChange={(e) => setVerificationForm({ ...verificationForm, reason: e.target.value })}
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="saveBtn"
+                            style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                            disabled={submittingVerification}
+                          >
+                            <MdVerified size={15} />
+                            <span>{submittingVerification ? 'Submitting to Admin...' : 'Submit Verification Request to Admin'}</span>
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* CARD 2: INSTITUTE AFFILIATION & LOGO BADGE */}
+                <div className="settingsCard">
+                  <div className="settingsCardHeader">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <FaUniversity size={20} color="#15803d" />
+                      <div>
+                        <h3>Institute Affiliation & Student Logo Badge</h3>
+                        <p>Link your educational institution to receive an official institute logo badge on your profile and feed posts.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="settingsCardBody" style={{ padding: '20px' }}>
+                    {/* Badge Preview */}
+                    {instituteForm.organizationId && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        background: '#f0fdf4',
+                        border: '1px solid #bbf7d0',
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        marginBottom: '16px',
+                      }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#166534' }}>Current Badge Preview:</span>
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: '#ffffff',
+                          border: '1px solid #86efac',
+                          padding: '3px 10px',
+                          borderRadius: '14px',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          color: '#15803d',
+                        }}>
+                          {approvedOrgs.find(o => o._id === instituteForm.organizationId)?.logo?.url ? (
+                            <img
+                              src={approvedOrgs.find(o => o._id === instituteForm.organizationId)?.logo?.url}
+                              alt=""
+                              style={{ width: '15px', height: '15px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <FaUniversity size={12} />
+                          )}
+                          <span>{approvedOrgs.find(o => o._id === instituteForm.organizationId)?.name || instituteForm.name || 'Institute'}</span>
+                          <span style={{ color: '#16a34a' }}>✓</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSaveInstitute} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div className="formRowGrid">
+                        <div className="formGroup">
+                          <label>Select Registered Institute Organization *</label>
+                          <select
+                            className="settingsInput"
+                            value={instituteForm.organizationId}
+                            onChange={(e) => {
+                              const orgId = e.target.value;
+                              const selected = approvedOrgs.find(o => o._id === orgId);
+                              setInstituteForm({
+                                ...instituteForm,
+                                organizationId: orgId,
+                                name: selected ? selected.name : instituteForm.name,
+                              });
+                            }}
+                          >
+                            <option value="">-- Select Educational Organization --</option>
+                            {approvedOrgs.map((org) => (
+                              <option key={org._id} value={org._id}>
+                                {org.name} {org.industry ? `(${org.industry})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                          <span style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                            Selecting an approved organization enables the official verified institute logo badge.
+                          </span>
+                        </div>
+
+                        <div className="formGroup">
+                          <label>Institute / College Name</label>
+                          <input
+                            type="text"
+                            className="settingsInput"
+                            placeholder="College or University Name"
+                            value={instituteForm.name}
+                            onChange={(e) => setInstituteForm({ ...instituteForm, name: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="formRowGrid">
+                        <div className="formGroup">
+                          <label>Department / Major</label>
+                          <input
+                            type="text"
+                            className="settingsInput"
+                            placeholder="e.g. Computer Science & Engineering"
+                            value={instituteForm.department}
+                            onChange={(e) => setInstituteForm({ ...instituteForm, department: e.target.value })}
+                          />
+                        </div>
+
+                        <div className="formGroup">
+                          <label>Student Roll / ID Number</label>
+                          <input
+                            type="text"
+                            className="settingsInput"
+                            placeholder="e.g. 21CS042"
+                            value={instituteForm.studentId}
+                            onChange={(e) => setInstituteForm({ ...instituteForm, studentId: e.target.value })}
+                          />
+                        </div>
+
+                        <div className="formGroup">
+                          <label>Graduation Batch / Year</label>
+                          <input
+                            type="number"
+                            className="settingsInput"
+                            placeholder="2026"
+                            value={instituteForm.graduationYear}
+                            onChange={(e) => setInstituteForm({ ...instituteForm, graduationYear: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="saveBtn"
+                        style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                        disabled={savingInstitute}
+                      >
+                        <FaCheck size={14} />
+                        <span>{savingInstitute ? 'Saving...' : 'Save & Link Institute Badge'}</span>
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>

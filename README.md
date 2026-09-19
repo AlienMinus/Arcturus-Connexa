@@ -13,6 +13,7 @@
 ## 📑 Table of Contents
 
 - [✨ Key Features](#-key-features)
+- [👥 Arcturus User Architecture, IDs & Dedicated Portals](#-arcturus-user-architecture-ids--dedicated-portals)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [📂 Project Architecture](#-project-architecture)
 - [🚀 Getting Started](#-getting-started)
@@ -77,6 +78,100 @@
 - **Default Light Theme**: Clean, accessible light mode designed with high readability.
 - **Dark Mode**: Dark slate/navy backgrounds (`#0f172a`, `#1e293b`) with neon blue accents and complete CSS coverage.
 - **Mobile First Navigation**: Bottom navigation bar with safe-area insets (`env(safe-area-inset-bottom)`).
+
+---
+
+## 👥 Arcturus User Architecture, IDs & Dedicated Portals
+
+Arcturus is engineered around a multi-tier identity model that segments privileges, UI dashboards, and capabilities across four distinct user roles and entities:
+
+```mermaid
+flowchart TD
+    subgraph Arcturus Ecosystem
+        Admin["👑 Arcturus Admin (Role: admin)"]
+        Org["🏢 Organization / Institute (Entity: Organization Model)"]
+        Recruiter["💼 Recruiter / Employer (AccountType: recruiter)"]
+        Student["🎓 Student / Professional (AccountType: individual / student)"]
+    end
+
+    Admin -->|Approves & Moderates| Org
+    Admin -->|Reviews & Awards Blue Tick| Student
+    Admin -->|Reviews & Awards Blue Tick| Recruiter
+    Admin -->|Oversees Campus Drives & Conflicts| AdminHub["Admin Operations Hub & CampusLink Command Center"]
+    
+    Org -->|Issues Verified Institute Logo Badge| Student
+    Org -->|Authorizes Hiring Postings| Recruiter
+    
+    Recruiter -->|Posts Openings & Reviews Pipeline| RecruiterHub["Recruiter Command Hub & Applicant Review"]
+    Student -->|Benchmarks Skill Gaps & Tracks Drives| StudentPortal["Student Readiness & Placement AI Portal"]
+```
+
+### 1. 🎓 Normal User / Student / Employee
+- **Identity & Data Models**:
+  - `User._id`: MongoDB ObjectId representing the personal account.
+  - `accountType`: `'individual'` or `'student'`.
+  - `isVerified`: Boolean indicating official identity verification (Blue Checkmark). Gated strictly behind Arcturus Admin approval.
+  - `institute`: Sub-document containing `organizationId` (ObjectId ref to `Organization`), `name`, `verified`, `studentId`, `graduationYear`, and `department`.
+- **Key Capabilities & Dedicated Views**:
+  - **Institute Affiliation & Verified Logo Badge**: Students linked to an approved Arcturus educational organization receive a clickable, branded institute logo badge on their profile cards, feed posts, and candidate listings that navigates directly to the official university page (`/company/:slug`).
+  - **Blue Tick Identity Verification**: Users can request official Blue Tick verification via `/settings` (under the *Verification & Badges* tab) by submitting proof documents, identity category, and affiliation statements for admin review.
+  - **Student Placement & Readiness Portal (`/campuslink`)**:
+    - **Readiness Score**: 4-tier continuous scoring (*Foundational*, *Developing*, *Placement-Ready*, *Industry Elite*).
+    - **Gemma-2 Risk Engine**: On-demand AI placement risk score, technical skill bottleneck analysis, and customized remedial roadmaps powered by Hugging Face `google/gemma-2-2b-it`.
+    - **Drive Skill Gaps**: Real-time benchmarking against actual scheduled recruiter drives.
+    - **Eligible Drives Calendar**: Live eligibility evaluation against minimum CGPA and maximum backlog cutoffs.
+    - **My Offers Tracker**: Digital offer letter status, acceptance/decline workflows, and cryptographic verification stamps.
+  - **Arcade & Social Feed**: Access to daily puzzles (`/games`), 24h ephemeral Tales, community discussions, and direct messaging.
+
+---
+
+### 2. 💼 Recruiter / Job Posting Account
+- **Identity & Data Models**:
+  - `User._id`: MongoDB ObjectId with `accountType: 'recruiter'`.
+  - Can be associated with an approved `Organization` or operate as an independent technical recruiter.
+- **Dedicated Portals & Capabilities**:
+  - **Recruiter Command Hub (`/recruiter/dashboard` & `/jobs/post?tab=dashboard`)**:
+    - **Hiring KPI Metrics**: Summary cards displaying Total Active Openings, Total Candidates, Candidates In Review, Shortlisted, and Hired.
+    - **Candidate Pipeline Tracker**: Interactive table of all incoming applications across postings, searchable by candidate name, skills, and role.
+    - **1-Click Candidate Status Actions**: Update candidate progress seamlessly across stages (`Reviewing`, `Shortlist`, `Interview`, `Reject`, `Hire`) via `PATCH /api/jobs/:id/applicants/:applicantId/status`.
+    - **Verified Profile Inspection**: Direct links to candidate portfolios with verified badges and institute credentials.
+  - **Job Creation & Multi-Tier Targeting (`/jobs/post?tab=post`)**:
+    - Comprehensive vacancy creation with salary ranges (LPA/USD), remote/hybrid flags, required experience, and tags.
+
+---
+
+### 3. 🏢 Organization / Educational Institute
+- **Identity & Data Models**:
+  - `Organization._id`: MongoDB ObjectId representing corporate or academic entities.
+  - `slug`: Unique SEO-friendly URL handle (e.g., `/company/mit-engineering`, `/company/google`).
+  - `status`: `'pending'`, `'approved'`, or `'rejected'` (governed by Arcturus Admin).
+  - `verificationDocs`: Secure document uploads (business registration, tax exemption, accreditation).
+- **Dedicated Portals & Capabilities**:
+  - **Company Creation Portal (`/company/create`)**:
+    - Multi-step registration flow accessible from the "For Business" dropdown in the navbar.
+  - **Official Branded Hub (`/company/:slug`)**:
+    - Showcase company overview, location, industry, website, open job listings, and alumni networks.
+  - **Student Credential Provider (Universities & Colleges)**:
+    - Approved academic organizations serve as credentialing bodies within Arcturus. When students select the institute in their profile settings, they automatically display the official institute logo badge across the platform.
+
+---
+
+### 4. 👑 Arcturus Platform Administrator
+- **Identity & Data Models**:
+  - `User.role === 'admin'` or `User.username === 'arcturus_admin'`.
+  - Global administrative and moderating authority.
+- **Dedicated Portals & Command Centers**:
+  - **Arcturus Operations Hub (`/admin`)**:
+    - **Real-Time KPI Metrics Ribbon**: Track total users, verified members, organizations, pending queues, active jobs, and posts.
+    - **Organization Approval Workflow**: Lightbox inspection for corporate legal documents with 1-click Approve and structured Rejection modals.
+    - **Blue Tick Identity Verification Queue**: Review submitted government documents, identity categories, affiliations, and statements with 1-click Approve, Reject, or Revoke controls.
+    - **Job Portal Moderation**: Monitor and delete fraudulent or policy-violating job listings.
+    - **User Account Governance**: 1-click toggle for user verification statuses.
+  - **CampusLink Institutional Command Center (`/campuslink`)**:
+    - **Placement Analytics Dashboard**: Institutional placement rate, average CTC, branch-wise hiring breakdown, package tiers, and predictive at-risk student monitoring.
+    - **Drive Scheduling & Venue Management**: Schedule corporate drives with package tiers, cutoffs, and eligible departments.
+    - **Real-Time Conflict Matrix**: Detect venue double-booking and schedule collisions with 1-click auto-resolution.
+    - **Candidate Matching Engine**: Algorithmic ranking and 1-click auto-shortlisting with explainable AI rationales.
 
 ---
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { GameLevel, GameScore } from '../models/Game.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -341,13 +342,16 @@ const INITIAL_LEVELS = [
 // Ensure levels exist in database
 async function seedLevelsIfEmpty() {
   try {
-    const count = await GameLevel.countDocuments();
+    if (mongoose.connection.readyState !== 1) {
+      mongoose.connection.once('connected', () => seedLevelsIfEmpty());
+      return;
+    }
+    const count = await GameLevel.countDocuments().maxTimeMS(4000);
     if (count === 0) {
       await GameLevel.insertMany(INITIAL_LEVELS);
-      console.log('Seeded game levels into database');
     }
   } catch (err) {
-    console.warn('Game levels seeding warning (using in-memory):', err.message);
+    // Falls back seamlessly to INITIAL_LEVELS in memory
   }
 }
 

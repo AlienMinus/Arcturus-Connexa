@@ -7,10 +7,12 @@ import {
   FaEllipsisH,
   FaHeart,
   FaHandsWash,
-  FaLightbulb,
-  FaLaugh,
-  FaHandHoldingHeart
+  FaLightbulb, 
+  FaLaugh, 
+  FaHandHoldingHeart,
+  FaUniversity
 } from "react-icons/fa";
+import { MdVerified } from "react-icons/md";
 import { buildApiUrl } from "../../../utils/api";
 import { BiRepost } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
@@ -253,6 +255,8 @@ const PostCard = ({ post }) => {
   const displayName = getUserFullName(authorSource?.userId) || authorSource?.authorName || authorSource?.author || authorSource?.authorUsername || 'Arcturus Member';
   const displayUsername = authorSource?.userId?.username || authorSource?.authorUsername || authorSource?.username || '';
   const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
+  const displayIsVerified = authorSource?.authorIsVerified ?? authorSource?.userId?.isVerified ?? false;
+  const displayInstitute = authorSource?.authorInstitute ?? authorSource?.userId?.institute ?? null;
   const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";
   const displayImage = isRepost ? post.repostedFrom.image : post.image;
 
@@ -318,7 +322,39 @@ const PostCard = ({ post }) => {
               <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div className="postInfo">
-              <h2>{displayName}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap' }}>
+                <h2>{displayName}</h2>
+                {displayIsVerified && (
+                  <MdVerified size={15} color="#0a66c2" title="Arcturus Verified Account" />
+                )}
+                {displayInstitute && (displayInstitute.organizationId || displayInstitute.slug) && (
+                  <Link
+                    to={`/company/${displayInstitute.slug || displayInstitute.organizationId?.slug || displayInstitute.organizationId?._id || displayInstitute.organizationId}`}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      background: '#f0fdf4',
+                      color: '#15803d',
+                      border: '1px solid #bbf7d0',
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                    }}
+                    title={`Student at ${displayInstitute.name}`}
+                  >
+                    {displayInstitute.logo ? (
+                      <img src={displayInstitute.logo} alt="" style={{ width: '12px', height: '12px', borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <FaUniversity size={10} />
+                    )}
+                    <span>{displayInstitute.name}</span>
+                  </Link>
+                )}
+              </div>
               <p>{displayHeadline}</p>
               <p>{post.time}</p>
             </div>
@@ -331,7 +367,39 @@ const PostCard = ({ post }) => {
               <CgProfile className="postAvatar postAvatarFallback" />
             )}
             <div className="postInfo">
-              <h2>{displayName}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexWrap: 'wrap' }}>
+                <h2>{displayName}</h2>
+                {displayIsVerified && (
+                  <MdVerified size={15} color="#0a66c2" title="Arcturus Verified Account" />
+                )}
+                {displayInstitute && (displayInstitute.organizationId || displayInstitute.slug) && (
+                  <Link
+                    to={`/company/${displayInstitute.slug || displayInstitute.organizationId?.slug || displayInstitute.organizationId?._id || displayInstitute.organizationId}`}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      background: '#f0fdf4',
+                      color: '#15803d',
+                      border: '1px solid #bbf7d0',
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                    }}
+                    title={`Student at ${displayInstitute.name}`}
+                  >
+                    {displayInstitute.logo ? (
+                      <img src={displayInstitute.logo} alt="" style={{ width: '12px', height: '12px', borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <FaUniversity size={10} />
+                    )}
+                    <span>{displayInstitute.name}</span>
+                  </Link>
+                )}
+              </div>
               <p>{displayHeadline}</p>
               <p>{post.time}</p>
             </div>

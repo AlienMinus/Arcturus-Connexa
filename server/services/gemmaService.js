@@ -101,13 +101,18 @@ export async function analyzePlacementRiskAndGuidance(profileData) {
     overallReadiness = 50,
     readinessLevel = 'Developing',
     targetRoles = [],
+    projectsCount = 0,
+    experienceCount = 0,
+    certificationsCount = 0,
+    headline = '',
+    summary = '',
   } = profileData;
 
   const studentSkills = Array.isArray(skills) ? skills : [];
   const skillsListStr = studentSkills.length > 0 ? studentSkills.join(', ') : 'None specified';
-  const rolesListStr = Array.isArray(targetRoles) && targetRoles.length > 0 ? targetRoles.join(', ') : 'Full Stack Cloud Engineer';
+  const rolesListStr = Array.isArray(targetRoles) && targetRoles.length > 0 ? targetRoles.join(', ') : 'Campus Placement Candidate';
 
-  // Construct prompt for Gemma-2
+  // Construct prompt for Gemma-2 with real applicant user profile data
   const gemmaPrompt = `You are the CampusLink AI Placement & Risk Diagnostic Engine powered by Google Gemma.
 Analyze the following student profile for corporate placement readiness, identify at-risk factors, diagnose skill gaps, and provide actionable mentor guidance:
 - College: ${collegeName}
@@ -118,11 +123,13 @@ Analyze the following student profile for corporate placement readiness, identif
 - Employability Readiness Score: ${overallReadiness}% (${readinessLevel})
 - Dimension Scores: Technical: ${technicalScore}%, Aptitude: ${aptitudeScore}%, Communication: ${communicationScore}%, Projects: ${projectScore}%
 - Key Skills: ${skillsListStr}
-- Target Recruiter Roles: ${rolesListStr}
+- Applicant Profile Background: ${projectsCount} technical project(s), ${experienceCount} work/internship experience(s), ${certificationsCount} license/certification(s)
+- Headline / Bio: ${headline || 'Aspiring Engineer'}
+- Target Recruiter Criteria: ${rolesListStr}
 
 Please output ONLY a valid JSON object with the following schema:
 {
-  "aiReadinessSummary": "concise 2-3 sentence analysis of the student's competitive placement positioning and readiness",
+  "aiReadinessSummary": "concise 2-3 sentence analysis of the student's competitive placement positioning and readiness based on their academic score and practical profile portfolio",
   "isAtRisk": boolean,
   "riskReason": "clear reason if at risk, or empty string",
   "mentorActionRecommendation": "actionable 1-2 sentence recommendation for the placement cell or faculty mentor",
@@ -186,12 +193,16 @@ Please output ONLY a valid JSON object with the following schema:
     mentorActionRecommendation = `Candidate is on track for Tier-1 corporate drives. Recommend targeted system design prep and competitive mock interviews for premium CTC packages.`;
   }
 
-  // Dynamic AI Readiness Summary
+  // Dynamic AI Readiness Summary Incorporating Applicant Profile Portfolio
   const skillHighlight = studentSkills.length > 0
     ? `demonstrates practical strengths in ${studentSkills.slice(0, 3).join(', ')}`
     : `has a foundational skill baseline requiring practical project expansion`;
 
-  let aiReadinessSummary = `Student presents a ${readinessLevel.toLowerCase()} placement readiness profile (${numReadiness}% score) within ${branch}. The candidate ${skillHighlight}. `;
+  const portfolioSummary = projectsCount > 0
+    ? `Portfolio features ${projectsCount} technical project(s)${experienceCount > 0 ? ` and ${experienceCount} work/internship experience(s)` : ''}.`
+    : `Practical project portfolio is currently minimal; publishing 2+ engineering projects on Arcturus will significantly strengthen recruiter conversion.`;
+
+  let aiReadinessSummary = `Candidate presents a ${readinessLevel.toLowerCase()} placement readiness profile (${numReadiness}% score) within ${branch}. The applicant ${skillHighlight}. ${portfolioSummary} `;
 
   if (isAtRisk) {
     aiReadinessSummary += `Predictive placement risk flagged due to ${riskReason.toLowerCase()}. Addressing this early with faculty mentoring will safeguard campus hiring prospects.`;

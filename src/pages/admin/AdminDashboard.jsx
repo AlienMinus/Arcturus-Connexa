@@ -10,10 +10,12 @@ import {
   FaCheckCircle, 
   FaLock 
 } from 'react-icons/fa';
+import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import AdminMetrics from '../../components/admin/AdminMetrics';
 import OrganizationApprovals from '../../components/admin/OrganizationApprovals';
+import VerificationRequests from '../../components/admin/VerificationRequests';
 import JobModeration from '../../components/admin/JobModeration';
 import UserModeration from '../../components/admin/UserModeration';
 import DocumentLightboxModal from '../../components/admin/DocumentLightboxModal';
@@ -24,13 +26,15 @@ const AdminDashboard = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('organizations'); // 'organizations', 'jobs', 'users'
+  const [activeTab, setActiveTab] = useState('organizations'); // 'organizations', 'verifications', 'jobs', 'users'
   const [statusFilter, setStatusFilter] = useState('pending'); // 'all', 'pending', 'approved', 'rejected'
+  const [verificationFilter, setVerificationFilter] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Data States
   const [stats, setStats] = useState(null);
   const [organizations, setOrganizations] = useState([]);
+  const [verificationRequests, setVerificationRequests] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,9 +136,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchVerificationRequests = async () => {
+    if (!token || !isArcturusAdmin) return;
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (verificationFilter !== 'all') params.append('status', verificationFilter);
+      if (searchQuery) params.append('q', searchQuery);
+
+      const res = await fetch(buildApiUrl(`/verification/admin/list?${params.toString()}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setVerificationRequests(data.requests || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch verification requests:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const reloadData = () => {
     fetchStats();
     if (activeTab === 'organizations') fetchOrganizations();
+    if (activeTab === 'verifications') fetchVerificationRequests();
     if (activeTab === 'jobs') fetchJobs();
     if (activeTab === 'users') fetchUsers();
   };
@@ -143,10 +170,84 @@ const AdminDashboard = () => {
     if (isArcturusAdmin) {
       fetchStats();
       if (activeTab === 'organizations') fetchOrganizations();
+      if (activeTab === 'verifications') fetchVerificationRequests();
       if (activeTab === 'jobs') fetchJobs();
       if (activeTab === 'users') fetchUsers();
     }
-  }, [token, activeTab, statusFilter]);
+  }, [token, activeTab, statusFilter, verificationFilter]);
+
+  // Action: Approve Blue Tick Verification
+  const handleApproveVerification = async (requestId) => {
+    setActionLoading(requestId);
+    try {
+      const res = await fetch(buildApiUrl(`/verification/admin/${requestId}/approve`), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        showToast('🎉 Blue Tick Verification approved! Member is now verified.');
+        fetchStats();
+        fetchVerificationRequests();
+      } else {
+        const data = await res.json();
+        showToast(`Error: ${data.error || 'Failed to approve request'}`);
+      }
+    } catch (err) {
+      showToast('Network error while approving verification');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Action: Reject Blue Tick Verification
+  const handleRejectVerification = async (requestId, reason) => {
+    setActionLoading(requestId);
+    try {
+      const res = await fetch(buildApiUrl(`/verification/admin/${requestId}/reject`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reason }),
+      });
+      if (res.ok) {
+        showToast('Verification request rejected.');
+        fetchStats();
+        fetchVerificationRequests();
+      } else {
+        const data = await res.json();
+        showToast(`Error: ${data.error || 'Failed to reject request'}`);
+      }
+    } catch (err) {
+      showToast('Network error while rejecting verification');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Action: Revoke Blue Tick Verification
+  const handleRevokeVerification = async (requestId) => {
+    setActionLoading(requestId);
+    try {
+      const res = await fetch(buildApiUrl(`/verification/admin/${requestId}/revoke`), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        showToast('Blue Tick verification revoked.');
+        fetchStats();
+        fetchVerificationRequests();
+      } else {
+        const data = await res.json();
+        showToast(`Error: ${data.error || 'Failed to revoke verification'}`);
+      }
+    } catch (err) {
+      showToast('Network error while revoking verification');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   // Action: Approve Organization
   const handleApproveOrg = async (orgId, orgName) => {
@@ -321,6 +422,23 @@ const AdminDashboard = () => {
 
           <button
             type="button"
+            className={`adminTabBtn ${activeTab === 'verifications' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('verifications');
+              setSearchQuery('');
+            }}
+            title="Blue Tick Verifications"
+            aria-label="Blue Tick Verifications"
+          >
+            <MdVerified size={16} />
+            <span className="tabLabel">Blue Tick Requests</span>
+            {stats?.pendingVerifications > 0 && (
+              <span className="tabCountPill pendingPill">{stats.pendingVerifications}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
             className={`adminTabBtn ${activeTab === 'jobs' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('jobs');
@@ -364,6 +482,8 @@ const AdminDashboard = () => {
             placeholder={
               activeTab === 'organizations'
                 ? 'Search company name, industry, location...'
+                : activeTab === 'verifications'
+                ? 'Search applicant name, username, organization...'
                 : activeTab === 'jobs'
                 ? 'Search job title, company, skills...'
                 : 'Search users by name, username, email...'
@@ -392,7 +512,21 @@ const AdminDashboard = () => {
         />
       )}
 
-      {/* TAB 2: JOB PORTAL MODERATION */}
+      {/* TAB 2: BLUE TICK IDENTITY VERIFICATIONS */}
+      {activeTab === 'verifications' && (
+        <VerificationRequests
+          requests={verificationRequests}
+          filter={verificationFilter}
+          setFilter={setVerificationFilter}
+          loading={loading}
+          actionLoading={actionLoading}
+          onApprove={handleApproveVerification}
+          onReject={handleRejectVerification}
+          onRevoke={handleRevokeVerification}
+        />
+      )}
+
+      {/* TAB 3: JOB PORTAL MODERATION */}
       {activeTab === 'jobs' && (
         <JobModeration
           jobs={jobs}

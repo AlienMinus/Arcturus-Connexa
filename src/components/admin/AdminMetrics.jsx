@@ -6,6 +6,7 @@ import {
   FaBriefcase, 
   FaFileAlt 
 } from 'react-icons/fa';
+import { MdVerified } from 'react-icons/md';
 
 const AdminMetrics = ({ stats }) => {
   return (
@@ -17,7 +18,7 @@ const AdminMetrics = ({ stats }) => {
         <div className="metricContent">
           <span className="metricLabel">Total Users</span>
           <span className="metricValue">{stats?.totalUsers ?? '...'}</span>
-          <span className="metricSubtext">Platform accounts</span>
+          <span className="metricSubtext">{stats?.verifiedUsers ?? 0} verified members</span>
         </div>
       </div>
 
@@ -37,9 +38,20 @@ const AdminMetrics = ({ stats }) => {
           <FaHourglassHalf size={22} />
         </div>
         <div className="metricContent">
-          <span className="metricLabel">Pending Approvals</span>
+          <span className="metricLabel">Pending Orgs</span>
           <span className="metricValue">{stats?.pendingOrganizations ?? 0}</span>
-          <span className="metricSubtext">Awaiting document review</span>
+          <span className="metricSubtext">Awaiting org review</span>
+        </div>
+      </div>
+
+      <div className={`metricCard highlight ${(stats?.pendingVerifications || 0) > 0 ? 'urgent' : ''}`}>
+        <div className="metricIconBox" style={{ background: '#e0f2fe', color: '#0a66c2' }}>
+          <MdVerified size={24} />
+        </div>
+        <div className="metricContent">
+          <span className="metricLabel">Blue Tick Requests</span>
+          <span className="metricValue">{stats?.pendingVerifications ?? 0}</span>
+          <span className="metricSubtext">Awaiting identity check</span>
         </div>
       </div>
 
@@ -50,7 +62,7 @@ const AdminMetrics = ({ stats }) => {
         <div className="metricContent">
           <span className="metricLabel">Active Jobs</span>
           <span className="metricValue">{stats?.activeJobs ?? '...'}</span>
-          <span className="metricSubtext">{stats?.totalApplications ?? 0} applications received</span>
+          <span className="metricSubtext">{stats?.totalApplications ?? 0} applications</span>
         </div>
       </div>
 

@@ -38,7 +38,8 @@ router.get('/', async (req, res) => {
               { headline: safeRegex },
             ],
           })
-            .select('firstName lastName username headline location profilePicture role isVerified')
+            .select('firstName lastName username headline location profilePicture role isVerified institute')
+            .populate('institute.organizationId', 'name slug logo')
             .limit(15)
             .lean()
         : Promise.resolve([]),
@@ -101,6 +102,7 @@ router.get('/', async (req, res) => {
       location: u.location,
       profilePicture: u.profilePicture,
       isVerified: u.isVerified,
+      institute: u.institute,
     }));
 
     const jobs = rawJobs.map((j) => ({

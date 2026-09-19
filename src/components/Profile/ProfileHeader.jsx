@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { CgProfile } from "react-icons/cg";
-import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck, FaCamera, FaSpinner } from "react-icons/fa";
+import { FaPencilAlt, FaUserPlus, FaUserCheck, FaCheck, FaCamera, FaSpinner, FaUniversity } from "react-icons/fa";
+import { MdVerified } from "react-icons/md";
 import { useProfile } from '../../context/ProfileContext';
 import { buildApiUrl } from '../../utils/api';
 import ProfileNetworkModal from './ProfileNetworkModal';
@@ -290,7 +291,51 @@ const ProfileHeader = ({
           <div className="profileIntroText">
             <div className="profileIntroTop">
               <div className="profileInfoPrimary">
-                <h1 className="profileName">{profile.name}</h1>
+                <div className="profileNameRow" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <h1 className="profileName" style={{ margin: 0 }}>{profile.name}</h1>
+                  {profile.isVerified && (
+                    <MdVerified
+                      size={22}
+                      color="#0a66c2"
+                      title="Arcturus Verified Account"
+                      style={{ flexShrink: 0 }}
+                    />
+                  )}
+                  {profile.institute && profile.institute.organizationId && (
+                    <Link
+                      to={`/company/${profile.institute.slug || profile.institute.organizationId}`}
+                      className="profileInstituteBadge"
+                      title={`Student at ${profile.institute.name}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: '#f0fdf4',
+                        color: '#15803d',
+                        border: '1px solid #bbf7d0',
+                        padding: '3px 10px',
+                        borderRadius: '16px',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {profile.institute.logo ? (
+                        <img
+                          src={profile.institute.logo}
+                          alt=""
+                          style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <FaUniversity size={13} />
+                      )}
+                      <span>{profile.institute.name}</span>
+                      {profile.institute.verified && (
+                        <span style={{ color: '#16a34a', fontSize: '12px' }}>✓</span>
+                      )}
+                    </Link>
+                  )}
+                </div>
                 {profile.headline && <p className="profileHeadline">{profile.headline}</p>}
                 {profile.location && <p className="profileLocation">{profile.location}</p>}
               </div>

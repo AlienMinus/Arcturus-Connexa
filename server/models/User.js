@@ -74,6 +74,19 @@ const UserSchema = new mongoose.Schema(
     organizations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' }],
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isAdmin: { type: Boolean, default: false },
+    accountType: {
+      type: String,
+      enum: ['individual', 'student', 'recruiter', 'organization', 'admin'],
+      default: 'individual',
+    },
+    institute: {
+      organizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
+      name: { type: String, default: '' },
+      verified: { type: Boolean, default: false },
+      studentId: { type: String, default: '' },
+      graduationYear: { type: Number },
+      department: { type: String, default: '' },
+    },
     notifications: [
       {
         type: {

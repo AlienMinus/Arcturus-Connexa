@@ -41,14 +41,17 @@ function AppRouter() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/campuslink" element={<CampusLinkPage />} />
+                <Route path="/company/create" element={<JobPostingPage />} />
                 <Route path="/company/:idOrSlug" element={<CompanyPage />} />
                 <Route path="/organization/:idOrSlug" element={<CompanyPage />} />
                 <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/jobs/manage" element={<JobPostingPage />} />
                 <Route path="/jobs/post" element={<JobPostingPage />} />
+                <Route path="/recruiter/dashboard" element={<JobPostingPage />} />
                 <Route path="/learning" element={<LearningHubPage />} />
                 <Route path="/advertise" element={<AdvertisePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/settings/verification" element={<SettingsPage />} />
                 <Route path="/settings/privacy" element={<SettingsPage />} />
                 <Route path="/settings/language" element={<SettingsPage />} />
                 <Route path="/settings/security" element={<SettingsPage />} />

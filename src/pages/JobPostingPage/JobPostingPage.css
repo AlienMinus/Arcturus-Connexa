@@ -957,14 +957,341 @@
   font-weight: 700;
 }
 
-.postedDateText {
+/* RECRUITER DASHBOARD STYLES */
+.recruiterDashboardPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recruiterKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.recruiterKpiCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.recruiterKpiIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpiBlue { background: #e0f2fe; color: #0284c7; }
+.kpiIndigo { background: #e0e7ff; color: #4f46e5; }
+.kpiAmber { background: #fef3c7; color: #d97706; }
+.kpiPurple { background: #f3e8ff; color: #9333ea; }
+.kpiEmerald { background: #d1fae5; color: #059669; }
+
+.recruiterKpiInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.recruiterKpiValue {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.recruiterKpiLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.recruiterFilterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.recruiterSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.recruiterSearchBox input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.88rem;
+  width: 100%;
+  color: #0f172a;
+}
+
+.recruiterFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recruiterFilterGroup label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.recruiterFilterGroup select {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.84rem;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+}
+
+.recruiterCandidatesTable {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.recruiterTableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.3fr 1fr 1fr 1.5fr;
+  padding: 12px 18px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recruiterCandidateRow {
+  display: grid;
+  grid-template-columns: 2fr 1.3fr 1fr 1fr 1.5fr;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+}
+
+.recruiterCandidateRow:hover {
+  background: #f8fafc;
+}
+
+.candProfileCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candAvatarImg {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.candAvatarFallback {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.candTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.candNameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.candNameLink {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.candNameLink:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.candNameText {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.candHeadlineText {
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.candInstituteBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1px 7px;
   font-size: 0.72rem;
-  color: #94a3b8;
+  font-weight: 600;
+  text-decoration: none;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+.candInstituteBadge .miniBadgeLogo {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.candRoleCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.candRoleCell strong {
+  font-size: 0.86rem;
+  color: #0f172a;
+}
+
+.candRoleCell span {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.candDateCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status_applied { background: #e0f2fe; color: #0284c7; }
+.status_inreview { background: #fef3c7; color: #d97706; }
+.status_shortlisted { background: #f3e8ff; color: #9333ea; }
+.status_hired { background: #d1fae5; color: #059669; }
+.status_rejected { background: #fee2e2; color: #dc2626; }
+
+.candActionsCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.candStatusSelect {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.78rem;
+  color: #0f172a;
+  outline: none;
+}
+
+.candQuickActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.candQuickActionBtn:hover {
+  opacity: 0.9;
+}
+
+.candQuickActionBtn.shortlist {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.candQuickActionBtn.hire {
+  background: #d1fae5;
+  color: #059669;
 }
 
 @media (max-width: 768px) {
   .jobFormGrid,
   .docUploadInputsRow {
     grid-template-columns: 1fr;
+  }
+  .recruiterTableHeader {
+    display: none;
+  }
+  .recruiterCandidateRow {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 }

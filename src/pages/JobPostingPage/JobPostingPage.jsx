@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { 
   FaBriefcase, 
   FaPlus, 
@@ -22,8 +22,16 @@ import {
   FaFileInvoice,
   FaGlobe,
   FaExclamationTriangle,
-  FaChevronDown
+  FaChevronDown,
+  FaUserCheck,
+  FaFilter,
+  FaSearch,
+  FaExternalLinkAlt,
+  FaCheck,
+  FaTimes,
+  FaUniversity
 } from 'react-icons/fa';
+import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import './JobPostingPage.css';
@@ -102,14 +110,87 @@ const DOCUMENT_TYPES = [
 const JobPostingPage = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState('post'); // 'post', 'manage', 'register_org'
+  const getInitialTab = () => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'register_org' || location.pathname === '/company/create') return 'register_org';
+    if (tabParam === 'dashboard' || location.pathname === '/recruiter/dashboard') return 'dashboard';
+    if (tabParam === 'manage') return 'manage';
+    return 'post';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [organizations, setOrganizations] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState('');
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Recruiter Dashboard Filter States
+  const [candidateSearch, setCandidateSearch] = useState('');
+  const [candidateStatusFilter, setCandidateStatusFilter] = useState('all');
+  const [candidateJobFilter, setCandidateJobFilter] = useState('');
+  const [updatingApplicantId, setUpdatingApplicantId] = useState(null);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'register_org' || location.pathname === '/company/create') {
+      setActiveTab('register_org');
+    } else if (tabParam === 'dashboard' || location.pathname === '/recruiter/dashboard') {
+      setActiveTab('dashboard');
+    } else if (tabParam === 'manage') {
+      setActiveTab('manage');
+    }
+  }, [location.pathname, searchParams]);
+
+  const handleUpdateCandidateStatus = async (jobId, applicantId, newStatus) => {
+    try {
+      setUpdatingApplicantId(applicantId);
+      const res = await fetch(buildApiUrl(`/jobs/${jobId}/applicants/${applicantId}/status`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        setJobListings((prev) =>
+          prev.map((job) => {
+            if (job._id === jobId) {
+              return {
+                ...job,
+                applicants: (job.applicants || []).map((app) => {
+                  if (
+                    app._id === applicantId ||
+                    app.applicantId?._id === applicantId ||
+                    app.applicantId === applicantId
+                  ) {
+                    return { ...app, status: newStatus };
+                  }
+                  return app;
+                }),
+              };
+            }
+            return job;
+          })
+        );
+        showToast(`Candidate status updated to "${newStatus}"!`);
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to update candidate status');
+      }
+    } catch (err) {
+      console.error('Failed to update candidate status:', err);
+      showToast('Network error while updating candidate status');
+    } finally {
+      setUpdatingApplicantId(null);
+    }
+  };
 
   // Job Form State
   const [form, setForm] = useState({
@@ -387,6 +468,37 @@ const JobPostingPage = () => {
   const rejectedOrgs = organizations.filter((o) => o.status === 'rejected');
   const selectedOrg = organizations.find((o) => o._id === selectedOrgId) || approvedOrgs[0];
 
+  const allApplicants = jobListings.flatMap((job) =>
+    (job.applicants || []).map((app) => ({
+      ...app,
+      jobId: job._id,
+      jobTitle: job.title,
+      company: job.company,
+      companyLogo: job.companyLogo,
+    }))
+  );
+
+  const filteredApplicants = allApplicants.filter((cand) => {
+    const candidateName = cand.name || `${cand.applicantId?.firstName || ''} ${cand.applicantId?.lastName || ''}`.trim();
+    const candidateHeadline = cand.headline || cand.applicantId?.headline || '';
+    const candidateEmail = cand.email || cand.applicantId?.email || '';
+
+    const matchesQuery =
+      !candidateSearch ||
+      candidateName.toLowerCase().includes(candidateSearch.toLowerCase()) ||
+      candidateHeadline.toLowerCase().includes(candidateSearch.toLowerCase()) ||
+      candidateEmail.toLowerCase().includes(candidateSearch.toLowerCase()) ||
+      cand.jobTitle?.toLowerCase().includes(candidateSearch.toLowerCase());
+
+    const matchesStatus =
+      candidateStatusFilter === 'all' || cand.status === candidateStatusFilter;
+
+    const matchesJob =
+      !candidateJobFilter || cand.jobId === candidateJobFilter;
+
+    return matchesQuery && matchesStatus && matchesJob;
+  });
+
   return (
     <div className="jobPostingPageWrapper">
       {/* Toast Notification */}
@@ -417,6 +529,15 @@ const JobPostingPage = () => {
             aria-label="Post a Job"
           >
             <FaPlus size={12} /> <span className="tabLabel">Post a Job</span>
+          </button>
+          <button
+            type="button"
+            className={`tabBtn ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+            title={`Recruiter Dashboard (${allApplicants.length} Candidates)`}
+            aria-label={`Recruiter Dashboard (${allApplicants.length} Candidates)`}
+          >
+            <FaUsers size={12} /> <span className="tabLabel">Recruiter Dashboard ({allApplicants.length})</span>
           </button>
           <button
             type="button"
@@ -656,6 +777,271 @@ const JobPostingPage = () => {
                     </button>
                   </div>
                 </form>
+              )}
+            </div>
+          )}
+
+          {/* TAB: RECRUITER DASHBOARD */}
+          {activeTab === 'dashboard' && (
+            <div className="recruiterDashboardPanel">
+              <div className="manageHeaderRow">
+                <div>
+                  <h3>Recruiter Command Hub</h3>
+                  <p>Real-time applicant tracking pipeline, candidate review, and hiring funnel across your positions.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="postPrimaryActionBtn"
+                    onClick={() => setActiveTab('post')}
+                  >
+                    <FaPlus size={12} /> <span>Post Opening</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="postPrimaryActionBtn secondary"
+                    onClick={() => setActiveTab('manage')}
+                    style={{ background: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                  >
+                    <FaBriefcase size={12} /> <span>Manage ({jobListings.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Summary Cards */}
+              <div className="recruiterKpiGrid">
+                <div className="recruiterKpiCard">
+                  <div className="recruiterKpiIcon kpiBlue">
+                    <FaBriefcase size={18} />
+                  </div>
+                  <div className="recruiterKpiInfo">
+                    <span className="recruiterKpiValue">{jobListings.filter(j => j.isActive).length}</span>
+                    <span className="recruiterKpiLabel">Active Openings</span>
+                  </div>
+                </div>
+
+                <div className="recruiterKpiCard">
+                  <div className="recruiterKpiIcon kpiIndigo">
+                    <FaUsers size={18} />
+                  </div>
+                  <div className="recruiterKpiInfo">
+                    <span className="recruiterKpiValue">{allApplicants.length}</span>
+                    <span className="recruiterKpiLabel">Total Applicants</span>
+                  </div>
+                </div>
+
+                <div className="recruiterKpiCard">
+                  <div className="recruiterKpiIcon kpiAmber">
+                    <FaClock size={18} />
+                  </div>
+                  <div className="recruiterKpiInfo">
+                    <span className="recruiterKpiValue">
+                      {allApplicants.filter(a => a.status === 'In Review').length}
+                    </span>
+                    <span className="recruiterKpiLabel">In Review</span>
+                  </div>
+                </div>
+
+                <div className="recruiterKpiCard">
+                  <div className="recruiterKpiIcon kpiPurple">
+                    <FaUserCheck size={18} />
+                  </div>
+                  <div className="recruiterKpiInfo">
+                    <span className="recruiterKpiValue">
+                      {allApplicants.filter(a => a.status === 'Shortlisted').length}
+                    </span>
+                    <span className="recruiterKpiLabel">Shortlisted</span>
+                  </div>
+                </div>
+
+                <div className="recruiterKpiCard">
+                  <div className="recruiterKpiIcon kpiEmerald">
+                    <FaCheckCircle size={18} />
+                  </div>
+                  <div className="recruiterKpiInfo">
+                    <span className="recruiterKpiValue">
+                      {allApplicants.filter(a => a.status === 'Hired').length}
+                    </span>
+                    <span className="recruiterKpiLabel">Hired</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter & Search Bar */}
+              <div className="recruiterFilterBar">
+                <div className="recruiterSearchBox">
+                  <FaSearch size={14} color="#94a3b8" />
+                  <input
+                    type="text"
+                    placeholder="Search applicants by name, role, or email..."
+                    value={candidateSearch}
+                    onChange={(e) => setCandidateSearch(e.target.value)}
+                  />
+                </div>
+
+                <div className="recruiterFilterGroup">
+                  <label htmlFor="recruiterStatusFilter"><FaFilter size={12} /> Status:</label>
+                  <select
+                    id="recruiterStatusFilter"
+                    value={candidateStatusFilter}
+                    onChange={(e) => setCandidateStatusFilter(e.target.value)}
+                  >
+                    <option value="all">All Statuses ({allApplicants.length})</option>
+                    <option value="Applied">Applied ({allApplicants.filter(a => a.status === 'Applied').length})</option>
+                    <option value="In Review">In Review ({allApplicants.filter(a => a.status === 'In Review').length})</option>
+                    <option value="Shortlisted">Shortlisted ({allApplicants.filter(a => a.status === 'Shortlisted').length})</option>
+                    <option value="Hired">Hired ({allApplicants.filter(a => a.status === 'Hired').length})</option>
+                    <option value="Rejected">Rejected ({allApplicants.filter(a => a.status === 'Rejected').length})</option>
+                  </select>
+
+                  {jobListings.length > 1 && (
+                    <select
+                      value={candidateJobFilter}
+                      onChange={(e) => setCandidateJobFilter(e.target.value)}
+                    >
+                      <option value="">All Positions</option>
+                      {jobListings.map(j => (
+                        <option key={j._id} value={j._id}>{j.title}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+
+              {/* Candidates Pipeline List */}
+              {filteredApplicants.length === 0 ? (
+                <div className="noListingsCard">
+                  <FaUsers size={40} color="#94a3b8" />
+                  <h4>No applicants found</h4>
+                  <p>
+                    {allApplicants.length === 0
+                      ? 'You have not received any applications on your posted jobs yet.'
+                      : 'No candidates match your current search and filter criteria.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="recruiterCandidatesTable">
+                  <div className="recruiterTableHeader">
+                    <span>Candidate</span>
+                    <span>Applied Role</span>
+                    <span>Applied Date</span>
+                    <span>Current Status</span>
+                    <span>Recruiter Action</span>
+                  </div>
+
+                  {filteredApplicants.map((cand) => {
+                    const applicantObj = cand.applicantId;
+                    const username = applicantObj?.username || cand.username;
+                    const profileUrl = username ? `/profile/${encodeURIComponent(username)}` : null;
+                    const avatarUrl = applicantObj?.profilePicture?.url;
+                    const isCandidateVerified = applicantObj?.isVerified;
+                    const institute = applicantObj?.institute;
+                    const candidateId = cand._id || applicantObj?._id;
+
+                    return (
+                      <div key={cand._id || candidateId} className="recruiterCandidateRow">
+                        {/* Candidate info */}
+                        <div className="candProfileCell">
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt={cand.name} className="candAvatarImg" />
+                          ) : (
+                            <div className="candAvatarFallback">
+                              {(cand.name || 'C').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="candTextGroup">
+                            <div className="candNameRow">
+                              {profileUrl ? (
+                                <Link to={profileUrl} className="candNameLink">
+                                  {cand.name}
+                                </Link>
+                              ) : (
+                                <strong className="candNameText">{cand.name}</strong>
+                              )}
+                              {isCandidateVerified && (
+                                <MdVerified className="verified-icon" size={14} title="Verified Arcturus Account" />
+                              )}
+                            </div>
+                            <span className="candHeadlineText">{cand.headline || 'Arcturus Member'}</span>
+                            {institute?.organizationId && (
+                              <Link
+                                to={`/company/${institute.organizationId.slug || institute.organizationId._id}`}
+                                className="candInstituteBadge"
+                                title={`Student at ${institute.organizationId.name || institute.name}`}
+                              >
+                                {institute.organizationId.logo?.url ? (
+                                  <img src={institute.organizationId.logo.url} alt="" className="miniBadgeLogo" />
+                                ) : (
+                                  <FaUniversity size={10} />
+                                )}
+                                <span>{institute.organizationId.name || institute.name}</span>
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Applied Role */}
+                        <div className="candRoleCell">
+                          <strong>{cand.jobTitle}</strong>
+                          <span>{cand.company}</span>
+                        </div>
+
+                        {/* Applied Date */}
+                        <div className="candDateCell">
+                          <FaClock size={11} color="#94a3b8" />
+                          <span>{new Date(cand.appliedAt).toLocaleDateString()}</span>
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="candStatusCell">
+                          <span className={`statusPill status_${(cand.status || 'Applied').toLowerCase().replace(/\s+/g, '')}`}>
+                            {cand.status || 'Applied'}
+                          </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="candActionsCell">
+                          <select
+                            className="candStatusSelect"
+                            value={cand.status || 'Applied'}
+                            disabled={updatingApplicantId === candidateId}
+                            onChange={(e) => handleUpdateCandidateStatus(cand.jobId, candidateId, e.target.value)}
+                          >
+                            <option value="Applied">Applied</option>
+                            <option value="In Review">In Review</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+
+                          {cand.status !== 'Shortlisted' && cand.status !== 'Hired' && (
+                            <button
+                              type="button"
+                              className="candQuickActionBtn shortlist"
+                              title="Shortlist Candidate"
+                              disabled={updatingApplicantId === candidateId}
+                              onClick={() => handleUpdateCandidateStatus(cand.jobId, candidateId, 'Shortlisted')}
+                            >
+                              <FaCheck size={11} /> Shortlist
+                            </button>
+                          )}
+
+                          {cand.status === 'Shortlisted' && (
+                            <button
+                              type="button"
+                              className="candQuickActionBtn hire"
+                              title="Mark as Hired"
+                              disabled={updatingApplicantId === candidateId}
+                              onClick={() => handleUpdateCandidateStatus(cand.jobId, candidateId, 'Hired')}
+                            >
+                              <FaCheckCircle size={11} /> Hire
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}

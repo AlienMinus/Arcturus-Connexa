@@ -3,6 +3,7 @@ import Organization from '../models/Organization.js';
 import User from '../models/User.js';
 import Job from '../models/Job.js';
 import Post from '../models/Post.js';
+import VerificationRequest from '../models/VerificationRequest.js';
 import authMiddleware from '../middleware/auth.js';
 import adminMiddleware from '../middleware/admin.js';
 
@@ -17,19 +18,25 @@ router.get('/stats', async (req, res) => {
   try {
     const [
       totalUsers,
+      verifiedUsers,
       totalOrganizations,
       pendingOrganizations,
       approvedOrganizations,
       rejectedOrganizations,
+      pendingVerifications,
+      totalVerifications,
       totalJobs,
       activeJobs,
       totalPosts,
     ] = await Promise.all([
       User.countDocuments(),
+      User.countDocuments({ isVerified: true }),
       Organization.countDocuments(),
       Organization.countDocuments({ status: 'pending' }),
       Organization.countDocuments({ status: 'approved' }),
       Organization.countDocuments({ status: 'rejected' }),
+      VerificationRequest.countDocuments({ status: 'pending' }),
+      VerificationRequest.countDocuments(),
       Job.countDocuments(),
       Job.countDocuments({ isActive: true }),
       Post.countDocuments(),
@@ -45,10 +52,13 @@ router.get('/stats', async (req, res) => {
     res.json({
       metrics: {
         totalUsers,
+        verifiedUsers,
         totalOrganizations,
         pendingOrganizations,
         approvedOrganizations,
         rejectedOrganizations,
+        pendingVerifications,
+        totalVerifications,
         totalJobs,
         activeJobs,
         totalPosts,

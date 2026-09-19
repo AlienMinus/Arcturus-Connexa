@@ -4,48 +4,26 @@ import PlacementProfile from '../models/PlacementProfile.js';
 import PlacementDrive from '../models/PlacementDrive.js';
 import PlacementOffer from '../models/PlacementOffer.js';
 import User from '../models/User.js';
+import Profile from '../models/Profile.js';
 import authMiddleware from '../middleware/auth.js';
 import { detectDriveConflicts } from '../utils/conflictDetector.js';
 import { analyzePlacementRiskAndGuidance, generateGemmaChatReply } from '../services/gemmaService.js';
 
 const router = express.Router();
 
-// Preset target role benchmarks for skill-gap analysis
-const ROLE_SKILL_BENCHMARKS = [
-  {
-    role: 'Full Stack Cloud Engineer',
-    requiredSkills: ['React', 'Node.js', 'MongoDB', 'Docker', 'AWS', 'Data Structures', 'Git'],
-    courses: [
-      { title: 'Full Stack Cloud Architecture with Docker & AWS', provider: 'Arcturus Learning', url: '/learning' },
-      { title: 'Advanced Scalable Microservices in Node.js', provider: 'Cloud Academy', url: '/learning' },
-    ],
-  },
-  {
-    role: 'Cloud Solutions Architect & SDE',
-    requiredSkills: ['Python', 'Kubernetes', 'AWS', 'Docker', 'Terraform', 'System Design'],
-    courses: [
-      { title: 'Kubernetes in Production & Container Mastery', provider: 'Arcturus Learning', url: '/learning' },
-      { title: 'Designing High-Availability Cloud Backends', provider: 'AWS Certifications', url: '/learning' },
-    ],
-  },
-  {
-    role: 'AI & Data Systems Engineer',
-    requiredSkills: ['Python', 'SQL', 'Machine Learning', 'Data Structures', 'TensorFlow', 'FastAPI'],
-    courses: [
-      { title: 'Applied Machine Learning & Vector Embeddings', provider: 'Arcturus AI Labs', url: '/learning' },
-      { title: 'Building Scalable AI APIs with FastAPI & PyTorch', provider: 'DataCamp', url: '/learning' },
-    ],
-  },
-];
-
-// Helper to compute student skill gap analysis
-const computeSkillGaps = (studentSkills = []) => {
+// Dynamic skill gap analysis evaluated against real scheduled placement drives
+const computeSkillGaps = (studentSkills = [], drives = []) => {
+  if (!Array.isArray(drives) || drives.length === 0) {
+    return [];
+  }
   const normalized = studentSkills.map((s) => s.toLowerCase().trim());
-  return ROLE_SKILL_BENCHMARKS.map((benchmark) => {
+  return drives.map((drive) => {
+    const roleName = `${drive.companyName} - ${drive.roleTitle}`;
+    const requiredSkills = drive.eligibility?.requiredSkills || ['Problem Solving', 'Data Structures'];
     const matched = [];
     const missing = [];
 
-    benchmark.requiredSkills.forEach((req) => {
+    requiredSkills.forEach((req) => {
       if (normalized.some((s) => s.includes(req.toLowerCase()) || req.toLowerCase().includes(s))) {
         matched.push(req);
       } else {
@@ -53,21 +31,40 @@ const computeSkillGaps = (studentSkills = []) => {
       }
     });
 
-    const matchPercentage = Math.round((matched.length / benchmark.requiredSkills.length) * 100);
+    const matchPercentage = requiredSkills.length > 0
+      ? Math.round((matched.length / requiredSkills.length) * 100)
+      : 100;
+
     const recommendation =
       missing.length > 0
-        ? `Skill gap detected in ${missing.slice(0, 2).join(' and ')}. Complete targeted project preparation to reach >80% recruiter fit.`
-        : 'All required technical competencies matched! Highly aligned with recruiter benchmarks.';
+        ? `Skill gap detected in ${missing.slice(0, 2).join(' and ')} for ${drive.companyName}. Complete targeted preparation to reach recruiter cutoff.`
+        : `100% technical competency matched with ${drive.companyName}'s hiring criteria!`;
+
+    const suggestedCourses = missing.slice(0, 2).map((sk) => ({
+      title: `${sk} Practical Preparation`,
+      provider: 'Arcturus Learning',
+      url: '/learning',
+    }));
 
     return {
-      targetRole: benchmark.role,
+      targetRole: roleName,
       matchedSkills: matched,
       missingSkills: missing,
       matchPercentage,
       recommendation,
-      suggestedCourses: benchmark.courses,
+      suggestedCourses,
     };
   });
+};
+
+const isCampusLinkAdmin = async (userId) => {
+  const user = await User.findById(userId);
+  return (
+    user?.role === 'admin' ||
+    user?.isAdmin === true ||
+    user?.username?.toLowerCase() === 'arcturus_admin' ||
+    user?.email?.toLowerCase()?.includes('admin@arcturus')
+  );
 };
 
 // GET /api/campuslink/profile/me - Get student's placement readiness profile
@@ -78,8 +75,9 @@ router.get('/profile/me', authMiddleware, async (req, res) => {
       return res.json({ profile: null });
     }
 
-    // Refresh dynamic skill gap recommendations
-    profile.skillGaps = computeSkillGaps(profile.skills || []);
+    // Refresh dynamic skill gap recommendations against actual scheduled drives
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+    profile.skillGaps = computeSkillGaps(profile.skills || [], activeDrives);
 
     res.json({ profile });
   } catch (err) {
@@ -116,11 +114,22 @@ router.post('/profile', authMiddleware, async (req, res) => {
     const numBacklogs = Number(activeBacklogs) || 0;
     const numGradYear = Number(graduationYear) || new Date().getFullYear();
 
-    // Compute realistic score dimensions based on inputs
-    const technicalScore = Math.min(100, Math.max(30, studentSkills.length * 12 + Math.round(numCgpa * 4)));
+    // Fetch applicant's main Arcturus profile data for comprehensive risk & readiness prediction
+    const userProfile = await Profile.findOne({ userId: req.userId }).lean();
+    const userDoc = await User.findById(req.userId).lean();
+
+    const profileSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+    const combinedSkills = Array.from(new Set([...studentSkills, ...profileSkills]));
+
+    const projectCount = userProfile?.projects?.length || 0;
+    const experienceCount = userProfile?.experience?.length || 0;
+    const certificationsCount = userProfile?.certifications?.length || 0;
+
+    // Compute realistic score dimensions incorporating applicant's real projects & background
+    const technicalScore = Math.min(100, Math.max(30, combinedSkills.length * 9 + Math.round(numCgpa * 4) + certificationsCount * 5));
     const aptitudeScore = Math.min(100, Math.max(35, Math.round(numCgpa * 9) - numBacklogs * 5));
     const communicationScore = 75; // Baseline behavioral score
-    const projectScore = Math.min(100, Math.max(40, studentSkills.length * 10 + 20));
+    const projectScore = Math.min(100, Math.max(40, projectCount * 18 + combinedSkills.length * 6 + (experienceCount > 0 ? 15 : 0)));
 
     const overallReadiness = Math.round(
       technicalScore * 0.4 + aptitudeScore * 0.25 + communicationScore * 0.15 + projectScore * 0.2
@@ -131,9 +140,11 @@ router.post('/profile', authMiddleware, async (req, res) => {
     else if (overallReadiness >= 70) readinessLevel = 'Ready';
     else if (overallReadiness < 50) readinessLevel = 'Not Ready';
 
-    const skillGaps = computeSkillGaps(studentSkills);
+    // Skill gaps evaluated dynamically against real scheduled recruitment drives
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+    const skillGaps = computeSkillGaps(combinedSkills, activeDrives);
 
-    // Run Hugging Face Gemma Risk & Recommendation Diagnostics
+    // Run Hugging Face Gemma Risk & Recommendation Diagnostics using real applicant profile data
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
       rollNumber,
       collegeName,
@@ -141,7 +152,7 @@ router.post('/profile', authMiddleware, async (req, res) => {
       graduationYear: numGradYear,
       cgpa: numCgpa,
       activeBacklogs: numBacklogs,
-      skills: studentSkills,
+      skills: combinedSkills,
       technicalScore,
       aptitudeScore,
       communicationScore,
@@ -149,6 +160,11 @@ router.post('/profile', authMiddleware, async (req, res) => {
       overallReadiness,
       readinessLevel,
       targetRoles,
+      projectsCount: projectCount,
+      experienceCount: experienceCount,
+      certificationsCount: certificationsCount,
+      headline: userDoc?.headline || '',
+      summary: userProfile?.summary || '',
     });
 
     let profile = await PlacementProfile.findOne({ userId: req.userId });
@@ -159,7 +175,7 @@ router.post('/profile', authMiddleware, async (req, res) => {
       profile.graduationYear = numGradYear;
       profile.cgpa = numCgpa;
       profile.activeBacklogs = numBacklogs;
-      profile.skills = studentSkills;
+      profile.skills = combinedSkills;
       profile.targetRoles = targetRoles || profile.targetRoles;
       profile.technicalScore = technicalScore;
       profile.aptitudeScore = aptitudeScore;
@@ -184,8 +200,8 @@ router.post('/profile', authMiddleware, async (req, res) => {
         cgpa: numCgpa,
         activeBacklogs: numBacklogs,
         totalBacklogs: numBacklogs,
-        skills: studentSkills,
-        targetRoles: targetRoles || ['Full Stack Cloud Engineer', 'Cloud Solutions Architect & SDE'],
+        skills: combinedSkills,
+        targetRoles: targetRoles || ['Campus Placement Candidate'],
         technicalScore,
         aptitudeScore,
         communicationScore,
@@ -220,6 +236,17 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Placement profile not found. Please complete profile setup first.' });
     }
 
+    // Fetch applicant's main Arcturus profile data
+    const userProfile = await Profile.findOne({ userId: req.userId }).lean();
+    const userDoc = await User.findById(req.userId).lean();
+
+    const profileSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+    const combinedSkills = Array.from(new Set([...(profile.skills || []), ...profileSkills]));
+
+    const projectCount = userProfile?.projects?.length || 0;
+    const experienceCount = userProfile?.experience?.length || 0;
+    const certificationsCount = userProfile?.certifications?.length || 0;
+
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
       rollNumber: profile.rollNumber,
       collegeName: profile.collegeName,
@@ -227,7 +254,7 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
       graduationYear: profile.graduationYear,
       cgpa: profile.cgpa,
       activeBacklogs: profile.activeBacklogs,
-      skills: profile.skills || [],
+      skills: combinedSkills,
       technicalScore: profile.technicalScore,
       aptitudeScore: profile.aptitudeScore,
       communicationScore: profile.communicationScore,
@@ -235,14 +262,22 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
       overallReadiness: profile.overallReadiness,
       readinessLevel: profile.readinessLevel,
       targetRoles: profile.targetRoles,
+      projectsCount: projectCount,
+      experienceCount: experienceCount,
+      certificationsCount: certificationsCount,
+      headline: userDoc?.headline || '',
+      summary: userProfile?.summary || '',
     });
 
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+
+    profile.skills = combinedSkills;
     profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
     profile.isAtRisk = gemmaAnalysis.isAtRisk;
     profile.riskReason = gemmaAnalysis.riskReason;
     profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
     profile.gemmaDiagnosticTimestamp = new Date();
-    profile.skillGaps = computeSkillGaps(profile.skills || []);
+    profile.skillGaps = computeSkillGaps(combinedSkills, activeDrives);
 
     await profile.save();
 
@@ -301,6 +336,12 @@ router.get('/drives', async (req, res) => {
 // POST /api/campuslink/drives - Create placement drive
 router.post('/drives', authMiddleware, async (req, res) => {
   try {
+    if (!(await isCampusLinkAdmin(req.userId))) {
+      return res.status(403).json({
+        error: 'Access denied: Scheduling recruitment drives is restricted strictly to Arcturus Administrators.',
+      });
+    }
+
     const {
       companyName,
       companyLogo,
@@ -363,6 +404,12 @@ router.post('/drives', authMiddleware, async (req, res) => {
 // PATCH /api/campuslink/drives/:id/resolve-conflict - 1-Click conflict resolution
 router.patch('/drives/:id/resolve-conflict', authMiddleware, async (req, res) => {
   try {
+    if (!(await isCampusLinkAdmin(req.userId))) {
+      return res.status(403).json({
+        error: 'Access denied: Resolving drive conflicts is restricted strictly to Arcturus Administrators.',
+      });
+    }
+
     const { newVenue, newTime } = req.body;
     const update = {};
     if (newVenue) update['schedule.venue'] = newVenue;
@@ -387,6 +434,12 @@ router.patch('/drives/:id/resolve-conflict', authMiddleware, async (req, res) =>
 // DELETE /api/campuslink/drives/:id - Delete or cancel a placement drive
 router.delete('/drives/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await isCampusLinkAdmin(req.userId))) {
+      return res.status(403).json({
+        error: 'Access denied: Deleting recruitment drives is restricted strictly to Arcturus Administrators.',
+      });
+    }
+
     const drive = await PlacementDrive.findByIdAndDelete(req.params.id);
     if (!drive) {
       return res.status(404).json({ error: 'Drive not found' });

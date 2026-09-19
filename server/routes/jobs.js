@@ -55,6 +55,11 @@ router.get('/my-listings', authMiddleware, async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .populate('organizationId', 'name logo slug status')
+      .populate({
+        path: 'applicants.applicantId',
+        select: 'firstName lastName username headline profilePicture location institute isVerified',
+        populate: { path: 'institute.organizationId', select: 'name logo slug' },
+      })
       .lean();
 
     res.json({ jobs });
@@ -240,6 +245,66 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Failed to delete job posting:', err);
     res.status(500).json({ error: 'Failed to delete listing' });
+  }
+});
+
+// PATCH /api/jobs/:id/applicants/:applicantId/status - Update candidate application status (Recruiter only)
+router.patch('/:id/applicants/:applicantId/status', authMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['Applied', 'In Review', 'Shortlisted', 'Rejected', 'Hired'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ error: 'Job opening not found' });
+    }
+
+    // Check recruiter authorization
+    const userOrgs = await Organization.find({
+      $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+    }).select('_id');
+    const orgIds = userOrgs.map((o) => o._id.toString());
+
+    const isAuthorized =
+      (job.recruiterId && job.recruiterId.toString() === req.userId) ||
+      (job.organizationId && orgIds.includes(job.organizationId.toString()));
+
+    if (!isAuthorized) {
+      return res.status(403).json({ error: 'Not authorized to manage candidates for this job listing.' });
+    }
+
+    const applicant = job.applicants.find(
+      (a) => a._id?.toString() === req.params.applicantId || a.applicantId?.toString() === req.params.applicantId
+    );
+
+    if (!applicant) {
+      return res.status(404).json({ error: 'Candidate application record not found' });
+    }
+
+    applicant.status = status;
+    await job.save();
+
+    // Push notification to applicant
+    if (applicant.applicantId) {
+      await User.findByIdAndUpdate(applicant.applicantId, {
+        $push: {
+          notifications: {
+            type: 'other',
+            message: `💼 Application Status Update: Your application for "${job.title}" at ${job.company} has been updated to "${status}".`,
+            read: false,
+            createdAt: new Date(),
+          },
+        },
+      });
+    }
+
+    res.json({ message: `Applicant status updated to ${status}!`, job });
+  } catch (err) {
+    console.error('Failed to update candidate status:', err);
+    res.status(500).json({ error: 'Failed to update candidate status' });
   }
 });
 

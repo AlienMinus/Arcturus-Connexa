@@ -15,6 +15,7 @@ import search from './search.js';
 import ads from './ads.js';
 import campuslink from './campuslink.js';
 import learning from './learning.js';
+import verification from './verification.js';
 
 const router = express.Router();
 
@@ -38,5 +39,6 @@ router.use('/search', search);
 router.use('/ads', ads);
 router.use('/campuslink', campuslink);
 router.use('/learning', learning);
+router.use('/verification', verification);
 
 export default router;
