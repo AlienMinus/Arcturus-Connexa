@@ -38,7 +38,7 @@ const COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Vocal Melody & Pitch',
@@ -106,7 +106,7 @@ const COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Subtext Listening',
@@ -167,7 +167,7 @@ const COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Executive Presence',
@@ -228,7 +228,7 @@ const COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'The CLEAR Framework',
