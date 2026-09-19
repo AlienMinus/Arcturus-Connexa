@@ -332,6 +332,70 @@
   .appStepperTrack { min-width: 330px; }
 }
 
+/* Account preferences dashboard widgets */
+.profileDashboardWidgets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.dashboardWidgetCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.dashboardWidgetCard:hover {
+  background: #ffffff;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.widgetIconBox {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+}
+
+.appWidgetIcon { color: #0a66c2; background: #dbeafe; }
+.orgWidgetIcon { color: #7c3aed; background: #ede9fe; }
+.widgetDetails { min-width: 0; }
+.widgetDetails h4 { margin: 0; color: #1e293b; font-size: 0.88rem; font-weight: 700; }
+.widgetDetails p { margin: 4px 0 0; overflow: hidden; color: #64748b; font-size: 0.76rem; line-height: 1.35; text-overflow: ellipsis; }
+
+.widgetActionBtn {
+  padding: 7px 9px;
+  color: #0a66c2;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.widgetActionBtn:hover { background: #eff6ff; border-color: #93c5fd; }
+
+@media (max-width: 760px) {
+  .profileDashboardWidgets { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .dashboardWidgetCard { grid-template-columns: auto minmax(0, 1fr); }
+  .widgetActionBtn { grid-column: 2; justify-self: start; }
+}
+
 .settingsTopBar {
   display: flex;
   align-items: center;
