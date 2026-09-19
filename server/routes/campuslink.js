@@ -67,6 +67,47 @@ const isCampusLinkAdmin = async (userId) => {
   );
 };
 
+// Helper to extract and import all candidate individual profile data from Arcturus Profile & User models
+const getFullCandidateProfile = async (userId) => {
+  if (!userId) return null;
+  try {
+    const [userDoc, userProfile] = await Promise.all([
+      User.findById(userId).populate('institute.organizationId', 'name logo slug').lean(),
+      Profile.findOne({ userId }).lean(),
+    ]);
+
+    if (!userDoc && !userProfile) return null;
+
+    const fullName = [userDoc?.firstName, userDoc?.middleName, userDoc?.lastName]
+      .filter(Boolean)
+      .join(' ') || userProfile?.name || userDoc?.name || userDoc?.username || '';
+
+    return {
+      userId,
+      fullName,
+      username: userDoc?.username || '',
+      email: userDoc?.email || '',
+      avatar: userProfile?.avatar?.url || userDoc?.profilePicture || null,
+      headline: userProfile?.headline || userDoc?.headline || '',
+      summary: userProfile?.summary || '',
+      location: userProfile?.location || '',
+      projects: Array.isArray(userProfile?.projects) ? userProfile.projects : [],
+      experience: Array.isArray(userProfile?.experience) ? userProfile.experience : [],
+      certifications: Array.isArray(userProfile?.certifications) ? userProfile.certifications : [],
+      education: Array.isArray(userProfile?.education) ? userProfile.education : [],
+      skills: Array.isArray(userProfile?.skills) ? userProfile.skills : [],
+      honors: Array.isArray(userProfile?.honors) ? userProfile.honors : [],
+      interests: Array.isArray(userProfile?.interests) ? userProfile.interests : [],
+      featured: Array.isArray(userProfile?.featured) ? userProfile.featured : [],
+      institute: userDoc?.institute || null,
+      isVerified: Boolean(userDoc?.isVerified),
+    };
+  } catch (err) {
+    console.error('Failed to import full candidate profile for user', userId, err);
+    return null;
+  }
+};
+
 // GET /api/campuslink/profile/me - Get student's placement readiness profile
 router.get('/profile/me', authMiddleware, async (req, res) => {
   try {
@@ -78,6 +119,10 @@ router.get('/profile/me', authMiddleware, async (req, res) => {
     // Refresh dynamic skill gap recommendations against actual scheduled drives
     const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
     profile.skillGaps = computeSkillGaps(profile.skills || [], activeDrives);
+
+    // Import full candidate individual profile data (projects, experiences, certifications)
+    const candidateProfile = await getFullCandidateProfile(req.userId);
+    profile.candidateProfile = candidateProfile;
 
     res.json({ profile });
   } catch (err) {
@@ -114,22 +159,21 @@ router.post('/profile', authMiddleware, async (req, res) => {
     const numBacklogs = Number(activeBacklogs) || 0;
     const numGradYear = Number(graduationYear) || new Date().getFullYear();
 
-    // Fetch applicant's main Arcturus profile data for comprehensive risk & readiness prediction
-    const userProfile = await Profile.findOne({ userId: req.userId }).lean();
-    const userDoc = await User.findById(req.userId).lean();
+    // Import complete candidate profile data from Arcturus Profile page
+    const candidateProfile = await getFullCandidateProfile(req.userId);
 
-    const profileSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+    const profileSkills = candidateProfile?.skills || [];
     const combinedSkills = Array.from(new Set([...studentSkills, ...profileSkills]));
 
-    const projectCount = userProfile?.projects?.length || 0;
-    const experienceCount = userProfile?.experience?.length || 0;
-    const certificationsCount = userProfile?.certifications?.length || 0;
+    const projectCount = candidateProfile?.projects?.length || 0;
+    const experienceCount = candidateProfile?.experience?.length || 0;
+    const certificationsCount = candidateProfile?.certifications?.length || 0;
 
-    // Compute realistic score dimensions incorporating applicant's real projects & background
-    const technicalScore = Math.min(100, Math.max(30, combinedSkills.length * 9 + Math.round(numCgpa * 4) + certificationsCount * 5));
+    // Compute realistic score dimensions incorporating applicant's real projects, descriptions & background
+    const technicalScore = Math.min(100, Math.max(30, combinedSkills.length * 8 + Math.round(numCgpa * 4) + certificationsCount * 5));
     const aptitudeScore = Math.min(100, Math.max(35, Math.round(numCgpa * 9) - numBacklogs * 5));
     const communicationScore = 75; // Baseline behavioral score
-    const projectScore = Math.min(100, Math.max(40, projectCount * 18 + combinedSkills.length * 6 + (experienceCount > 0 ? 15 : 0)));
+    const projectScore = Math.min(100, Math.max(40, projectCount * 18 + combinedSkills.length * 5 + (experienceCount > 0 ? 15 : 0)));
 
     const overallReadiness = Math.round(
       technicalScore * 0.4 + aptitudeScore * 0.25 + communicationScore * 0.15 + projectScore * 0.2
@@ -144,7 +188,7 @@ router.post('/profile', authMiddleware, async (req, res) => {
     const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
     const skillGaps = computeSkillGaps(combinedSkills, activeDrives);
 
-    // Run Hugging Face Gemma Risk & Recommendation Diagnostics using real applicant profile data
+    // Run Hugging Face Gemma Risk & Recommendation Diagnostics using imported candidate profile data
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
       rollNumber,
       collegeName,
@@ -160,11 +204,18 @@ router.post('/profile', authMiddleware, async (req, res) => {
       overallReadiness,
       readinessLevel,
       targetRoles,
-      projectsCount: projectCount,
-      experienceCount: experienceCount,
-      certificationsCount: certificationsCount,
-      headline: userDoc?.headline || '',
-      summary: userProfile?.summary || '',
+      // Full candidate profile portfolio imported from Arcturus Profile page
+      headline: candidateProfile?.headline || '',
+      summary: candidateProfile?.summary || '',
+      location: candidateProfile?.location || '',
+      projects: candidateProfile?.projects || [],
+      experience: candidateProfile?.experience || [],
+      certifications: candidateProfile?.certifications || [],
+      education: candidateProfile?.education || [],
+      honors: candidateProfile?.honors || [],
+      interests: candidateProfile?.interests || [],
+      featured: candidateProfile?.featured || [],
+      isVerified: Boolean(candidateProfile?.isVerified),
     });
 
     let profile = await PlacementProfile.findOne({ userId: req.userId });
@@ -217,9 +268,12 @@ router.post('/profile', authMiddleware, async (req, res) => {
       });
     }
 
+    const profileObj = profile.toObject ? profile.toObject() : profile;
+    profileObj.candidateProfile = candidateProfile;
+
     res.json({
       message: 'Placement profile saved and analyzed with Hugging Face Gemma!',
-      profile,
+      profile: profileObj,
       gemmaAnalysis,
     });
   } catch (err) {
@@ -237,15 +291,14 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
     }
 
     // Fetch applicant's main Arcturus profile data
-    const userProfile = await Profile.findOne({ userId: req.userId }).lean();
-    const userDoc = await User.findById(req.userId).lean();
+    const candidateProfile = await getFullCandidateProfile(req.userId);
 
-    const profileSkills = Array.isArray(userProfile?.skills) ? userProfile.skills : [];
+    const profileSkills = candidateProfile?.skills || [];
     const combinedSkills = Array.from(new Set([...(profile.skills || []), ...profileSkills]));
 
-    const projectCount = userProfile?.projects?.length || 0;
-    const experienceCount = userProfile?.experience?.length || 0;
-    const certificationsCount = userProfile?.certifications?.length || 0;
+    const projectCount = candidateProfile?.projects?.length || 0;
+    const experienceCount = candidateProfile?.experience?.length || 0;
+    const certificationsCount = candidateProfile?.certifications?.length || 0;
 
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
       rollNumber: profile.rollNumber,
@@ -262,11 +315,18 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
       overallReadiness: profile.overallReadiness,
       readinessLevel: profile.readinessLevel,
       targetRoles: profile.targetRoles,
-      projectsCount: projectCount,
-      experienceCount: experienceCount,
-      certificationsCount: certificationsCount,
-      headline: userDoc?.headline || '',
-      summary: userProfile?.summary || '',
+      // Full candidate profile portfolio imported from Arcturus Profile page
+      headline: candidateProfile?.headline || '',
+      summary: candidateProfile?.summary || '',
+      location: candidateProfile?.location || '',
+      projects: candidateProfile?.projects || [],
+      experience: candidateProfile?.experience || [],
+      certifications: candidateProfile?.certifications || [],
+      education: candidateProfile?.education || [],
+      honors: candidateProfile?.honors || [],
+      interests: candidateProfile?.interests || [],
+      featured: candidateProfile?.featured || [],
+      isVerified: Boolean(candidateProfile?.isVerified),
     });
 
     const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
@@ -281,9 +341,12 @@ router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
 
     await profile.save();
 
+    const profileObj = profile.toObject();
+    profileObj.candidateProfile = candidateProfile;
+
     res.json({
       message: 'Hugging Face Gemma-2 AI Diagnostics completed successfully!',
-      profile,
+      profile: profileObj,
       gemmaAnalysis,
     });
   } catch (err) {
@@ -461,10 +524,17 @@ router.get('/drives/:id/match', async (req, res) => {
 
     // Evaluate all registered student profiles
     const allProfiles = await PlacementProfile.find().populate('userId', 'firstName lastName email username profilePicture').lean();
+    const userIds = allProfiles.map((p) => p.userId?._id).filter(Boolean);
+    const candidateProfiles = await Profile.find({ userId: { $in: userIds } }).lean();
+    const profileMap = new Map(candidateProfiles.map((cp) => [cp.userId.toString(), cp]));
 
     const rankedCandidates = allProfiles.map((p) => {
       const name = p.userId ? `${p.userId.firstName} ${p.userId.lastName}`.trim() : `Student ${p.rollNumber}`;
       const email = p.userId?.email || `${p.rollNumber.toLowerCase()}@college.edu`;
+      const up = p.userId ? profileMap.get(p.userId._id.toString()) : null;
+
+      const userProjects = Array.isArray(up?.projects) ? up.projects : [];
+      const userExperiences = Array.isArray(up?.experience) ? up.experience : [];
 
       // 1. Check CGPA eligibility
       const meetsCgpa = p.cgpa >= drive.eligibility.minCgpa;
@@ -477,24 +547,38 @@ router.get('/drives/:id/match', async (req, res) => {
         (b) => b.toLowerCase().includes(p.branch.toLowerCase()) || p.branch.toLowerCase().includes(b.toLowerCase())
       );
 
-      // 4. Calculate Skill Match %
-      const studentSkills = (p.skills || []).map((s) => s.toLowerCase());
+      // 4. Calculate Skill & Project Match %
+      const studentSkills = (p.skills || []).concat(up?.skills || []).map((s) => s.toLowerCase());
       const reqSkills = drive.eligibility.requiredSkills || [];
       const matched = reqSkills.filter((r) =>
         studentSkills.some((s) => s.includes(r.toLowerCase()) || r.toLowerCase().includes(s))
       );
       const skillScore = reqSkills.length > 0 ? (matched.length / reqSkills.length) * 100 : 80;
 
+      // Check for matching projects in candidate's profile
+      const matchingProject = userProjects.find((proj) =>
+        (proj.techStack || []).some((tech) =>
+          reqSkills.some((req) => req.toLowerCase().includes(tech.toLowerCase()) || tech.toLowerCase().includes(req.toLowerCase()))
+        )
+      );
+
+      // Project boost factor (up to 10 points for candidate with relevant practical projects)
+      const projectBonus = matchingProject ? 10 : userProjects.length > 0 ? 5 : 0;
+
       // 5. Readiness benchmark factor
       const readinessFactor = Math.min(100, (p.overallReadiness / (drive.eligibility.minReadinessScore || 70)) * 100);
 
       // Total Fit Score Calculation
-      const fitScore = Math.round(
-        (meetsCgpa ? 30 : 5) +
-        (meetsBacklogs ? 15 : 0) +
-        (meetsBranch ? 15 : 5) +
-        (skillScore * 0.25) +
-        (readinessFactor * 0.15)
+      const fitScore = Math.min(
+        100,
+        Math.round(
+          (meetsCgpa ? 25 : 5) +
+          (meetsBacklogs ? 15 : 0) +
+          (meetsBranch ? 15 : 5) +
+          (skillScore * 0.25) +
+          (readinessFactor * 0.15) +
+          projectBonus
+        )
       );
 
       const isEligible = meetsCgpa && meetsBacklogs && meetsBranch;
@@ -508,9 +592,15 @@ router.get('/drives/:id/match', async (req, res) => {
       } else if (!meetsBacklogs) {
         fitRationale = `Ineligible: Recruiter policy mandates 0 active backlogs (Student has ${p.activeBacklogs}).`;
       } else if (fitScore >= 80) {
-        fitRationale = `Eligible & Top Match: CGPA (${p.cgpa} >= ${drive.eligibility.minCgpa}) meets cutoff, ${Math.round(skillScore)}% skill match (${matched.slice(0, 3).join(', ')}), and High Employability readiness (${p.overallReadiness}%).`;
+        fitRationale = `Eligible & Top Match: CGPA (${p.cgpa} >= ${drive.eligibility.minCgpa}) meets cutoff, ${Math.round(skillScore)}% skill alignment (${matched.slice(0, 3).join(', ')}), and High Employability readiness (${p.overallReadiness}%).`;
+        if (matchingProject) {
+          fitRationale += ` Features relevant project "${matchingProject.title}" using ${matchingProject.techStack?.slice(0, 3).join(', ')}.`;
+        }
       } else {
         fitRationale = `Moderate Fit: Meets academic criteria, but skill alignment shows gaps in ${reqSkills.filter((r) => !matched.includes(r)).slice(0, 2).join(', ')}.`;
+        if (userProjects.length > 0) {
+          fitRationale += ` Portfolio includes ${userProjects.length} project(s).`;
+        }
       }
 
       return {
@@ -526,6 +616,8 @@ router.get('/drives/:id/match', async (req, res) => {
         status: isEligible && fitScore >= 75 ? 'shortlisted' : 'applied',
         readinessLevel: p.readinessLevel,
         overallReadiness: p.overallReadiness,
+        projectsCount: userProjects.length,
+        experienceCount: userExperiences.length,
       };
     });
 
@@ -742,23 +834,30 @@ router.post('/ai-assistant', async (req, res) => {
 
     // Optional profile if token or profileId is provided
     let profile = null;
+    let candidateData = null;
     if (profileId) {
       profile = await PlacementProfile.findById(profileId).lean();
+      if (profile?.userId) {
+        candidateData = await getFullCandidateProfile(profile.userId);
+      }
     } else if (req.headers.authorization) {
       try {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
         if (decoded?.userId) {
           profile = await PlacementProfile.findOne({ userId: decoded.userId }).lean();
+          candidateData = await getFullCandidateProfile(decoded.userId);
         }
       } catch (e) {
         // Token decode ignored if invalid
       }
     }
 
+    const mergedProfile = candidateData ? { ...(profile || {}), ...candidateData } : profile;
+
     const reply = await generateGemmaChatReply({
       prompt,
-      profile,
+      profile: mergedProfile,
       drives: activeDrives,
       conflicts,
     });

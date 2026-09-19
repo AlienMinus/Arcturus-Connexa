@@ -24,6 +24,7 @@ import {
   FaTrash,
   FaLightbulb
 } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import './CampusLinkPage.css';
@@ -1295,6 +1296,137 @@ const CampusLinkPage = () => {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* ========================================================
+                  IMPORTED ARCTURUS CANDIDATE PROFILE PORTFOLIO
+                  ======================================================== */}
+              <div className="campusSubCard" style={{ borderColor: '#bae6fd', background: '#f8fafc', marginBottom: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#0369a1', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <FaBriefcase color="#0284c7" /> Imported Candidate Profile Portfolio
+                    </h3>
+                    <p style={{ margin: '3px 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                      Imported directly from candidate's individual profile page for Gemma-2 placement risk & readiness analysis
+                    </p>
+                  </div>
+                  {user?.username && (
+                    <Link
+                      to={`/profile/${user.username}`}
+                      target="_blank"
+                      className="campusTabBtn"
+                      style={{ fontSize: '0.78rem', padding: '5px 12px', textDecoration: 'none', background: '#ffffff', color: '#0284c7', borderColor: '#bae6fd' }}
+                    >
+                      <FaExternalLinkAlt size={11} /> View / Edit Profile in Arcturus
+                    </Link>
+                  )}
+                </div>
+
+                {/* Candidate Headline & Summary */}
+                {studentProfile.candidateProfile?.headline && (
+                  <div style={{ marginBottom: 10 }}>
+                    <strong style={{ fontSize: '0.84rem', color: '#0f172a' }}>Professional Headline: </strong>
+                    <span style={{ fontSize: '0.84rem', color: '#334155' }}>{studentProfile.candidateProfile.headline}</span>
+                  </div>
+                )}
+                {studentProfile.candidateProfile?.summary && (
+                  <div style={{ background: '#ffffff', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.82rem', color: '#334155', marginBottom: 14, lineHeight: 1.45 }}>
+                    <strong style={{ color: '#0369a1' }}>About Statement: </strong> {studentProfile.candidateProfile.summary}
+                  </div>
+                )}
+
+                {/* Technical Projects with Descriptions & Tech Badges */}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>
+                      Technical Projects ({studentProfile.candidateProfile?.projects?.length || 0})
+                    </strong>
+                    <span style={{ fontSize: '0.76rem', color: '#64748b' }}>Used for Project Depth & Risk Evaluation</span>
+                  </div>
+
+                  {studentProfile.candidateProfile?.projects?.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {studentProfile.candidateProfile.projects.map((proj, idx) => (
+                        <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                            <strong style={{ fontSize: '0.92rem', color: '#0a66c2' }}>{proj.title}</strong>
+                            {proj.url && (
+                              <a href={proj.url} target="_blank" rel="noreferrer" style={{ fontSize: '0.78rem', color: '#0284c7', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                Repository / Demo <FaExternalLinkAlt size={10} />
+                              </a>
+                            )}
+                          </div>
+                          {proj.techStack?.length > 0 && (
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '6px 0' }}>
+                              {proj.techStack.map((tech, tidx) => (
+                                <span key={tidx} style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '0.72rem', padding: '2px 7px', borderRadius: '4px', fontWeight: 600 }}>
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {proj.description && (
+                            <p style={{ margin: '6px 0 0', fontSize: '0.82rem', color: '#475569', lineHeight: 1.45 }}>
+                              {proj.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ background: '#ffffff', padding: '12px 14px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                      <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
+                        No technical projects added to your Arcturus profile yet. Adding projects with descriptions and tech stacks significantly improves your Gemma-2 placement score.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Work & Internship Experiences with Descriptions */}
+                {studentProfile.candidateProfile?.experience?.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <strong style={{ fontSize: '0.88rem', color: '#0f172a', display: 'block', marginBottom: 8 }}>
+                      Work & Internship Experience ({studentProfile.candidateProfile.experience.length})
+                    </strong>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {studentProfile.candidateProfile.experience.map((exp, idx) => (
+                        <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 14px' }}>
+                          <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>{exp.title}</strong>
+                          {exp.subtitle && <span style={{ fontSize: '0.85rem', color: '#64748b' }}> · {exp.subtitle}</span>}
+                          {exp.dateRange && <span style={{ fontSize: '0.76rem', color: '#94a3b8', display: 'block', marginTop: 2 }}>{exp.dateRange}</span>}
+                          {exp.description && (
+                            <p style={{ margin: '6px 0 0', fontSize: '0.82rem', color: '#475569', lineHeight: 1.45 }}>
+                              {exp.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Licenses & Certifications */}
+                {studentProfile.candidateProfile?.certifications?.length > 0 && (
+                  <div>
+                    <strong style={{ fontSize: '0.88rem', color: '#0f172a', display: 'block', marginBottom: 8 }}>
+                      Licenses & Certifications ({studentProfile.candidateProfile.certifications.length})
+                    </strong>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {studentProfile.candidateProfile.certifications.map((cert, idx) => (
+                        <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <strong style={{ fontSize: '0.88rem', color: '#0f172a' }}>{cert.title}</strong>
+                            {cert.issuer && <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{cert.issuer}</span>}
+                          </div>
+                          {cert.description && (
+                            <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>{cert.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ========================================================

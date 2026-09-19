@@ -85,6 +85,7 @@ export async function queryHuggingFaceGemma(prompt, maxTokens = 450) {
 
 /**
  * Analyze Student Placement Risk, Employability Rationale, and Mentor Recommendations
+ * Imports and analyzes complete candidate individual profile data (projects, experiences, certifications, descriptions, tech stacks, bio)
  */
 export async function analyzePlacementRiskAndGuidance(profileData) {
   const {
@@ -101,42 +102,128 @@ export async function analyzePlacementRiskAndGuidance(profileData) {
     overallReadiness = 50,
     readinessLevel = 'Developing',
     targetRoles = [],
-    projectsCount = 0,
-    experienceCount = 0,
-    certificationsCount = 0,
+    // Individual candidate profile fields imported from Arcturus Profile page
     headline = '',
     summary = '',
+    location = '',
+    projects = [],
+    experience = [],
+    certifications = [],
+    education = [],
+    honors = [],
+    interests = [],
+    featured = [],
+    isVerified = false,
   } = profileData;
 
   const studentSkills = Array.isArray(skills) ? skills : [];
   const skillsListStr = studentSkills.length > 0 ? studentSkills.join(', ') : 'None specified';
   const rolesListStr = Array.isArray(targetRoles) && targetRoles.length > 0 ? targetRoles.join(', ') : 'Campus Placement Candidate';
 
-  // Construct prompt for Gemma-2 with real applicant user profile data
-  const gemmaPrompt = `You are the CampusLink AI Placement & Risk Diagnostic Engine powered by Google Gemma.
-Analyze the following student profile for corporate placement readiness, identify at-risk factors, diagnose skill gaps, and provide actionable mentor guidance:
-- College: ${collegeName}
-- Branch: ${branch}
-- Roll Number: ${rollNumber}
-- CGPA: ${cgpa} / 10
-- Active Backlogs: ${activeBacklogs}
-- Employability Readiness Score: ${overallReadiness}% (${readinessLevel})
-- Dimension Scores: Technical: ${technicalScore}%, Aptitude: ${aptitudeScore}%, Communication: ${communicationScore}%, Projects: ${projectScore}%
-- Key Skills: ${skillsListStr}
-- Applicant Profile Background: ${projectsCount} technical project(s), ${experienceCount} work/internship experience(s), ${certificationsCount} license/certification(s)
-- Headline / Bio: ${headline || 'Aspiring Engineer'}
-- Target Recruiter Criteria: ${rolesListStr}
+  const projectsList = Array.isArray(projects) ? projects : [];
+  const experienceList = Array.isArray(experience) ? experience : [];
+  const certsList = Array.isArray(certifications) ? certifications : [];
+  const eduList = Array.isArray(education) ? education : [];
+  const honorsList = Array.isArray(honors) ? honors : [];
 
-Please output ONLY a valid JSON object with the following schema:
+  const projectsCount = projectsList.length;
+  const experienceCount = experienceList.length;
+  const certificationsCount = certsList.length;
+
+  // Format full technical projects with title, tech stack, and detailed descriptions
+  const projectsFormatted = projectsList.length > 0
+    ? projectsList.map((p, i) => {
+        const title = p.title ? `"${p.title}"` : `Project #${i + 1}`;
+        const tech = Array.isArray(p.techStack) && p.techStack.length > 0 ? ` [Tech Stack: ${p.techStack.join(', ')}]` : '';
+        const url = p.url ? ` (Link: ${p.url})` : '';
+        const desc = p.description ? `\n    - Description: ${p.description.trim()}` : '';
+        return `  ${i + 1}. ${title}${tech}${url}${desc}`;
+      }).join('\n')
+    : '  None recorded on candidate profile';
+
+  // Format work & internship experience with role, company, location, dates, and detailed descriptions
+  const experienceFormatted = experienceList.length > 0
+    ? experienceList.map((e, i) => {
+        const role = e.title || 'Role';
+        const org = e.subtitle ? ` at ${e.subtitle}` : '';
+        const loc = e.location ? ` (${e.location})` : '';
+        const dates = e.dateRange ? ` [${e.dateRange}]` : '';
+        const desc = e.description ? `\n    - Responsibilities & Achievements: ${e.description.trim()}` : '';
+        return `  ${i + 1}. ${role}${org}${loc}${dates}${desc}`;
+      }).join('\n')
+    : '  None recorded on candidate profile';
+
+  // Format licenses & certifications with issuer, date, and descriptions
+  const certsFormatted = certsList.length > 0
+    ? certsList.map((c, i) => {
+        const title = c.title || 'Certification';
+        const issuer = c.issuer || c.subtitle ? ` issued by ${c.issuer || c.subtitle}` : '';
+        const dates = c.dateRange ? ` [${c.dateRange}]` : '';
+        const desc = c.description ? `\n    - Description: ${c.description.trim()}` : '';
+        return `  ${i + 1}. ${title}${issuer}${dates}${desc}`;
+      }).join('\n')
+    : '  None recorded on candidate profile';
+
+  // Format education details & coursework
+  const eduFormatted = eduList.length > 0
+    ? eduList.map((ed, i) => {
+        const deg = ed.title || 'Degree';
+        const school = ed.subtitle ? ` at ${ed.subtitle}` : '';
+        const dates = ed.dateRange ? ` [${ed.dateRange}]` : '';
+        const desc = ed.description ? ` - ${ed.description.trim()}` : '';
+        return `  ${i + 1}. ${deg}${school}${dates}${desc}`;
+      }).join('\n')
+    : '';
+
+  // Format honors & awards
+  const honorsFormatted = honorsList.length > 0
+    ? honorsList.map((h, i) => `  ${i + 1}. ${h.title}${h.issuer ? ` (${h.issuer})` : ''}${h.date ? ` [${h.date}]` : ''}`).join('\n')
+    : '';
+
+  // Construct comprehensive prompt for Gemma-2 with complete candidate profile details
+  const gemmaPrompt = `You are the CampusLink AI Placement & Risk Diagnostic Engine powered by Google Gemma.
+Conduct an in-depth corporate placement readiness & risk diagnostic for the following candidate, incorporating their academic standing, practical projects, work experience, certifications, and technical profile details:
+
+=== 1. ACADEMIC & INSTITUTIONAL ELIGIBILITY ===
+- College / University: ${collegeName}
+- Branch / Department: ${branch}
+- Student Roll / ID: ${rollNumber}
+- Current CGPA: ${cgpa} / 10
+- Active Backlogs: ${activeBacklogs}
+- Overall Readiness Score: ${overallReadiness}% (${readinessLevel})
+- Dimension Scores: Technical: ${technicalScore}%, Aptitude: ${aptitudeScore}%, Communication: ${communicationScore}%, Practical Projects: ${projectScore}%
+- Verified Student Status: ${isVerified ? 'Officially Verified Student' : 'Unverified'}
+
+=== 2. COMPLETE CANDIDATE PROFILE PORTFOLIO (FROM ARCTURUS PROFILE PAGE) ===
+- Headline: ${headline || 'Aspiring Software Engineer'}
+- About / Bio Summary: ${summary || 'None specified'}
+- All Listed Skills: ${skillsListStr}
+
+- Technical Projects (${projectsCount} total with implementation descriptions):
+${projectsFormatted}
+
+- Work & Internship Experience (${experienceCount} total with impact descriptions):
+${experienceFormatted}
+
+- Licenses & Certifications (${certificationsCount} total):
+${certsFormatted}
+${eduFormatted ? `\n- Academic Education History:\n${eduFormatted}` : ''}
+${honorsFormatted ? `\n- Honors, Awards & Hackathons:\n${honorsFormatted}` : ''}
+
+=== 3. TARGET RECRUITER ROLES & CRITERIA ===
+- Target Roles / Scheduled Drives: ${rolesListStr}
+
+Analyze the candidate's real project descriptions, technologies utilized, hands-on experience, and academic record.
+Output ONLY a valid JSON object with the following schema:
 {
-  "aiReadinessSummary": "concise 2-3 sentence analysis of the student's competitive placement positioning and readiness based on their academic score and practical profile portfolio",
+  "aiReadinessSummary": "concise 2-3 sentence analysis of the candidate's competitive placement positioning, referencing their actual projects, tech stacks, or work experience, and evaluating readiness against target corporate roles",
   "isAtRisk": boolean,
-  "riskReason": "clear reason if at risk, or empty string",
-  "mentorActionRecommendation": "actionable 1-2 sentence recommendation for the placement cell or faculty mentor",
+  "riskReason": "clear reason if at risk (e.g. active backlogs, CGPA below cutoff, lack of hands-on projects matching corporate tech stacks), or empty string",
+  "mentorActionRecommendation": "actionable 1-2 sentence recommendation for faculty mentors or the campus placement cell tailored to their specific project and academic background",
   "topSkillRecommendations": ["specific skill 1", "specific skill 2", "specific skill 3"]
 }`;
 
-  const hfResult = await queryHuggingFaceGemma(gemmaPrompt, 500);
+  const hfResult = await queryHuggingFaceGemma(gemmaPrompt, 600);
 
   if (hfResult.isLive && hfResult.text) {
     try {
@@ -193,21 +280,38 @@ Please output ONLY a valid JSON object with the following schema:
     mentorActionRecommendation = `Candidate is on track for Tier-1 corporate drives. Recommend targeted system design prep and competitive mock interviews for premium CTC packages.`;
   }
 
-  // Dynamic AI Readiness Summary Incorporating Applicant Profile Portfolio
-  const skillHighlight = studentSkills.length > 0
-    ? `demonstrates practical strengths in ${studentSkills.slice(0, 3).join(', ')}`
-    : `has a foundational skill baseline requiring practical project expansion`;
+  // Dynamic AI Readiness Summary incorporating candidate's real projects & descriptions
+  const topProject = projectsList[0];
+  const topExp = experienceList[0];
+  const topCert = certsList[0];
 
-  const portfolioSummary = projectsCount > 0
-    ? `Portfolio features ${projectsCount} technical project(s)${experienceCount > 0 ? ` and ${experienceCount} work/internship experience(s)` : ''}.`
-    : `Practical project portfolio is currently minimal; publishing 2+ engineering projects on Arcturus will significantly strengthen recruiter conversion.`;
+  let portfolioDetail = '';
+  if (topProject) {
+    const techStr = Array.isArray(topProject.techStack) && topProject.techStack.length > 0 
+      ? ` utilizing ${topProject.techStack.slice(0, 3).join(', ')}` 
+      : '';
+    portfolioDetail += `Portfolio is highlighted by project "${topProject.title}"${techStr}`;
+    if (topProject.description) {
+      portfolioDetail += ` (${topProject.description.trim().slice(0, 80)}...)`;
+    }
+    portfolioDetail += '.';
+  }
+  if (topExp) {
+    portfolioDetail += ` Practical experience includes "${topExp.title}"${topExp.subtitle ? ` at ${topExp.subtitle}` : ''}.`;
+  }
+  if (topCert) {
+    portfolioDetail += ` Certified in ${topCert.title}${topCert.issuer ? ` via ${topCert.issuer}` : ''}.`;
+  }
+  if (!portfolioDetail) {
+    portfolioDetail = `Candidate has ${projectsCount} project(s) and ${experienceCount} experience(s) listed; publishing detailed engineering projects with tech stacks on Arcturus will strengthen recruiter interest.`;
+  }
 
-  let aiReadinessSummary = `Candidate presents a ${readinessLevel.toLowerCase()} placement readiness profile (${numReadiness}% score) within ${branch}. The applicant ${skillHighlight}. ${portfolioSummary} `;
+  let aiReadinessSummary = `Candidate presents a ${readinessLevel.toLowerCase()} placement readiness profile (${numReadiness}% score) in ${branch}. ${portfolioDetail} `;
 
   if (isAtRisk) {
-    aiReadinessSummary += `Predictive placement risk flagged due to ${riskReason.toLowerCase()}. Addressing this early with faculty mentoring will safeguard campus hiring prospects.`;
+    aiReadinessSummary += `Placement risk flagged: ${riskReason.toLowerCase()}. Addressing this with targeted mentoring will safeguard campus hiring opportunities.`;
   } else {
-    aiReadinessSummary += `Strong candidate profile aligned with upcoming software engineering and campus technical recruitment benchmarks.`;
+    aiReadinessSummary += `Strong candidate positioning aligned with corporate software and technical recruitment criteria.`;
   }
 
   // Targeted Skill Recommendations based on missing benchmarks
@@ -248,9 +352,30 @@ export async function generateGemmaChatReply({ prompt, profile, drives = [], con
       .map((d) => `${d.companyName} (${d.roleTitle}, CTC: ${d.ctcLpa} LPA, Min CGPA: ${d.eligibility?.minCgpa || 7.0})`)
       .join('; ');
 
-    const profileContext = profile
-      ? `Student: ${profile.branch}, CGPA: ${profile.cgpa}, Readiness: ${profile.overallReadiness}%, Backlogs: ${profile.activeBacklogs || 0}`
-      : 'Student: General Campus Candidate';
+    let profileContext = 'Student: General Campus Candidate';
+    if (profile) {
+      const pList = Array.isArray(profile.projects) ? profile.projects : [];
+      const expList = Array.isArray(profile.experience) ? profile.experience : [];
+      const certList = Array.isArray(profile.certifications) ? profile.certifications : [];
+
+      const pText = pList.length > 0
+        ? `Projects (${pList.length}): ${pList.slice(0, 3).map((p) => `"${p.title}" [${(p.techStack || []).join(', ')}] - ${p.description ? p.description.slice(0, 90) : ''}`).join('; ')}`
+        : 'Projects: None listed';
+      const expText = expList.length > 0
+        ? `Experience (${expList.length}): ${expList.slice(0, 2).map((e) => `"${e.title}" at ${e.subtitle || ''} - ${e.description ? e.description.slice(0, 90) : ''}`).join('; ')}`
+        : 'Experience: None listed';
+      const certText = certList.length > 0
+        ? `Certifications: ${certList.slice(0, 3).map((c) => c.title).join(', ')}`
+        : '';
+
+      profileContext = `Student: ${profile.fullName || profile.rollNumber || 'Candidate'}, Branch: ${profile.branch || 'Engineering'}, CGPA: ${profile.cgpa || 'N/A'}, Backlogs: ${profile.activeBacklogs || 0}, Overall Readiness: ${profile.overallReadiness || 50}%.
+Headline: ${profile.headline || 'None'}
+About/Summary: ${profile.summary || 'None'}
+Skills: ${(profile.skills || []).join(', ')}
+${pText}
+${expText}
+${certText}`;
+    }
 
     const systemPrompt = `You are CampusLink AI, an expert campus placement advisor powered by Hugging Face Gemma-2.
 Context:
