@@ -5,7 +5,12 @@ import { useAuth } from "../../context/AuthContext";
 import { buildApiUrl } from "../../utils/api";
 import { getUserFullName } from "../../utils/user";
 
-const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
+const NavLeft = ({
+  onSearchFocusChange,
+  onMobileSearchChange,
+  isMobileSearchOpen = false,
+  isSmallScreen = false,
+}) => {
   const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [userResults, setUserResults] = useState([]);
@@ -13,13 +18,11 @@ const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
   const [jobResults, setJobResults] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const navigate = useNavigate();
   const searchRef = useRef(null);
   const inputRef = useRef(null);
 
   const handleOpenMobileSearch = () => {
-    setIsMobileSearchOpen(true);
     onMobileSearchChange?.(true);
     setTimeout(() => {
       inputRef.current?.focus();
@@ -27,33 +30,19 @@ const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
   };
 
   const handleCloseMobileSearch = () => {
-    setIsMobileSearchOpen(false);
     onMobileSearchChange?.(false);
     setQuery("");
     setIsDropdownVisible(false);
   };
 
   const handleSearchIconClick = (e) => {
-    if (window.innerWidth <= 768) {
-      if (!isMobileSearchOpen) {
-        e.stopPropagation();
-        handleOpenMobileSearch();
-      }
+    if (isSmallScreen) {
+      e.stopPropagation();
+      handleOpenMobileSearch();
     } else {
       inputRef.current?.focus();
     }
   };
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768 && isMobileSearchOpen) {
-        setIsMobileSearchOpen(false);
-        onMobileSearchChange?.(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isMobileSearchOpen, onMobileSearchChange]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -101,9 +90,8 @@ const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsDropdownVisible(false);
-        if (window.innerWidth <= 768 && isMobileSearchOpen) {
-          setIsMobileSearchOpen(false);
-          onMobileSearchChange?.(false);
+        if (isMobileSearchOpen) {
+          handleCloseMobileSearch();
         }
       }
     };
@@ -114,13 +102,12 @@ const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
-  }, [isMobileSearchOpen, onMobileSearchChange]);
+  }, [isMobileSearchOpen]);
 
   const closeDropdown = () => {
     setIsDropdownVisible(false);
-    if (window.innerWidth <= 768) {
-      setIsMobileSearchOpen(false);
-      onMobileSearchChange?.(false);
+    if (isMobileSearchOpen) {
+      handleCloseMobileSearch();
     }
   };
 
@@ -165,7 +152,7 @@ const NavLeft = ({ onSearchFocusChange, onMobileSearchChange }) => {
       <div
         className={`searchBox ${isMobileSearchOpen ? "expanded" : ""}`}
         onClick={() => {
-          if (!isMobileSearchOpen && window.innerWidth <= 768) {
+          if (isSmallScreen && !isMobileSearchOpen) {
             handleOpenMobileSearch();
           }
         }}

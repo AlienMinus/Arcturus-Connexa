@@ -4,7 +4,8 @@ import {
   FaBuilding, 
   FaHourglassHalf, 
   FaBriefcase, 
-  FaFileAlt 
+  FaFileAlt,
+  FaBookOpen
 } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 
@@ -52,6 +53,17 @@ const AdminMetrics = ({ stats }) => {
           <span className="metricLabel">Blue Tick Requests</span>
           <span className="metricValue">{stats?.pendingVerifications ?? 0}</span>
           <span className="metricSubtext">Awaiting identity check</span>
+        </div>
+      </div>
+
+      <div className="metricCard">
+        <div className="metricIconBox courses" style={{ background: '#eef2ff', color: '#4f46e5' }}>
+          <FaBookOpen size={22} />
+        </div>
+        <div className="metricContent">
+          <span className="metricLabel">Masterclasses</span>
+          <span className="metricValue">{stats?.totalCourses ?? '...'}</span>
+          <span className="metricSubtext">{stats?.totalLearners ?? 0} enrolled learners</span>
         </div>
       </div>
 

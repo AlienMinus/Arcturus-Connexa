@@ -1214,30 +1214,49 @@
     padding: 0;
   }
 
-  .navRightContainer,
-  .navRight {
-    flex: 0 0 auto;
-    margin-left: 0;
-    width: max-content;
+  .navRightContainer {
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
   .navRight {
-    gap: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
   }
 
   .profileMenu,
   .businessMenu,
   .forBusinessTrigger {
-    padding: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    text-decoration: none;
   }
 
+  .profileMenu:hover,
+  .profileMenu:active,
+  .businessMenu:hover,
+  .businessMenu:active,
+  .forBusinessTrigger:hover,
+  .forBusinessTrigger:active {
+    background-color: #f1f5f9;
+  }
+
+  .profile-text,
   .business-text {
-    display: flex;
+    display: none !important;
   }
 
   /* Preserve room for Search; Advertise stays available on larger screens. */
   .advertise {
-    display: none;
+    display: none !important;
   }
 }
 

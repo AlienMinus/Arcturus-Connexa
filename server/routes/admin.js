@@ -3,9 +3,11 @@ import Organization from '../models/Organization.js';
 import User from '../models/User.js';
 import Job from '../models/Job.js';
 import Post from '../models/Post.js';
+import Course from '../models/Course.js';
 import VerificationRequest from '../models/VerificationRequest.js';
 import authMiddleware from '../middleware/auth.js';
 import adminMiddleware from '../middleware/admin.js';
+import { DEFAULT_COURSES } from './learning.js';
 
 const router = express.Router();
 
@@ -29,6 +31,7 @@ router.get('/stats', async (req, res) => {
       totalJobs,
       activeJobs,
       totalPosts,
+      totalCourses,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isVerified: true }),
@@ -42,12 +45,20 @@ router.get('/stats', async (req, res) => {
       Job.countDocuments(),
       Job.countDocuments({ isActive: true }),
       Post.countDocuments(),
+      Course.countDocuments(),
     ]);
 
     // Aggregate total applications across all jobs
     const jobsWithApplicants = await Job.find().select('applicants').lean();
     const totalApplications = jobsWithApplicants.reduce(
       (acc, job) => acc + (job.applicants?.length || 0),
+      0
+    );
+
+    // Aggregate total learners across all courses
+    const coursesWithLearners = await Course.find().select('learnersCount enrolledUsers').lean();
+    const totalLearners = coursesWithLearners.reduce(
+      (acc, c) => acc + (c.learnersCount || c.enrolledUsers?.length || 0),
       0
     );
 
@@ -66,6 +77,8 @@ router.get('/stats', async (req, res) => {
         activeJobs,
         totalPosts,
         totalApplications,
+        totalCourses,
+        totalLearners,
       },
     });
   } catch (err) {
@@ -252,24 +265,290 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// POST /api/admin/users/:id/toggle-verify - Toggle user verification badge
-router.post('/users/:id/toggle-verify', async (req, res) => {
+// ==========================================
+// COURSE MANAGEMENT ROUTES (ADMIN)
+// ==========================================
+
+// GET /api/admin/courses - List courses with filters and curriculum counts
+router.get('/courses', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    const { category, level, q } = req.query;
+    const filter = {};
+
+    if (category && category !== 'all') {
+      filter.category = category;
     }
 
-    user.isVerified = !user.isVerified;
-    await user.save();
+    if (level && level !== 'all') {
+      filter.level = level;
+    }
 
-    res.json({
-      message: `User verification status updated to ${user.isVerified ? 'Verified' : 'Unverified'}`,
-      isVerified: user.isVerified,
+    if (q && q.trim()) {
+      filter.$or = [
+        { title: { $regex: q.trim(), $options: 'i' } },
+        { 'instructor.name': { $regex: q.trim(), $options: 'i' } },
+        { skills: { $regex: q.trim(), $options: 'i' } },
+        { description: { $regex: q.trim(), $options: 'i' } },
+      ];
+    }
+
+    const courses = await Course.find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const formatted = courses.map((course) => {
+      const modulesCount = course.modules?.length || 0;
+      const lessonsCount = course.modules?.reduce(
+        (sum, m) => sum + (m.lessons?.length || 0),
+        0
+      ) || 0;
+      const enrolledCount = course.enrolledUsers?.length || 0;
+      const completedCount = course.enrolledUsers?.filter(
+        (e) => (e.progress || 0) >= 100 || e.certificateId
+      ).length || 0;
+
+      return {
+        ...course,
+        modulesCount,
+        lessonsCount,
+        enrolledCount,
+        completedCount,
+      };
+    });
+
+    res.json({ courses: formatted });
+  } catch (err) {
+    console.error('Failed to fetch admin courses:', err);
+    res.status(500).json({ error: 'Failed to retrieve courses list' });
+  }
+});
+
+// GET /api/admin/courses/:id - Get full course details
+router.get('/courses/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id).lean();
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    res.json({ course });
+  } catch (err) {
+    console.error('Failed to fetch course details:', err);
+    res.status(500).json({ error: 'Failed to retrieve course details' });
+  }
+});
+
+// POST /api/admin/courses - Create new course
+router.post('/courses', async (req, res) => {
+  try {
+    const {
+      title,
+      slug,
+      description,
+      category,
+      level,
+      duration,
+      thumbnail,
+      instructor,
+      skills,
+      modules,
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Course title is required' });
+    }
+
+    if (!description || !description.trim()) {
+      return res.status(400).json({ error: 'Course description is required' });
+    }
+
+    // Auto-generate unique slug
+    let baseSlug = (slug || title)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    
+    let generatedSlug = baseSlug || 'course';
+    let counter = 1;
+    while (await Course.findOne({ slug: generatedSlug })) {
+      generatedSlug = `${baseSlug}-${counter}`;
+      counter += 1;
+    }
+
+    // Sanitize modules and lessons
+    const sanitizedModules = (modules || []).map((m, mIdx) => ({
+      title: m.title?.trim() || `Module ${mIdx + 1}`,
+      lessons: (m.lessons || []).map((l, lIdx) => ({
+        title: l.title?.trim() || `Lesson ${lIdx + 1}`,
+        duration: l.duration?.trim() || '15m',
+        videoUrl: l.videoUrl?.trim() || '',
+        summary: l.summary?.trim() || '',
+      })),
+    }));
+
+    // Auto calculate duration if not specified
+    let courseDuration = duration?.trim();
+    if (!courseDuration) {
+      const totalLessons = sanitizedModules.reduce(
+        (sum, m) => sum + m.lessons.length,
+        0
+      );
+      courseDuration = totalLessons > 0 ? `${Math.ceil((totalLessons * 18) / 60)}h ${totalLessons * 18 % 60}m` : '1h';
+    }
+
+    const newCourse = new Course({
+      title: title.trim(),
+      slug: generatedSlug,
+      description: description.trim(),
+      category: category || 'Communication',
+      level: level || 'All Levels',
+      duration: courseDuration,
+      thumbnail: thumbnail?.trim() || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
+      instructor: {
+        name: instructor?.name?.trim() || 'Arcturus Masterclass Coach',
+        role: instructor?.role?.trim() || 'Senior Industry Specialist',
+        avatar: instructor?.avatar?.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      },
+      skills: Array.isArray(skills)
+        ? skills.filter(Boolean).map((s) => s.trim())
+        : typeof skills === 'string'
+        ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+        : [],
+      modules: sanitizedModules,
+      rating: 4.9,
+      reviewsCount: 1,
+      learnersCount: 0,
+      enrolledUsers: [],
+    });
+
+    await newCourse.save();
+
+    res.status(201).json({
+      message: `Course "${newCourse.title}" created successfully! 🎉`,
+      course: newCourse,
     });
   } catch (err) {
-    console.error('Failed to toggle verification:', err);
-    res.status(500).json({ error: 'Failed to update user verification' });
+    console.error('Failed to create course:', err);
+    res.status(500).json({ error: err.message || 'Failed to create course' });
+  }
+});
+
+// PUT /api/admin/courses/:id - Update an existing course
+router.put('/courses/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    const {
+      title,
+      slug,
+      description,
+      category,
+      level,
+      duration,
+      thumbnail,
+      instructor,
+      skills,
+      modules,
+    } = req.body;
+
+    if (title && title.trim()) course.title = title.trim();
+    if (description && description.trim()) course.description = description.trim();
+    if (category) course.category = category;
+    if (level) course.level = level;
+    if (duration) course.duration = duration.trim();
+    if (thumbnail) course.thumbnail = thumbnail.trim();
+
+    if (slug && slug.trim() && slug !== course.slug) {
+      const sanitizedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+      const existing = await Course.findOne({ slug: sanitizedSlug, _id: { $ne: course._id } });
+      if (existing) {
+        return res.status(400).json({ error: `Slug "${sanitizedSlug}" is already in use by another course.` });
+      }
+      course.slug = sanitizedSlug;
+    }
+
+    if (instructor) {
+      course.instructor = {
+        name: instructor.name?.trim() || course.instructor.name,
+        role: instructor.role?.trim() || course.instructor.role,
+        avatar: instructor.avatar?.trim() || course.instructor.avatar,
+      };
+    }
+
+    if (skills !== undefined) {
+      course.skills = Array.isArray(skills)
+        ? skills.filter(Boolean).map((s) => s.trim())
+        : typeof skills === 'string'
+        ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+        : [];
+    }
+
+    if (modules && Array.isArray(modules)) {
+      course.modules = modules.map((m, mIdx) => ({
+        title: m.title?.trim() || `Module ${mIdx + 1}`,
+        lessons: (m.lessons || []).map((l, lIdx) => ({
+          title: l.title?.trim() || `Lesson ${lIdx + 1}`,
+          duration: l.duration?.trim() || '15m',
+          videoUrl: l.videoUrl?.trim() || '',
+          summary: l.summary?.trim() || '',
+        })),
+      }));
+    }
+
+    await course.save();
+
+    res.json({
+      message: `Course "${course.title}" updated successfully!`,
+      course,
+    });
+  } catch (err) {
+    console.error('Failed to update course:', err);
+    res.status(500).json({ error: err.message || 'Failed to update course' });
+  }
+});
+
+// DELETE /api/admin/courses/:id - Delete a course permanently
+router.delete('/courses/:id', async (req, res) => {
+  try {
+    const course = await Course.findByIdAndDelete(req.params.id);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    res.json({
+      message: `Course "${course.title}" has been deleted successfully.`,
+      deletedId: req.params.id,
+    });
+  } catch (err) {
+    console.error('Failed to delete course:', err);
+    res.status(500).json({ error: 'Failed to delete course' });
+  }
+});
+
+// POST /api/admin/courses/seed-defaults - Re-seed official default masterclasses
+router.post('/courses/seed-defaults', async (req, res) => {
+  try {
+    let seededCount = 0;
+    for (const courseData of DEFAULT_COURSES) {
+      const existing = await Course.findOne({ slug: courseData.slug });
+      if (!existing) {
+        await Course.create(courseData);
+        seededCount += 1;
+      }
+    }
+
+    res.json({
+      message: seededCount > 0
+        ? `Successfully seeded ${seededCount} official masterclass(es)!`
+        : 'All official masterclasses already exist in the catalog.',
+      seededCount,
+    });
+  } catch (err) {
+    console.error('Failed to seed masterclasses:', err);
+    res.status(500).json({ error: 'Failed to seed masterclasses' });
   }
 });
 

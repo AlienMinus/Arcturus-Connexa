@@ -9,7 +9,8 @@ import {
   FaSyncAlt, 
   FaCheckCircle, 
   FaLock,
-  FaGraduationCap
+  FaGraduationCap,
+  FaBookOpen
 } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +20,7 @@ import OrganizationApprovals from '../../components/admin/OrganizationApprovals'
 import VerificationRequests from '../../components/admin/VerificationRequests';
 import JobModeration from '../../components/admin/JobModeration';
 import UserModeration from '../../components/admin/UserModeration';
+import CourseManagement from '../../components/admin/CourseManagement';
 import DocumentLightboxModal from '../../components/admin/DocumentLightboxModal';
 import RejectionReasonModal from '../../components/admin/RejectionReasonModal';
 import './AdminDashboard.css';
@@ -427,6 +429,9 @@ const AdminDashboard = () => {
           <Link to="/jobs" className="adminLinkToPortal" title="Job Portal" aria-label="Job Portal">
             <FaBriefcase size={13} /> <span className="btnLabel">Job Portal</span>
           </Link>
+          <Link to="/learning" className="adminLinkToPortal" title="Learning Hub" aria-label="Learning Hub">
+            <FaBookOpen size={13} /> <span className="btnLabel">Learning Hub</span>
+          </Link>
         </div>
       </header>
 
@@ -511,6 +516,21 @@ const AdminDashboard = () => {
             <span className="tabLabel">User Accounts</span>
             <span className="tabCountPill">{stats?.totalUsers || 0}</span>
           </button>
+
+          <button
+            type="button"
+            className={`adminTabBtn ${activeTab === 'courses' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('courses');
+              setSearchQuery('');
+            }}
+            title="Course Management"
+            aria-label="Course Management"
+          >
+            <FaBookOpen size={15} />
+            <span className="tabLabel">Courses & Masterclasses</span>
+            <span className="tabCountPill">{stats?.totalCourses || 0}</span>
+          </button>
         </div>
 
         {/* Global Search Bar */}
@@ -531,6 +551,8 @@ const AdminDashboard = () => {
                 ? 'Search applicant name, username, organization...'
                 : activeTab === 'jobs'
                 ? 'Search job title, company, skills...'
+                : activeTab === 'courses'
+                ? 'Search course title, instructor, skill...'
                 : 'Search users by name, username, email...'
             }
             value={searchQuery}
@@ -606,6 +628,15 @@ const AdminDashboard = () => {
           usersList={usersList}
           loading={loading}
           onToggleVerify={handleToggleUserVerify}
+        />
+      )}
+
+      {/* TAB 4: COURSE MANAGEMENT & MASTERCLASSES */}
+      {activeTab === 'courses' && (
+        <CourseManagement
+          token={token}
+          showToast={showToast}
+          onStatsUpdate={fetchStats}
         />
       )}
 

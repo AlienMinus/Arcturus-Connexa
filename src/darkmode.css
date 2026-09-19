@@ -175,6 +175,28 @@ body.dark-mode .advertise {
   color: var(--text-muted) !important;
 }
 
+[data-theme="dark"] .businessMenu .business-icon svg,
+[data-theme="dark"] .forBusinessTrigger .business-icon svg,
+body.dark-mode .businessMenu .business-icon svg,
+body.dark-mode .forBusinessTrigger .business-icon svg {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+[data-theme="dark"] .profileMenu:hover,
+[data-theme="dark"] .profileMenu:active,
+[data-theme="dark"] .businessMenu:hover,
+[data-theme="dark"] .businessMenu:active,
+[data-theme="dark"] .forBusinessTrigger:hover,
+[data-theme="dark"] .forBusinessTrigger:active,
+body.dark-mode .profileMenu:hover,
+body.dark-mode .profileMenu:active,
+body.dark-mode .businessMenu:hover,
+body.dark-mode .businessMenu:active,
+body.dark-mode .forBusinessTrigger:hover,
+body.dark-mode .forBusinessTrigger:active {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* Dropdown Menu Modal */
 [data-theme="dark"] .profile-dropdown,
 body.dark-mode .profile-dropdown {
@@ -3415,6 +3437,471 @@ body.dark-mode .switchOrgBtn {
   color: #f8fafc !important;
 }
 
+/* ==========================================================================
+   ADMIN OPERATIONS HUB & COURSE MANAGEMENT
+   ========================================================================== */
 
+[data-theme="dark"] .adminDashboardWrapper,
+body.dark-mode .adminDashboardWrapper {
+  background: #0b0f19 !important;
+  color: #f8fafc !important;
+}
 
+[data-theme="dark"] .adminTopHeader,
+body.dark-mode .adminTopHeader {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
 
+[data-theme="dark"] .adminHeaderTitleRow h1,
+body.dark-mode .adminHeaderTitleRow h1 {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .adminSubtitle,
+body.dark-mode .adminSubtitle {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .adminTabsBar,
+body.dark-mode .adminTabsBar {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .adminTabBtn,
+body.dark-mode .adminTabBtn {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .adminTabBtn:hover,
+body.dark-mode .adminTabBtn:hover {
+  color: #f9fafb !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .adminTabBtn.active,
+body.dark-mode .adminTabBtn.active {
+  color: #38bdf8 !important;
+  border-bottom-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .tabBadge,
+body.dark-mode .tabBadge {
+  background: #1f2937 !important;
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .adminTabBtn.active .tabBadge,
+body.dark-mode .adminTabBtn.active .tabBadge {
+  background: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .adminMetricCard,
+body.dark-mode .adminMetricCard {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .adminMetricValue,
+body.dark-mode .adminMetricValue {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .adminMetricLabel,
+body.dark-mode .adminMetricLabel {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .adminMetricSub,
+body.dark-mode .adminMetricSub {
+  color: #6b7280 !important;
+}
+
+/* Course Management Section */
+[data-theme="dark"] .courseManagementHeader h3,
+body.dark-mode .courseManagementHeader h3 {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .courseManagementHeader p,
+body.dark-mode .courseManagementHeader p {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .courseSearchForm input,
+body.dark-mode .courseSearchForm input {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .courseSearchForm input:focus,
+body.dark-mode .courseSearchForm input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+}
+
+[data-theme="dark"] .courseSearchIcon,
+body.dark-mode .courseSearchIcon {
+  color: #6b7280 !important;
+}
+
+[data-theme="dark"] .courseSelectFilters select,
+body.dark-mode .courseSelectFilters select,
+[data-theme="dark"] .adminSelectFilter,
+body.dark-mode .adminSelectFilter {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Course Cards */
+[data-theme="dark"] .adminCourseCard,
+body.dark-mode .adminCourseCard {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .adminCourseCard:hover,
+body.dark-mode .adminCourseCard:hover {
+  border-color: #374151 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .courseCardTitle,
+body.dark-mode .courseCardTitle {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .courseCardDesc,
+body.dark-mode .courseCardDesc {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .courseLevelPill,
+body.dark-mode .courseLevelPill {
+  background: #1f2937 !important;
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .courseInstructorRow,
+body.dark-mode .courseInstructorRow {
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .courseInstructorMeta strong,
+body.dark-mode .courseInstructorMeta strong {
+  color: #f3f4f6 !important;
+}
+
+[data-theme="dark"] .courseInstructorMeta small,
+body.dark-mode .courseInstructorMeta small {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .courseStatsRibbon,
+body.dark-mode .courseStatsRibbon {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .courseStatItem strong,
+body.dark-mode .courseStatItem strong {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .courseCardActions,
+body.dark-mode .courseCardActions {
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .courseEditBtn,
+body.dark-mode .courseEditBtn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .courseEditBtn:hover,
+body.dark-mode .courseEditBtn:hover {
+  background: #334155 !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .coursePreviewBtn,
+body.dark-mode .coursePreviewBtn {
+  background: transparent !important;
+  border-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .coursePreviewBtn:hover,
+body.dark-mode .coursePreviewBtn:hover {
+  background: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .courseDeleteBtn,
+body.dark-mode .courseDeleteBtn {
+  background: transparent !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .courseDeleteBtn:hover,
+body.dark-mode .courseDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+}
+
+/* Course Editor Modal */
+[data-theme="dark"] .adminModalContainer,
+body.dark-mode .adminModalContainer,
+[data-theme="dark"] .courseEditorModal,
+body.dark-mode .courseEditorModal {
+  background: #111827 !important;
+  border: 1px solid #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .adminModalHeader,
+body.dark-mode .adminModalHeader {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .adminModalHeader h3,
+body.dark-mode .adminModalHeader h3 {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .adminModalHeader p,
+body.dark-mode .adminModalHeader p {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .adminModalCloseBtn,
+body.dark-mode .adminModalCloseBtn {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .adminModalCloseBtn:hover,
+body.dark-mode .adminModalCloseBtn:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .courseModalTabs,
+body.dark-mode .courseModalTabs {
+  background: #0f172a !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .courseModalTabBtn,
+body.dark-mode .courseModalTabBtn {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .courseModalTabBtn:hover,
+body.dark-mode .courseModalTabBtn:hover {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .courseModalTabBtn.active,
+body.dark-mode .courseModalTabBtn.active {
+  background: #111827 !important;
+  color: #38bdf8 !important;
+  border-bottom-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .courseModalBody,
+body.dark-mode .courseModalBody {
+  background: #111827 !important;
+}
+
+[data-theme="dark"] .formGroup label,
+body.dark-mode .formGroup label {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] .formGroup input,
+body.dark-mode .formGroup input,
+[data-theme="dark"] .formGroup select,
+body.dark-mode .formGroup select,
+[data-theme="dark"] .formGroup textarea,
+body.dark-mode .formGroup textarea {
+  background: #0f172a !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .formGroup input:focus,
+body.dark-mode .formGroup input:focus,
+[data-theme="dark"] .formGroup select:focus,
+body.dark-mode .formGroup select:focus,
+[data-theme="dark"] .formGroup textarea:focus,
+body.dark-mode .formGroup textarea:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+}
+
+[data-theme="dark"] .instructorSubSection,
+body.dark-mode .instructorSubSection {
+  background: #0f172a !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .instructorSubSection h4,
+body.dark-mode .instructorSubSection h4 {
+  color: #f9fafb !important;
+}
+
+/* Curriculum Builder in Dark Mode */
+[data-theme="dark"] .curriculumBuilderHeader,
+body.dark-mode .curriculumBuilderHeader {
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .curriculumBuilderHeader h4,
+body.dark-mode .curriculumBuilderHeader h4 {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .curriculumBuilderHeader p,
+body.dark-mode .curriculumBuilderHeader p {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .moduleAccordionCard,
+body.dark-mode .moduleAccordionCard {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .moduleAccordionHeader,
+body.dark-mode .moduleAccordionHeader {
+  background: #0f172a !important;
+}
+
+[data-theme="dark"] .moduleTitleInput,
+body.dark-mode .moduleTitleInput {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .moduleTitleInput:focus,
+body.dark-mode .moduleTitleInput:focus {
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .lessonCountPill,
+body.dark-mode .lessonCountPill {
+  background: #1f2937 !important;
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .toggleExpandBtn,
+body.dark-mode .toggleExpandBtn {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .moduleAccordionBody,
+body.dark-mode .moduleAccordionBody {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .lessonBuilderItem,
+body.dark-mode .lessonBuilderItem {
+  background: #0f172a !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .lessonBulletNumber,
+body.dark-mode .lessonBulletNumber {
+  background: #1f2937 !important;
+  color: #93c5fd !important;
+}
+
+[data-theme="dark"] .lessonTitleInput,
+body.dark-mode .lessonTitleInput {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .lessonTitleInput:focus,
+body.dark-mode .lessonTitleInput:focus {
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .lessonField label,
+body.dark-mode .lessonField label {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .lessonField input,
+body.dark-mode .lessonField input {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .lessonField input:focus,
+body.dark-mode .lessonField input:focus {
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .addLessonBtn,
+body.dark-mode .addLessonBtn {
+  background: rgba(56, 189, 248, 0.08) !important;
+  border-color: #0284c7 !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .addLessonBtn:hover,
+body.dark-mode .addLessonBtn:hover {
+  background: rgba(56, 189, 248, 0.16) !important;
+}
+
+[data-theme="dark"] .adminModalFooter,
+body.dark-mode .adminModalFooter {
+  background: #0f172a !important;
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .adminSecondaryBtn,
+body.dark-mode .adminSecondaryBtn {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+[data-theme="dark"] .adminSecondaryBtn:hover,
+body.dark-mode .adminSecondaryBtn:hover {
+  background: #374151 !important;
+}
+
+[data-theme="dark"] .accessDeniedCard,
+body.dark-mode .accessDeniedCard {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .accessDeniedCard h2,
+body.dark-mode .accessDeniedCard h2 {
+  color: #f9fafb !important;
+}
+
+[data-theme="dark"] .accessDeniedCard p,
+body.dark-mode .accessDeniedCard p {
+  color: #9ca3af !important;
+}

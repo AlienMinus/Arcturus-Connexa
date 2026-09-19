@@ -474,5 +474,6 @@ router.get('/certificate/:certId', async (req, res) => {
   }
 });
 
+export { DEFAULT_COURSES };
 export default router;
 
