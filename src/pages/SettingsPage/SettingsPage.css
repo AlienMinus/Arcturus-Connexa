@@ -839,6 +839,999 @@
   background: #004182;
 }
 
+/* Badge count on sidebar buttons */
+.tabCountBadge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #0a66c2;
+  color: #ffffff;
+  padding: 1px 7px;
+  border-radius: 12px;
+}
+
+.tabCountBadge.orgBadge {
+  background: #2563eb;
+}
+
+/* Profile Dashboard Quick Widgets */
+.profileDashboardWidgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dashboardWidgetCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dashboardWidgetCard:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.widgetIconBox {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.appWidgetIcon {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.orgWidgetIcon {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.widgetDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.widgetDetails h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.widgetDetails p {
+  margin: 3px 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.widgetActionBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0a66c2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   JOB APPLICATIONS TRACKING SYSTEM
+   ========================================================================== */
+.appTrackerCard {
+  position: relative;
+}
+
+.appTrackerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.appRefreshBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.appRefreshBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.spinIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* KPI Summary Grid */
+.appKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.appKpiCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.appKpiCard:hover {
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.appKpiCard.kpiActive {
+  border-color: #0a66c2;
+  background: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
+}
+
+.appKpiNumber {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.appKpiLabel {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.kpiApplied.kpiActive .appKpiNumber { color: #0284c7; }
+.kpiReview.kpiActive .appKpiNumber { color: #d97706; }
+.kpiShortlisted.kpiActive .appKpiNumber { color: #7c3aed; }
+.kpiHired.kpiActive .appKpiNumber { color: #16a34a; }
+.kpiRejected.kpiActive .appKpiNumber { color: #dc2626; }
+
+/* Filter & Search Bar */
+.appFilterToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.appSearchBox {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.appSearchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.appSearchBox input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 34px 8px 34px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.appSearchBox input:focus {
+  border-color: #0a66c2;
+}
+
+.appClearSearch {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+}
+
+.appStatusPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.appStatusPill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.appStatusPill:hover {
+  background: #f1f5f9;
+}
+
+.appStatusPill.pillActive {
+  background: #0a66c2;
+  border-color: #0a66c2;
+  color: #ffffff;
+}
+
+/* Loading & Empty States */
+.appLoadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.appSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0a66c2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+.appEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.appEmptyIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.appEmptyState h4 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.appEmptyState p {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: #64748b;
+  max-width: 400px;
+}
+
+.browseJobsBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a66c2;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.browseJobsBtn:hover {
+  background: #004182;
+}
+
+/* Applications List & Cards */
+.applicationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appTrackingCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.appTrackingCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.appCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.appCompanyBlock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.appCompanyLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.appTitleInfo h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.appCompanyMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.appCompanyName {
+  font-weight: 600;
+  color: #334155;
+}
+
+.appLocation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.appDot {
+  color: #cbd5e1;
+}
+
+.appStatusBadge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+.status-applied {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-in-review {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.status-shortlisted {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.status-hired {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.appMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.appMetaPill {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.appSalaryPill {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.appAppliedTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: #64748b;
+  margin-left: auto;
+}
+
+/* Visual Progress Stepper */
+.appStepperContainer {
+  margin: 18px 0 16px;
+  padding: 10px 8px 6px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.appStepperTrack {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 0 16px;
+}
+
+.appStepperTrack::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.appStepperBar {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  height: 3px;
+  background: #0a66c2;
+  z-index: 2;
+  transition: width 0.3s ease;
+}
+
+.appStepperBar.stepperRejected {
+  background: #dc2626;
+}
+
+.appStepperBar.stepperHired {
+  background: #16a34a;
+}
+
+.appStepPoint {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.stepCompleted .stepCircle {
+  background: #0a66c2;
+  border-color: #0a66c2;
+  color: #ffffff;
+}
+
+.stepCurrent .stepCircle {
+  background: #ffffff;
+  border-color: #0a66c2;
+  color: #0a66c2;
+  box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.15);
+}
+
+.stepRejected .stepCircle {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+.stepLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.stepCompleted .stepLabel,
+.stepCurrent .stepLabel {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.appSkillsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.appSkillTag {
+  font-size: 0.72rem;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.appCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.appActionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0a66c2;
+  text-decoration: none;
+}
+
+.appActionLink:hover {
+  text-decoration: underline;
+}
+
+.appWithdrawBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.appWithdrawBtn:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* ==========================================================================
+   ACCOUNTS & ORGANIZATIONS VIEW
+   ========================================================================== */
+.accountsCard {
+  position: relative;
+}
+
+.currentAccountCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1px solid #bfdbfe;
+  padding: 18px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.currentAccountLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.currentAccountPill {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.currentAccountBody {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.currentAccountAvatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.currentAccountAvatar.orgLogo {
+  border-radius: 10px;
+}
+
+.currentAccountAvatar.orgFallback {
+  border-radius: 10px;
+  color: #2563eb;
+}
+
+.currentAccountBody h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.currentAccountBody p {
+  margin: 3px 0 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.switchBtnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.switchBtnPrimary:hover {
+  background: #1d4ed8;
+}
+
+.actingLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #166534;
+  background: #dcfce7;
+  padding: 4px 12px;
+  border-radius: 14px;
+}
+
+.organizationsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orgSectionTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.orgSectionTop h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.orgSectionTop p {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.createOrgBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.createOrgBtn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.orgCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.orgManagedCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.15s ease;
+}
+
+.orgManagedCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.orgManagedCard.orgCardActive {
+  border-color: #2563eb;
+  background: #f8fafc;
+}
+
+.orgCardMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.orgCardLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.orgCardDetails h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.orgMetaLine {
+  display: block;
+  margin: 2px 0 6px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.orgStatusBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.orgStatusPill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.orgStatusPill.status-approved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.orgStatusPill.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.orgRolePill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.orgJobsPill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.orgCardActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.currentActiveTag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.switchOrgBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.switchOrgBtn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.manageJobsBtn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0a66c2;
+  text-decoration: none;
+}
+
+.manageJobsBtn:hover {
+  text-decoration: underline;
+}
+
+.emptyOrgsBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+}
+
+.emptyOrgsBox h5 {
+  margin: 12px 0 4px;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.emptyOrgsBox p {
+  margin: 0 0 16px;
+  font-size: 0.82rem;
+  color: #64748b;
+  max-width: 440px;
+}
+
+.registerNowBtn {
+  background: #0a66c2;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.registerNowBtn:hover {
+  background: #004182;
+}
+
 @media (max-width: 768px) {
   .settingsPageWrapper {
     padding: 8px 4px 85px;

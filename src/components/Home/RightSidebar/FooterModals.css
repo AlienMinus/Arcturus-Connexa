@@ -1,0 +1,594 @@
+/* ==========================================================================
+   FOOTER MODALS STYLING (About, Accessibility, Ad Choices, App, Business)
+   ========================================================================== */
+
+.footerModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalBackdropFade 0.2s ease-out;
+}
+
+@keyframes modalBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.footerModalCard {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.footerModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modalHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modalHeaderTitle h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.closeModalBtn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.closeModalBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.footerModalBody {
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modalIntroText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.footerModalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.modalPrimaryBtn {
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.modalPrimaryBtn:hover {
+  background: #004182;
+}
+
+.learnMoreLink {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0a66c2;
+  text-decoration: none;
+}
+
+.learnMoreLink:hover {
+  text-decoration: underline;
+}
+
+.copyrightNote {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* 1. About Modal Specifics */
+.aboutHeroBox {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1px solid #bfdbfe;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.versionBadge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.aboutHeroBox h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.aboutHeroBox p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.aboutFeaturesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.featureIcon {
+  font-size: 18px;
+  color: #0a66c2;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.featureItem strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.featureItem p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* 2. Accessibility Options */
+.a11yOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.a11yOptionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.a11yOptionRow strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.a11yOptionRow p {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.a11yToggle {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a11yShortcutsBox {
+  background: #f1f5f9;
+  border-left: 3px solid #0a66c2;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.a11yShortcutsBox strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #0f172a;
+}
+
+.a11yShortcutsBox ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.a11yShortcutsBox li {
+  margin-bottom: 4px;
+}
+
+.a11yShortcutsBox kbd {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* 3. Ad Choices */
+.adTransparencyBox {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #166534;
+  line-height: 1.45;
+}
+
+.adTransparencyBox p {
+  margin: 0;
+}
+
+/* 4. App Download Modal */
+.appPromoHeader h4 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.appPromoHeader p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.appInstallGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.appPlatformCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appPlatformCard strong {
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.appPlatformCard p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.installBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 10px;
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.appSyncBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #166534;
+}
+
+/* 5. Business Solutions Modal */
+.businessServicesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.businessServiceTile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.businessServiceTile:hover {
+  border-color: #93c5fd;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.businessServiceTile.createOrgTile {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.businessServiceTile.createOrgTile:hover {
+  background: #dbeafe;
+}
+
+.tileIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tileText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.tileText strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+.tileText span {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.tileArrow {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* 6. More Resources Modal */
+.moreLinksList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.moreLinkItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.moreLinkItem:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateX(2px);
+}
+
+.moreLinkItem strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.moreLinkItem span {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* ==========================================================================
+   DARK MODE FOR FOOTER MODALS
+   ========================================================================== */
+[data-theme="dark"] .footerModalCard,
+body.dark-mode .footerModalCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .footerModalHeader,
+body.dark-mode .footerModalHeader,
+[data-theme="dark"] .footerModalFooter,
+body.dark-mode .footerModalFooter {
+  border-color: #334155 !important;
+  background: #0f172a !important;
+}
+
+[data-theme="dark"] .modalHeaderTitle h3,
+body.dark-mode .modalHeaderTitle h3,
+[data-theme="dark"] .closeModalBtn,
+body.dark-mode .closeModalBtn {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .closeModalBtn:hover,
+body.dark-mode .closeModalBtn:hover {
+  background: #334155 !important;
+}
+
+[data-theme="dark"] .aboutHeroBox,
+body.dark-mode .aboutHeroBox {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .aboutHeroBox h4,
+body.dark-mode .aboutHeroBox h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .aboutHeroBox p,
+body.dark-mode .aboutHeroBox p {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .featureItem,
+body.dark-mode .featureItem,
+[data-theme="dark"] .a11yOptionRow,
+body.dark-mode .a11yOptionRow,
+[data-theme="dark"] .appPlatformCard,
+body.dark-mode .appPlatformCard,
+[data-theme="dark"] .businessServiceTile,
+body.dark-mode .businessServiceTile,
+[data-theme="dark"] .moreLinkItem,
+body.dark-mode .moreLinkItem {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .featureItem strong,
+body.dark-mode .featureItem strong,
+[data-theme="dark"] .a11yOptionRow strong,
+body.dark-mode .a11yOptionRow strong,
+[data-theme="dark"] .appPlatformCard strong,
+body.dark-mode .appPlatformCard strong,
+[data-theme="dark"] .tileText strong,
+body.dark-mode .tileText strong,
+[data-theme="dark"] .moreLinkItem strong,
+body.dark-mode .moreLinkItem strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .featureItem p,
+body.dark-mode .featureItem p,
+[data-theme="dark"] .a11yOptionRow p,
+body.dark-mode .a11yOptionRow p,
+[data-theme="dark"] .appPlatformCard p,
+body.dark-mode .appPlatformCard p,
+[data-theme="dark"] .tileText span,
+body.dark-mode .tileText span,
+[data-theme="dark"] .moreLinkItem span,
+body.dark-mode .moreLinkItem span {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .a11yShortcutsBox,
+body.dark-mode .a11yShortcutsBox {
+  background: #0f172a !important;
+  border-left-color: #38bdf8 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .a11yShortcutsBox strong,
+body.dark-mode .a11yShortcutsBox strong {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .a11yShortcutsBox kbd,
+body.dark-mode .a11yShortcutsBox kbd {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .adTransparencyBox,
+body.dark-mode .adTransparencyBox,
+[data-theme="dark"] .appSyncBanner,
+body.dark-mode .appSyncBanner {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  color: #86efac !important;
+}
+

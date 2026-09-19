@@ -3115,6 +3115,202 @@ body.dark-mode .create-company-btn:hover {
   color: #ffffff !important;
 }
 
+/* ==========================================================================
+   SETTINGS: JOB APPLICATIONS TRACKER & ACCOUNTS (DARK MODE)
+   ========================================================================== */
+[data-theme="dark"] .dashboardWidgetCard,
+body.dark-mode .dashboardWidgetCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .widgetDetails h4,
+body.dark-mode .widgetDetails h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .widgetDetails p,
+body.dark-mode .widgetDetails p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .appKpiCard,
+body.dark-mode .appKpiCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .appKpiCard.kpiActive,
+body.dark-mode .appKpiCard.kpiActive {
+  background: rgba(14, 165, 233, 0.15) !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .appKpiNumber,
+body.dark-mode .appKpiNumber {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .appFilterToolbar,
+body.dark-mode .appFilterToolbar {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .appSearchBox input,
+body.dark-mode .appSearchBox input {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .appStatusPill,
+body.dark-mode .appStatusPill {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .appStatusPill.pillActive,
+body.dark-mode .appStatusPill.pillActive {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .appTrackingCard,
+body.dark-mode .appTrackingCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .appTitleInfo h4,
+body.dark-mode .appTitleInfo h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .appCompanyName,
+body.dark-mode .appCompanyName {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .appLocation,
+body.dark-mode .appLocation {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .appMetaPill,
+body.dark-mode .appMetaPill {
+  background: #0f172a !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .appSalaryPill,
+body.dark-mode .appSalaryPill {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  color: #4ade80 !important;
+}
+
+[data-theme="dark"] .appStepperContainer,
+body.dark-mode .appStepperContainer {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .appStepperTrack::before,
+body.dark-mode .appStepperTrack::before {
+  background: #334155 !important;
+}
+
+[data-theme="dark"] .stepCircle,
+body.dark-mode .stepCircle {
+  background: #1e293b !important;
+  border-color: #475569 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .stepCompleted .stepCircle,
+body.dark-mode .stepCompleted .stepCircle {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .stepLabel,
+body.dark-mode .stepLabel {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .stepCompleted .stepLabel,
+body.dark-mode .stepCompleted .stepLabel,
+[data-theme="dark"] .stepCurrent .stepLabel,
+body.dark-mode .stepCurrent .stepLabel {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .appSkillTag,
+body.dark-mode .appSkillTag {
+  background: #0f172a !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .appCardFooter,
+body.dark-mode .appCardFooter {
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .currentAccountCard,
+body.dark-mode .currentAccountCard {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .currentAccountBody h4,
+body.dark-mode .currentAccountBody h4 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .currentAccountBody p,
+body.dark-mode .currentAccountBody p {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .orgManagedCard,
+body.dark-mode .orgManagedCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .orgManagedCard.orgCardActive,
+body.dark-mode .orgManagedCard.orgCardActive {
+  background: #0f172a !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .orgCardDetails h5,
+body.dark-mode .orgCardDetails h5 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .emptyOrgsBox,
+body.dark-mode .emptyOrgsBox {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .emptyOrgsBox h5,
+body.dark-mode .emptyOrgsBox h5 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .switchOrgBtn,
+body.dark-mode .switchOrgBtn {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
 
 
 
