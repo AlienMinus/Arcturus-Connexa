@@ -694,16 +694,17 @@ const CampusLinkPage = () => {
         setDriveForm={setDriveForm}
         handleScheduleDrive={handleScheduleDrive}
       />
-        {isOrganizationAccount && (
-          <ScheduleDriveModal
-            showDriveModal={showDriveModal}
-            setShowDriveModal={setShowDriveModal}
-            driveForm={driveForm}
-            setDriveForm={setDriveForm}
-            handleScheduleDrive={handleScheduleDrive}
-          />
-        )}
       </>
+      )}
+
+      {isOrganizationAccount && (
+        <ScheduleDriveModal
+          showDriveModal={showDriveModal}
+          setShowDriveModal={setShowDriveModal}
+          driveForm={driveForm}
+          setDriveForm={setDriveForm}
+          handleScheduleDrive={handleScheduleDrive}
+        />
       )}
     </div>
   );
