@@ -73,6 +73,8 @@ const PlacementProfileSchema = new mongoose.Schema(
     isAtRisk: { type: Boolean, default: false },
     riskReason: { type: String, default: '' },
     assignedMentor: { type: String, default: '' },
+    mentorActionRecommendation: { type: String, default: '' },
+    gemmaDiagnosticTimestamp: { type: Date, default: Date.now },
 
     mockInterviewsTaken: { type: Number, default: 0 },
     lastAssessmentDate: { type: Date, default: Date.now },
@@ -101,7 +103,7 @@ PlacementProfileSchema.pre('save', function () {
   }
 
   // Predictive at risk flag: low CGPA, active backlogs, or low readiness
-  if (this.cgpa < 6.5 || this.activeBacklogs > 0 || this.overallReadiness < 55) {
+  if (this.cgpa < 6.5 || this.activeBacklogs > 0 || this.overallReadiness < 55 || this.isAtRisk) {
     this.isAtRisk = true;
     if (!this.riskReason) {
       this.riskReason =

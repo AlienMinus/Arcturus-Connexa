@@ -1,10 +1,12 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import PlacementProfile from '../models/PlacementProfile.js';
 import PlacementDrive from '../models/PlacementDrive.js';
 import PlacementOffer from '../models/PlacementOffer.js';
 import User from '../models/User.js';
 import authMiddleware from '../middleware/auth.js';
 import { detectDriveConflicts } from '../utils/conflictDetector.js';
+import { analyzePlacementRiskAndGuidance, generateGemmaChatReply } from '../services/gemmaService.js';
 
 const router = express.Router();
 
@@ -129,8 +131,25 @@ router.post('/profile', authMiddleware, async (req, res) => {
     else if (overallReadiness >= 70) readinessLevel = 'Ready';
     else if (overallReadiness < 50) readinessLevel = 'Not Ready';
 
-    const isAtRisk = numCgpa < 6.5 || numBacklogs > 0 || overallReadiness < 50;
     const skillGaps = computeSkillGaps(studentSkills);
+
+    // Run Hugging Face Gemma Risk & Recommendation Diagnostics
+    const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
+      rollNumber,
+      collegeName,
+      branch,
+      graduationYear: numGradYear,
+      cgpa: numCgpa,
+      activeBacklogs: numBacklogs,
+      skills: studentSkills,
+      technicalScore,
+      aptitudeScore,
+      communicationScore,
+      projectScore,
+      overallReadiness,
+      readinessLevel,
+      targetRoles,
+    });
 
     let profile = await PlacementProfile.findOne({ userId: req.userId });
     if (profile) {
@@ -149,7 +168,11 @@ router.post('/profile', authMiddleware, async (req, res) => {
       profile.overallReadiness = overallReadiness;
       profile.readinessLevel = readinessLevel;
       profile.skillGaps = skillGaps;
-      profile.isAtRisk = isAtRisk;
+      profile.isAtRisk = gemmaAnalysis.isAtRisk;
+      profile.riskReason = gemmaAnalysis.riskReason;
+      profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
+      profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
+      profile.gemmaDiagnosticTimestamp = new Date();
       await profile.save();
     } else {
       profile = await PlacementProfile.create({
@@ -170,14 +193,67 @@ router.post('/profile', authMiddleware, async (req, res) => {
         overallReadiness,
         readinessLevel,
         skillGaps,
-        isAtRisk,
+        isAtRisk: gemmaAnalysis.isAtRisk,
+        riskReason: gemmaAnalysis.riskReason,
+        aiReadinessSummary: gemmaAnalysis.aiReadinessSummary,
+        mentorActionRecommendation: gemmaAnalysis.mentorActionRecommendation,
+        gemmaDiagnosticTimestamp: new Date(),
       });
     }
 
-    res.json({ message: 'Placement profile saved successfully!', profile });
+    res.json({
+      message: 'Placement profile saved and analyzed with Hugging Face Gemma!',
+      profile,
+      gemmaAnalysis,
+    });
   } catch (err) {
     console.error('Failed to save placement profile:', err);
     res.status(500).json({ error: 'Failed to save placement profile' });
+  }
+});
+
+// POST /api/campuslink/profile/diagnose-ai - On-demand Gemma AI Risk & Recommendation Diagnostics
+router.post('/profile/diagnose-ai', authMiddleware, async (req, res) => {
+  try {
+    let profile = await PlacementProfile.findOne({ userId: req.userId });
+    if (!profile) {
+      return res.status(404).json({ error: 'Placement profile not found. Please complete profile setup first.' });
+    }
+
+    const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
+      rollNumber: profile.rollNumber,
+      collegeName: profile.collegeName,
+      branch: profile.branch,
+      graduationYear: profile.graduationYear,
+      cgpa: profile.cgpa,
+      activeBacklogs: profile.activeBacklogs,
+      skills: profile.skills || [],
+      technicalScore: profile.technicalScore,
+      aptitudeScore: profile.aptitudeScore,
+      communicationScore: profile.communicationScore,
+      projectScore: profile.projectScore,
+      overallReadiness: profile.overallReadiness,
+      readinessLevel: profile.readinessLevel,
+      targetRoles: profile.targetRoles,
+    });
+
+    profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
+    profile.isAtRisk = gemmaAnalysis.isAtRisk;
+    profile.riskReason = gemmaAnalysis.riskReason;
+    profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
+    profile.gemmaDiagnosticTimestamp = new Date();
+    profile.skillGaps = computeSkillGaps(profile.skills || []);
+
+    await profile.save();
+
+    res.json({
+      message: 'Hugging Face Gemma-2 AI Diagnostics completed successfully!',
+      profile,
+      gemmaAnalysis,
+    });
+  } catch (err) {
+    console.error('Failed to run Gemma diagnostics:', err);
+    res.status(500).json({ error: 'Failed to run Gemma AI diagnostics' });
   }
 });
 
@@ -523,13 +599,15 @@ router.get('/analytics', async (req, res) => {
 
     const atRiskStudents = atRiskProfiles.map((p) => {
       const studentName = p.userId ? `${p.userId.firstName} ${p.userId.lastName}`.trim() : `Student ${p.rollNumber}`;
-      let riskReason = 'Readiness score below benchmark';
-      if (p.activeBacklogs > 0 && p.cgpa < 6.5) {
-        riskReason = `Active backlogs (${p.activeBacklogs}) & CGPA below 6.5`;
-      } else if (p.activeBacklogs > 0) {
-        riskReason = `${p.activeBacklogs} active backlog(s) flagged`;
-      } else if (p.cgpa < 6.5) {
-        riskReason = `CGPA (${p.cgpa}) below institutional benchmark (6.5)`;
+      let riskReason = p.riskReason || 'Readiness score below benchmark';
+      if (!p.riskReason) {
+        if (p.activeBacklogs > 0 && p.cgpa < 6.5) {
+          riskReason = `Active backlogs (${p.activeBacklogs}) & CGPA below 6.5`;
+        } else if (p.activeBacklogs > 0) {
+          riskReason = `${p.activeBacklogs} active backlog(s) flagged`;
+        } else if (p.cgpa < 6.5) {
+          riskReason = `CGPA (${p.cgpa}) below institutional benchmark (6.5)`;
+        }
       }
       return {
         id: p._id.toString(),
@@ -541,7 +619,9 @@ router.get('/analytics', async (req, res) => {
         readiness: p.overallReadiness,
         readinessLevel: p.readinessLevel,
         riskReason,
-        mentor: 'Department Faculty Advisor',
+        mentor: p.assignedMentor || 'Department Faculty Advisor',
+        mentorRecommendation: p.mentorActionRecommendation || 'Schedule 1-on-1 counseling session to review academic progress.',
+        aiReadinessSummary: p.aiReadinessSummary || '',
       };
     });
 
@@ -595,46 +675,48 @@ router.post('/offers/:id/respond', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /api/campuslink/ai-assistant - Conversational Placement Assistant (Real Context)
+// POST /api/campuslink/ai-assistant - Conversational Placement Assistant Powered by Gemma
 router.post('/ai-assistant', async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, profileId } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    const lower = prompt.toLowerCase();
-    let reply = '';
-
     // Fetch active drives for real context
-    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).limit(5).lean();
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).limit(6).lean();
+    const conflicts = detectDriveConflicts(activeDrives);
 
-    if (lower.includes('eligible') || lower.includes('drive')) {
-      if (activeDrives.length > 0) {
-        const driveList = activeDrives
-          .map((d) => `- **${d.companyName}** (${d.roleTitle}): Min CGPA ${d.eligibility?.minCgpa || 7.0}, Max ${d.eligibility?.maxBacklogs || 0} backlogs, Package: ${d.ctcLpa} LPA.`)
-          .join('\n');
-        reply = `🔍 **Active Placement Drives Eligibility Criteria:**\n${driveList}\n\nReview your profile in the **Readiness & Skills** tab to check if your CGPA and technical skills match these recruiter thresholds.`;
-      } else {
-        reply = `🔍 **Placement Drives Status:**\nThere are currently no active placement drives scheduled. Once the Placement Cell publishes recruitment drives, I will evaluate your eligibility and cutoff match in real-time.`;
+    // Optional profile if token or profileId is provided
+    let profile = null;
+    if (profileId) {
+      profile = await PlacementProfile.findById(profileId).lean();
+    } else if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        if (decoded?.userId) {
+          profile = await PlacementProfile.findOne({ userId: decoded.userId }).lean();
+        }
+      } catch (e) {
+        // Token decode ignored if invalid
       }
-    } else if (lower.includes('skill gap') || lower.includes('gap')) {
-      reply = `📊 **Target Role Skill-Gap Diagnostics:**\n- For **Full Stack Cloud Engineer**, high-priority industry competencies include **Docker Containerization**, **AWS/Cloud Orchestration**, and **Microservices Architecture**.\n- For **Cloud Solutions Architect**, focus on **Distributed System Design** and **Kubernetes**.\n- Check your personal diagnostic recommendations under the **Readiness & Skills** tab.`;
-    } else if (lower.includes('interview') || lower.includes('question') || lower.includes('prep')) {
-      reply = `💡 **Core Technical Interview Focus Areas:**\n1. *Data Structures & Algorithms:* Time/Space complexity, Hash Maps, Trees, Graphs, and Dynamic Programming.\n2. *System Design:* Load balancing, horizontal scaling, caching strategies (Redis), and database indexing (B-Trees).\n3. *Backend Engineering:* RESTful API design, authentication (JWT/OAuth), and asynchronous messaging.\nPractice using the **Mock Assessment Booster** in the Readiness tab!`;
-    } else if (lower.includes('conflict') || lower.includes('schedule')) {
-      const conflicts = detectDriveConflicts(activeDrives);
-      if (conflicts.length > 0) {
-        reply = `⚠️ **Placement Drive Schedule Notice:**\nWe detected ${conflicts.length} scheduling collision(s) among upcoming drives. The Placement Cell can use the **1-Click Auto-Resolve** button in the **Drives & Conflicts** tab to stagger slots and clear venue clashes.`;
-      } else {
-        reply = `✅ **Placement Schedule Status:**\nAll scheduled drives currently have distinct venues and non-overlapping time slots. No schedule conflicts detected.`;
-      }
-    } else {
-      reply = `🎓 **CampusLink AI Assistant:**\nI can help you review upcoming drive eligibility, diagnose technical skill gaps, evaluate your 4-tier readiness score, or practice technical interview questions. What would you like assistance with today?`;
     }
 
-    res.json({ reply });
+    const reply = await generateGemmaChatReply({
+      prompt,
+      profile,
+      drives: activeDrives,
+      conflicts,
+    });
+
+    res.json({
+      reply,
+      engine: 'Hugging Face Gemma-2-2B-IT',
+      timestamp: new Date().toISOString(),
+    });
   } catch (err) {
+    console.error('CampusLink AI Assistant error:', err);
     res.status(500).json({ error: 'AI Assistant error' });
   }
 });
