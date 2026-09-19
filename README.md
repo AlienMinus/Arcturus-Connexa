@@ -2,9 +2,9 @@
 
 <div align="center">
   <img src="public/logo.png" alt="Arcturus Logo" width="90" height="90" />
-  <h3>Next-Generation Professional Social, Career & Creator Platform</h3>
+  <h3>Next-Generation Professional Social, Career, Campus Placement & Creator Platform</h3>
   <p>
-    A full-stack professional networking platform designed to connect developers, creators, organizations, and recruiters with real-time communication, multimedia feeds, 24-hour ephemeral Tales (stories/status), organization approval workflows, interactive job marketplaces, and daily puzzle games.
+    A full-stack professional networking and campus-to-corporate placement ecosystem designed to connect students, developers, creators, organizations, and recruiters with real-time communication, multimedia feeds, 24-hour ephemeral Tales, AI-powered employability diagnostics via Hugging Face Gemma-2, institutional conflict resolution, interactive job marketplaces, and admin-governed identity verifications.
   </p>
 </div>
 
@@ -14,6 +14,7 @@
 
 - [✨ Key Features](#-key-features)
 - [👥 Arcturus User Architecture, IDs & Dedicated Portals](#-arcturus-user-architecture-ids--dedicated-portals)
+- [🎓 CampusLink Ecosystem & Gemma-2 AI Diagnostics](#-campuslink-ecosystem--gemma-2-ai-diagnostics)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [📂 Project Architecture](#-project-architecture)
 - [🚀 Getting Started](#-getting-started)
@@ -29,61 +30,68 @@
 
 ## ✨ Key Features
 
-### 1. 📖 24h Ephemeral Stories ("Tales")
+### 1. 🎓 CampusLink AI Placement & Institutional Command Center (`/campuslink`)
+- **Role-Gated Access Control**:
+  - **Arcturus Admin**: Exclusive access to the **Institutional Placement Command Center**, real-time macro analytics, branch conversion metrics, scheduling conflict detection matrix, recruiter candidate matching, and automated candidate shortlisting.
+  - **Students / Professionals**: Dedicated **Student Employability & Skill-Gap Portal**, real-time drive eligibility checks, personalized skill-gap roadmaps against scheduled company drives, and offer letter tracking.
+- **Hugging Face Gemma-2 AI Engine**:
+  - Integrates `google/gemma-2-2b-it` via Hugging Face Inference API for predictive placement risk scoring, identifying technical bottlenecks, and generating remedial mentor roadmaps.
+  - **Candidate Portfolio Analysis**: Automatically imports complete candidate profile background (projects with full descriptions and tech stacks, internship experiences, licenses and certifications, education, honors, and verified skills) from the student's Arcturus profile page to feed Gemma-2 diagnostics.
+- **4-Tier Employability Scoring**: Continuous algorithmic evaluation across 4 dimensions: *Technical Competency* (DSA, Web & Systems), *Aptitude & Quantitative*, *Communication & Behavioral*, and *Project & Practical Depth*.
+- **Real-Time Conflict Resolution Engine**: Audits overlapping interview drives and venue double-bookings with 1-click automated schedule re-allocation.
+- **Explainable AI Matching**: Ranks candidate pools with transparent, natural-language recruitment rationales explaining why a student is shortlisted or flagged.
+- **Offer Letters & Cryptographic Verification**: Track extended corporate offers with salary tier analytics and verifiable SHA-256 integrity hashes.
+- **Floating CampusLink AI Assistant**: Persistent conversational placement assistant powered by Gemma-2 with smooth streaming markdown typewriter effects and quick prompts.
+
+### 2. 🛡️ Blue Tick Verification & Branded Institute Badges
+- **Admin-Governed Blue Tick**: The verified blue badge is awarded strictly following administrative review. Users submit identity verification requests with documentary proof via `/settings` (under *Verification & Badges*), and administrators approve or reject submissions via `/admin`.
+- **Branded Institute Logo Badges**: Students affiliated with an educational institution that has an approved organization account in Arcturus automatically display the official institute logo badge on their profile cards, feed posts, and candidate listings.
+
+### 3. 📖 24h Ephemeral Stories ("Tales")
 - **Dual Creation Modes**: Text statuses with customizable gradient backgrounds and typography palettes + photo and video media stories with caption overlays.
-- **Story Player**: Fullscreen story player with segmented progress bars, 5-second auto-advancement, pause/play toggles, and touch navigation zones.
+- **Story Player**: Fullscreen player with segmented progress bars, 5-second auto-advancement, pause/play toggles, and touch navigation zones.
 - **Live Reactions**: Instant reaction emoji picker (`❤️`, `🔥`, `👏`, `💡`, `🚀`, `😂`) displaying floating badges on viewer profiles.
-- **Contained Interactive Drawers**:
-  - **Viewers Sheet**: Lists story viewers with timestamps, profile links, and their latest reaction badges.
-  - **Comments System**: Public comment section loaded with smooth in/out animations.
-- **Dual DM Integration**: Comments posted on a Tale automatically dispatch as a direct reply message to the author with an embedded semi-blurred Tale card preview.
+- **Interactive Drawers & DM Integration**: Public comments and direct-message replies with embedded semi-blurred Tale card previews.
 - **Auto-Expiration**: 24-hour MongoDB TTL expiration index.
 
-### 2. 🔐 Modern Authentication & Organization Verification
+### 4. 🔐 Modern Authentication & Organization Verification
 - **Frosted Glassmorphism UI**: High-contrast typography, floating inputs, and animated eye toggles.
 - **EmailJS OTP Verification**: 4-step registration flow with a 6-digit one-time passcode and 10-minute auto-expiry.
 - **Organization Account Approval**: Organizations submit registration verification documents (stored securely in MongoDB & Cloudinary) subject to approval by Arcturus Admin.
 - **Secure Password Reset**: One-click reset links with time-limited JWT tokens and EmailJS integration.
 
-### 3. 👑 Graphical Admin Dashboard (`/admin`)
+### 5. 👑 Graphical Admin Dashboard (`/admin`)
 - **Arcturus Admin Control Center**: Exclusive graphical administration dashboard for `arcturus_admin`.
+- **Identity Verification Queue**: Comprehensive review of submitted government documents, identity categories, affiliations, and statements with 1-click Approve, Reject, or Revoke controls.
 - **Organization Document Review**: Document inspection lightbox for business licenses and tax filings with 1-click Approval and preset Rejection workflows.
 - **Platform Analytics**: Real-time stats on registered users, active jobs, posts, server uptime, and pending verification queues.
-- **Audit Logs & Quick Actions**: Searchable administrative logs and user role management.
 
-### 4. 📰 Multimedia Feed & Advanced Post Suite
+### 6. 💼 Jobs Marketplace & Recruiter Dashboard
+- **MongoDB Jobs Marketplace**: Real-time search and filtering by job title, location, employment type, and tech stack.
+- **1-Click Apply**: Direct application submission attaching user credentials, contact details, and headline.
+- **Personalized Recruiter Dashboard (`/recruiter/dashboard`)**: Hiring KPI metrics, candidate pipeline tracker, applicant status updating (`Reviewing`, `Shortlist`, `Interview`, `Reject`, `Hire`), and verified portfolio inspection.
+
+### 7. 📰 Multimedia Feed & Post Suite
 - **Quick Access Creation Bar**: One-click triggers for 📷 Media, 🎥 Video, 📅 Event creation, and 📝 Long-form Article drafts.
 - **AI Rewrite & Post Assistant**: 1-click AI enhancements (Professional, Catchy Hook, Concise, Storytelling styles) with undo support.
 - **Post Scheduling & Audience Targeting**: Schedule posts for future release and target audiences (Public, Connections, Groups, Drafts).
-- **Social Engagement**: Multi-reaction bar, comments with profile navigation, reposts, and share capabilities.
 
-### 5. 💼 Jobs Portal & Recruiter Management
-- **MongoDB Jobs Marketplace**: Real-time search and filtering by job title, location, employment type, and tech stack.
-- **1-Click Apply**: Direct application submission attaching user credentials, contact details, and headline.
-- **Recruiter Portal**: Recruiter-exclusive dashboard to publish openings, customize company logos, and track active listings.
-
-### 6. 💬 Real-Time Messaging & Floating Chat
+### 8. 💬 Real-Time Messaging & Floating Chat
 - **Full Messaging Hub (`/messaging`)**: Split-view conversation drawer with message search, end-to-end encryption indicator, and embedded Tale replies.
 - **Floating Mini-Messenger Widget**: Persistent bottom-right chat widget allowing seamless multi-tasking across all pages.
 
-### 7. 🚀 Floating Back to Top Component
-- **Scroll Progress Ring**: Integrated SVG circular progress indicator that fills dynamically as you scroll down the page.
-- **Smooth Auto-Scroll**: Scrolls smoothly to the top when clicked.
-- **Smart Visibility**: Fades into view past 250px scroll depth with mobile clearance above the bottom navigation bar.
-
-### 8. 🎮 Daily Puzzle Games Arcade (`/games`)
+### 9. 🎮 Daily Puzzle Games Arcade (`/games`)
 - Integrated daily brain puzzles including **Crossclimb**, **Pinpoint**, **Queens**, **Tango**, **Mini Sudoku**, and **Zip**.
 
-### 9. 🎨 Dual Theme & Mobile Responsiveness
-- **Default Light Theme**: Clean, accessible light mode designed with high readability.
-- **Dark Mode**: Dark slate/navy backgrounds (`#0f172a`, `#1e293b`) with neon blue accents and complete CSS coverage.
-- **Mobile First Navigation**: Bottom navigation bar with safe-area insets (`env(safe-area-inset-bottom)`).
+### 10. 🎨 Dual Theme & Mobile Responsiveness
+- Instant switching between clean light mode and dark mode (`#0f172a`, `#1e293b`).
+- Responsive mobile layout with safe-area insets (`env(safe-area-inset-bottom)`).
 
 ---
 
 ## 👥 Arcturus User Architecture, IDs & Dedicated Portals
 
-Arcturus is engineered around a multi-tier identity model that segments privileges, UI dashboards, and capabilities across four distinct user roles and entities:
+Arcturus features a multi-tier identity model that segments privileges, UI dashboards, and capabilities across four distinct user roles and entities:
 
 ```mermaid
 flowchart TD
@@ -110,11 +118,11 @@ flowchart TD
 - **Identity & Data Models**:
   - `User._id`: MongoDB ObjectId representing the personal account.
   - `accountType`: `'individual'` or `'student'`.
-  - `isVerified`: Boolean indicating official identity verification (Blue Checkmark). Gated strictly behind Arcturus Admin approval.
+  - `isVerified`: Boolean indicating official identity verification (Blue Checkmark), granted strictly following admin approval.
   - `institute`: Sub-document containing `organizationId` (ObjectId ref to `Organization`), `name`, `verified`, `studentId`, `graduationYear`, and `department`.
 - **Key Capabilities & Dedicated Views**:
   - **Institute Affiliation & Verified Logo Badge**: Students linked to an approved Arcturus educational organization receive a clickable, branded institute logo badge on their profile cards, feed posts, and candidate listings that navigates directly to the official university page (`/company/:slug`).
-  - **Blue Tick Identity Verification**: Users can request official Blue Tick verification via `/settings` (under the *Verification & Badges* tab) by submitting proof documents, identity category, and affiliation statements for admin review.
+  - **Blue Tick Identity Verification Request**: Users can request official Blue Tick verification via `/settings` (under the *Verification & Badges* tab) by submitting proof documents, identity category, and affiliation statements for admin review.
   - **Student Placement & Readiness Portal (`/campuslink`)**:
     - **Readiness Score**: 4-tier continuous scoring (*Foundational*, *Developing*, *Placement-Ready*, *Industry Elite*).
     - **Gemma-2 Risk Engine**: On-demand AI placement risk score, technical skill bottleneck analysis, and customized remedial roadmaps powered by Hugging Face `google/gemma-2-2b-it`.
@@ -163,15 +171,42 @@ flowchart TD
 - **Dedicated Portals & Command Centers**:
   - **Arcturus Operations Hub (`/admin`)**:
     - **Real-Time KPI Metrics Ribbon**: Track total users, verified members, organizations, pending queues, active jobs, and posts.
-    - **Organization Approval Workflow**: Lightbox inspection for corporate legal documents with 1-click Approve and structured Rejection modals.
     - **Blue Tick Identity Verification Queue**: Review submitted government documents, identity categories, affiliations, and statements with 1-click Approve, Reject, or Revoke controls.
+    - **Organization Approval Workflow**: Lightbox inspection for corporate legal documents with 1-click Approve and structured Rejection modals.
     - **Job Portal Moderation**: Monitor and delete fraudulent or policy-violating job listings.
-    - **User Account Governance**: 1-click toggle for user verification statuses.
   - **CampusLink Institutional Command Center (`/campuslink`)**:
     - **Placement Analytics Dashboard**: Institutional placement rate, average CTC, branch-wise hiring breakdown, package tiers, and predictive at-risk student monitoring.
     - **Drive Scheduling & Venue Management**: Schedule corporate drives with package tiers, cutoffs, and eligible departments.
     - **Real-Time Conflict Matrix**: Detect venue double-booking and schedule collisions with 1-click auto-resolution.
     - **Candidate Matching Engine**: Algorithmic ranking and 1-click auto-shortlisting with explainable AI rationales.
+
+---
+
+## 🎓 CampusLink Ecosystem & Gemma-2 AI Diagnostics
+
+```plaintext
+                                      ┌──────────────────────────────────────┐
+                                      │   Arcturus User Profile Portfolio    │
+                                      │  (Projects, Experience, Certs, DSA)  │
+                                      └──────────────────┬───────────────────┘
+                                                         │
+                                                         ▼
+┌────────────────────────────┐        ┌──────────────────────────────────────┐
+│  Scheduled Recruiter Drives│ ────►  │   Hugging Face Gemma-2 AI Engine     │
+│  (Cutoffs, Skills, Venues) │        │     (google/gemma-2-2b-it Model)     │
+└─────────────┬──────────────┘        └──────────────────┬───────────────────┘
+              │                                          │
+              ▼                                          ▼
+┌────────────────────────────┐        ┌──────────────────────────────────────┐
+│  Real-Time Conflict Engine │        │   Predictive Placement Diagnostics   │
+│  (1-Click Auto-Resolution) │        │ (Risk Reason, Gaps, Remedial Plan)   │
+└────────────────────────────┘        └──────────────────────────────────────┘
+```
+
+CampusLink bridges campus placement cells with corporate recruitment drives:
+1. **Candidate Profile Ingestion**: When students evaluate their employability or admins view ranked candidates, the platform extracts technical projects with descriptions, GitHub/demo URLs, tech stacks, work and internship experiences, licenses and certifications, academic milestones, and skills.
+2. **Hugging Face Gemma-2-2B-IT Diagnostic**: Prompt-engineered LLM inference synthesizes the student's complete academic and portfolio background to flag corporate risk factors, produce an explainable readiness summary, and generate a step-by-step remedial action plan for faculty mentors.
+3. **Institutional Command Center**: Gated exclusively to Arcturus Administrators, offering macro visibility into campus placement statistics, branch conversion rates, salary tier distributions, and at-risk student interventions.
 
 ---
 
@@ -181,13 +216,15 @@ flowchart TD
 - **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Routing**: [React Router DOM v7](https://reactrouter.com/)
 - **Icons**: [React Icons](https://react-icons.github.io/react-icons/) (FontAwesome, Bootstrap Icons, Remix, React Icons)
-- **Styling**: Vanilla CSS Modules + Bootstrap 5 + Glassmorphic Design Tokens + Custom Dark Mode
+- **Styling**: Vanilla CSS Modules + Glassmorphic Design Tokens + Custom Dark Mode
+- **Markdown & AI Streaming**: `react-markdown` + Custom Typewriter Streaming Engine
 - **Client SDKs**: `@emailjs/browser`, `axios`
 
 ### Backend
 - **Runtime**: [Node.js](https://nodejs.org/) (ES Modules)
 - **Framework**: [Express 5](https://expressjs.com/)
-- **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) via [Mongoose 9](https://mongoosejs.com/)
+- **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) via [Mongoose 9](https://mongoosejs.com/) (configured with `{ family: 4 }` IPv4 resolution)
+- **AI Inference**: Hugging Face Inference API (`google/gemma-2-2b-it`)
 - **Authentication**: JSON Web Tokens (`jsonwebtoken`) + `bcrypt`
 - **File & Media Storage**: [Cloudinary SDK](https://cloudinary.com/) + `multer`
 - **Email Engine**: [EmailJS REST API](https://www.emailjs.com/)
@@ -198,66 +235,97 @@ flowchart TD
 
 ```plaintext
 arcturus/
-├── public/                     # Static assets (logos, icons, background images)
-│   ├── manifest.json           # PWA web manifest
-│   ├── login.png               # Auth scenic backdrop image
-│   └── logo.png                # Brand logo
-├── server/                     # Express.js Backend API
-│   ├── middleware/             # Authentication & admin authorization middleware
+├── public/                               # Static assets (logos, icons, background images)
+│   ├── manifest.json                     # PWA web manifest
+│   ├── login.png                         # Auth scenic backdrop image
+│   └── logo.png                          # Brand logo
+├── server/                               # Express.js Backend API
+│   ├── db.js                             # MongoDB Atlas connection (IPv4 DNS & reconnection listeners)
+│   ├── middleware/                       # Authentication & admin authorization middleware
 │   │   ├── auth.js
 │   │   └── adminAuth.js
-│   ├── models/                 # Mongoose schema models
-│   │   ├── User.js             # User accounts, credentials & org details
-│   │   ├── Profile.js          # Profile attributes, experience, skills
-│   │   ├── Post.js             # Feed posts, likes, reactions & comments
-│   │   ├── Tale.js             # 24-hour ephemeral stories, reactions & comments
-│   │   ├── Message.js          # Encrypted direct messages & embedded tale replies
-│   │   ├── Job.js              # Job listings & candidate applications
-│   │   └── Otp.js              # Temporary OTP verification with TTL
-│   ├── routes/                 # REST API endpoints
-│   │   ├── auth.js             # Registration, login, OTP & password reset
-│   │   ├── admin.js            # Admin metrics, org approvals & audit logs
-│   │   ├── tales.js            # 24h stories, reactions & comments
-│   │   ├── profile.js          # Profile queries & updates
-│   │   ├── posts.js            # Post creation, AI rewrite & engagement
-│   │   ├── messages.js         # Conversation threads
-│   │   ├── notifications.js    # Activity alerts & updates
-│   │   └── jobs.js             # Job openings & recruiter operations
-│   ├── templates/              # HTML Email Templates (EmailJS)
-│   ├── utils/                  # Cloudinary uploaders, JWT signing, password hashing
-│   └── server.js               # Express application entry point
-├── src/                        # React Frontend Application
-│   ├── components/             # Reusable UI components
-│   │   ├── Tale/               # TaleTray, CreateTaleModal, TaleViewerModal
-│   │   ├── Home/               # Feed, PostCard, PostModal, Messenger, Sidebars
-│   │   ├── Games/              # Puzzle games arcade
-│   │   ├── admin/              # Admin dashboard widgets & document lightbox
-│   │   ├── common/             # BackToTop, buttons & shared components
-│   │   ├── Navbar/             # Global navigation bar, search & drawer
-│   │   └── Profile/            # Profile sections & modals
-│   ├── context/                # Global React State Contexts
-│   │   ├── AuthContext.jsx     # User session & token management
-│   │   ├── ProfileContext.jsx  # Active user profile data
-│   │   ├── ThemeContext.jsx    # Light / Dark theme toggling
-│   │   └── ReactionContext.jsx # Global reaction states
-│   ├── pages/                  # Top-level Page Views
-│   │   ├── admin/              # AdminDashboard page
-│   │   ├── AuthPage/           # Authentication hub
-│   │   ├── HomePage/           # Main activity feed & Tale tray
-│   │   ├── JobsPage/           # Jobs discovery marketplace
-│   │   ├── JobPostingPage/     # Recruiter job management portal
-│   │   ├── MessegingPage/      # Full-page messaging center
-│   │   ├── NotificationsPage/  # Clickable activity & connection alerts
-│   │   ├── ProfilePage/        # User portfolio & details
-│   │   ├── SettingsPage/       # Account, security & privacy preferences
-│   │   └── HelpPage/           # Help center & support tickets
-│   ├── utils/                  # Client helpers, user name resolution, API URL builders
-│   ├── darkmode.css            # Dark mode overrides & theme variables
-│   ├── mobile.css              # Mobile screen styles & safe-area insets
-│   ├── index.css               # Global base styles & CSS variables
-│   ├── Router.jsx              # Application route tree
+│   ├── models/                           # Mongoose schema models
+│   │   ├── User.js                       # User accounts, credentials, institute & verification status
+│   │   ├── Profile.js                    # Profile attributes, experience, projects, skills
+│   │   ├── Organization.js               # Corporate & academic organizations with verification status
+│   │   ├── VerificationRequest.js        # Blue Tick verification requests & uploaded documents
+│   │   ├── PlacementProfile.js           # Student placement profile, readiness scores & Gemma diagnostics
+│   │   ├── PlacementDrive.js             # Campus recruitment drives, eligibility cutoffs & schedules
+│   │   ├── PlacementOffer.js             # Post-selection offers & cryptographic verification hashes
+│   │   ├── Post.js                       # Feed posts, likes, reactions & comments
+│   │   ├── Tale.js                       # 24-hour ephemeral stories, reactions & comments
+│   │   ├── Message.js                    # Direct messages & embedded tale replies
+│   │   ├── Job.js                        # Job listings & candidate applications
+│   │   └── Otp.js                        # Temporary OTP verification with TTL
+│   ├── routes/                           # REST API endpoints
+│   │   ├── campuslink/                   # Modular CampusLink sub-routers
+│   │   │   ├── helpers.js                # Candidate profile extractor, skill gap analyzer & admin check
+│   │   │   ├── analyticsRoutes.js        # Command Center macro analytics & at-risk student list
+│   │   │   ├── drivesRoutes.js           # Recruitment drives, conflict matrix & AI candidate matching
+│   │   │   ├── profileRoutes.js          # Placement profile setup, assessment booster & Gemma AI diagnostics
+│   │   │   ├── offersRoutes.js           # Corporate offer letters & status updates
+│   │   │   ├── assistantRoutes.js        # Gemma-2 conversational placement assistant
+│   │   │   └── index.js                  # Sub-router aggregator
+│   │   ├── verification.js               # Blue Tick request submission & admin review
+│   │   ├── auth.js                       # Registration, login, OTP & password reset
+│   │   ├── admin.js                      # Admin metrics, org approvals & audit logs
+│   │   ├── tales.js                      # 24h stories, reactions & comments
+│   │   ├── profile.js                    # Profile queries & updates
+│   │   ├── posts.js                      # Post creation, AI rewrite & engagement
+│   │   ├── messages.js                   # Conversation threads
+│   │   ├── notifications.js              # Activity alerts & updates
+│   │   └── jobs.js                       # Job openings & recruiter operations
+│   ├── services/
+│   │   └── gemmaService.js               # Hugging Face Gemma-2 AI prompt engine & chat reply generator
+│   ├── utils/                            # Conflict detector, Cloudinary uploader, password hashing
+│   └── server.js                         # Express application entry point
+├── src/                                  # React Frontend Application
+│   ├── components/                       # Reusable UI components
+│   │   ├── CampusLink/                   # Modular CampusLink components
+│   │   │   ├── CampusHero.jsx            # Dynamic role-aware hero header & KPI pills
+│   │   │   ├── CampusTabsNav.jsx         # Role-segmented navigation tabs
+│   │   │   ├── CommandCenterTab.jsx      # Admin Placement Command Center & at-risk panel
+│   │   │   ├── DrivesTab.jsx             # Drives grid, conflict alert banner & eligibility pills
+│   │   │   ├── ReadinessTab.jsx          # 4-tier score dial, candidate portfolio & Gemma risk card
+│   │   │   ├── MatchingTab.jsx           # Recruiter candidate matching & explainable AI rationales
+│   │   │   ├── OffersTab.jsx             # Post-selection offers & cryptographic hash display
+│   │   │   ├── FloatingAIAssistant.jsx   # Floating Gemma-2 AI chatbot widget
+│   │   │   ├── TypewriterMarkdown.jsx    # Streaming markdown typewriter renderer
+│   │   │   ├── MockAssessmentModal.jsx   # Interactive readiness assessment booster
+│   │   │   ├── ScheduleDriveModal.jsx    # Drive scheduling modal with criteria pre-audits
+│   │   │   └── index.js                  # Component index
+│   │   ├── Tale/                         # TaleTray, CreateTaleModal, TaleViewerModal
+│   │   ├── Home/                         # Feed, PostCard, PostModal, Messenger, Sidebars
+│   │   ├── Games/                        # Puzzle games arcade
+│   │   ├── admin/                        # Admin dashboard widgets & document lightbox
+│   │   ├── common/                       # BackToTop, buttons & shared components
+│   │   ├── Navbar/                       # Global navigation bar, search & drawer
+│   │   └── Profile/                      # Profile sections & modals
+│   ├── context/                          # Global React State Contexts
+│   │   ├── AuthContext.jsx               # User session, token & role management
+│   │   ├── ProfileContext.jsx            # Active user profile data
+│   │   ├── ThemeContext.jsx              # Light / Dark theme toggling
+│   │   └── ReactionContext.jsx           # Global reaction states
+│   ├── pages/                            # Top-level Page Views
+│   │   ├── CampusLink/
+│   │   │   ├── CampusLinkPage.jsx        # Orchestrator page component
+│   │   │   └── CampusLinkPage.css        # Shared CampusLink layout & styling tokens
+│   │   ├── admin/                        # AdminDashboard page
+│   │   ├── AuthPage/                     # Authentication hub
+│   │   ├── HomePage/                     # Main activity feed & Tale tray
+│   │   ├── JobsPage/                     # Jobs discovery marketplace
+│   │   ├── JobPostingPage/               # Recruiter job management portal
+│   │   ├── MessegingPage/                # Full-page messaging center
+│   │   ├── NotificationsPage/            # Activity & connection alerts
+│   │   ├── ProfilePage/                  # User portfolio & details
+│   │   ├── SettingsPage/                 # Account, security, Blue Tick requests & preferences
+│   │   └── HelpPage/                     # Help center & support tickets
+│   ├── utils/                            # Client helpers, user name resolution, API URL builders
+│   ├── darkmode.css                      # Dark mode overrides & theme variables
+│   ├── index.css                         # Global base styles & CSS variables
+│   ├── Router.jsx                        # Application route tree
 │   └── App.jsx
-├── vite.config.js              # Vite bundler & API proxy configuration
+├── vite.config.js                        # Vite bundler & API proxy configuration
 └── package.json
 ```
 
@@ -270,6 +338,7 @@ arcturus/
 - **Node.js**: `v18.0.0` or higher
 - **npm**: `v9.0.0` or higher
 - **MongoDB Atlas** database cluster
+- **Hugging Face Account & API Token** (for Gemma-2 AI inference)
 - **Cloudinary** account (for media storage)
 - **EmailJS** account (for transactional OTP & password reset emails)
 
@@ -286,8 +355,11 @@ Create a file named `.env` inside the `server/` directory:
 PORT=3000
 CLIENT_URL=http://localhost:5173
 
-# Database
+# Database (Atlas Connection String)
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/arcturus?retryWrites=true&w=majority
+
+# Hugging Face AI Engine (Gemma-2 Diagnostics)
+HF_TOKEN=hf_your_hugging_face_access_token
 
 # JWT Security
 JWT_SECRET=your_super_secret_jwt_key
@@ -348,6 +420,34 @@ Visit **`http://localhost:5173`** in your browser.
 ---
 
 ## 📡 API Endpoints Reference
+
+### 🎓 CampusLink Ecosystem (`/api/campuslink`)
+
+| Method   | Endpoint                                   | Description                                                             | Auth Required |
+| :------- | :----------------------------------------- | :---------------------------------------------------------------------- | :-----------: |
+| `GET`    | `/api/campuslink/analytics`                | Aggregated command center metrics, branch conversions, and at-risk list |      ❌       |
+| `GET`    | `/api/campuslink/drives`                   | List active recruitment drives with real-time conflict detection matrix |      ❌       |
+| `POST`   | `/api/campuslink/drives`                   | Schedule recruitment drive with cutoffs, venue, and criteria            |  ✅ (Admin)   |
+| `PATCH`  | `/api/campuslink/drives/:id/resolve-conflict` | 1-Click automated resolution re-allocating drive venue / schedule    |  ✅ (Admin)   |
+| `DELETE` | `/api/campuslink/drives/:id`               | Cancel and remove recruitment drive                                     |  ✅ (Admin)   |
+| `GET`    | `/api/campuslink/drives/:id/match`         | Rank candidate pool with Explainable AI shortlisting rationales         |      ❌       |
+| `POST`   | `/api/campuslink/drives/:id/auto-shortlist`| 1-Click auto-shortlisting candidates meeting criteria                   |  ✅ (Admin)   |
+| `GET`    | `/api/campuslink/profile/me`               | Retrieve student placement readiness profile and candidate portfolio    |      ✅       |
+| `POST`   | `/api/campuslink/profile`                  | Save/update placement profile and run initial Gemma-2 risk analysis     |      ✅       |
+| `POST`   | `/api/campuslink/profile/diagnose-ai`      | On-demand Gemma-2 risk & recommendation diagnostics                     |      ✅       |
+| `POST`   | `/api/campuslink/profile/assessment`       | Submit quick readiness assessment and boost dimension scores            |      ✅       |
+| `GET`    | `/api/campuslink/offers`                   | List extended placement offers with cryptographic verification hashes   |      ❌       |
+| `POST`   | `/api/campuslink/offers/:id/respond`       | Student accept / decline action for an extended job offer               |      ✅       |
+| `POST`   | `/api/campuslink/ai-assistant`             | Conversational AI placement assistant powered by Gemma-2                |   Optional    |
+
+### 🛡️ Identity Verification & Blue Tick (`/api/verification`)
+
+| Method   | Endpoint                              | Description                                                | Auth Required |
+| :------- | :------------------------------------ | :--------------------------------------------------------- | :-----------: |
+| `POST`   | `/api/verification/request`           | Submit Blue Tick verification request with proof documents |      ✅       |
+| `GET`    | `/api/verification/my-status`          | Check current verification request status                  |      ✅       |
+| `GET`    | `/api/verification/admin/pending`     | Retrieve all pending verification requests for admin review|  ✅ (Admin)   |
+| `POST`   | `/api/verification/admin/:id/decision`| Approve, reject, or revoke user Blue Tick verification     |  ✅ (Admin)   |
 
 ### 📖 Ephemeral Stories / Statuses (`/api/tales`)
 
@@ -415,6 +515,7 @@ Visit **`http://localhost:5173`** in your browser.
 - **Dual Theme System**: Seamless instant switching between clean light mode and dark mode with persistent `localStorage` synchronization.
 - **Glassmorphic Aesthetics**: Frosted glass inputs, modals, and embedded preview cards with real-time backdrop filters.
 - **Responsive Layout**: Fluid layouts across ultra-wide monitors, laptops, tablets, and smartphones with dedicated bottom tab navigation.
+- **Scroll Progress Ring**: Integrated SVG circular progress indicator that fills dynamically as you scroll down the page and provides 1-click smooth scrolling to top.
 
 ---
 
