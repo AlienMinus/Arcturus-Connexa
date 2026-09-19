@@ -231,7 +231,7 @@ const NavRight = () => {
           {isAuthenticated && (
             <div className="profile-dropdown-section account-switcher-section">
               <div className="account-switcher-header">
-                <h5>Switch Account</h5>
+                <h5>Switch identity</h5>
                 <Link 
                   to="/settings/accounts" 
                   className="manage-accounts-link"
@@ -279,7 +279,7 @@ const NavRight = () => {
                         setDropdownOpen(false);
                       }}
                     >
-                      Switch
+                      Use identity
                     </button>
                   )}
                 </div>
@@ -328,7 +328,7 @@ const NavRight = () => {
                                 setDropdownOpen(false);
                               }}
                             >
-                              Switch
+                              Use identity
                             </button>
                           )}
                         </div>

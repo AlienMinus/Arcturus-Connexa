@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -17,7 +18,7 @@ import {
 import './CampusLinkPage.css';
 
 const CampusLinkPage = () => {
-  const { token, user } = useAuth();
+  const { token, user, activeAccount } = useAuth();
   const isArcturusAdmin = user?.role === 'admin' || user?.username === 'arcturus_admin';
   const [activeTab, setActiveTab] = useState(() => 
     (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
@@ -498,6 +499,13 @@ const CampusLinkPage = () => {
 
   return (
     <div className="campusLinkWrapper">
+      <div className={`workspaceIdentityStrip ${activeAccount?.type === 'organization' ? 'organization-context' : ''}`}>
+        <div className="workspaceIdentityCopy">
+          <span className="workspaceIdentityEyebrow">Placement workspace</span>
+          <strong>{activeAccount?.type === 'organization' ? activeAccount.name : 'Personal profile'}</strong>
+        </div>
+        <Link to="/settings/accounts" className="workspaceIdentityLink">Switch identity</Link>
+      </div>
       {/* Toast */}
       {toastMessage && (
         <div className="campusToast">

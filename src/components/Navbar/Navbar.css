@@ -932,7 +932,7 @@
 }
 
 .account-switcher-section {
-  background-color: #f8fafc;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   padding: 10px 14px !important;
   border-bottom: 1px solid #e2e8f0 !important;
 }
@@ -1089,6 +1089,26 @@
   background: #0a66c2;
   border-color: #0a66c2;
   color: #ffffff;
+}
+
+.account-switch-btn:focus-visible,
+.manage-accounts-link:focus-visible,
+.create-org-action-link:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 2px;
+}
+
+.account-switch-row.active-account .account-switch-name {
+  color: #1d4ed8;
+}
+
+.account-switch-row.active-account::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: #2563eb;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .orgs-switch-group {

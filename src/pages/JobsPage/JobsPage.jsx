@@ -21,7 +21,7 @@ import './JobsPage.css';
 const JOB_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship'];
 
 const JobsPage = () => {
-  const { user, token } = useAuth();
+  const { user, token, activeAccount } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,6 +154,13 @@ const JobsPage = () => {
   return (
     <div className="jobsPortalWrapper">
       <div className="jobsPortalContainer">
+        <div className={`workspaceIdentityStrip ${activeAccount?.type === 'organization' ? 'organization-context' : ''}`}>
+          <div className="workspaceIdentityCopy">
+            <span className="workspaceIdentityEyebrow">Browsing as</span>
+            <strong>{activeAccount?.type === 'organization' ? activeAccount.name : 'Personal profile'}</strong>
+          </div>
+          <Link to="/settings/accounts" className="workspaceIdentityLink">Switch identity</Link>
+        </div>
         {/* Toast Alert */}
         {toastMessage && (
           <div className="jobsToast">

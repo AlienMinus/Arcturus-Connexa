@@ -18,6 +18,320 @@
   gap: 16px;
 }
 
+.accountsCard .settingsCardHeader,
+.appTrackerCard .settingsCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.currentAccountCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: #f8fbff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+}
+
+.currentAccountPill {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: #1d4ed8;
+  background: #dbeafe;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.currentAccountBody,
+.currentAccountLeft,
+.currentAccountRight {
+  display: flex;
+  align-items: center;
+}
+
+.currentAccountBody { gap: 12px; }
+.currentAccountLeft { display: block; }
+.currentAccountRight { gap: 8px; flex-shrink: 0; }
+
+.currentAccountAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  color: #0a66c2;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+}
+
+.currentAccountAvatar.orgLogo,
+.currentAccountAvatar.orgFallback { border-radius: 9px; }
+
+.currentAccountBody h4 { margin: 0; color: #0f172a; font-size: 0.95rem; }
+.currentAccountBody p { margin: 3px 0 0; color: #64748b; font-size: 0.78rem; }
+
+.switchBtnPrimary,
+.switchBtnSecondary {
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.switchBtnPrimary { color: #ffffff; background: #0a66c2; border: 1px solid #0a66c2; }
+.switchBtnSecondary { color: #0a66c2; background: #ffffff; border: 1px solid #93c5fd; }
+.switchBtnPrimary:hover { background: #004182; }
+.switchBtnSecondary:hover { background: #eff6ff; }
+
+.appKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.appKpiCard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.appKpiCard:hover,
+.appKpiCard.kpiActive { border-color: #93c5fd; background: #eff6ff; }
+.appKpiNumber { color: #0f172a; font-size: 1.25rem; font-weight: 800; }
+.appKpiLabel { color: #64748b; font-size: 0.7rem; font-weight: 700; }
+
+.appTrackingCard {
+  padding: 16px;
+  margin-top: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.appTrackingCard.in-review { border-left: 3px solid #f59e0b; }
+.appTrackingCard.shortlisted { border-left: 3px solid #0a66c2; }
+.appTrackingCard.hired { border-left: 3px solid #16a34a; }
+.appTrackingCard.rejected { border-left: 3px solid #ef4444; }
+
+@media (max-width: 700px) {
+  .currentAccountCard,
+  .accountsCard .settingsCardHeader,
+  .appTrackerCard .settingsCardHeader { align-items: stretch; flex-direction: column; }
+  .currentAccountRight { width: 100%; }
+  .switchBtnPrimary, .switchBtnSecondary { flex: 1; }
+  .appKpiGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Job applications and organization management */
+.appTrackerHeader {
+  align-items: center !important;
+}
+
+.appHeaderTitle {
+  min-width: 0;
+}
+
+.appRefreshBtn,
+.createOrgBtn,
+.switchOrgBtn,
+.manageJobsBtn,
+.registerNowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.appRefreshBtn {
+  flex-shrink: 0;
+  padding: 8px 11px;
+  color: #0a66c2;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+}
+
+.appRefreshBtn:hover,
+.createOrgBtn:hover,
+.switchOrgBtn:hover,
+.manageJobsBtn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.appFilterToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.appSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.appSearchBox:focus-within { border-color: #0a66c2; box-shadow: 0 0 0 2px #dbeafe; }
+.appSearchIcon { color: #64748b; flex-shrink: 0; }
+.appSearchBox input { width: 100%; min-width: 0; border: 0; outline: 0; color: #0f172a; font-size: 0.82rem; }
+.appClearSearch { display: inline-flex; padding: 2px; color: #64748b; background: transparent; border: 0; cursor: pointer; }
+
+.appStatusPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.appStatusPill {
+  padding: 6px 9px;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.appStatusPill:hover,
+.appStatusPill.pillActive { color: #0a66c2; background: #ebf4fd; border-color: #93c5fd; }
+
+.appCardTop,
+.appCompanyBlock,
+.appCompanyMeta,
+.appMetaRow,
+.appCardFooter {
+  display: flex;
+  align-items: center;
+}
+
+.appCardTop { justify-content: space-between; gap: 16px; }
+.appCompanyBlock { gap: 12px; min-width: 0; }
+.appCompanyLogo { width: 42px; height: 42px; flex: 0 0 42px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; padding: 4px; box-sizing: border-box; }
+.appTitleInfo { min-width: 0; }
+.appTitleInfo h4 { margin: 0; overflow: hidden; color: #0f172a; font-size: 0.96rem; text-overflow: ellipsis; white-space: nowrap; }
+.appCompanyMeta { flex-wrap: wrap; gap: 6px; margin-top: 4px; color: #64748b; font-size: 0.76rem; }
+.appLocation { display: inline-flex; align-items: center; gap: 4px; }
+.appStatusTagBlock { flex-shrink: 0; }
+.appStatusBadge { display: inline-flex; padding: 5px 8px; border-radius: 999px; color: #475569; background: #f1f5f9; font-size: 0.7rem; font-weight: 800; }
+.status-applied { color: #0369a1; background: #e0f2fe; }
+.status-in-review { color: #92400e; background: #fef3c7; }
+.status-shortlisted { color: #1d4ed8; background: #dbeafe; }
+.status-hired { color: #166534; background: #dcfce7; }
+.status-rejected { color: #991b1b; background: #fee2e2; }
+
+.appMetaRow { flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.appMetaPill,
+.appSkillTag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; color: #475569; background: #f1f5f9; border-radius: 5px; font-size: 0.7rem; font-weight: 600; }
+.appSalaryPill { color: #166534; background: #ecfdf5; }
+.appAppliedTime { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; color: #64748b; font-size: 0.72rem; }
+
+.appStepperContainer { padding: 22px 8px 12px; }
+.appStepperTrack { position: relative; display: flex; justify-content: space-between; height: 3px; background: #e2e8f0; }
+.appStepperBar { position: absolute; inset: 0 auto 0 0; max-width: 100%; background: #0a66c2; }
+.appStepPoint { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; transform: translateY(-9px); }
+.stepCircle { display: grid; place-items: center; width: 21px; height: 21px; color: #64748b; background: #ffffff; border: 2px solid #cbd5e1; border-radius: 50%; font-size: 0.65rem; font-weight: 800; }
+.stepCompleted .stepCircle,
+.stepCurrent .stepCircle { color: #ffffff; background: #0a66c2; border-color: #0a66c2; }
+.stepRejected .stepCircle { color: #ffffff; background: #ef4444; border-color: #ef4444; }
+.stepLabel { color: #64748b; font-size: 0.66rem; font-weight: 700; white-space: nowrap; }
+
+.appSkillsList { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.appSkillTag { color: #0a66c2; background: #eff6ff; }
+.appCardFooter { justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+.appActionLink { display: inline-flex; align-items: center; gap: 5px; color: #0a66c2; font-size: 0.76rem; font-weight: 700; text-decoration: none; }
+.appWithdrawBtn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 9px; color: #b91c1c; background: #ffffff; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+.appWithdrawBtn:hover { background: #fef2f2; }
+.appLoadingState,
+.appEmptyState { padding: 42px 20px; color: #64748b; text-align: center; }
+.appEmptyIcon { color: #94a3b8; margin-bottom: 10px; }
+.appEmptyState h4 { margin: 0 0 5px; color: #334155; }
+.appEmptyState p { margin: 0 0 14px; font-size: 0.84rem; }
+.browseJobsBtn,
+.registerNowBtn { padding: 8px 12px; color: #0a66c2; background: #eff6ff; border: 1px solid #bfdbfe; }
+
+.organizationsSection { padding-top: 4px; }
+.orgSectionTop { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.orgSectionTop h4 { margin: 0; color: #1e293b; font-size: 0.98rem; }
+.orgSectionTop p { margin: 4px 0 0; color: #64748b; font-size: 0.8rem; }
+.createOrgBtn { flex-shrink: 0; padding: 8px 11px; color: #ffffff; background: #0a66c2; border: 1px solid #0a66c2; }
+.createOrgBtn:hover { color: #ffffff; background: #004182; }
+.orgCardsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.orgManagedCard { padding: 14px; border: 1px solid #e2e8f0; border-radius: 9px; background: #ffffff; }
+.orgManagedCard.orgCardActive { border-color: #93c5fd; background: #f8fbff; }
+.orgCardMain { display: flex; gap: 11px; min-width: 0; }
+.orgCardLogo { width: 44px; height: 44px; flex: 0 0 44px; object-fit: contain; padding: 4px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; box-sizing: border-box; }
+.orgCardDetails { min-width: 0; }
+.orgCardDetails h5 { margin: 0; overflow: hidden; color: #0f172a; font-size: 0.9rem; text-overflow: ellipsis; white-space: nowrap; }
+.orgMetaLine { display: block; margin-top: 3px; overflow: hidden; color: #64748b; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.orgStatusBadges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.orgStatusPill, .orgRolePill, .orgJobsPill { padding: 3px 6px; border-radius: 5px; font-size: 0.65rem; font-weight: 700; }
+.orgStatusPill.status-approved { color: #166534; background: #dcfce7; }
+.orgStatusPill.status-pending { color: #92400e; background: #fef3c7; }
+.orgStatusPill.status-rejected { color: #991b1b; background: #fee2e2; }
+.orgRolePill { color: #1d4ed8; background: #dbeafe; }
+.orgJobsPill { color: #475569; background: #f1f5f9; }
+.orgCardActions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+.currentActiveTag { color: #166534; font-size: 0.72rem; font-weight: 800; }
+.switchOrgBtn, .manageJobsBtn { padding: 6px 8px; color: #0a66c2; background: #ffffff; border: 1px solid #bfdbfe; }
+.manageJobsBtn { border-color: transparent; }
+.actingLabel { color: #64748b; font-size: 0.75rem; font-weight: 600; }
+.emptyOrgsBox { padding: 34px 20px; color: #64748b; text-align: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 9px; }
+.emptyOrgsBox h5 { margin: 10px 0 5px; color: #334155; font-size: 0.95rem; }
+.emptyOrgsBox p { max-width: 520px; margin: 0 auto 14px; font-size: 0.8rem; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .appFilterToolbar,
+  .orgSectionTop { align-items: stretch; flex-direction: column; }
+  .appStatusPills { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
+  .appStatusPill { flex-shrink: 0; }
+  .appAppliedTime { width: 100%; margin-left: 0; }
+  .orgCardsGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .appCardTop,
+  .appCardFooter,
+  .orgCardActions { align-items: flex-start; flex-direction: column; }
+  .appStatusTagBlock { align-self: flex-start; }
+  .appStepperContainer { overflow-x: auto; padding-left: 24px; padding-right: 24px; }
+  .appStepperTrack { min-width: 330px; }
+}
+
 .settingsTopBar {
   display: flex;
   align-items: center;
