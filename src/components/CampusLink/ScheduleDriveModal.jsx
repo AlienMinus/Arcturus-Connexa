@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaCalendarAlt, FaTimes, FaPlus } from 'react-icons/fa';
+import './ScheduleDriveModal.css';
 
 export const ScheduleDriveModal = ({
   showDriveModal,
@@ -12,7 +13,7 @@ export const ScheduleDriveModal = ({
 
   return (
     <div
-      className="modalOverlay"
+      className="modalOverlay scheduleModalOverlay"
       style={{
         position: 'fixed',
         top: 0,
@@ -28,6 +29,7 @@ export const ScheduleDriveModal = ({
       }}
     >
       <div
+        className="scheduleModalSurface"
         style={{
           background: '#ffffff',
           borderRadius: '14px',
@@ -50,7 +52,7 @@ export const ScheduleDriveModal = ({
           Define company details, CTC package, eligibility criteria, date, and venue. Our Conflict Engine will automatically audit schedule clashes.
         </p>
 
-        <form onSubmit={handleScheduleDrive} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <form onSubmit={handleScheduleDrive} className="scheduleDriveForm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
               Company Name *
@@ -295,14 +297,14 @@ export const ScheduleDriveModal = ({
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, gridColumn: '1 / -1', marginTop: 12 }}>
             <button
               type="button"
-              className="campusTabBtn"
+              className="campusTabBtn scheduleCancelBtn"
               onClick={() => setShowDriveModal(false)}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="campusTabBtn active"
+              className="campusTabBtn active scheduleSubmitBtn"
             >
               <FaPlus size={12} /> Schedule Drive & Check Conflicts
             </button>
