@@ -560,7 +560,7 @@ const SettingsPage = () => {
                       </p>
                     </div>
                     <button type="button" className="widgetActionBtn">
-                      Switch Account →
+                      Switch identity →
                     </button>
                   </div>
                 </div>
