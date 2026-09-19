@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { 
   FaGraduationCap, 
   FaChartLine, 
@@ -24,6 +25,65 @@ import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
 import './CampusLinkPage.css';
 
+// Real React Markdown Typewriter Component
+const TypewriterMarkdown = ({ text, isTyping, scrollRef, onComplete }) => {
+  const [displayedText, setDisplayedText] = useState(() => (isTyping ? '' : text));
+  const [isFinished, setIsFinished] = useState(!isTyping);
+
+  useEffect(() => {
+    if (!isTyping || isFinished) {
+      setDisplayedText(text);
+      setIsFinished(true);
+      return;
+    }
+
+    let currentIdx = 0;
+    const step = 3; // reveals 3 chars per tick for smooth, fast streaming
+    const speed = 14; // 14ms per tick
+
+    const timer = setInterval(() => {
+      currentIdx += step;
+      if (currentIdx >= text.length) {
+        setDisplayedText(text);
+        setIsFinished(true);
+        clearInterval(timer);
+        onComplete?.();
+      } else {
+        setDisplayedText(text.slice(0, currentIdx));
+      }
+
+      if (scrollRef?.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, isTyping, isFinished, onComplete, scrollRef]);
+
+  const handleSkip = () => {
+    if (!isFinished) {
+      setDisplayedText(text);
+      setIsFinished(true);
+      onComplete?.();
+      if (scrollRef?.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }
+  };
+
+  return (
+    <div
+      className={`chatMsgMarkdown ${!isFinished ? 'isTypingActive' : ''}`}
+      onClick={handleSkip}
+      title={!isFinished ? 'Click to reveal full response' : undefined}
+      style={{ cursor: !isFinished ? 'pointer' : 'default' }}
+    >
+      <ReactMarkdown>{displayedText}</ReactMarkdown>
+      {!isFinished && <span className="typewriterCursor" aria-hidden="true" />}
+    </div>
+  );
+};
+
 const CampusLinkPage = () => {
   const { token, user } = useAuth();
   const [activeTab, setActiveTab] = useState('analytics'); // 'analytics' | 'drives' | 'readiness' | 'matching' | 'offers' | 'assistant'
@@ -44,15 +104,26 @@ const CampusLinkPage = () => {
   const [assessmentStep, setAssessmentStep] = useState(1);
   const [assessmentAnswers, setAssessmentAnswers] = useState({ q1: 'b', q2: 'a', q3: 'c' });
 
-  // Chatbot State
+  // Chatbot State & Refs
+  const chatScrollRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const [chatMessages, setChatMessages] = useState([
     {
       sender: 'assistant',
       text: '🎓 **Hello! I am your CAMPUSLINK Placement AI Assistant.**\n\nI can help you check drive eligibility, analyze your technical skill gaps, review your readiness score, or simulate interview questions. How can I assist you today?',
+      isTyping: false,
     },
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isChatSending, setIsChatSending] = useState(false);
+  const [isChatFloatingOpen, setIsChatFloatingOpen] = useState(false);
+
+  // Auto-scroll chat when messages update or sending changes
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, isChatSending]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -227,7 +298,7 @@ const CampusLinkPage = () => {
     if (!chatInput.trim()) return;
 
     const userPrompt = chatInput.trim();
-    setChatMessages((prev) => [...prev, { sender: 'user', text: userPrompt }]);
+    setChatMessages((prev) => [...prev, { sender: 'user', text: userPrompt, isTyping: false }]);
     setChatInput('');
     setIsChatSending(true);
 
@@ -239,17 +310,28 @@ const CampusLinkPage = () => {
       });
       if (res.ok) {
         const data = await res.json();
-        setChatMessages((prev) => [...prev, { sender: 'assistant', text: data.reply }]);
+        setChatMessages((prev) => [
+          ...prev, 
+          { sender: 'assistant', text: data.reply, isTyping: true }
+        ]);
       } else {
         setChatMessages((prev) => [
           ...prev,
-          { sender: 'assistant', text: 'Sorry, I encountered an issue processing your request. Please try again.' },
+          { 
+            sender: 'assistant', 
+            text: '⚠️ **System Notice**: Sorry, I encountered an issue processing your request. Please try again.', 
+            isTyping: true 
+          },
         ]);
       }
     } catch (err) {
       setChatMessages((prev) => [
         ...prev,
-        { sender: 'assistant', text: 'Network connection issue with the AI engine.' },
+        { 
+          sender: 'assistant', 
+          text: '⚠️ **Network Notice**: Unable to reach the AI placement engine. Please verify your connection.', 
+          isTyping: true 
+        },
       ]);
     } finally {
       setIsChatSending(false);
@@ -341,8 +423,9 @@ const CampusLinkPage = () => {
 
         <button
           type="button"
-          className={`campusTabBtn ${activeTab === 'assistant' ? 'active' : ''}`}
-          onClick={() => setActiveTab('assistant')}
+          className={`campusTabBtn ${isChatFloatingOpen ? 'active' : ''}`}
+          onClick={() => setIsChatFloatingOpen((prev) => !prev)}
+          title="Toggle CampusLink AI Placement Assistant"
         >
           <FaRobot size={14} /> AI Assistant
         </button>
@@ -894,46 +977,79 @@ const CampusLinkPage = () => {
       )}
 
       {/* ========================================================
-          TAB 6: CAMPUSLINK AI ASSISTANT (CHATBOT)
+          FLOATING CAMPUSLINK AI ASSISTANT (BOTTOM LEFT)
           ======================================================== */}
-      {activeTab === 'assistant' && (
-        <div className="campusPanel">
-          <div className="campusPanelHeader">
-            <div>
-              <h2><FaRobot color="#0a66c2" /> CampusLink AI Placement Assistant</h2>
-              <p>Ask questions about drive eligibility, interview preparation, and technical skill gaps.</p>
+      <div className="campusFloatingAssistantContainer">
+        {isChatFloatingOpen && (
+          <div className="campusFloatingChatWidget">
+            <div className="floatingChatHeader">
+              <div className="floatingChatTitle">
+                <div className="floatingChatHeaderAvatar">
+                  <FaRobot size={18} color="#0a66c2" />
+                </div>
+                <div>
+                  <strong>CampusLink AI Assistant</strong>
+                  <small>Online · Placement Advisor</small>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="floatingChatCloseBtn"
+                onClick={() => setIsChatFloatingOpen(false)}
+                title="Minimize AI Assistant"
+                aria-label="Close Assistant"
+              >
+                <FaTimes size={15} />
+              </button>
             </div>
-          </div>
 
-          <div className="campusChatWrapper">
-            <div className="campusChatMessages">
+            <div className="campusChatMessages floatingChatScroll" ref={chatScrollRef}>
               {chatMessages.map((msg, idx) => (
                 <div key={idx} className={`chatMsg ${msg.sender}`}>
-                  <div style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
+                  {msg.sender === 'assistant' ? (
+                    <TypewriterMarkdown
+                      text={msg.text}
+                      isTyping={Boolean(msg.isTyping)}
+                      scrollRef={chatScrollRef}
+                      onComplete={() => {
+                        setChatMessages((prev) =>
+                          prev.map((m, i) => (i === idx ? { ...m, isTyping: false } : m))
+                        );
+                      }}
+                    />
+                  ) : (
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+                  )}
                 </div>
               ))}
               {isChatSending && (
-                <div className="chatMsg assistant" style={{ color: '#64748b' }}>
-                  <em>CampusLink AI is analyzing placement data...</em>
+                <div className="chatMsg assistant typingLoaderMsg">
+                  <div className="typingDots">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span style={{ fontSize: '0.82rem', color: '#64748b' }}>
+                    CampusLink AI is analyzing placement data...
+                  </span>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Quick Prompts Chips */}
-            <div className="chatQuickPrompts">
+            <div className="chatQuickPrompts floatingPrompts">
               {[
                 'Am I eligible for Google Cloud India drive?',
                 'Diagnose my skill gaps for SDE role',
-                'Top technical interview questions for placement',
+                'Top technical interview questions',
                 'Check drive schedule conflicts',
               ].map((chip) => (
                 <button
                   key={chip}
                   type="button"
                   className="quickPromptChip"
-                  onClick={() => {
-                    setChatInput(chip);
-                  }}
+                  onClick={() => setChatInput(chip)}
                 >
                   {chip}
                 </button>
@@ -941,21 +1057,39 @@ const CampusLinkPage = () => {
             </div>
 
             {/* Chat Input Bar */}
-            <form className="chatInputBar" onSubmit={handleChatSend}>
+            <form className="chatInputBar floatingInputBar" onSubmit={handleChatSend}>
               <input
                 type="text"
                 className="chatInput"
-                placeholder="Ask about placement drives, eligibility, skill gaps, or interview prep..."
+                placeholder="Ask about drives, skill gaps, or prep..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
               />
               <button type="submit" className="chatSendBtn" disabled={isChatSending}>
-                <FaPaperPlane size={14} /> Send
+                <FaPaperPlane size={13} />
               </button>
             </form>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Round Floating AI Launcher Button */}
+        <button
+          type="button"
+          className={`campusFloatingRoundBtn ${isChatFloatingOpen ? 'active' : ''}`}
+          title={isChatFloatingOpen ? "Close AI Assistant" : "CampusLink AI Placement Assistant"}
+          onClick={() => setIsChatFloatingOpen((prev) => !prev)}
+          aria-label="Toggle CampusLink AI Assistant"
+        >
+          <div className="floatingIconBadge">
+            {isChatFloatingOpen ? (
+              <FaTimes size={20} />
+            ) : (
+              <FaRobot size={24} color="#38bdf8" />
+            )}
+            {!isChatFloatingOpen && <span className="floatingPulseDot" />}
+          </div>
+        </button>
+      </div>
 
       {/* Mock Assessment Modal Simulator */}
       {showAssessmentModal && (
