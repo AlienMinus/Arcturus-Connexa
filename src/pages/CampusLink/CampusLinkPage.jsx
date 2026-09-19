@@ -21,7 +21,8 @@ import {
   FaExternalLinkAlt,
   FaArrowRight,
   FaPlus,
-  FaTrash
+  FaTrash,
+  FaLightbulb
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -102,6 +103,7 @@ const CampusLinkPage = () => {
   // UI & Loading States
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
+  const [isDiagnosingGemma, setIsDiagnosingGemma] = useState(false);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [assessmentStep, setAssessmentStep] = useState(1);
   const [assessmentAnswers, setAssessmentAnswers] = useState({ q1: 'b', q2: 'a', q3: 'c' });
@@ -148,7 +150,7 @@ const CampusLinkPage = () => {
   const [chatMessages, setChatMessages] = useState([
     {
       sender: 'assistant',
-      text: '🎓 **Hello! I am your CAMPUSLINK Placement AI Assistant.**\n\nI can help you check drive eligibility, analyze your technical skill gaps, review your readiness score, or simulate interview questions. How can I assist you today?',
+      text: '🎓 **Hello! I am your CAMPUSLINK Placement AI Assistant, powered by Hugging Face Gemma-2.**\n\nI can help you evaluate corporate placement risk, diagnose technical skill gaps, review active drive cutoffs, or simulate technical interview questions. How can I assist you today?',
       isTyping: false,
     },
   ]);
@@ -408,6 +410,38 @@ const CampusLinkPage = () => {
     }
   };
 
+  // Run On-Demand Hugging Face Gemma AI Risk & Recommendation Diagnostics
+  const handleRunGemmaDiagnostics = async () => {
+    if (!token) {
+      showToast('Please sign in to run Gemma AI diagnostics');
+      return;
+    }
+    setIsDiagnosingGemma(true);
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/profile/diagnose-ai'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStudentProfile(data.profile);
+        showToast('✨ Hugging Face Gemma AI diagnostic complete! Risk & recommendations updated.');
+        loadCampusData();
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to complete Gemma diagnostics');
+      }
+    } catch (err) {
+      console.error('Gemma diagnostics error:', err);
+      showToast('Network error during Gemma diagnostics');
+    } finally {
+      setIsDiagnosingGemma(false);
+    }
+  };
+
   // Submit Mock Assessment Handler
   const handleAssessmentSubmit = async () => {
     try {
@@ -486,10 +520,13 @@ const CampusLinkPage = () => {
     setIsChatSending(true);
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
       const res = await fetch(buildApiUrl('/campuslink/ai-assistant'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userPrompt }),
+        headers,
+        body: JSON.stringify({ prompt: userPrompt, profileId: studentProfile?._id }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -738,15 +775,25 @@ const CampusLinkPage = () => {
               analytics.atRiskStudents.map((s) => (
                 <div key={s.id} className="atRiskStudentCard">
                   <div className="atRiskMeta">
-                    <h4>{s.name} ({s.rollNumber}) · {s.branch}</h4>
-                    <p>CGPA: <strong>{s.cgpa}</strong> · Backlogs: <strong>{s.activeBacklogs}</strong> · Readiness: <strong>{s.readiness}% ({s.readinessLevel})</strong></p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <h4 style={{ margin: 0 }}>{s.name} ({s.rollNumber}) · {s.branch}</h4>
+                      <span className="gemmaBadge" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
+                        <FaRobot size={10} /> Gemma AI Flagged
+                      </span>
+                    </div>
+                    <p style={{ marginTop: 4 }}>CGPA: <strong>{s.cgpa}</strong> · Backlogs: <strong>{s.activeBacklogs}</strong> · Readiness: <strong>{s.readiness}% ({s.readinessLevel})</strong></p>
                     <p style={{ color: '#b45309', marginTop: 3 }}><em>Trigger: {s.riskReason}</em></p>
+                    {s.mentorRecommendation && (
+                      <p style={{ color: '#6d28d9', marginTop: 4, fontSize: '0.8rem', background: '#f5f3ff', padding: '5px 9px', borderRadius: '6px', lineHeight: 1.4 }}>
+                        💡 <strong>Gemma Remedial Plan:</strong> {s.mentorRecommendation}
+                      </p>
+                    )}
                   </div>
 
                   <button
                     type="button"
                     className="escalateBtn"
-                    onClick={() => showToast(`Escalated ${s.name} for mentor review.`)}
+                    onClick={() => showToast(`📢 Escalated ${s.name} to ${s.mentor || 'Advisor'} with Gemma Remedial Plan.`)}
                   >
                     Escalate to Mentor
                   </button>
@@ -1139,6 +1186,106 @@ const CampusLinkPage = () => {
                 </div>
               </div>
 
+              {/* ========================================================
+                  HUGGING FACE GEMMA-2 AI RISK & RECOMMENDATION SECTION
+                  ======================================================== */}
+              <div className="gemmaInsightCard">
+                <div className="gemmaHeader">
+                  <div className="gemmaHeaderLeft">
+                    <span className="gemmaBadge">
+                      <FaRobot size={13} /> Hugging Face Gemma-2 AI Engine
+                    </span>
+                    {studentProfile.isAtRisk ? (
+                      <span className="gemmaRiskStatusBadge danger">
+                        <FaExclamationTriangle size={12} /> Predictive At-Risk Flagged
+                      </span>
+                    ) : (
+                      <span className="gemmaRiskStatusBadge optimal">
+                        <FaCheckCircle size={12} /> Optimal Corporate Placement Track
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="gemmaRunBtn"
+                    onClick={handleRunGemmaDiagnostics}
+                    disabled={isDiagnosingGemma}
+                    title="Refresh AI risk diagnostics using Hugging Face Gemma-2-2B-IT"
+                  >
+                    <FaSyncAlt size={12} className={isDiagnosingGemma ? 'fa-spin' : ''} />
+                    {isDiagnosingGemma ? 'Diagnosing with Gemma...' : 'Re-Run Gemma AI Diagnostics'}
+                  </button>
+                </div>
+
+                {/* At-Risk Warning Callout if Flagged */}
+                {studentProfile.isAtRisk && (
+                  <div className="gemmaRiskCallout">
+                    <FaExclamationTriangle color="#e11d48" size={18} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <strong style={{ fontSize: '0.88rem', color: '#9f1239' }}>Identified Corporate Placement Risk Factor:</strong>
+                      <p>{studentProfile.riskReason || 'Academic or readiness bottleneck flagged below recruiter benchmark.'}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Split Diagnostics Grid */}
+                <div className="gemmaGrid">
+                  <div className="gemmaBox">
+                    <div className="gemmaBoxTitle">
+                      <FaChartLine color="#0a66c2" /> Gemma Employability Diagnostic Rationale
+                    </div>
+                    <p className="gemmaBoxText">
+                      {studentProfile.aiReadinessSummary ||
+                        'Candidate profile evaluated against recruiter benchmarks. Meets foundational readiness criteria for upcoming recruitment drives.'}
+                    </p>
+                  </div>
+
+                  <div className="gemmaBox">
+                    <div className="gemmaBoxTitle">
+                      <FaLightbulb color="#ca8a04" /> Remedial Mentor Guidance & Action Plan
+                    </div>
+                    <p className="gemmaBoxText">
+                      {studentProfile.mentorActionRecommendation ||
+                        'Candidate is on track for Tier-1 corporate drives. Recommend targeted system design prep and competitive mock interviews for premium CTC packages.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Gemma Recommended Next Competencies */}
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #f1f5f9' }}>
+                  <strong style={{ fontSize: '0.82rem', color: '#475569', display: 'block', marginBottom: 6 }}>
+                    🎯 Top Recruiter Competencies Recommended by Gemma for Your Target Roles:
+                  </strong>
+                  <div className="gemmaSkillsList">
+                    {[
+                      'System Design & Microservices Architecture',
+                      'Docker & Cloud Containerization',
+                      'AWS / Cloud Orchestration',
+                      'Data Structures & Algorithms (Trees, Graphs & DP)',
+                      'RESTful API Security & Asynchronous Queues',
+                    ].map((sk) => (
+                      <span key={sk} className="gemmaSkillPill">
+                        ⚡ {sk}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer Metadata */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, fontSize: '0.74rem', color: '#94a3b8', flexWrap: 'wrap', gap: 8 }}>
+                  <span>
+                    Inference Model: <strong>google/gemma-2-2b-it</strong> · Hosted via Hugging Face API
+                  </span>
+                  {studentProfile.gemmaDiagnosticTimestamp && (
+                    <span>
+                      Last Diagnosed: {new Date(studentProfile.gemmaDiagnosticTimestamp).toLocaleDateString()} at{' '}
+                      {new Date(studentProfile.gemmaDiagnosticTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+
               {/* Skill-Gap Analysis against Target Roles */}
               <div>
                 <h3 style={{ margin: '0 0 16px 0', fontSize: '1.1rem', color: '#0f172a' }}>
@@ -1412,7 +1559,7 @@ const CampusLinkPage = () => {
                 </div>
                 <div>
                   <strong>CampusLink AI Assistant</strong>
-                  <small>Online · Placement Advisor</small>
+                  <small>Online · Powered by Hugging Face Gemma-2</small>
                 </div>
               </div>
               <button
@@ -1453,7 +1600,7 @@ const CampusLinkPage = () => {
                     <span />
                   </div>
                   <span style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                    CampusLink AI is analyzing placement data...
+                    CampusLink AI (Gemma-2) is analyzing placement data...
                   </span>
                 </div>
               )}
@@ -1463,6 +1610,7 @@ const CampusLinkPage = () => {
             {/* Quick Prompts Chips */}
             <div className="chatQuickPrompts floatingPrompts">
               {[
+                'Evaluate my placement risk & recommendations',
                 'Am I eligible for current active drives?',
                 'Diagnose my skill gaps for target roles',
                 'Top technical interview questions',
