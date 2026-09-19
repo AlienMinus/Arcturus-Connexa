@@ -30,6 +30,7 @@ const NavRight = () => {
 
   const isAuthenticated = Boolean(token);
   const isOrgActive = activeAccount?.type === 'organization';
+  const canManageJobs = isAuthenticated && isOrgActive;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -392,16 +393,20 @@ const NavRight = () => {
                   Posts & Activity
                 </Link>
               </li>
-              <li>
-                <Link to="/settings/applications" onClick={() => setDropdownOpen(false)} style={{ color: '#0a66c2', fontWeight: '600' }}>
-                  💼 Job Applications Tracker
-                </Link>
-              </li>
-              <li>
-                <Link to="/jobs/manage" onClick={() => setDropdownOpen(false)}>
-                  Job Posting Account
-                </Link>
-              </li>
+              {!isOrgActive && (
+                <li>
+                  <Link to="/settings/applications" onClick={() => setDropdownOpen(false)} style={{ color: '#0a66c2', fontWeight: '600' }}>
+                    💼 Job Applications Tracker
+                  </Link>
+                </li>
+              )}
+              {canManageJobs && (
+                <li>
+                  <Link to="/jobs/manage" onClick={() => setDropdownOpen(false)}>
+                    Job Posting Account
+                  </Link>
+                </li>
+              )}
               {(user?.role === 'admin' || user?.isAdmin || user?.username?.toLowerCase() === 'arcturus_admin' || profile?.username?.toLowerCase() === 'arcturus_admin') && (
                 <li>
                   <Link to="/admin" onClick={() => setDropdownOpen(false)} style={{ color: "#0a66c2", fontWeight: "700" }}>
@@ -462,19 +467,21 @@ const NavRight = () => {
               </div>
             </Link>
 
-            <Link
-              to="/jobs/manage"
-              className="business-app-card"
-              onClick={() => setBusinessOpen(false)}
-            >
-              <div className="business-app-icon" style={{ background: '#dcfce7', color: '#16a34a' }}>
-                <FaBriefcase size={20} />
-              </div>
-              <div className="business-app-info">
-                <strong>Talent Solutions</strong>
-                <span>Post jobs, manage applications & hire talent</span>
-              </div>
-            </Link>
+            {canManageJobs && (
+              <Link
+                to="/jobs/manage"
+                className="business-app-card"
+                onClick={() => setBusinessOpen(false)}
+              >
+                <div className="business-app-icon" style={{ background: '#dcfce7', color: '#16a34a' }}>
+                  <FaBriefcase size={20} />
+                </div>
+                <div className="business-app-info">
+                  <strong>Talent Solutions</strong>
+                  <span>Post jobs, manage applications & hire talent</span>
+                </div>
+              </Link>
+            )}
 
             <Link
               to="/campuslink"
@@ -512,13 +519,15 @@ const NavRight = () => {
           <div className="business-solutions-section">
             <h4>Arcturus Business Solutions</h4>
             <div className="business-solution-list">
-              <Link to="/jobs/manage" className="business-solution-item" onClick={() => setBusinessOpen(false)}>
-                <div>
-                  <strong>Talent Solutions</strong>
-                  <p>Find, attract and recruit qualified candidates</p>
-                </div>
-                <FaChevronRight size={12} color="#94a3b8" />
-              </Link>
+              {canManageJobs && (
+                <Link to="/jobs/manage" className="business-solution-item" onClick={() => setBusinessOpen(false)}>
+                  <div>
+                    <strong>Talent Solutions</strong>
+                    <p>Find, attract and recruit qualified candidates</p>
+                  </div>
+                  <FaChevronRight size={12} color="#94a3b8" />
+                </Link>
+              )}
 
               <Link to="/advertise" className="business-solution-item" onClick={() => setBusinessOpen(false)}>
                 <div>

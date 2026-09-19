@@ -22,6 +22,7 @@ const JOB_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship'];
 
 const JobsPage = () => {
   const { user, token, activeAccount } = useAuth();
+  const canManageJobs = activeAccount?.type === 'organization';
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -218,12 +219,20 @@ const JobsPage = () => {
           </div>
 
           <div className="jobsRecruiterActions">
-            <Link to="/jobs/manage" className="manageListingsBtn">
-              <FaBriefcase size={13} /> <span>Manage Listings</span>
-            </Link>
-            <Link to="/jobs/post" className="postJobBtn">
-              <FaPlus size={12} /> <span>Post a Free Job</span>
-            </Link>
+            {canManageJobs ? (
+              <>
+                <Link to="/jobs/manage" className="manageListingsBtn">
+                  <FaBriefcase size={13} /> <span>Manage Listings</span>
+                </Link>
+                <Link to="/jobs/post" className="postJobBtn">
+                  <FaPlus size={12} /> <span>Post a Free Job</span>
+                </Link>
+              </>
+            ) : (
+              <Link to="/settings/applications" className="manageListingsBtn applicationTrackerBtn">
+                <FaBriefcase size={13} /> <span>Application Tracker</span>
+              </Link>
+            )}
           </div>
         </div>
 

@@ -50,9 +50,7 @@ router.get('/my-listings', authMiddleware, async (req, res) => {
     }).select('_id');
     const orgIds = userOrgs.map((o) => o._id);
 
-    const jobs = await Job.find({
-      $or: [{ recruiterId: req.userId }, { organizationId: { $in: orgIds } }],
-    })
+    const jobs = await Job.find({ organizationId: { $in: orgIds } })
       .sort({ createdAt: -1 })
       .populate('organizationId', 'name logo slug status')
       .populate({
@@ -320,7 +318,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Job not found' });
     }
 
-    if (job.recruiterId && job.recruiterId.toString() !== req.userId) {
+    const userOrgs = await Organization.find({
+      $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+    }).select('_id');
+    const orgIds = userOrgs.map((organization) => organization._id.toString());
+
+    if (!job.organizationId || !orgIds.includes(job.organizationId.toString())) {
       return res.status(403).json({ error: 'You do not have permission to delete this listing' });
     }
 
@@ -353,9 +356,7 @@ router.patch('/:id/applicants/:applicantId/status', authMiddleware, async (req, 
     }).select('_id');
     const orgIds = userOrgs.map((o) => o._id.toString());
 
-    const isAuthorized =
-      (job.recruiterId && job.recruiterId.toString() === req.userId) ||
-      (job.organizationId && orgIds.includes(job.organizationId.toString()));
+    const isAuthorized = job.organizationId && orgIds.includes(job.organizationId.toString());
 
     if (!isAuthorized) {
       return res.status(403).json({ error: 'Not authorized to manage candidates for this job listing.' });

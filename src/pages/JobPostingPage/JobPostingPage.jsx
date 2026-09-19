@@ -108,7 +108,7 @@ const DOCUMENT_TYPES = [
 ];
 
 const JobPostingPage = () => {
-  const { user, token } = useAuth();
+  const { user, token, activeAccount } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -134,6 +134,14 @@ const JobPostingPage = () => {
   const [candidateStatusFilter, setCandidateStatusFilter] = useState('all');
   const [candidateJobFilter, setCandidateJobFilter] = useState('');
   const [updatingApplicantId, setUpdatingApplicantId] = useState(null);
+  const isOrganizationAccount = activeAccount?.type === 'organization';
+  const isRegistrationPage = location.pathname === '/company/create' || searchParams.get('tab') === 'register_org';
+
+  useEffect(() => {
+    if (!isRegistrationPage && !isOrganizationAccount) {
+      navigate('/jobs', { replace: true });
+    }
+  }, [isRegistrationPage, isOrganizationAccount, navigate]);
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');

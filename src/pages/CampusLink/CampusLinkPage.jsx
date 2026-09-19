@@ -20,16 +20,21 @@ import './CampusLinkPage.css';
 const CampusLinkPage = () => {
   const { token, user, activeAccount } = useAuth();
   const isArcturusAdmin = user?.role === 'admin' || user?.username === 'arcturus_admin';
+  const isOrganizationAccount = activeAccount?.type === 'organization';
   const [activeTab, setActiveTab] = useState(() => 
-    (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
+    isOrganizationAccount ? 'organization' : (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
   );
   
   // Guard non-admins against administrative tabs
   useEffect(() => {
-    if (!isArcturusAdmin && (activeTab === 'analytics' || activeTab === 'matching')) {
+    if (isOrganizationAccount && activeTab !== 'organization') {
+      setActiveTab('organization');
+    } else if (!isOrganizationAccount && activeTab === 'organization') {
+      setActiveTab(isArcturusAdmin ? 'analytics' : 'readiness');
+    } else if (!isArcturusAdmin && (activeTab === 'analytics' || activeTab === 'matching')) {
       setActiveTab('readiness');
     }
-  }, [isArcturusAdmin, activeTab]);
+  }, [isArcturusAdmin, isOrganizationAccount, activeTab]);
   
   // Data States
   const [analytics, setAnalytics] = useState(null);
@@ -506,6 +511,36 @@ const CampusLinkPage = () => {
         </div>
         <Link to="/settings/accounts" className="workspaceIdentityLink">Switch identity</Link>
       </div>
+      {isOrganizationAccount && (
+        <div className="campusOrganizationWorkspace">
+          <div className="campusOrganizationHero">
+            <div>
+              <span className="campusOrganizationEyebrow">Organization placement workspace</span>
+              <h1>{activeAccount.name}</h1>
+              <p>Coordinate your hiring presence, review campus opportunities, and manage your organization account from one workspace.</p>
+            </div>
+            <div className="campusOrganizationStatus">{activeAccount.status || 'approved'}</div>
+          </div>
+
+          <div className="campusOrganizationStats">
+            <div><strong>{drives.length}</strong><span>Active drives</span></div>
+            <div><strong>{offers.length}</strong><span>Placement offers</span></div>
+            <div><strong>{conflicts.length}</strong><span>Schedule conflicts</span></div>
+          </div>
+
+          <div className="campusOrganizationActions">
+            <Link to="/jobs/manage" className="campusOrganizationPrimary">Manage jobs & applicants</Link>
+            <Link to={activeAccount.slug ? `/company/${activeAccount.slug}` : `/organization/${activeAccount.id}`} className="campusOrganizationSecondary">View company page</Link>
+          </div>
+
+          <div className="campusOrganizationNotice">
+            <strong>Recruiter workspace active</strong>
+            <span>Switch to your Personal Profile from the account menu to view student readiness, eligible drives, and personal offers.</span>
+          </div>
+        </div>
+      )}
+      {!isOrganizationAccount && (
+      <>
       {/* Toast */}
       {toastMessage && (
         <div className="campusToast">
@@ -626,6 +661,8 @@ const CampusLinkPage = () => {
         setDriveForm={setDriveForm}
         handleScheduleDrive={handleScheduleDrive}
       />
+      </>
+      )}
     </div>
   );
 };
