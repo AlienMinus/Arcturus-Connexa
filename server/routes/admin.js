@@ -475,6 +475,9 @@ router.put('/courses/:id', async (req, res) => {
         name: instructor.name?.trim() || course.instructor.name,
         role: instructor.role?.trim() || course.instructor.role,
         avatar: instructor.avatar?.trim() || course.instructor.avatar,
+        name: instructor.name?.trim() || course.instructor?.name || 'Vinh Giang',
+        role: instructor.role?.trim() || course.instructor?.role || 'Masterclass Coach',
+        avatar: instructor.avatar?.trim() || course.instructor?.avatar || '',
       };
     }
 
@@ -532,23 +535,36 @@ router.delete('/courses/:id', async (req, res) => {
 router.post('/courses/seed-defaults', async (req, res) => {
   try {
     let seededCount = 0;
+    let updatedCount = 0;
+
     for (const courseData of DEFAULT_COURSES) {
       const existing = await Course.findOne({ slug: courseData.slug });
       if (!existing) {
         await Course.create(courseData);
         seededCount += 1;
+      } else {
+        await Course.findOneAndUpdate(
+          { slug: courseData.slug },
+          { $set: courseData },
+          { returnDocument: 'after' }
+        );
+        updatedCount += 1;
       }
     }
 
+    const total = await Course.countDocuments();
+
     res.json({
       message: seededCount > 0
-        ? `Successfully seeded ${seededCount} official masterclass(es)!`
-        : 'All official masterclasses already exist in the catalog.',
+        ? `Successfully seeded ${seededCount} new and refreshed ${updatedCount} masterclass(es)! (Total: ${total})`
+        : `Successfully re-seeded and refreshed ${updatedCount} official masterclass(es)!`,
       seededCount,
+      updatedCount,
+      total,
     });
   } catch (err) {
     console.error('Failed to seed masterclasses:', err);
-    res.status(500).json({ error: 'Failed to seed masterclasses' });
+    res.status(500).json({ error: err.message || 'Failed to seed masterclasses' });
   }
 });
 

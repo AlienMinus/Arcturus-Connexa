@@ -33,8 +33,18 @@ const CATEGORIES = [
 ];
 
 const LEVELS = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
+const LEVELS = [
+  'All Levels',
+  'Beginner',
+  'Intermediate',
+  'Advanced',
+  'Beginner to Intermediate',
+  'Intermediate to Advanced',
+];
 
 const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
+  const getAuthToken = () => token || localStorage.getItem('authToken');
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -61,7 +71,7 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: 'Public Speaking, Vocal Pitch, Executive Presence',
     modules: [
@@ -82,13 +92,14 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
+      const authToken = getAuthToken();
       const params = new URLSearchParams();
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
       if (levelFilter !== 'all') params.append('level', levelFilter);
       if (searchQuery.trim()) params.append('q', searchQuery.trim());
 
       const res = await fetch(buildApiUrl(`/admin/courses?${params.toString()}`), {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${authToken}` },
       });
 
       if (res.ok) {
@@ -107,7 +118,7 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
 
   useEffect(() => {
     fetchCourses();
-  }, [categoryFilter, levelFilter]);
+  }, [categoryFilter, levelFilter, token]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -130,7 +141,7 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
       instructor: {
         name: 'Vinh Giang',
         role: 'Keynote Speaker & Communication Coach',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
       },
       skills: 'Vocal Clarity, Executive Presence, Influence',
       modules: [
@@ -196,9 +207,10 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
     }
     setActionLoading(courseId);
     try {
+      const authToken = getAuthToken();
       const res = await fetch(buildApiUrl(`/admin/courses/${courseId}`), {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${authToken}` },
       });
       const data = await res.json();
       if (res.ok) {
@@ -219,16 +231,25 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
   const handleSeedMasterclasses = async () => {
     setActionLoading('seed');
     try {
+      const authToken = getAuthToken();
       const res = await fetch(buildApiUrl('/admin/courses/seed-defaults'), {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}` 
+        },
       });
       const data = await res.json();
-      showToast(data.message || 'Seeded masterclasses.');
-      fetchCourses();
-      onStatsUpdate?.();
+      if (res.ok) {
+        showToast(data.message || 'Seeded masterclasses successfully.');
+        fetchCourses();
+        onStatsUpdate?.();
+      } else {
+        showToast(data.error || 'Failed to seed masterclasses.');
+      }
     } catch (err) {
-      showToast('Failed to seed masterclasses.');
+      console.error('Seed masterclasses error:', err);
+      showToast('Network error while seeding masterclasses.');
     } finally {
       setActionLoading(null);
     }
@@ -349,8 +370,10 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
 
     // Sanitize lesson video URLs
     const sanitizedModules = formData.modules.map((m) => ({
+    const sanitizedModules = (formData.modules || []).map((m) => ({
       ...m,
       lessons: m.lessons.map((l) => ({
+      lessons: (m.lessons || []).map((l) => ({
         ...l,
         videoUrl: sanitizeVideoUrl(l.videoUrl),
       })),
@@ -376,11 +399,12 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
         : buildApiUrl(`/admin/courses/${formData._id}`);
       const method = modalMode === 'create' ? 'POST' : 'PUT';
 
+      const authToken = getAuthToken();
       const res = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(payload),
       });

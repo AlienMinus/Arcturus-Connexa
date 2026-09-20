@@ -293,7 +293,7 @@ async function seed() {
     const res = await Course.findOneAndUpdate(
       { slug: c.slug },
       { $set: c },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
     );
     console.log(`- Upserted course: "${res.title}" (${res.slug})`);
   }

@@ -634,7 +634,7 @@ const AdminDashboard = () => {
       {/* TAB 4: COURSE MANAGEMENT & MASTERCLASSES */}
       {activeTab === 'courses' && (
         <CourseManagement
-          token={token}
+          token={token || localStorage.getItem('authToken')}
           showToast={showToast}
           onStatsUpdate={fetchStats}
         />

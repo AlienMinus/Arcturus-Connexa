@@ -12,19 +12,19 @@
 
 ## 📑 Table of Contents
 
-- [Database Schema & Dataflow](docs/DATABASE_SCHEMA_DATAFLOW.md)
-
+- [Database Schema &amp; Dataflow](docs/DATABASE_SCHEMA_DATAFLOW.md)
 - [✨ Key Features](#-key-features)
-- [👥 Arcturus User Architecture, IDs & Dedicated Portals](#-arcturus-user-architecture-ids--dedicated-portals)
-- [🎓 CampusLink Ecosystem & Gemma-2 AI Diagnostics](#-campuslink-ecosystem--gemma-2-ai-diagnostics)
+- [👥 Arcturus User Architecture, IDs &amp; Dedicated Portals](#-arcturus-user-architecture-ids--dedicated-portals)
+- [🎓 CampusLink Ecosystem &amp; Gemma-2 AI Diagnostics](#-campuslink-ecosystem--gemma-2-ai-diagnostics)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [📂 Project Architecture](#-project-architecture)
 - [🚀 Getting Started](#-getting-started)
+
   - [Prerequisites](#prerequisites)
   - [Environment Setup](#environment-setup)
-  - [Installation & Running](#installation--running)
+  - [Installation &amp; Running](#installation--running)
 - [📡 API Endpoints Reference](#-api-endpoints-reference)
-- [🎨 Themes & UI Features](#-themes--ui-features)
+- [🎨 Themes &amp; UI Features](#-themes--ui-features)
 - [🚢 Deployment](#-deployment)
 - [📄 License](#-license)
 
@@ -33,6 +33,7 @@
 ## ✨ Key Features
 
 ### 1. 🎓 CampusLink AI Placement & Institutional Command Center (`/campuslink`)
+
 - **Role-Gated Access Control**:
   - **Arcturus Admin**: Exclusive access to the **Institutional Placement Command Center**, real-time macro analytics, branch conversion metrics, scheduling conflict detection matrix, recruiter candidate matching, and automated candidate shortlisting.
   - **Students / Professionals**: Dedicated **Student Employability & Skill-Gap Portal**, real-time drive eligibility checks, personalized skill-gap roadmaps against scheduled company drives, and offer letter tracking.
@@ -46,10 +47,12 @@
 - **Floating CampusLink AI Assistant**: Persistent conversational placement assistant powered by Gemma-2 with smooth streaming markdown typewriter effects and quick prompts.
 
 ### 2. 🛡️ Blue Tick Verification & Branded Institute Badges
+
 - **Admin-Governed Blue Tick**: The verified blue badge is awarded strictly following administrative review. Users submit identity verification requests with documentary proof via `/settings` (under *Verification & Badges*), and administrators approve or reject submissions via `/admin`.
 - **Branded Institute Logo Badges**: Students affiliated with an educational institution that has an approved organization account in Arcturus automatically display the official institute logo badge on their profile cards, feed posts, and candidate listings.
 
 ### 3. 📖 24h Ephemeral Stories ("Tales")
+
 - **Dual Creation Modes**: Text statuses with customizable gradient backgrounds and typography palettes + photo and video media stories with caption overlays.
 - **Story Player**: Fullscreen player with segmented progress bars, 5-second auto-advancement, pause/play toggles, and touch navigation zones.
 - **Live Reactions**: Instant reaction emoji picker (`❤️`, `🔥`, `👏`, `💡`, `🚀`, `😂`) displaying floating badges on viewer profiles.
@@ -57,35 +60,42 @@
 - **Auto-Expiration**: 24-hour MongoDB TTL expiration index.
 
 ### 4. 🔐 Modern Authentication & Organization Verification
+
 - **Frosted Glassmorphism UI**: High-contrast typography, floating inputs, and animated eye toggles.
 - **EmailJS OTP Verification**: 4-step registration flow with a 6-digit one-time passcode and 10-minute auto-expiry.
 - **Organization Account Approval**: Organizations submit registration verification documents (stored securely in MongoDB & Cloudinary) subject to approval by Arcturus Admin.
 - **Secure Password Reset**: One-click reset links with time-limited JWT tokens and EmailJS integration.
 
 ### 5. 👑 Graphical Admin Dashboard (`/admin`)
+
 - **Arcturus Admin Control Center**: Exclusive graphical administration dashboard for `arcturus_admin`.
 - **Identity Verification Queue**: Comprehensive review of submitted government documents, identity categories, affiliations, and statements with 1-click Approve, Reject, or Revoke controls.
 - **Organization Document Review**: Document inspection lightbox for business licenses and tax filings with 1-click Approval and preset Rejection workflows.
 - **Platform Analytics**: Real-time stats on registered users, active jobs, posts, server uptime, and pending verification queues.
 
 ### 6. 💼 Jobs Marketplace & Recruiter Dashboard
+
 - **MongoDB Jobs Marketplace**: Real-time search and filtering by job title, location, employment type, and tech stack.
 - **1-Click Apply**: Direct application submission attaching user credentials, contact details, and headline.
 - **Personalized Recruiter Dashboard (`/recruiter/dashboard`)**: Hiring KPI metrics, candidate pipeline tracker, applicant status updating (`Reviewing`, `Shortlist`, `Interview`, `Reject`, `Hire`), and verified portfolio inspection.
 
 ### 7. 📰 Multimedia Feed & Post Suite
+
 - **Quick Access Creation Bar**: One-click triggers for 📷 Media, 🎥 Video, 📅 Event creation, and 📝 Long-form Article drafts.
 - **AI Rewrite & Post Assistant**: 1-click AI enhancements (Professional, Catchy Hook, Concise, Storytelling styles) with undo support.
 - **Post Scheduling & Audience Targeting**: Schedule posts for future release and target audiences (Public, Connections, Groups, Drafts).
 
 ### 8. 💬 Real-Time Messaging & Floating Chat
+
 - **Full Messaging Hub (`/messaging`)**: Split-view conversation drawer with message search, end-to-end encryption indicator, and embedded Tale replies.
 - **Floating Mini-Messenger Widget**: Persistent bottom-right chat widget allowing seamless multi-tasking across all pages.
 
 ### 9. 🎮 Daily Puzzle Games Arcade (`/games`)
+
 - Integrated daily brain puzzles including **Crossclimb**, **Pinpoint**, **Queens**, **Tango**, **Mini Sudoku**, and **Zip**.
 
 ### 10. 🎨 Dual Theme & Mobile Responsiveness
+
 - Instant switching between clean light mode and dark mode (`#0f172a`, `#1e293b`).
 - Responsive mobile layout with safe-area insets (`env(safe-area-inset-bottom)`).
 
@@ -108,15 +118,16 @@ flowchart TD
     Admin -->|Reviews & Awards Blue Tick| Student
     Admin -->|Reviews & Awards Blue Tick| Recruiter
     Admin -->|Oversees Campus Drives & Conflicts| AdminHub["Admin Operations Hub & CampusLink Command Center"]
-    
+  
     Org -->|Issues Verified Institute Logo Badge| Student
     Org -->|Authorizes Hiring Postings| Recruiter
-    
+  
     Recruiter -->|Posts Openings & Reviews Pipeline| RecruiterHub["Recruiter Command Hub & Applicant Review"]
     Student -->|Benchmarks Skill Gaps & Tracks Drives| StudentPortal["Student Readiness & Placement AI Portal"]
 ```
 
 ### 1. 🎓 Normal User / Student / Employee
+
 - **Identity & Data Models**:
   - `User._id`: MongoDB ObjectId representing the personal account.
   - `accountType`: `'individual'` or `'student'`.
@@ -136,6 +147,7 @@ flowchart TD
 ---
 
 ### 2. 💼 Recruiter / Job Posting Account
+
 - **Identity & Data Models**:
   - `User._id`: MongoDB ObjectId with `accountType: 'recruiter'`.
   - Can be associated with an approved `Organization` or operate as an independent technical recruiter.
@@ -151,6 +163,7 @@ flowchart TD
 ---
 
 ### 3. 🏢 Organization / Educational Institute
+
 - **Identity & Data Models**:
   - `Organization._id`: MongoDB ObjectId representing corporate or academic entities.
   - `slug`: Unique SEO-friendly URL handle (e.g., `/company/mit-engineering`, `/company/google`).
@@ -167,6 +180,7 @@ flowchart TD
 ---
 
 ### 4. 👑 Arcturus Platform Administrator
+
 - **Identity & Data Models**:
   - `User.role === 'admin'` or `User.username === 'arcturus_admin'`.
   - Global administrative and moderating authority.
@@ -206,6 +220,7 @@ flowchart TD
 ```
 
 CampusLink bridges campus placement cells with corporate recruitment drives:
+
 1. **Candidate Profile Ingestion**: When students evaluate their employability or admins view ranked candidates, the platform extracts technical projects with descriptions, GitHub/demo URLs, tech stacks, work and internship experiences, licenses and certifications, academic milestones, and skills.
 2. **Hugging Face Gemma-2-2B-IT Diagnostic**: Prompt-engineered LLM inference synthesizes the student's complete academic and portfolio background to flag corporate risk factors, produce an explainable readiness summary, and generate a step-by-step remedial action plan for faculty mentors.
 3. **Institutional Command Center**: Gated exclusively to Arcturus Administrators, offering macro visibility into campus placement statistics, branch conversion rates, salary tier distributions, and at-risk student interventions.
@@ -215,6 +230,7 @@ CampusLink bridges campus placement cells with corporate recruitment drives:
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Routing**: [React Router DOM v7](https://reactrouter.com/)
 - **Icons**: [React Icons](https://react-icons.github.io/react-icons/) (FontAwesome, Bootstrap Icons, Remix, React Icons)
@@ -223,6 +239,7 @@ CampusLink bridges campus placement cells with corporate recruitment drives:
 - **Client SDKs**: `@emailjs/browser`, `axios`
 
 ### Backend
+
 - **Runtime**: [Node.js](https://nodejs.org/) (ES Modules)
 - **Framework**: [Express 5](https://expressjs.com/)
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) via [Mongoose 9](https://mongoosejs.com/) (configured with `{ family: 4 }` IPv4 resolution)
@@ -425,90 +442,90 @@ Visit **`http://localhost:5173`** in your browser.
 
 ### 🎓 CampusLink Ecosystem (`/api/campuslink`)
 
-| Method   | Endpoint                                   | Description                                                             | Auth Required |
-| :------- | :----------------------------------------- | :---------------------------------------------------------------------- | :-----------: |
-| `GET`    | `/api/campuslink/analytics`                | Aggregated command center metrics, branch conversions, and at-risk list |      ❌       |
-| `GET`    | `/api/campuslink/drives`                   | List active recruitment drives with real-time conflict detection matrix |      ❌       |
-| `POST`   | `/api/campuslink/drives`                   | Schedule recruitment drive with cutoffs, venue, and criteria            |  ✅ (Admin)   |
-| `PATCH`  | `/api/campuslink/drives/:id/resolve-conflict` | 1-Click automated resolution re-allocating drive venue / schedule    |  ✅ (Admin)   |
-| `DELETE` | `/api/campuslink/drives/:id`               | Cancel and remove recruitment drive                                     |  ✅ (Admin)   |
-| `GET`    | `/api/campuslink/drives/:id/match`         | Rank candidate pool with Explainable AI shortlisting rationales         |      ❌       |
-| `POST`   | `/api/campuslink/drives/:id/auto-shortlist`| 1-Click auto-shortlisting candidates meeting criteria                   |  ✅ (Admin)   |
-| `GET`    | `/api/campuslink/profile/me`               | Retrieve student placement readiness profile and candidate portfolio    |      ✅       |
-| `POST`   | `/api/campuslink/profile`                  | Save/update placement profile and run initial Gemma-2 risk analysis     |      ✅       |
-| `POST`   | `/api/campuslink/profile/diagnose-ai`      | On-demand Gemma-2 risk & recommendation diagnostics                     |      ✅       |
-| `POST`   | `/api/campuslink/profile/assessment`       | Submit quick readiness assessment and boost dimension scores            |      ✅       |
-| `GET`    | `/api/campuslink/offers`                   | List extended placement offers with cryptographic verification hashes   |      ❌       |
-| `POST`   | `/api/campuslink/offers/:id/respond`       | Student accept / decline action for an extended job offer               |      ✅       |
-| `POST`   | `/api/campuslink/ai-assistant`             | Conversational AI placement assistant powered by Gemma-2                |   Optional    |
+| Method     | Endpoint                                        | Description                                                             | Auth Required |
+| :--------- | :---------------------------------------------- | :---------------------------------------------------------------------- | :-----------: |
+| `GET`    | `/api/campuslink/analytics`                   | Aggregated command center metrics, branch conversions, and at-risk list |      ❌      |
+| `GET`    | `/api/campuslink/drives`                      | List active recruitment drives with real-time conflict detection matrix |      ❌      |
+| `POST`   | `/api/campuslink/drives`                      | Schedule recruitment drive with cutoffs, venue, and criteria            |  ✅ (Admin)  |
+| `PATCH`  | `/api/campuslink/drives/:id/resolve-conflict` | 1-Click automated resolution re-allocating drive venue / schedule       |  ✅ (Admin)  |
+| `DELETE` | `/api/campuslink/drives/:id`                  | Cancel and remove recruitment drive                                     |  ✅ (Admin)  |
+| `GET`    | `/api/campuslink/drives/:id/match`            | Rank candidate pool with Explainable AI shortlisting rationales         |      ❌      |
+| `POST`   | `/api/campuslink/drives/:id/auto-shortlist`   | 1-Click auto-shortlisting candidates meeting criteria                   |  ✅ (Admin)  |
+| `GET`    | `/api/campuslink/profile/me`                  | Retrieve student placement readiness profile and candidate portfolio    |      ✅      |
+| `POST`   | `/api/campuslink/profile`                     | Save/update placement profile and run initial Gemma-2 risk analysis     |      ✅      |
+| `POST`   | `/api/campuslink/profile/diagnose-ai`         | On-demand Gemma-2 risk & recommendation diagnostics                     |      ✅      |
+| `POST`   | `/api/campuslink/profile/assessment`          | Submit quick readiness assessment and boost dimension scores            |      ✅      |
+| `GET`    | `/api/campuslink/offers`                      | List extended placement offers with cryptographic verification hashes   |      ❌      |
+| `POST`   | `/api/campuslink/offers/:id/respond`          | Student accept / decline action for an extended job offer               |      ✅      |
+| `POST`   | `/api/campuslink/ai-assistant`                | Conversational AI placement assistant powered by Gemma-2                |   Optional   |
 
 ### 🛡️ Identity Verification & Blue Tick (`/api/verification`)
 
-| Method   | Endpoint                              | Description                                                | Auth Required |
-| :------- | :------------------------------------ | :--------------------------------------------------------- | :-----------: |
-| `POST`   | `/api/verification/request`           | Submit Blue Tick verification request with proof documents |      ✅       |
-| `GET`    | `/api/verification/my-status`          | Check current verification request status                  |      ✅       |
-| `GET`    | `/api/verification/admin/pending`     | Retrieve all pending verification requests for admin review|  ✅ (Admin)   |
-| `POST`   | `/api/verification/admin/:id/decision`| Approve, reject, or revoke user Blue Tick verification     |  ✅ (Admin)   |
+| Method   | Endpoint                                 | Description                                                 | Auth Required |
+| :------- | :--------------------------------------- | :---------------------------------------------------------- | :-----------: |
+| `POST` | `/api/verification/request`            | Submit Blue Tick verification request with proof documents  |      ✅      |
+| `GET`  | `/api/verification/my-status`          | Check current verification request status                   |      ✅      |
+| `GET`  | `/api/verification/admin/pending`      | Retrieve all pending verification requests for admin review |  ✅ (Admin)  |
+| `POST` | `/api/verification/admin/:id/decision` | Approve, reject, or revoke user Blue Tick verification      |  ✅ (Admin)  |
 
 ### 📖 Ephemeral Stories / Statuses (`/api/tales`)
 
-| Method   | Endpoint                  | Description                                                | Auth Required |
-| :------- | :------------------------ | :--------------------------------------------------------- | :-----------: |
-| `GET`    | `/api/tales`              | Fetch active, unexpired stories grouped by user            |      ❌       |
-| `POST`   | `/api/tales`              | Create a new Tale (text status or media story)             |      ✅       |
-| `POST`   | `/api/tales/:id/view`     | Mark story as viewed by authenticated user                 |      ✅       |
-| `POST`   | `/api/tales/:id/react`    | React to a story with an emoji                             |      ✅       |
-| `POST`   | `/api/tales/:id/comment`  | Post public comment on story & send DM reply to author     |      ✅       |
-| `DELETE` | `/api/tales/:id`          | Delete own story                                           |  ✅ (Author)  |
+| Method     | Endpoint                   | Description                                            | Auth Required |
+| :--------- | :------------------------- | :----------------------------------------------------- | :-----------: |
+| `GET`    | `/api/tales`             | Fetch active, unexpired stories grouped by user        |      ❌      |
+| `POST`   | `/api/tales`             | Create a new Tale (text status or media story)         |      ✅      |
+| `POST`   | `/api/tales/:id/view`    | Mark story as viewed by authenticated user             |      ✅      |
+| `POST`   | `/api/tales/:id/react`   | React to a story with an emoji                         |      ✅      |
+| `POST`   | `/api/tales/:id/comment` | Post public comment on story & send DM reply to author |      ✅      |
+| `DELETE` | `/api/tales/:id`         | Delete own story                                       |  ✅ (Author)  |
 
 ### 👑 Admin Operations (`/api/admin`)
 
-| Method   | Endpoint                          | Description                                             | Auth Required |
-| :------- | :-------------------------------- | :------------------------------------------------------ | :-----------: |
-| `GET`    | `/api/admin/metrics`              | Fetch system statistics and pending verification counts |  ✅ (Admin)   |
-| `GET`    | `/api/admin/organizations`        | List organizations with document review status          |  ✅ (Admin)   |
-| `POST`   | `/api/admin/organizations/approve`| Approve organization account                            |  ✅ (Admin)   |
-| `POST`   | `/api/admin/organizations/reject` | Reject organization account with reason preset          |  ✅ (Admin)   |
-| `GET`    | `/api/admin/audit-logs`           | Retrieve platform audit activity logs                   |  ✅ (Admin)   |
+| Method   | Endpoint                             | Description                                             | Auth Required |
+| :------- | :----------------------------------- | :------------------------------------------------------ | :-----------: |
+| `GET`  | `/api/admin/metrics`               | Fetch system statistics and pending verification counts |  ✅ (Admin)  |
+| `GET`  | `/api/admin/organizations`         | List organizations with document review status          |  ✅ (Admin)  |
+| `POST` | `/api/admin/organizations/approve` | Approve organization account                            |  ✅ (Admin)  |
+| `POST` | `/api/admin/organizations/reject`  | Reject organization account with reason preset          |  ✅ (Admin)  |
+| `GET`  | `/api/admin/audit-logs`            | Retrieve platform audit activity logs                   |  ✅ (Admin)  |
 
 ### 🔑 Authentication (`/api/auth`)
 
-| Method   | Endpoint                          | Description                                             | Auth Required |
-| :------- | :-------------------------------- | :------------------------------------------------------ | :-----------: |
-| `POST`   | `/api/auth/send-registration-otp` | Sends 6-digit OTP to email                              |      ❌       |
-| `POST`   | `/api/auth/register`              | Verifies OTP and creates user / organization account    |      ❌       |
-| `POST`   | `/api/auth/login`                 | Authenticates user & issues JWT                         |      ❌       |
-| `POST`   | `/api/auth/forgot-password`       | Dispatches password reset link                          |      ❌       |
-| `POST`   | `/api/auth/reset-password`        | Resets password with token                              |      ❌       |
+| Method   | Endpoint                            | Description                                          | Auth Required |
+| :------- | :---------------------------------- | :--------------------------------------------------- | :-----------: |
+| `POST` | `/api/auth/send-registration-otp` | Sends 6-digit OTP to email                           |      ❌      |
+| `POST` | `/api/auth/register`              | Verifies OTP and creates user / organization account |      ❌      |
+| `POST` | `/api/auth/login`                 | Authenticates user & issues JWT                      |      ❌      |
+| `POST` | `/api/auth/forgot-password`       | Dispatches password reset link                       |      ❌      |
+| `POST` | `/api/auth/reset-password`        | Resets password with token                           |      ❌      |
 
 ### 📰 Feed & Posts (`/api/posts`)
 
-| Method   | Endpoint                   | Description                                                | Auth Required |
-| :------- | :------------------------- | :--------------------------------------------------------- | :-----------: |
-| `GET`    | `/api/posts`               | Fetch feed posts with populated author profiles            |      ✅       |
-| `POST`   | `/api/posts`               | Create new post with media, audience, and optional schedule|      ✅       |
-| `POST`   | `/api/posts/:id/like`      | Like or react to a post                                    |      ✅       |
-| `POST`   | `/api/posts/:id/comment`   | Add a comment to a post                                    |      ✅       |
-| `DELETE` | `/api/posts/:id`           | Delete post                                                |  ✅ (Author)  |
+| Method     | Endpoint                   | Description                                                 | Auth Required |
+| :--------- | :------------------------- | :---------------------------------------------------------- | :-----------: |
+| `GET`    | `/api/posts`             | Fetch feed posts with populated author profiles             |      ✅      |
+| `POST`   | `/api/posts`             | Create new post with media, audience, and optional schedule |      ✅      |
+| `POST`   | `/api/posts/:id/like`    | Like or react to a post                                     |      ✅      |
+| `POST`   | `/api/posts/:id/comment` | Add a comment to a post                                     |      ✅      |
+| `DELETE` | `/api/posts/:id`         | Delete post                                                 |  ✅ (Author)  |
 
 ### 💼 Jobs Marketplace (`/api/jobs`)
 
-| Method   | Endpoint                  | Description                                                | Auth Required |
-| :------- | :------------------------ | :--------------------------------------------------------- | :-----------: |
-| `GET`    | `/api/jobs`               | Retrieve active openings with query filters                |      ❌       |
-| `GET`    | `/api/jobs/my-listings`   | Get jobs published by authenticated recruiter              |      ✅       |
-| `POST`   | `/api/jobs`               | Publish a new job opening                                  |      ✅       |
-| `POST`   | `/api/jobs/:id/apply`     | 1-Click apply to a job listing                             |      ✅       |
-| `DELETE` | `/api/jobs/:id`           | Close and delete a job listing                             |  ✅ (Owner)   |
+| Method     | Endpoint                  | Description                                   | Auth Required |
+| :--------- | :------------------------ | :-------------------------------------------- | :-----------: |
+| `GET`    | `/api/jobs`             | Retrieve active openings with query filters   |      ❌      |
+| `GET`    | `/api/jobs/my-listings` | Get jobs published by authenticated recruiter |      ✅      |
+| `POST`   | `/api/jobs`             | Publish a new job opening                     |      ✅      |
+| `POST`   | `/api/jobs/:id/apply`   | 1-Click apply to a job listing                |      ✅      |
+| `DELETE` | `/api/jobs/:id`         | Close and delete a job listing                |  ✅ (Owner)  |
 
 ### 💬 Messaging (`/api/messages`)
 
-| Method   | Endpoint                      | Description                                              | Auth Required |
-| :------- | :---------------------------- | :------------------------------------------------------- | :-----------: |
-| `GET`    | `/api/messages/conversations` | List conversation threads with unread counts             |      ✅       |
-| `GET`    | `/api/messages/:userId`       | Fetch chat history with user                             |      ✅       |
-| `POST`   | `/api/messages`               | Send direct encrypted message or embedded tale reply     |      ✅       |
+| Method   | Endpoint                        | Description                                          | Auth Required |
+| :------- | :------------------------------ | :--------------------------------------------------- | :-----------: |
+| `GET`  | `/api/messages/conversations` | List conversation threads with unread counts         |      ✅      |
+| `GET`  | `/api/messages/:userId`       | Fetch chat history with user                         |      ✅      |
+| `POST` | `/api/messages`               | Send direct encrypted message or embedded tale reply |      ✅      |
 
 ---
 
@@ -524,6 +541,7 @@ Visit **`http://localhost:5173`** in your browser.
 ## 🚢 Deployment
 
 ### Deploy Backend to [Render](https://render.com)
+
 1. Connect your GitHub repository to Render as a **Web Service**.
 2. Set **Root Directory** to `server`.
 3. Set **Build Command** to `npm install`.
@@ -531,6 +549,7 @@ Visit **`http://localhost:5173`** in your browser.
 5. Add all backend environment variables in the **Environment** tab.
 
 ### Deploy Frontend to [Vercel](https://vercel.com)
+
 1. Import your GitHub repository into Vercel.
 2. Set **Framework Preset** to `Vite`.
 3. Add `VITE_API_BASE_URL=https://your-render-service.onrender.com/api`.

@@ -20,7 +20,7 @@ const DEFAULT_COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Vocal Melody & Pitch',
@@ -88,7 +88,7 @@ const DEFAULT_COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Subtext Listening',
@@ -149,7 +149,7 @@ const DEFAULT_COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'Executive Presence',
@@ -210,7 +210,7 @@ const DEFAULT_COURSES = [
     instructor: {
       name: 'Vinh Giang',
       role: 'International Keynote Speaker, Magician & Masterclass Coach',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      avatar: 'https://thetopcelebrity.com/public/assets/img/article/vinh-giang-picture-1.webp',
     },
     skills: [
       'The CLEAR Framework',
@@ -259,14 +259,14 @@ const DEFAULT_COURSES = [
   },
 ];
 
-// Helper to seed initial courses and enforce communication masterclasses
+// Helper to seed initial courses if missing
 const ensureSeedCourses = async () => {
   try {
     for (const c of DEFAULT_COURSES) {
       await Course.findOneAndUpdate(
         { slug: c.slug },
-        { $set: c },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { $setOnInsert: c },
+        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
       );
     }
   } catch (err) {
