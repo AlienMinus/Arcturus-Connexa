@@ -32,7 +32,6 @@ const CATEGORIES = [
   'Data Engineering',
 ];
 
-const LEVELS = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
 const LEVELS = [
   'All Levels',
   'Beginner',
@@ -369,10 +368,8 @@ const CourseManagement = ({ token, showToast, onStatsUpdate }) => {
     }
 
     // Sanitize lesson video URLs
-    const sanitizedModules = formData.modules.map((m) => ({
     const sanitizedModules = (formData.modules || []).map((m) => ({
       ...m,
-      lessons: m.lessons.map((l) => ({
       lessons: (m.lessons || []).map((l) => ({
         ...l,
         videoUrl: sanitizeVideoUrl(l.videoUrl),
