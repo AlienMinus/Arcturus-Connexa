@@ -967,6 +967,52 @@ body.dark-mode .suggestedUserHeadline {
   color: #94a3b8 !important;
 }
 
+[data-theme="dark"] .newMsgPagination,
+body.dark-mode .newMsgPagination {
+  background-color: var(--bg-primary) !important;
+  border-top-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .newMsgPageBtn,
+body.dark-mode .newMsgPageBtn {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .newMsgPageBtn:disabled,
+body.dark-mode .newMsgPageBtn:disabled {
+  background-color: var(--bg-hover) !important;
+  color: #64748b !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .newMsgPageInfo,
+body.dark-mode .newMsgPageInfo {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .suggestedRelationBadge,
+body.dark-mode .suggestedRelationBadge {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .conversationEmptyState p,
+body.dark-mode .conversationEmptyState p,
+[data-theme="dark"] .newMsgEmptyState p,
+body.dark-mode .newMsgEmptyState p {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .emptyStateSubtext,
+body.dark-mode .emptyStateSubtext,
+[data-theme="dark"] .newMsgEmptyState span,
+body.dark-mode .newMsgEmptyState span {
+  color: #94a3b8 !important;
+}
+
+
 /* ==========================================================================
    6. PROFILE PAGE
    ========================================================================== */
