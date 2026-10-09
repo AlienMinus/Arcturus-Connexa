@@ -914,9 +914,16 @@ body.dark-mode .messageBubble.received {
 }
 
 [data-theme="dark"] .messageBubble.sent,
-body.dark-mode .messageBubble.sent {
+body.dark-mode .messageBubble.sent,
+[data-theme="dark"] .messageBubble.sent p,
+body.dark-mode .messageBubble.sent p {
   background-color: #0a66c2 !important;
   color: #ffffff !important;
+}
+
+[data-theme="dark"] .messageBubble.sent .messageTime,
+body.dark-mode .messageBubble.sent .messageTime {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 [data-theme="dark"] .chatInputArea,
