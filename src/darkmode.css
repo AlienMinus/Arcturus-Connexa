@@ -3285,6 +3285,91 @@ body.dark-mode .quickPromptChip {
   color: #cbd5e1 !important;
 }
 
+[data-theme="dark"] .campusProfileFormCard,
+body.dark-mode .campusProfileFormCard {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusFormSectionTitle,
+body.dark-mode .campusFormSectionTitle {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusFormLabel,
+body.dark-mode .campusFormLabel {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .campusFormInput,
+body.dark-mode .campusFormInput,
+[data-theme="dark"] .campusFormSelect,
+body.dark-mode .campusFormSelect {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .campusFormInput:focus,
+body.dark-mode .campusFormInput:focus,
+[data-theme="dark"] .campusFormSelect:focus,
+body.dark-mode .campusFormSelect:focus {
+  border-color: #38bdf8 !important;
+  background: #0f172a !important;
+}
+
+[data-theme="dark"] .dialMentorMeta,
+body.dark-mode .dialMentorMeta {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .trackApplicationBtn,
+body.dark-mode .trackApplicationBtn,
+[data-theme="dark"] .detailsTrackBtn,
+body.dark-mode .detailsTrackBtn {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: #0284c7 !important;
+}
+
+[data-theme="dark"] .trackModalContent,
+body.dark-mode .trackModalContent {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .trackModalHeader,
+body.dark-mode .trackModalHeader,
+[data-theme="dark"] .trackModalFooter,
+body.dark-mode .trackModalFooter {
+  border-color: #334155 !important;
+  background: #1e293b !important;
+}
+
+[data-theme="dark"] .trackJobSummary,
+body.dark-mode .trackJobSummary,
+[data-theme="dark"] .trackCandidateInfo,
+body.dark-mode .trackCandidateInfo,
+[data-theme="dark"] .trackTimeline,
+body.dark-mode .trackTimeline {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .trackModalHeaderTitle h3,
+body.dark-mode .trackModalHeaderTitle h3,
+[data-theme="dark"] .trackJobSummary h4,
+body.dark-mode .trackJobSummary h4,
+[data-theme="dark"] .trackTimelineTitle,
+body.dark-mode .trackTimelineTitle,
+[data-theme="dark"] .stepContent strong,
+body.dark-mode .stepContent strong {
+  color: #f8fafc !important;
+}
+
 /* For Business Dropdown in Dark Mode */
 [data-theme="dark"] .for-business-dropdown,
 body.dark-mode .for-business-dropdown {

@@ -12,7 +12,8 @@ import {
   FaRegBookmark,
   FaTimes, 
   FaPaperPlane,
-  FaClock
+  FaClock,
+  FaClipboardCheck
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -23,6 +24,8 @@ const JOB_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship'];
 const JobsPage = () => {
   const { user, token, activeAccount } = useAuth();
   const canManageJobs = activeAccount?.type === 'organization';
+  const currentUserId = (user?._id || user?.id)?.toString();
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,12 +40,41 @@ const JobsPage = () => {
     }
   });
   const [appliedJobIds, setAppliedJobIds] = useState(new Set());
+  const [applicationsMap, setApplicationsMap] = useState({});
   const [applyingJobId, setApplyingJobId] = useState(null);
+  const [trackingModalJob, setTrackingModalJob] = useState(null);
+  const [withdrawing, setWithdrawing] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  const fetchMyApplications = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(buildApiUrl('/jobs/my-applications'), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const apps = data.applications || [];
+        const map = {};
+        const appliedSet = new Set();
+        apps.forEach((app) => {
+          const jid = (app.jobId?._id || app.jobId)?.toString();
+          if (jid) {
+            map[jid] = app;
+            appliedSet.add(jid);
+          }
+        });
+        setApplicationsMap(map);
+        setAppliedJobIds((prev) => new Set([...prev, ...appliedSet]));
+      }
+    } catch (err) {
+      console.error('Failed to load candidate applications:', err);
+    }
   };
 
   const fetchJobs = async () => {
@@ -67,15 +99,21 @@ const JobsPage = () => {
           setSelectedJob(null);
         }
 
-        // Detect if user has already applied
-        if (user?._id) {
+        // Detect if user has already applied via applicant records
+        if (currentUserId) {
           const applied = new Set();
           list.forEach((j) => {
-            if (j.applicants?.some((a) => (a.applicantId?._id || a.applicantId) === user._id)) {
-              applied.add(j._id || j.id);
+            const jid = (j._id || j.id)?.toString();
+            if (
+              j.applicants?.some((a) => {
+                const aid = (a.applicantId?._id || a.applicantId || a.userId)?.toString();
+                return aid === currentUserId;
+              })
+            ) {
+              applied.add(jid);
             }
           });
-          setAppliedJobIds(applied);
+          setAppliedJobIds((prev) => new Set([...prev, ...applied]));
         }
       } else {
         setJobs([]);
@@ -92,7 +130,10 @@ const JobsPage = () => {
 
   useEffect(() => {
     fetchJobs();
-  }, [selectedType]);
+    if (token) {
+      fetchMyApplications();
+    }
+  }, [selectedType, token]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -100,9 +141,9 @@ const JobsPage = () => {
   };
 
   const handleApply = async (job) => {
-    const jobId = job._id || job.id;
+    const jobId = (job._id || job.id)?.toString();
     if (appliedJobIds.has(jobId)) {
-      showToast('You have already applied to this position');
+      setTrackingModalJob(job);
       return;
     }
 
@@ -125,6 +166,7 @@ const JobsPage = () => {
       if (res.ok) {
         setAppliedJobIds((prev) => new Set([...prev, jobId]));
         showToast(`Application submitted to ${job.company}! 🎉`);
+        fetchMyApplications();
         fetchJobs();
       } else {
         showToast(data.error || 'Failed to submit application');
@@ -134,6 +176,46 @@ const JobsPage = () => {
       showToast('Network error while applying');
     } finally {
       setApplyingJobId(null);
+    }
+  };
+
+  const handleWithdrawApplication = async (jobId) => {
+    if (!token || !jobId) return;
+    if (!window.confirm('Are you sure you want to withdraw your application for this position?')) {
+      return;
+    }
+    setWithdrawing(true);
+    try {
+      const res = await fetch(buildApiUrl(`/jobs/${jobId}/withdraw`), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || 'Application withdrawn successfully');
+        setTrackingModalJob(null);
+        setAppliedJobIds((prev) => {
+          const next = new Set(prev);
+          next.delete(jobId.toString());
+          return next;
+        });
+        setApplicationsMap((prev) => {
+          const next = { ...prev };
+          delete next[jobId.toString()];
+          return next;
+        });
+        fetchMyApplications();
+        fetchJobs();
+      } else {
+        showToast(data.error || 'Failed to withdraw application');
+      }
+    } catch (err) {
+      console.error('Withdraw application error:', err);
+      showToast('Error withdrawing application');
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -264,7 +346,7 @@ const JobsPage = () => {
             ) : (
               <div className="jobsGrid">
                 {jobs.map((job) => {
-                  const jobId = job._id || job.id;
+                  const jobId = (job._id || job.id)?.toString();
                   const isApplied = appliedJobIds.has(jobId);
                   const isSaved = savedJobs.includes(jobId);
                   const isApplying = applyingJobId === jobId;
@@ -326,27 +408,36 @@ const JobsPage = () => {
                           <FaClock size={11} /> Active Opening
                         </span>
 
-                        <button
-                          type="button"
-                          className={`easyApplyBtn ${isApplied ? 'applied' : ''}`}
-                          disabled={isApplied || isApplying}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleApply(job);
-                          }}
-                        >
-                          {isApplying ? (
-                            'Applying...'
-                          ) : isApplied ? (
-                            <>
-                              <FaCheckCircle size={12} /> Applied
-                            </>
-                          ) : (
-                            <>
-                              <FaPaperPlane size={11} /> Easy Apply
-                            </>
-                          )}
-                        </button>
+                        {isApplied ? (
+                          <button
+                            type="button"
+                            className="trackApplicationBtn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTrackingModalJob(job);
+                            }}
+                          >
+                            <FaClipboardCheck size={12} /> Track Application
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="easyApplyBtn"
+                            disabled={isApplying}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApply(job);
+                            }}
+                          >
+                            {isApplying ? (
+                              'Applying...'
+                            ) : (
+                              <>
+                                <FaPaperPlane size={11} /> Easy Apply
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -380,29 +471,37 @@ const JobsPage = () => {
                   </div>
 
                   <div className="detailsActionRow">
-                    <button
-                      type="button"
-                      className={`detailsApplyBtn ${appliedJobIds.has(selectedJob._id || selectedJob.id) ? 'applied' : ''}`}
-                      disabled={appliedJobIds.has(selectedJob._id || selectedJob.id)}
-                      onClick={() => handleApply(selectedJob)}
-                    >
-                      {appliedJobIds.has(selectedJob._id || selectedJob.id) ? (
-                        <>
-                          <FaCheckCircle size={13} /> Applied with Arcturus Profile
-                        </>
-                      ) : (
-                        <>
-                          <FaPaperPlane size={12} /> 1-Click Easy Apply
-                        </>
-                      )}
-                    </button>
+                    {appliedJobIds.has((selectedJob._id || selectedJob.id)?.toString()) ? (
+                      <button
+                        type="button"
+                        className="detailsTrackBtn"
+                        onClick={() => setTrackingModalJob(selectedJob)}
+                      >
+                        <FaClipboardCheck size={14} /> Track Application
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="detailsApplyBtn"
+                        disabled={applyingJobId === (selectedJob._id || selectedJob.id)?.toString()}
+                        onClick={() => handleApply(selectedJob)}
+                      >
+                        {applyingJobId === (selectedJob._id || selectedJob.id)?.toString() ? (
+                          'Applying...'
+                        ) : (
+                          <>
+                            <FaPaperPlane size={12} /> 1-Click Easy Apply
+                          </>
+                        )}
+                      </button>
+                    )}
 
                     <button
                       type="button"
                       className="detailsSaveBtn"
                       onClick={() => toggleSaveJob(selectedJob._id || selectedJob.id)}
                     >
-                      {savedJobs.includes(selectedJob._id || selectedJob.id) ? (
+                      {savedJobs.includes((selectedJob._id || selectedJob.id)?.toString()) ? (
                         <FaBookmark size={15} color="#0a66c2" />
                       ) : (
                         <FaRegBookmark size={15} />
@@ -452,7 +551,156 @@ const JobsPage = () => {
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Track Application Modal */}
+      {trackingModalJob && (() => {
+        const trkId = (trackingModalJob._id || trackingModalJob.id)?.toString();
+        const currentApp = applicationsMap[trkId];
+        const statusStr = currentApp?.status || 'Applied';
+        const stLower = statusStr.toLowerCase();
+        const isUnderReview = stLower.includes('review') || stLower.includes('shortlist') || stLower.includes('interview') || stLower.includes('hire') || stLower.includes('offer');
+        const isShortlisted = stLower.includes('shortlist') || stLower.includes('interview') || stLower.includes('hire') || stLower.includes('offer');
+        const isDecision = stLower.includes('hire') || stLower.includes('offer') || stLower.includes('placed') || stLower.includes('reject');
+
+        return (
+          <div className="trackModalOverlay" onClick={() => setTrackingModalJob(null)}>
+            <div className="trackModalContent" onClick={(e) => e.stopPropagation()}>
+              <div className="trackModalHeader">
+                <div className="trackModalHeaderTitle">
+                  <FaClipboardCheck size={20} color="#0a66c2" />
+                  <h3>Application Status Tracker</h3>
+                </div>
+                <button
+                  type="button"
+                  className="trackModalCloseBtn"
+                  onClick={() => setTrackingModalJob(null)}
+                >
+                  <FaTimes size={16} />
+                </button>
+              </div>
+
+              <div className="trackModalBody">
+                <div className="trackJobSummary">
+                  <img
+                    src={trackingModalJob.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                    alt={trackingModalJob.company}
+                    className="trackCompanyLogo"
+                  />
+                  <div>
+                    <h4>{trackingModalJob.title}</h4>
+                    <div className="trackCompanyName">{trackingModalJob.company}</div>
+                    <div className="trackJobMeta">
+                      <span><FaMapMarkerAlt size={11} /> {trackingModalJob.location}</span>
+                      <span>•</span>
+                      <span className="workplaceBadge">{trackingModalJob.workplaceType || 'Hybrid'}</span>
+                      <span>•</span>
+                      <span>{trackingModalJob.employmentType || 'Full-time'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="trackStatusBanner">
+                  <span className="trackStatusLabel">Current Status:</span>
+                  <span className={`trackStatusBadge status-${statusStr.toLowerCase().replace(' ', '-')}`}>
+                    <FaCheckCircle size={13} /> {statusStr}
+                  </span>
+                </div>
+
+                <div className="trackTimeline">
+                  <div className="trackTimelineTitle">Hiring Process & Timeline</div>
+                  <div className="trackTimelineSteps">
+                    <div className="timelineStep completed">
+                      <div className="stepDot"><FaCheckCircle size={12} /></div>
+                      <div className="stepContent">
+                        <strong>Application Submitted</strong>
+                        <span>Submitted with verified Arcturus candidate profile</span>
+                        {currentApp?.appliedAt && (
+                          <span className="stepTime">
+                            {new Date(currentApp.appliedAt).toLocaleDateString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={`timelineStep ${isUnderReview ? 'active' : ''}`}>
+                      <div className="stepDot">2</div>
+                      <div className="stepContent">
+                        <strong>Under Review</strong>
+                        <span>Hiring team is evaluating candidate credentials and background</span>
+                      </div>
+                    </div>
+
+                    <div className={`timelineStep ${isShortlisted ? 'active' : ''}`}>
+                      <div className="stepDot">3</div>
+                      <div className="stepContent">
+                        <strong>Interview & Assessment</strong>
+                        <span>Shortlisted for technical assessment or round discussion</span>
+                      </div>
+                    </div>
+
+                    <div className={`timelineStep ${isDecision ? 'active' : ''}`}>
+                      <div className="stepDot">4</div>
+                      <div className="stepContent">
+                        <strong>Offer Decision</strong>
+                        <span>Final decision and formal employment proposal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="trackCandidateInfo">
+                  <div className="trackCandidateInfoTitle">Candidate Profile Attached</div>
+                  <div className="trackCandidateDetails">
+                    <div>
+                      <strong>Applicant: </strong>
+                      <span>{currentApp?.candidateName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Arcturus Member'}</span>
+                    </div>
+                    {(currentApp?.candidateHeadline || user?.headline) && (
+                      <div>
+                        <strong>Headline: </strong>
+                        <span>{currentApp?.candidateHeadline || user?.headline}</span>
+                      </div>
+                    )}
+                    {user?.email && (
+                      <div>
+                        <strong>Email: </strong>
+                        <span>{user?.email}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="trackModalFooter">
+                <button
+                  type="button"
+                  className="withdrawAppBtn"
+                  disabled={withdrawing}
+                  onClick={() => handleWithdrawApplication(trkId)}
+                >
+                  {withdrawing ? 'Withdrawing...' : 'Withdraw Application'}
+                </button>
+
+                <button
+                  type="button"
+                  className="trackCloseActionBtn"
+                  onClick={() => setTrackingModalJob(null)}
+                >
+                  Close Tracker
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      </div>
+    
   );
 };
 
