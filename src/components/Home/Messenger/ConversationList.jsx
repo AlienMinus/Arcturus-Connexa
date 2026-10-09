@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { buildApiUrl } from "../../../utils/api";
 import ConversationItem from "./ConversationItem";
 
-const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
+const ConversationList = ({ onSelectChat, searchTerm = "", activeTab = "focused", filterMode = "all" }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,7 +10,6 @@ const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
   useEffect(() => {
     let interval;
     const loadContacts = async () => {
-
       try {
         const token = localStorage.getItem('authToken');
         const response = await fetch(buildApiUrl('/users'), {
@@ -41,43 +40,83 @@ const ConversationList = ({ onSelectChat, searchTerm = "" }) => {
   }, []);
 
   if (loading) {
-    return <div className="conversationList">Loading contacts...</div>;
+    return <div className="conversationList conversationListState">Loading conversations...</div>;
   }
 
   if (error) {
-    return <div className="conversationList">{error}</div>;
+    return <div className="conversationList conversationListState conversationError">{error}</div>;
   }
 
+  // 1. Sort contacts by most recent message timestamp
   const sortedContacts = [...contacts].sort((a, b) => {
-    if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
-      return new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp);
-    }
-    if (a.lastMessageTimestamp) return -1;
-    if (b.lastMessageTimestamp) return 1;
+    const timeA = a.lastMessageTimestamp ? new Date(a.lastMessageTimestamp).getTime() : 0;
+    const timeB = b.lastMessageTimestamp ? new Date(b.lastMessageTimestamp).getTime() : 0;
+    if (timeA && timeB) return timeB - timeA;
+    if (timeA) return -1;
+    if (timeB) return 1;
     return (a.name || '').localeCompare(b.name || '');
   });
 
-  const filteredContacts = sortedContacts.filter(contact => 
-    contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    contact.lastMessage?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 2. Filter contacts by activeTab: Focused (followers/following/connections) vs Other (non-followers)
+  const tabFilteredContacts = sortedContacts.filter((contact) => {
+    if (activeTab === "focused") {
+      return Boolean(contact.isFocused);
+    }
+    if (activeTab === "other") {
+      return !contact.isFocused;
+    }
+    return true;
+  });
+
+  // 3. Filter by search term & unread filter mode
+  const filteredContacts = tabFilteredContacts.filter((contact) => {
+    if (filterMode === "unread" && !(contact.unreadCount > 0)) {
+      return false;
+    }
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      contact.name?.toLowerCase().includes(term) ||
+      contact.username?.toLowerCase().includes(term) ||
+      contact.lastMessage?.toLowerCase().includes(term)
+    );
+  });
 
   return (
     <div className="conversationList">
-      {filteredContacts.map((contact) => (
-        <ConversationItem
-          key={contact.id}
-          data={{
-            id: contact.id,
-            name: contact.name,
-            msg: contact.lastMessage || contact.headline || 'Say hello',
-            timestamp: contact.lastMessageTimestamp,
-            unreadCount: contact.unreadCount,
-            avatar: contact.avatar,
-          }}
-          onClick={() => onSelectChat(contact)}
-        />
-      ))}
+      {filteredContacts.length === 0 ? (
+        <div className="conversationEmptyState">
+          <p>
+            {searchTerm
+              ? "No conversations match your search"
+              : activeTab === "focused"
+              ? "No focused messages yet"
+              : "No other messages yet"}
+          </p>
+          <span className="emptyStateSubtext">
+            {searchTerm
+              ? "Try searching for a different name or message keyword."
+              : activeTab === "focused"
+              ? "Conversations with your connections, followers, and following will appear here."
+              : "Messages from members outside your network will appear here."}
+          </span>
+        </div>
+      ) : (
+        filteredContacts.map((contact) => (
+          <ConversationItem
+            key={contact.id || contact._id}
+            data={{
+              id: contact.id || contact._id,
+              name: contact.name,
+              msg: contact.lastMessage || contact.headline || "Say hello",
+              timestamp: contact.lastMessageTimestamp,
+              unreadCount: contact.unreadCount,
+              avatar: contact.avatar,
+            }}
+            onClick={() => onSelectChat(contact)}
+          />
+        ))
+      )}
     </div>
   );
 };

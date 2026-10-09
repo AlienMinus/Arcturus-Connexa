@@ -13,6 +13,7 @@ const Messenger = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeChat, setActiveChat] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("focused");
   const { profile } = useProfile();
 
   const toggle = () => {
@@ -31,13 +32,23 @@ const Messenger = () => {
         {isOpen && (
           <>
             <MessageSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-            <MessageTabs />
-            <ConversationList onSelectChat={setActiveChat} searchTerm={searchTerm} />
+            <MessageTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            <ConversationList
+              onSelectChat={setActiveChat}
+              searchTerm={searchTerm}
+              activeTab={activeTab}
+            />
           </>
         )}
       </div>
       {showNewMessage && (
-        <NewMessageModal closeModal={() => setShowNewMessage(false)} />
+        <NewMessageModal
+          closeModal={() => setShowNewMessage(false)}
+          onSelectChat={(contact) => {
+            setShowNewMessage(false);
+            setActiveChat(contact);
+          }}
+        />
       )}
       {activeChat && (
         <ChatWindow contact={activeChat} closeChat={() => setActiveChat(null)} />

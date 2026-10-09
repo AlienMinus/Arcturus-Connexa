@@ -3,6 +3,7 @@ import { FaEdit, FaEllipsisH, FaCheckDouble, FaCog, FaTimes } from "react-icons/
 import { Link } from "react-router-dom";
 import ConversationList from "../../components/Home/Messenger/ConversationList";
 import MessageSearch from "../../components/Home/Messenger/MessageSearch";
+import MessageTabs from "../../components/Home/Messenger/MessageTabs";
 import ChatWindow from "../../components/Home/Messenger/ChatWindow";
 import NewMessageModal from "../../components/Home/Messenger/NewMessageModal";
 import useMediaQuery from "../../hooks/useMediaQuery";
@@ -11,6 +12,7 @@ import "./MessegingPage.css";
 const MessegingPage = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("focused");
   const [filterMode, setFilterMode] = useState("all");
   const [isComposing, setIsComposing] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -86,6 +88,8 @@ const MessegingPage = () => {
             />
           </div>
 
+          <MessageTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
           <div className="messaging-list-container">
             <ConversationList
               onSelectChat={(chat) => {
@@ -93,6 +97,8 @@ const MessegingPage = () => {
                 setIsComposing(false);
               }}
               searchTerm={searchTerm}
+              activeTab={activeTab}
+              filterMode={filterMode}
             />
           </div>
         </div>
@@ -105,7 +111,13 @@ const MessegingPage = () => {
             <ChatWindow contact={activeChat} closeChat={() => setActiveChat(null)} />
           ) : isComposing ? (
             <div className="composeContainer">
-              <NewMessageModal closeModal={() => setIsComposing(false)} />
+              <NewMessageModal
+                closeModal={() => setIsComposing(false)}
+                onSelectChat={(chat) => {
+                  setIsComposing(false);
+                  setActiveChat(chat);
+                }}
+              />
             </div>
           ) : (
             <div className="messaging-empty-state">
@@ -127,7 +139,13 @@ const MessegingPage = () => {
       {/* Compose modal overlay if opened in floating mode */}
       {isComposing && !isMobile && activeChat && (
         <div className="composeFloatingModal">
-          <NewMessageModal closeModal={() => setIsComposing(false)} />
+          <NewMessageModal
+            closeModal={() => setIsComposing(false)}
+            onSelectChat={(chat) => {
+              setIsComposing(false);
+              setActiveChat(chat);
+            }}
+          />
         </div>
       )}
     </div>

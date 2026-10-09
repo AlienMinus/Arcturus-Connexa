@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
 import Post from '../models/Post.js';
@@ -46,54 +47,213 @@ const sendNotificationToUsers = async (userIds, notification) => {
   );
 };
 
-// Get list of other users for messenger contacts
+// Get list of users with whom messages have been exchanged (initiated or received messages only)
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const users = await User.find({ _id: { $ne: req.userId } })
-      .select('firstName middleName lastName username email headline profilePicture')
-      .limit(50)
+    const userObjectId = new mongoose.Types.ObjectId(req.userId);
+
+    // 1. Find distinct conversation partners where a message exists
+    const partners = await Message.aggregate([
+      {
+        $match: {
+          $or: [
+            { senderId: userObjectId },
+            { receiverId: userObjectId }
+          ]
+        }
+      },
+      {
+        $project: {
+          partnerId: {
+            $cond: {
+              if: { $eq: ['$senderId', userObjectId] },
+              then: '$receiverId',
+              else: '$senderId'
+            }
+          },
+          createdAt: 1
+        }
+      },
+      {
+        $group: {
+          _id: '$partnerId',
+          latestMessageAt: { $max: '$createdAt' }
+        }
+      },
+      {
+        $sort: { latestMessageAt: -1 }
+      }
+    ]);
+
+    if (!partners || partners.length === 0) {
+      return res.json({ contacts: [] });
+    }
+
+    const partnerIds = partners.map((p) => p._id);
+
+    // 2. Fetch current user's relationships (followers, following, connections)
+    const currentUser = await User.findById(req.userId)
+      .select('followers following connections')
       .lean();
 
-    const contacts = await Promise.all(users.map(async (user) => {
-      const lastMessage = await Message.findOne({
-        $or: [
-          { senderId: req.userId, receiverId: user._id },
-          { senderId: user._id, receiverId: req.userId }
-        ]
-      }).sort({ createdAt: -1 });
+    const followersSet = new Set((currentUser?.followers || []).map((id) => id.toString()));
+    const followingSet = new Set((currentUser?.following || []).map((id) => id.toString()));
+    const connectionsSet = new Set((currentUser?.connections || []).map((id) => id.toString()));
 
-      const unreadCount = await Message.countDocuments({
-        senderId: user._id,
-        receiverId: req.userId,
-        read: false
-      });
+    // 3. Fetch partner users
+    const partnerUsers = await User.find({ _id: { $in: partnerIds } })
+      .select('firstName middleName lastName username email headline profilePicture')
+      .lean();
 
-      return {
-        id: user._id,
-        username: user.username,
-        name: getFullName(user) || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Anonymous',
-        headline: user.headline || user.email,
-        avatar: user.profilePicture || null,
-        lastMessage: lastMessage ? lastMessage.content : null,
-        lastMessageTimestamp: lastMessage ? lastMessage.createdAt : null,
-        unreadCount
-      };
-    }));
+    const partnerUsersMap = new Map(partnerUsers.map((u) => [u._id.toString(), u]));
 
-    // Sort contacts: Most recent messages at the top, then alphabetically for remaining
+    // 4. Build contact info for each partner
+    const contacts = (await Promise.all(
+      partners.map(async (partner) => {
+        const partnerIdStr = partner._id.toString();
+        const user = partnerUsersMap.get(partnerIdStr);
+        if (!user) return null;
+
+        const lastMessage = await Message.findOne({
+          $or: [
+            { senderId: req.userId, receiverId: user._id },
+            { senderId: user._id, receiverId: req.userId }
+          ]
+        }).sort({ createdAt: -1 });
+
+        const unreadCount = await Message.countDocuments({
+          senderId: user._id,
+          receiverId: req.userId,
+          read: false
+        });
+
+        const isFollower = followersSet.has(partnerIdStr);
+        const isFollowing = followingSet.has(partnerIdStr);
+        const isConnected = connectionsSet.has(partnerIdStr);
+        const isFocused = isFollower || isFollowing || isConnected;
+
+        return {
+          id: user._id,
+          _id: user._id,
+          username: user.username,
+          name: getFullName(user) || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Member',
+          headline: user.headline || user.email,
+          avatar: user.profilePicture || null,
+          lastMessage: lastMessage ? lastMessage.content : null,
+          lastMessageTimestamp: lastMessage ? lastMessage.createdAt : partner.latestMessageAt,
+          unreadCount,
+          isFocused,
+          category: isFocused ? 'focused' : 'other',
+          isFollower,
+          isFollowing,
+          isConnected
+        };
+      })
+    )).filter(Boolean);
+
+    // Sort contacts by most recent message timestamp descending
     contacts.sort((a, b) => {
-      if (a.lastMessageTimestamp && b.lastMessageTimestamp) {
-        return new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp);
-      }
-      if (a.lastMessageTimestamp) return -1;
-      if (b.lastMessageTimestamp) return 1;
-      return (a.name || '').localeCompare(b.name || '');
+      const timeA = a.lastMessageTimestamp ? new Date(a.lastMessageTimestamp).getTime() : 0;
+      const timeB = b.lastMessageTimestamp ? new Date(b.lastMessageTimestamp).getTime() : 0;
+      return timeB - timeA;
     });
 
     res.json({ contacts });
   } catch (err) {
-    console.error('Failed to fetch users for messenger:', err);
+    console.error('Failed to fetch conversation contacts:', err);
     res.status(500).json({ error: 'Failed to fetch contacts' });
+  }
+});
+
+// Get list of followers, followings, and connections for New Message modal (paged by 10)
+router.get('/network-contacts', authMiddleware, async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
+    const search = (req.query.search || '').trim();
+
+    const currentUser = await User.findById(req.userId)
+      .select('followers following connections')
+      .lean();
+
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const followersSet = new Set((currentUser.followers || []).map((id) => id.toString()));
+    const followingSet = new Set((currentUser.following || []).map((id) => id.toString()));
+    const connectionsSet = new Set((currentUser.connections || []).map((id) => id.toString()));
+
+    const networkUserIds = Array.from(new Set([
+      ...(currentUser.followers || []),
+      ...(currentUser.following || []),
+      ...(currentUser.connections || [])
+    ].map((id) => id.toString())));
+
+    if (networkUserIds.length === 0) {
+      return res.json({
+        contacts: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+        hasMore: false
+      });
+    }
+
+    const query = {
+      _id: { $in: networkUserIds.map((id) => new mongoose.Types.ObjectId(id)) }
+    };
+
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escaped, 'i');
+      query.$or = [
+        { firstName: searchRegex },
+        { middleName: searchRegex },
+        { lastName: searchRegex },
+        { username: searchRegex },
+        { email: searchRegex },
+        { headline: searchRegex }
+      ];
+    }
+
+    const total = await User.countDocuments(query);
+    const skip = (page - 1) * limit;
+
+    const users = await User.find(query)
+      .select('firstName middleName lastName username email headline profilePicture')
+      .sort({ firstName: 1, lastName: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const contacts = users.map((u) => {
+      const uIdStr = u._id.toString();
+      return {
+        id: u._id,
+        _id: u._id,
+        username: u.username,
+        name: getFullName(u) || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username || 'Member',
+        headline: u.headline || u.email,
+        avatar: u.profilePicture || null,
+        isFollower: followersSet.has(uIdStr),
+        isFollowing: followingSet.has(uIdStr),
+        isConnected: connectionsSet.has(uIdStr),
+      };
+    });
+
+    res.json({
+      contacts,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasMore: skip + contacts.length < total
+    });
+  } catch (err) {
+    console.error('Failed to fetch network contacts for new message:', err);
+    res.status(500).json({ error: 'Failed to fetch network contacts' });
   }
 });
 
