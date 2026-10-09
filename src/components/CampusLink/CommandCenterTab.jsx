@@ -484,22 +484,10 @@ export const CommandCenterTab = ({
                       lineHeight: 1.4,
                     }}
                   >
-                    💡 <strong>Gemma Remedial Plan:</strong> {s.mentorRecommendation}
+                    💡 <strong>Actionable Remedial Plan:</strong> {s.mentorRecommendation}
                   </p>
                 )}
               </div>
-
-              <button
-                type="button"
-                className="escalateBtn"
-                onClick={() =>
-                  showToast(
-                    `📢 Escalated ${s.name} to ${s.mentor || 'Advisor'} with Gemma Remedial Plan.`
-                  )
-                }
-              >
-                Escalate to Mentor
-              </button>
             </div>
           ))
         ) : (

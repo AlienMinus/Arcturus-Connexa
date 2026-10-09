@@ -86,6 +86,7 @@ const CampusLinkPage = () => {
   const [drives, setDrives] = useState([]);
   const [conflicts, setConflicts] = useState([]);
   const [studentProfile, setStudentProfile] = useState(null);
+  const [diagnosticReport, setDiagnosticReport] = useState(null);
   const [offers, setOffers] = useState([]);
   const [matchingPool, setMatchingPool] = useState(null);
   const [selectedDriveForMatch, setSelectedDriveForMatch] = useState('');
@@ -220,6 +221,9 @@ const CampusLinkPage = () => {
         if (profRes.ok) {
           const profData = await profRes.json();
           setStudentProfile(profData.profile);
+          if (profData.diagnosticReport) {
+            setDiagnosticReport(profData.diagnosticReport);
+          }
           if (profData.profile) {
             setProfileForm({
               collegeName: profData.profile.collegeName || '',
@@ -470,7 +474,10 @@ const CampusLinkPage = () => {
         if (data.profile) {
           setStudentProfile({ ...data.profile });
         }
-        showToast('✨ Hugging Face Gemma AI diagnostic complete! Risk & recommendations updated.');
+        if (data.diagnosticReport) {
+          setDiagnosticReport(data.diagnosticReport);
+        }
+        showToast('✨ Employability & skill-gap diagnostics updated from Arcturus profile!');
       } else {
         const err = await res.json();
         showToast(err.error || 'Failed to complete Gemma diagnostics');
@@ -731,6 +738,7 @@ const CampusLinkPage = () => {
         <ReadinessTab
           user={user}
           studentProfile={studentProfile}
+          diagnosticReport={diagnosticReport}
           isEditingProfile={isEditingProfile}
           setIsEditingProfile={setIsEditingProfile}
           profileForm={profileForm}

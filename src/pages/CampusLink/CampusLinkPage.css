@@ -2350,5 +2350,416 @@ body.dark-mode .typingDots span {
   color: #b91c1c;
 }
 
+/* Synchronized Profile Credentials Banner */
+.profileCredentialsBanner {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0a66c2;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+}
+
+.profileCredentialsMain {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 280px;
+}
+
+.profileCredentialsAvatarWrap {
+  flex-shrink: 0;
+}
+
+.profileCredentialsAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.profileCredentialsAvatarPlaceholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #0a66c2;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.profileCredentialsDetails {
+  flex: 1;
+}
+
+.profileCredentialsNameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profileCredentialsNameRow h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+}
+
+.profileCredentialsVerifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.profileCredentialsHeadline {
+  margin: 4px 0 10px;
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.profileCredentialsMetaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-bottom: 12px;
+}
+
+.metaGridItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #334155;
+}
+
+.profileCredentialsPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.portfolioPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.profileCredentialsAction {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.profileCredentialsSyncNote {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #64748b;
+  max-width: 220px;
+  line-height: 1.35;
+}
+
+.profileCredentialsEditBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #ffffff;
+  color: #0a66c2;
+  border: 1px solid #bfdbfe;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.profileCredentialsEditBtn:hover {
+  background: #eff6ff;
+  border-color: #0a66c2;
+}
+
+/* One-Click Diagnostics Hero CTA */
+.diagnosticsHeroCta {
+  background: linear-gradient(135deg, #0a66c2 0%, #1e3a8a 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 16px rgba(10, 102, 194, 0.2);
+}
+
+.diagnosticsHeroContent {
+  flex: 1;
+  min-width: 280px;
+}
+
+.diagnosticsHeroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diagnosticsHeroContent h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.35rem;
+}
+
+.diagnosticsHeroContent p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #dbeafe;
+  max-width: 680px;
+  line-height: 1.45;
+}
+
+.diagnosticsHeroRunBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: #ffffff;
+  color: #0a66c2;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.diagnosticsHeroRunBtn:hover:not(:disabled) {
+  background: #f0f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.diagnosticsHeroRunBtn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Detailed Report Card & Download Toolbar */
+.reportDownloadCard {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.reportDownloadHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reportStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.reportIdTag {
+  font-size: 0.74rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+.reportActionButtonsGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reportDownloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.reportDownloadBtn.primary {
+  background: #0a66c2;
+  color: #ffffff;
+  border: 1px solid #0a66c2;
+}
+
+.reportDownloadBtn.primary:hover {
+  background: #004182;
+}
+
+.reportDownloadBtn.secondary {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.reportDownloadBtn.secondary:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* In-UI JSON Inspector */
+.jsonViewerContainer {
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  background: #0f172a;
+}
+
+.jsonViewerToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+
+.jsonCopyInlineBtn {
+  background: transparent;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.jsonCopyInlineBtn:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.diagnosticJsonViewer {
+  margin: 0;
+  padding: 16px;
+  max-height: 420px;
+  overflow-y: auto;
+  font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #38bdf8;
+  background: #0f172a;
+}
+
+/* Self-Study Milestones */
+.remedialMilestoneCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.remedialMilestoneHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.milestonePriorityBadge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.4px;
+}
+
+.milestonePriorityBadge.priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.milestonePriorityBadge.priority-medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.milestonePriorityBadge.priority-low {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+@media (max-width: 768px) {
+  .profileCredentialsBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .profileCredentialsAction {
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+  }
+  .diagnosticsHeroCta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .diagnosticsHeroRunBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 
 

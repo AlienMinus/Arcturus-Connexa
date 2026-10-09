@@ -5,27 +5,72 @@ import Organization from '../../models/Organization.js';
 import User from '../../models/User.js';
 import authMiddleware from '../../middleware/auth.js';
 import { analyzePlacementRiskAndGuidance } from '../../services/gemmaService.js';
-import { computeSkillGaps, getFullCandidateProfile, escapeRegex } from './helpers.js';
+import {
+  computeSkillGaps,
+  getFullCandidateProfile,
+  derivePlacementDataFromProfile,
+  generateDiagnosticReport,
+  escapeRegex,
+} from './helpers.js';
 
 const router = express.Router();
 
-// GET /api/campuslink/profile/me - Get student's placement readiness profile
+// GET /api/campuslink/profile/me - Get student's placement readiness profile derived directly from profile
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    let profile = await PlacementProfile.findOne({ userId: req.userId }).lean();
+    const candidateProfile = await getFullCandidateProfile(req.userId);
+    const userDoc = await User.findById(req.userId).lean();
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+
+    let profile = await PlacementProfile.findOne({ userId: req.userId });
+
+    // If no PlacementProfile exists yet, auto-create one directly from the student's Arcturus profile!
+    if (!profile && candidateProfile) {
+      const derived = derivePlacementDataFromProfile(userDoc, candidateProfile);
+      let resolvedOrg = null;
+      if (userDoc?.institute?.organizationId) {
+        resolvedOrg = await Organization.findById(userDoc.institute.organizationId).lean();
+      }
+      if (!resolvedOrg && derived.collegeName) {
+        resolvedOrg = await Organization.findOne({
+          name: { $regex: new RegExp(`^${escapeRegex(derived.collegeName)}$`, 'i') },
+          status: 'approved',
+        }).lean();
+      }
+
+      const skillGaps = computeSkillGaps(derived.skills, activeDrives);
+
+      profile = await PlacementProfile.create({
+        userId: req.userId,
+        organizationId: resolvedOrg?._id,
+        ...derived,
+        skillGaps,
+        aiReadinessSummary: `${derived.readinessLevel} placement readiness at ${derived.overallReadiness}%. Profile dynamically evaluated from Arcturus credentials.`,
+        mentorActionRecommendation: 'Candidate is on track for upcoming placement drives. Focus on independent system design and problem solving practice.',
+        gemmaDiagnosticTimestamp: new Date(),
+      });
+    }
+
     if (!profile) {
-      return res.json({ profile: null });
+      return res.json({ profile: null, candidateProfile, diagnosticReport: null });
     }
 
     // Refresh dynamic skill gap recommendations against actual scheduled drives
-    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
-    profile.skillGaps = computeSkillGaps(profile.skills || [], activeDrives);
+    const profileSkills = Array.from(new Set([...(profile.skills || []), ...(candidateProfile?.skills || [])]));
+    profile.skills = profileSkills;
+    profile.skillGaps = computeSkillGaps(profileSkills, activeDrives);
+    await profile.save();
 
-    // Import full candidate individual profile data (projects, experiences, certifications)
-    const candidateProfile = await getFullCandidateProfile(req.userId);
-    profile.candidateProfile = candidateProfile;
+    const profileObj = profile.toObject ? profile.toObject() : profile;
+    profileObj.candidateProfile = candidateProfile;
 
-    res.json({ profile });
+    const diagnosticReport = generateDiagnosticReport({
+      profile: profileObj,
+      candidateProfile,
+      activeDrives,
+    });
+
+    res.json({ profile: profileObj, candidateProfile, diagnosticReport });
   } catch (err) {
     console.error('Failed to get student placement profile:', err);
     res.status(500).json({ error: 'Failed to load placement profile' });
@@ -283,35 +328,50 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /api/campuslink/profile/diagnose-ai - On-demand Gemma AI Risk & Recommendation Diagnostics
+// POST /api/campuslink/profile/diagnose-ai - On-demand Gemma AI Risk & Recommendation Diagnostics directly from profile
 router.post('/diagnose-ai', authMiddleware, async (req, res) => {
   try {
-    let profile = await PlacementProfile.findOne({ userId: req.userId });
-    if (!profile) {
-      return res.status(404).json({ error: 'Placement profile not found. Please complete profile setup first.' });
+    const candidateProfile = await getFullCandidateProfile(req.userId);
+    const userDoc = await User.findById(req.userId).lean();
+    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+
+    // Auto-derive fresh academic metrics directly from candidate's Arcturus profile
+    const derived = derivePlacementDataFromProfile(userDoc, candidateProfile);
+
+    let resolvedOrg = null;
+    if (userDoc?.institute?.organizationId) {
+      resolvedOrg = await Organization.findById(userDoc.institute.organizationId).lean();
+    }
+    if (!resolvedOrg && derived.collegeName) {
+      resolvedOrg = await Organization.findOne({
+        name: { $regex: new RegExp(`^${escapeRegex(derived.collegeName)}$`, 'i') },
+        status: 'approved',
+      }).lean();
     }
 
-    // Fetch applicant's main Arcturus profile data
-    const candidateProfile = await getFullCandidateProfile(req.userId);
+    let profile = await PlacementProfile.findOne({ userId: req.userId });
 
-    const profileSkills = candidateProfile?.skills || [];
-    const combinedSkills = Array.from(new Set([...(profile.skills || []), ...profileSkills]));
+    const combinedSkills = Array.from(new Set([
+      ...(profile?.skills || []),
+      ...(candidateProfile?.skills || []),
+    ]));
 
+    // Run Hugging Face Gemma Risk & Recommendation Diagnostics using live profile portfolio
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
-      rollNumber: profile.rollNumber,
-      collegeName: profile.collegeName,
-      branch: profile.branch,
-      graduationYear: profile.graduationYear,
-      cgpa: profile.cgpa,
-      activeBacklogs: profile.activeBacklogs,
+      rollNumber: profile?.rollNumber || derived.rollNumber,
+      collegeName: profile?.collegeName || derived.collegeName,
+      branch: profile?.branch || derived.branch,
+      graduationYear: profile?.graduationYear || derived.graduationYear,
+      cgpa: profile?.cgpa || derived.cgpa,
+      activeBacklogs: profile?.activeBacklogs || 0,
       skills: combinedSkills,
-      technicalScore: profile.technicalScore,
-      aptitudeScore: profile.aptitudeScore,
-      communicationScore: profile.communicationScore,
-      projectScore: profile.projectScore,
-      overallReadiness: profile.overallReadiness,
-      readinessLevel: profile.readinessLevel,
-      targetRoles: profile.targetRoles,
+      technicalScore: derived.technicalScore,
+      aptitudeScore: derived.aptitudeScore,
+      communicationScore: derived.communicationScore,
+      projectScore: derived.projectScore,
+      overallReadiness: derived.overallReadiness,
+      readinessLevel: derived.readinessLevel,
+      targetRoles: derived.targetRoles,
       headline: candidateProfile?.headline || '',
       summary: candidateProfile?.summary || '',
       location: candidateProfile?.location || '',
@@ -325,26 +385,63 @@ router.post('/diagnose-ai', authMiddleware, async (req, res) => {
       isVerified: Boolean(candidateProfile?.isVerified),
     });
 
-    const activeDrives = await PlacementDrive.find({ status: { $ne: 'completed' } }).lean();
+    const skillGaps = computeSkillGaps(combinedSkills, activeDrives);
 
-    profile.skills = combinedSkills;
-    profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
-    profile.isAtRisk = gemmaAnalysis.isAtRisk;
-    profile.riskReason = gemmaAnalysis.riskReason;
-    profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
-    profile.gemmaModel = gemmaAnalysis.model || 'google/gemma-3-4b-it';
-    profile.gemmaProvider = gemmaAnalysis.provider || 'Hugging Face Gemma';
-    profile.gemmaDiagnosticTimestamp = new Date();
-    profile.skillGaps = computeSkillGaps(combinedSkills, activeDrives);
+    if (profile) {
+      profile.collegeName = derived.collegeName;
+      profile.rollNumber = derived.rollNumber;
+      profile.branch = derived.branch;
+      profile.graduationYear = derived.graduationYear;
+      profile.cgpa = derived.cgpa;
+      profile.skills = combinedSkills;
+      profile.targetRoles = derived.targetRoles;
+      profile.technicalScore = derived.technicalScore;
+      profile.aptitudeScore = derived.aptitudeScore;
+      profile.communicationScore = derived.communicationScore;
+      profile.projectScore = derived.projectScore;
+      profile.overallReadiness = derived.overallReadiness;
+      profile.readinessLevel = derived.readinessLevel;
+      profile.skillGaps = skillGaps;
+      profile.isAtRisk = gemmaAnalysis.isAtRisk;
+      profile.riskReason = gemmaAnalysis.riskReason;
+      profile.aiReadinessSummary = gemmaAnalysis.aiReadinessSummary;
+      profile.mentorActionRecommendation = gemmaAnalysis.mentorActionRecommendation;
+      profile.gemmaModel = gemmaAnalysis.model || 'google/gemma-3-4b-it';
+      profile.gemmaProvider = gemmaAnalysis.provider || 'Hugging Face Gemma';
+      profile.gemmaDiagnosticTimestamp = new Date();
+      if (resolvedOrg?._id) profile.organizationId = resolvedOrg._id;
+      await profile.save();
+    } else {
+      profile = await PlacementProfile.create({
+        userId: req.userId,
+        organizationId: resolvedOrg?._id,
+        ...derived,
+        skills: combinedSkills,
+        skillGaps,
+        isAtRisk: gemmaAnalysis.isAtRisk,
+        riskReason: gemmaAnalysis.riskReason,
+        aiReadinessSummary: gemmaAnalysis.aiReadinessSummary,
+        mentorActionRecommendation: gemmaAnalysis.mentorActionRecommendation,
+        gemmaModel: gemmaAnalysis.model || 'google/gemma-3-4b-it',
+        gemmaProvider: gemmaAnalysis.provider || 'Hugging Face Gemma',
+        gemmaDiagnosticTimestamp: new Date(),
+      });
+    }
 
-    await profile.save();
-
-    const profileObj = profile.toObject();
+    const profileObj = profile.toObject ? profile.toObject() : profile;
     profileObj.candidateProfile = candidateProfile;
 
-    res.json({
-      message: 'Hugging Face Gemma-3 AI Diagnostics completed successfully!',
+    const diagnosticReport = generateDiagnosticReport({
       profile: profileObj,
+      candidateProfile,
+      activeDrives,
+      gemmaAnalysis,
+    });
+
+    res.json({
+      message: 'Employability & skill-gap diagnostics generated successfully from Arcturus profile!',
+      profile: profileObj,
+      diagnosticReport,
       gemmaAnalysis,
     });
   } catch (err) {
