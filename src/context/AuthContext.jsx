@@ -74,20 +74,57 @@ export const AuthProvider = ({ children }) => {
     return orgAcc;
   };
 
-  // Initialize from localStorage
+  const refreshCurrentUser = async (authToken = token) => {
+    const t = authToken || localStorage.getItem('authToken');
+    if (!t) return null;
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${t}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          const formatted = {
+            id: (data.user._id || data.user.id)?.toString(),
+            _id: (data.user._id || data.user.id)?.toString(),
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
+            email: data.user.email,
+            username: data.user.username,
+            headline: data.user.headline,
+            role: data.user.role || 'user',
+            isAdmin: Boolean(data.user.isAdmin || data.user.role === 'admin'),
+            accountType: data.user.accountType || 'individual',
+            profilePicture: data.user.profilePicture,
+          };
+          setUser(formatted);
+          localStorage.setItem('user', JSON.stringify(formatted));
+          return formatted;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh user credentials from server:', err);
+    }
+    return null;
+  };
+
+  // Initialize from localStorage and sync latest user profile
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
     const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
+    if (storedToken) {
       setToken(storedToken);
-      try {
-        setUser(JSON.parse(storedUser));
-        refreshOrganizations(storedToken);
-      } catch (e) {
-        console.error('Failed to parse stored user:', e);
-        localStorage.removeItem('user');
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.error('Failed to parse stored user:', e);
+          localStorage.removeItem('user');
+        }
       }
+      refreshOrganizations(storedToken);
+      refreshCurrentUser(storedToken);
     }
     setLoading(false);
   }, []);
@@ -247,6 +284,7 @@ export const AuthProvider = ({ children }) => {
         userOrganizations,
         refreshOrganizations,
         loadingOrganizations,
+        refreshCurrentUser,
         isOrgAccount: activeAccount?.type === 'organization',
         register,
         login,

@@ -699,8 +699,7 @@ const JobsPage = () => {
           </div>
         );
       })()}
-      </div>
-    
+    </div>
   );
 };
 

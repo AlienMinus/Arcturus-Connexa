@@ -173,6 +173,9 @@ router.post('/register', async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         username: user.username,
+        role: user.role || 'user',
+        isAdmin: Boolean(user.isAdmin || user.role === 'admin'),
+        accountType: user.accountType || 'individual',
       },
     });
   } catch (error) {
@@ -216,6 +219,9 @@ router.post('/login', async (req, res) => {
         email: user.email,
         username: user.username,
         headline: user.headline,
+        role: user.role || 'user',
+        isAdmin: Boolean(user.isAdmin || user.role === 'admin'),
+        accountType: user.accountType || 'individual',
       },
     });
   } catch (error) {
@@ -379,10 +385,13 @@ router.post('/change-password', authMiddleware, async (req, res) => {
 // Get current user (protected route)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password -passwordHistory');
+    const user = await User.findById(req.userId).select('-password -passwordHistory').lean();
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    user.id = user._id;
+    user.isAdmin = Boolean(user.isAdmin || user.role === 'admin');
 
     res.status(200).json({ user });
   } catch (error) {
