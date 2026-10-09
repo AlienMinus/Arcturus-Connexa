@@ -1,9 +1,11 @@
 import express from 'express';
 import PlacementProfile from '../../models/PlacementProfile.js';
 import PlacementDrive from '../../models/PlacementDrive.js';
+import Organization from '../../models/Organization.js';
+import User from '../../models/User.js';
 import authMiddleware from '../../middleware/auth.js';
 import { analyzePlacementRiskAndGuidance } from '../../services/gemmaService.js';
-import { computeSkillGaps, getFullCandidateProfile } from './helpers.js';
+import { computeSkillGaps, getFullCandidateProfile, escapeRegex } from './helpers.js';
 
 const router = express.Router();
 
@@ -175,10 +177,36 @@ router.post('/', authMiddleware, async (req, res) => {
       isVerified: Boolean(candidateProfile?.isVerified),
     });
 
+    // Resolve linked Organization for this college
+    let resolvedOrg = null;
+    const userDoc = await User.findById(req.userId).select('institute').lean();
+    if (userDoc?.institute?.organizationId) {
+      resolvedOrg = await Organization.findById(userDoc.institute.organizationId).lean();
+    }
+    if (!resolvedOrg && collegeName) {
+      resolvedOrg = await Organization.findOne({
+        name: { $regex: new RegExp(`^${escapeRegex(collegeName.trim())}$`, 'i') },
+        status: 'approved',
+      }).lean();
+    }
+
+    if (userDoc) {
+      await User.findByIdAndUpdate(req.userId, {
+        $set: {
+          'institute.name': collegeName.trim(),
+          ...(resolvedOrg ? { 'institute.organizationId': resolvedOrg._id, 'institute.verified': true } : {}),
+          'institute.graduationYear': numGradYear,
+          'institute.department': sanitizedBranch,
+          'institute.studentId': rollNumber.trim(),
+        },
+      });
+    }
+
     let profile = await PlacementProfile.findOne({ userId: req.userId });
     if (profile) {
       profile.rollNumber = rollNumber.trim();
       profile.collegeName = collegeName.trim();
+      if (resolvedOrg?._id) profile.organizationId = resolvedOrg._id;
       profile.branch = sanitizedBranch;
       profile.graduationYear = numGradYear;
       profile.cgpa = numCgpa;
@@ -209,6 +237,7 @@ router.post('/', authMiddleware, async (req, res) => {
     } else {
       profile = await PlacementProfile.create({
         userId: req.userId,
+        organizationId: resolvedOrg?._id || undefined,
         rollNumber: rollNumber.trim(),
         collegeName: collegeName.trim(),
         branch: sanitizedBranch,

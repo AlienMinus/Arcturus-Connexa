@@ -60,10 +60,23 @@ export const isCampusLinkAdmin = async (userId) => {
   );
 };
 
+export const escapeRegex = (str = '') => String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export const getPlacementOfficerOrganization = async (userId) => {
-  const user = await User.findById(userId).select('placementOfficer').lean();
-  if (user?.placementOfficer?.status !== 'approved' || !user.placementOfficer.organizationId) return null;
-  return Organization.findOne({ _id: user.placementOfficer.organizationId, status: 'approved' });
+  if (!userId) return null;
+  const user = await User.findById(userId).select('placementOfficer accountType').lean();
+  if (user?.placementOfficer?.status === 'approved' && user.placementOfficer.organizationId) {
+    const org = await Organization.findOne({ _id: user.placementOfficer.organizationId, status: 'approved' });
+    if (org) return org;
+  }
+  // Check if member of an approved organization with role 'Placement Officer'
+  const memberOrg = await Organization.findOne({
+    status: 'approved',
+    members: { $elemMatch: { userId, role: 'Placement Officer' } },
+  });
+  if (memberOrg) return memberOrg;
+
+  return null;
 };
 
 export const getManagedOrganization = async (userId, organizationId) => {

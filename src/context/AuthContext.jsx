@@ -96,6 +96,8 @@ export const AuthProvider = ({ children }) => {
             isAdmin: Boolean(data.user.isAdmin || data.user.role === 'admin'),
             accountType: data.user.accountType || 'individual',
             profilePicture: data.user.profilePicture,
+            placementOfficer: data.user.placementOfficer,
+            institute: data.user.institute,
           };
           setUser(formatted);
           localStorage.setItem('user', JSON.stringify(formatted));

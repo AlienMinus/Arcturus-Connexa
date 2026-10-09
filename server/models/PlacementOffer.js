@@ -8,8 +8,13 @@ const PlacementOfferSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+    },
     studentName: { type: String, required: true },
     rollNumber: { type: String, required: true },
+    collegeName: { type: String },
     branch: { type: String, required: true },
     companyName: { type: String, required: true },
     companyLogo: {

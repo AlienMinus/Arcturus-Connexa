@@ -33,6 +33,19 @@ const NavRight = () => {
   const isOrgActive = activeAccount?.type === 'organization';
   const canManageJobs = isAuthenticated && isOrgActive;
 
+  const isAdminUser = Boolean(
+    user?.role === 'admin' ||
+    user?.isAdmin === true ||
+    profile?.role === 'admin' ||
+    profile?.isAdmin === true ||
+    user?.username?.toLowerCase() === 'arcturus_admin' ||
+    user?.username?.toLowerCase() === 'arc_admin' ||
+    profile?.username?.toLowerCase() === 'arcturus_admin' ||
+    profile?.username?.toLowerCase() === 'arc_admin' ||
+    user?.email?.toLowerCase()?.includes('admin@arcturus') ||
+    profile?.email?.toLowerCase()?.includes('admin@arcturus')
+  );
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -408,7 +421,7 @@ const NavRight = () => {
                   </Link>
                 </li>
               )}
-              {(user?.role === 'admin' || user?.isAdmin || user?.username?.toLowerCase() === 'arcturus_admin' || profile?.username?.toLowerCase() === 'arcturus_admin') && (
+              {isAdminUser && (
                 <li>
                   <Link to="/admin" onClick={() => setDropdownOpen(false)} style={{ color: "#0a66c2", fontWeight: "700" }}>
                     🛡️ Admin Operations Hub
@@ -515,7 +528,7 @@ const NavRight = () => {
               </div>
             </Link>
 
-            {(user?.role === 'admin' || user?.isAdmin || user?.username?.toLowerCase() === 'arcturus_admin' || profile?.username?.toLowerCase() === 'arcturus_admin') && (
+            {isAdminUser && (
               <Link
                 to="/admin"
                 className="business-app-card"

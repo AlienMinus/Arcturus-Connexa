@@ -176,6 +176,8 @@ router.post('/register', async (req, res) => {
         role: user.role || 'user',
         isAdmin: Boolean(user.isAdmin || user.role === 'admin'),
         accountType: user.accountType || 'individual',
+        placementOfficer: user.placementOfficer,
+        institute: user.institute,
       },
     });
   } catch (error) {
@@ -193,7 +195,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase() })
+      .populate('placementOfficer.organizationId', 'name slug logo status')
+      .populate('institute.organizationId', 'name slug logo status');
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -222,6 +226,8 @@ router.post('/login', async (req, res) => {
         role: user.role || 'user',
         isAdmin: Boolean(user.isAdmin || user.role === 'admin'),
         accountType: user.accountType || 'individual',
+        placementOfficer: user.placementOfficer,
+        institute: user.institute,
       },
     });
   } catch (error) {
@@ -385,7 +391,11 @@ router.post('/change-password', authMiddleware, async (req, res) => {
 // Get current user (protected route)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password -passwordHistory').lean();
+    const user = await User.findById(req.userId)
+      .select('-password -passwordHistory')
+      .populate('placementOfficer.organizationId', 'name slug logo status')
+      .populate('institute.organizationId', 'name slug logo status')
+      .lean();
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }

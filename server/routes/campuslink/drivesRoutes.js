@@ -3,15 +3,35 @@ import PlacementDrive from '../../models/PlacementDrive.js';
 import PlacementProfile from '../../models/PlacementProfile.js';
 import Profile from '../../models/Profile.js';
 import authMiddleware from '../../middleware/auth.js';
+import { verifyAccessToken } from '../../utils/jwtUtils.js';
 import { detectDriveConflicts } from '../../utils/conflictDetector.js';
 import { isCampusLinkAdmin, getPlacementOfficerOrganization, getManagedOrganization } from './helpers.js';
 
 const router = express.Router();
 
-// GET /api/campuslink/drives - Get all drives and real-time conflicts
+// GET /api/campuslink/drives - Get all drives and real-time conflicts (Scoped by institute for placement officers)
 router.get('/', async (req, res) => {
   try {
-    const filter = req.query.organizationId ? { organizationId: req.query.organizationId } : {};
+    let currentUserId = null;
+    if (req.headers.authorization?.startsWith('Bearer ')) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = verifyAccessToken(token);
+        currentUserId = decoded?.userId;
+      } catch (e) {}
+    }
+
+    const adminAccess = await isCampusLinkAdmin(currentUserId);
+    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(currentUserId);
+
+    let filter = {};
+    if (officerOrganization) {
+      // Placement Officer strictly sees drives for their institute
+      filter = { organizationId: officerOrganization._id };
+    } else if (req.query.organizationId) {
+      filter = { organizationId: req.query.organizationId };
+    }
+
     const drives = await PlacementDrive.find(filter).sort({ 'schedule.driveDate': 1 }).lean();
     const conflicts = detectDriveConflicts(drives);
 
@@ -176,7 +196,12 @@ router.get('/:id/match', authMiddleware, async (req, res) => {
     const allProfiles = await PlacementProfile.find().populate('userId', 'firstName lastName email username profilePicture institute').lean();
     const candidateOrganization = officerOrganization || managedOrganization;
     const scopedProfiles = candidateOrganization
-      ? allProfiles.filter((profile) => profile.userId?.institute?.organizationId?.toString() === candidateOrganization._id.toString())
+      ? allProfiles.filter(
+          (profile) =>
+            profile.userId?.institute?.organizationId?.toString() === candidateOrganization._id.toString() ||
+            profile.organizationId?.toString() === candidateOrganization._id.toString() ||
+            (profile.collegeName && profile.collegeName.toLowerCase() === candidateOrganization.name.toLowerCase())
+        )
       : allProfiles;
     const userIds = scopedProfiles.map((p) => p.userId?._id).filter(Boolean);
     const candidateProfiles = await Profile.find({ userId: { $in: userIds } }).lean();

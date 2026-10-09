@@ -19,28 +19,70 @@ import './CampusLinkPage.css';
 
 const CampusLinkPage = () => {
   const { token, user, activeAccount } = useAuth();
-  const isArcturusAdmin = user?.role === 'admin' || user?.username === 'arcturus_admin';
+  const isArcturusAdmin = user?.role === 'admin' || user?.isAdmin === true || user?.username === 'arcturus_admin';
   const isOrganizationAccount = activeAccount?.type === 'organization';
-  const canManageDrives = isArcturusAdmin || isOrganizationAccount;
-  const [activeTab, setActiveTab] = useState(() => 
-    isOrganizationAccount ? 'organization' : (user?.role === 'admin' || user?.username === 'arcturus_admin' ? 'analytics' : 'readiness')
-  );
-  
-  // Guard non-admins against administrative tabs
+
+  // Data States
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsPayload, setAnalyticsPayload] = useState(null);
+  const [selectedAdminInstituteId, setSelectedAdminInstituteId] = useState('');
+
+  // Role & Permission Calculation
+  const isApprovedOfficer =
+    user?.placementOfficer?.status === 'approved' && Boolean(user?.placementOfficer?.organizationId);
+  const isOrgOfficer =
+    isOrganizationAccount && (activeAccount?.role === 'Placement Officer' || activeAccount?.role === 'Admin');
+
+  const isPlacementOfficer =
+    !isArcturusAdmin &&
+    Boolean(
+      analyticsPayload?.isPlacementOfficer ||
+        isApprovedOfficer ||
+        user?.accountType === 'placement_officer' ||
+        isOrgOfficer
+    );
+
+  const canAccessCommandCenter = isArcturusAdmin || isPlacementOfficer;
+  const canManageDrives = isArcturusAdmin || isPlacementOfficer || isOrganizationAccount;
+
+  const officerInstitute =
+    analyticsPayload?.institute ||
+    (user?.placementOfficer?.organizationId?.name
+      ? user.placementOfficer.organizationId
+      : null) ||
+    (isOrgOfficer && activeAccount
+      ? { id: activeAccount.id, name: activeAccount.name, logo: activeAccount.logo }
+      : null);
+
+  const [activeTab, setActiveTab] = useState(() => {
+    if (isOrganizationAccount) return 'organization';
+    if (
+      user?.role === 'admin' ||
+      user?.isAdmin ||
+      user?.username === 'arcturus_admin' ||
+      user?.placementOfficer?.status === 'approved' ||
+      user?.accountType === 'placement_officer'
+    ) {
+      return 'analytics';
+    }
+    return 'readiness';
+  });
+
+  // Guard non-privileged users against administrative tabs
   useEffect(() => {
     if (isOrganizationAccount && canManageDrives && activeTab === 'matching') {
       return;
     } else if (isOrganizationAccount && activeTab !== 'organization') {
       setActiveTab('organization');
     } else if (!isOrganizationAccount && activeTab === 'organization') {
-      setActiveTab(isArcturusAdmin ? 'analytics' : 'readiness');
-    } else if (!isArcturusAdmin && (activeTab === 'analytics' || activeTab === 'matching')) {
+      setActiveTab(canAccessCommandCenter ? 'analytics' : 'readiness');
+    } else if (!canAccessCommandCenter && activeTab === 'analytics') {
+      setActiveTab('readiness');
+    } else if (!canManageDrives && activeTab === 'matching') {
       setActiveTab('readiness');
     }
-  }, [isArcturusAdmin, isOrganizationAccount, canManageDrives, activeTab]);
-  
-  // Data States
-  const [analytics, setAnalytics] = useState(null);
+  }, [isArcturusAdmin, isPlacementOfficer, isOrganizationAccount, canManageDrives, canAccessCommandCenter, activeTab]);
+
   const [drives, setDrives] = useState([]);
   const [conflicts, setConflicts] = useState([]);
   const [studentProfile, setStudentProfile] = useState(null);
@@ -130,20 +172,30 @@ const CampusLinkPage = () => {
   };
 
   // Fetch initial data
-  const loadCampusData = async () => {
+  const loadCampusData = async (adminInstituteId = selectedAdminInstituteId) => {
     setLoading(true);
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       // 1. Fetch Analytics
-      const analRes = await fetch(buildApiUrl('/campuslink/analytics'));
+      const queryParams = new URLSearchParams();
+      if (adminInstituteId) queryParams.set('instituteId', adminInstituteId);
+      if (isOrganizationAccount && activeAccount?.id) queryParams.set('organizationId', activeAccount.id);
+
+      const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      const analRes = await fetch(buildApiUrl(`/campuslink/analytics${queryString}`), { headers });
       if (analRes.ok) {
         const analData = await analRes.json();
         setAnalytics(analData.stats);
+        setAnalyticsPayload(analData);
       }
 
       // 2. Fetch Drives & Conflicts
-      const driveQuery = isOrganizationAccount && activeAccount?.id ? `?organizationId=${encodeURIComponent(activeAccount.id)}` : '';
+      const driveParams = new URLSearchParams();
+      if (adminInstituteId) driveParams.set('organizationId', adminInstituteId);
+      else if (isOrganizationAccount && activeAccount?.id) driveParams.set('organizationId', activeAccount.id);
+
+      const driveQuery = driveParams.toString() ? `?${driveParams.toString()}` : '';
       const drivesRes = await fetch(buildApiUrl(`/campuslink/drives${driveQuery}`), { headers });
       if (drivesRes.ok) {
         const drivesData = await drivesRes.json();
@@ -155,7 +207,8 @@ const CampusLinkPage = () => {
       }
 
       // 3. Fetch Offers
-      const offersRes = await fetch(buildApiUrl('/campuslink/offers'));
+      const offerQuery = adminInstituteId ? `?instituteId=${encodeURIComponent(adminInstituteId)}` : '';
+      const offersRes = await fetch(buildApiUrl(`/campuslink/offers${offerQuery}`), { headers });
       if (offersRes.ok) {
         const offersData = await offersRes.json();
         setOffers(offersData.offers || []);
@@ -622,6 +675,9 @@ const CampusLinkPage = () => {
       {/* Hero Header */}
       <CampusHero
         isArcturusAdmin={isArcturusAdmin}
+        isPlacementOfficer={isPlacementOfficer}
+        officerInstitute={officerInstitute}
+        analyticsPayload={analyticsPayload}
         analytics={analytics}
         drivesCount={drives.length}
       />
@@ -629,6 +685,7 @@ const CampusLinkPage = () => {
       {/* Navigation Tabs Bar */}
       <CampusTabsNav
         isArcturusAdmin={isArcturusAdmin}
+        isPlacementOfficer={isPlacementOfficer}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         conflictsCount={conflicts.length}
@@ -642,7 +699,12 @@ const CampusLinkPage = () => {
       {activeTab === 'analytics' && (
         <CommandCenterTab
           isArcturusAdmin={isArcturusAdmin}
+          isPlacementOfficer={isPlacementOfficer}
+          officerInstitute={officerInstitute}
+          analyticsPayload={analyticsPayload}
           analytics={analytics}
+          selectedAdminInstituteId={selectedAdminInstituteId}
+          setSelectedAdminInstituteId={setSelectedAdminInstituteId}
           loadCampusData={loadCampusData}
           setActiveTab={setActiveTab}
           showToast={showToast}
@@ -697,6 +759,7 @@ const CampusLinkPage = () => {
       {activeTab === 'offers' && (
         <OffersTab
           isArcturusAdmin={isArcturusAdmin}
+          isPlacementOfficer={isPlacementOfficer}
           offers={offers}
           handleOfferResponse={handleOfferResponse}
         />

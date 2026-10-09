@@ -20,6 +20,10 @@ const PlacementProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+    },
     rollNumber: { type: String, required: true, trim: true },
     collegeName: { type: String, required: true, trim: true },
     branch: {

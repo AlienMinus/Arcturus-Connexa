@@ -5,11 +5,14 @@ import {
   FaUserCheck, 
   FaUsers, 
   FaFileInvoiceDollar, 
-  FaRobot 
+  FaRobot,
+  FaShieldAlt,
+  FaUniversity
 } from 'react-icons/fa';
 
 export const CampusTabsNav = ({
   isArcturusAdmin,
+  isPlacementOfficer,
   activeTab,
   setActiveTab,
   conflictsCount,
@@ -18,32 +21,32 @@ export const CampusTabsNav = ({
   isChatFloatingOpen,
   setIsChatFloatingOpen,
 }) => {
+  const canAccessCommandCenter = isArcturusAdmin || isPlacementOfficer;
+  const canAccessMatching = isArcturusAdmin || isPlacementOfficer;
+
   return (
     <div className="campusTabsCard">
-      {isArcturusAdmin && (
+      {/* TAB 1: Command Center (Admin or Placement Officer only) */}
+      {canAccessCommandCenter && (
         <button
           type="button"
           className={`campusTabBtn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
-          <FaChartLine size={14} /> Command Center
+          {isArcturusAdmin ? (
+            <>
+              <FaShieldAlt size={14} /> Global Operations Hub
+            </>
+          ) : (
+            <>
+              <FaUniversity size={14} /> Institutional Command Center
+            </>
+          )}
         </button>
       )}
 
-      {isArcturusAdmin ? (
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
-          onClick={() => setActiveTab('drives')}
-        >
-          <FaCalendarAlt size={14} /> Drives & Conflicts
-          {conflictsCount > 0 && (
-            <span style={{ background: '#ef4444', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
-              {conflictsCount}
-            </span>
-          )}
-        </button>
-      ) : (
+      {/* For Students: Readiness is Tab 1 */}
+      {!canAccessCommandCenter && (
         <button
           type="button"
           className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
@@ -53,42 +56,74 @@ export const CampusTabsNav = ({
         </button>
       )}
 
-      {isArcturusAdmin ? (
+      {/* TAB 2: Drives */}
+      <button
+        type="button"
+        className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
+        onClick={() => setActiveTab('drives')}
+      >
+        <FaCalendarAlt size={14} />{' '}
+        {isArcturusAdmin ? (
+          'Platform Drives & Collisions'
+        ) : isPlacementOfficer ? (
+          'Campus Drives & Schedules'
+        ) : (
+          `Eligible Drives (${drivesCount})`
+        )}
+        {isArcturusAdmin && conflictsCount > 0 && (
+          <span
+            style={{
+              background: '#ef4444',
+              color: '#fff',
+              fontSize: '10px',
+              padding: '1px 6px',
+              borderRadius: '10px',
+              marginLeft: '4px',
+            }}
+          >
+            {conflictsCount}
+          </span>
+        )}
+      </button>
+
+      {/* For Officers & Admins: Student Readiness Portal is Tab 3 */}
+      {canAccessCommandCenter && (
         <button
           type="button"
           className={`campusTabBtn ${activeTab === 'readiness' ? 'active' : ''}`}
           onClick={() => setActiveTab('readiness')}
         >
-          <FaUserCheck size={14} /> Student Readiness Engine
-        </button>
-      ) : (
-        <button
-          type="button"
-          className={`campusTabBtn ${activeTab === 'drives' ? 'active' : ''}`}
-          onClick={() => setActiveTab('drives')}
-        >
-          <FaCalendarAlt size={14} /> Eligible Drives ({drivesCount})
+          <FaUserCheck size={14} />{' '}
+          {isArcturusAdmin ? 'Student Readiness Engine' : 'Student Readiness Portal'}
         </button>
       )}
 
-      {isArcturusAdmin && (
+      {/* TAB 4: Recruiter Matching (Admin or Placement Officer only) */}
+      {canAccessMatching && (
         <button
           type="button"
           className={`campusTabBtn ${activeTab === 'matching' ? 'active' : ''}`}
           onClick={() => setActiveTab('matching')}
         >
-          <FaUsers size={14} /> Recruiter Matching
+          <FaUsers size={14} /> {isArcturusAdmin ? 'Multi-Campus Matching' : 'Recruiter Matching'}
         </button>
       )}
 
+      {/* TAB 5: Offers */}
       <button
         type="button"
         className={`campusTabBtn ${activeTab === 'offers' ? 'active' : ''}`}
         onClick={() => setActiveTab('offers')}
       >
-        <FaFileInvoiceDollar size={14} /> {isArcturusAdmin ? 'All Offers & Compliance' : 'My Offers'} ({offersCount})
+        <FaFileInvoiceDollar size={14} />{' '}
+        {isArcturusAdmin
+          ? `Network Offers & Compliance (${offersCount})`
+          : isPlacementOfficer
+          ? `Institutional Offers (${offersCount})`
+          : `My Offers (${offersCount})`}
       </button>
 
+      {/* TAB 6: AI Assistant */}
       <button
         type="button"
         className={`campusTabBtn ${isChatFloatingOpen ? 'active' : ''}`}
@@ -102,4 +137,3 @@ export const CampusTabsNav = ({
 };
 
 export default CampusTabsNav;
-

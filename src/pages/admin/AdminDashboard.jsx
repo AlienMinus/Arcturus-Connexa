@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import { useProfile } from '../../context/ProfileContext';
 import { buildApiUrl } from '../../utils/api';
 import AdminMetrics from '../../components/admin/AdminMetrics';
 import OrganizationApprovals from '../../components/admin/OrganizationApprovals';
@@ -27,6 +28,7 @@ import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { user, token } = useAuth();
+  const { profile } = useProfile();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('organizations'); // 'organizations', 'verifications', 'officers', 'jobs', 'users'
@@ -50,11 +52,18 @@ const AdminDashboard = () => {
   const [rejectionModalOrg, setRejectionModalOrg] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
 
-  const isArcturusAdmin =
+  const isArcturusAdmin = Boolean(
     user?.role === 'admin' ||
     user?.isAdmin === true ||
+    profile?.role === 'admin' ||
+    profile?.isAdmin === true ||
     user?.username?.toLowerCase() === 'arcturus_admin' ||
-    user?.email?.toLowerCase()?.includes('admin@arcturus');
+    user?.username?.toLowerCase() === 'arc_admin' ||
+    profile?.username?.toLowerCase() === 'arcturus_admin' ||
+    profile?.username?.toLowerCase() === 'arc_admin' ||
+    user?.email?.toLowerCase()?.includes('admin@arcturus') ||
+    profile?.email?.toLowerCase()?.includes('admin@arcturus')
+  );
 
   const showToast = (msg) => {
     setToastMessage(msg);

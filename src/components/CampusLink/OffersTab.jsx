@@ -3,6 +3,7 @@ import { FaFileInvoiceDollar } from 'react-icons/fa';
 
 export const OffersTab = ({
   isArcturusAdmin,
+  isPlacementOfficer,
   offers,
   handleOfferResponse,
 }) => {
@@ -10,8 +11,21 @@ export const OffersTab = ({
     <div className="campusPanel">
       <div className="campusPanelHeader">
         <div>
-          <h2><FaFileInvoiceDollar color="#0a66c2" /> Post-Selection Offers & Verification Lifecycle</h2>
-          <p>Track student offer letters, CTC packages, acceptance status, and cryptographic verification hashes.</p>
+          <h2>
+            <FaFileInvoiceDollar color="#0a66c2" />{' '}
+            {isArcturusAdmin
+              ? 'Network-Wide Corporate Offers & Compliance'
+              : isPlacementOfficer
+              ? 'Institutional Placement Offers & Verification'
+              : 'My Corporate Placement Offers'}
+          </h2>
+          <p>
+            {isArcturusAdmin
+              ? 'Review verified corporate offers across all partner colleges, compensation tiers, and verification hashes.'
+              : isPlacementOfficer
+              ? 'Monitor offers extended to candidates from your institute, package breakdowns, and student decisions.'
+              : 'Track your personal offer letters, CTC packages, acceptance deadlines, and cryptographic verification hashes.'}
+          </p>
         </div>
       </div>
 
@@ -63,7 +77,7 @@ export const OffersTab = ({
                 </span>
               </div>
 
-              {o.status === 'offered' && (
+              {!isArcturusAdmin && !isPlacementOfficer && o.status === 'offered' && (
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     type="button"
