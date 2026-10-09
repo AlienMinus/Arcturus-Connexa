@@ -271,3 +271,39 @@
   color: #666;
   margin: 2px 0 0 0;
 }
+
+.conversationListState {
+  padding: 24px 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.conversationError {
+  color: #ef4444;
+}
+
+.conversationEmptyState {
+  padding: 36px 18px;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversationEmptyState p {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 6px 0;
+}
+
+.emptyStateSubtext {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+  max-width: 250px;
+}
+
