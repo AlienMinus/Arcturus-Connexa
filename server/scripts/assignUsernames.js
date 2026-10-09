@@ -15,19 +15,25 @@ function generateRandomAlphaNumeric(length) {
 }
 
 async function generateUniqueUsername(user, allUsernames) {
-    let baseUsername = user.firstName.toLowerCase();
-    if (user.middleName) {
-        baseUsername += `_${user.middleName.toLowerCase()}`;
+    const emailPrefix = (user.email || '').toLowerCase().split('@')[0].split('+')[0] || '';
+    let baseUsername = emailPrefix
+        .replace(/[\.\-]/g, '_')
+        .replace(/[^a-z0-9_]+/g, '')
+        .replace(/_{2,}/g, '_')
+        .replace(/^_+|_+$/g, '');
+
+    if (!baseUsername || baseUsername.length < 3) {
+        baseUsername = (baseUsername || 'user').padEnd(3, '0');
     }
-    baseUsername += `_${user.lastName.toLowerCase()}`;
-    
-    baseUsername = baseUsername.replace(/[^a-z0-9_]+/g, '').replace(/_{2,}/g, '_');
+    if (baseUsername.length > 25) {
+        baseUsername = baseUsername.slice(0, 25).replace(/_+$/, '');
+    }
 
     let username = baseUsername;
+    let counter = 1;
 
     while (allUsernames.has(username)) {
-        const randomSuffix = generateRandomAlphaNumeric(4);
-        username = `${baseUsername}_${randomSuffix}`;
+        username = `${baseUsername}${counter++}`;
     }
     
     return username;

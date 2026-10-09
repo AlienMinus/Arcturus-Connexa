@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import multer from 'multer';
 import cloudinary from '../utils/cloudinary.js';
 import Profile from '../models/Profile.js';
@@ -336,18 +337,18 @@ router.get('/check-username/:username', authMiddleware, async (req, res) => {
 // Get profile by username
 router.get('/:username', authMiddleware, async (req, res) => {
   try {
-    const rawParam = decodeURIComponent(req.params.username || '').trim();
-    const normalizedUsername = rawParam.toLowerCase();
-    const snakeCaseUsername = normalizedUsername.replace(/\s+/g, '_');
-    const escapedParam = rawParam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const rawParam = decodeURIComponent(req.params.username || '').trim().toLowerCase();
+    const snakeCaseUsername = rawParam.replace(/\s+/g, '_');
 
-    let targetUser = await User.findOne({
-      $or: [
-        { username: normalizedUsername },
-        { username: snakeCaseUsername },
-        { name: new RegExp('^' + escapedParam + '$', 'i') },
-      ]
-    })
+    const orConditions = [
+      { username: rawParam },
+      { username: snakeCaseUsername },
+    ];
+    if (mongoose.isValidObjectId(rawParam)) {
+      orConditions.push({ _id: rawParam });
+    }
+
+    let targetUser = await User.findOne({ $or: orConditions })
       .select('-password -passwordHistory -passwordResetToken -passwordResetExpires -verificationToken')
       .populate('followers', 'firstName middleName lastName username headline profilePicture')
       .populate('following', 'firstName middleName lastName username headline profilePicture')

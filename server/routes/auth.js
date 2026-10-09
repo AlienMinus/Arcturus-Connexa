@@ -100,14 +100,26 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await hashPassword(password);
 
-    const baseUsername = email.toLowerCase().split('@')[0].replace(/[^a-z0-9]+/g, '');
-    let username = baseUsername || `${firstName}${lastName}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
-    let usernameCandidate = username;
-    let usernameCounter = 1;
-    while (await User.findOne({ username: usernameCandidate })) {
-      usernameCandidate = `${username}${usernameCounter++}`;
+    // Generate email-based username (clean email prefix, sequential numbering on collision)
+    const emailPrefix = (email || '').toLowerCase().split('@')[0].split('+')[0] || '';
+    let baseUsername = emailPrefix
+      .replace(/[\.\-]/g, '_')
+      .replace(/[^a-z0-9_]+/g, '')
+      .replace(/_{2,}/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+    if (!baseUsername || baseUsername.length < 3) {
+      baseUsername = (baseUsername || 'user').padEnd(3, '0');
     }
-    username = usernameCandidate;
+    if (baseUsername.length > 25) {
+      baseUsername = baseUsername.slice(0, 25).replace(/_+$/, '');
+    }
+
+    let username = baseUsername;
+    let usernameCounter = 1;
+    while (await User.findOne({ username })) {
+      username = `${baseUsername}${usernameCounter++}`;
+    }
 
     // Create user
     const user = new User({
