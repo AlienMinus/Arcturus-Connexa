@@ -29,13 +29,104 @@ const reactions = [
   { name: "Funny", icon: <FaLaugh color="#4ea1de" /> },
 ];
 
-const PostCard = ({ post }) => {
+const TOKEN_REGEX = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s]|www\.[^\s<]+[^<.,:;"')\]\s]|#[a-zA-Z0-9_\u0080-\uffff]+)/g;
+const MAX_PREVIEW_LINES = 4;
+const MAX_PREVIEW_CHARS = 320;
+
+const getTruncatedContent = (content) => {
+  if (!content) return { text: '', isTruncated: false };
+
+  const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalized.split('\n');
+
+  if (normalized.length <= MAX_PREVIEW_CHARS && lines.length <= MAX_PREVIEW_LINES) {
+    return { text: normalized, isTruncated: false };
+  }
+
+  let result = '';
+  let lineCount = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (lineCount >= MAX_PREVIEW_LINES) break;
+    if (result.length + line.length > MAX_PREVIEW_CHARS && result.length > 80) break;
+    result += (i > 0 ? '\n' : '') + line;
+    lineCount++;
+  }
+
+  if (result.length > MAX_PREVIEW_CHARS) {
+    const lastSpace = result.lastIndexOf(' ', MAX_PREVIEW_CHARS);
+    result = result.substring(0, lastSpace > 60 ? lastSpace : MAX_PREVIEW_CHARS);
+  }
+
+  if (result.trim() === normalized.trim() || result.length >= normalized.length) {
+    return { text: normalized, isTruncated: false };
+  }
+
+  return { text: result.trimEnd(), isTruncated: true };
+};
+
+const renderFormattedContent = (text, onHashtagClick) => {
+  if (!text) return null;
+  const parts = text.split(TOKEN_REGEX);
+
+  return parts.map((part, index) => {
+    if (!part) return null;
+
+    if (part.startsWith('http://') || part.startsWith('https://') || part.startsWith('www.')) {
+      const url = part.startsWith('www.') ? `https://${part}` : part;
+      return (
+        <a
+          key={index}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="postLink"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+
+    if (part.startsWith('#')) {
+      return (
+        <span
+          key={index}
+          className="hashtag"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onHashtagClick) {
+              onHashtagClick(e, part);
+            }
+          }}
+        >
+          {part}
+        </span>
+      );
+    }
+
+    return part;
+  });
+};
+
+const PostCard = ({ post, fullView = false }) => {
   const { profile } = useProfile();
   const { reactionsState, setReactionState } = useReactions();
   const navigate = useNavigate();
   const [showReactions, setShowReactions] = useState(false);
   const [hideReactionsTimer, setHideReactionsTimer] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+
+  const isPostDetailPage = typeof window !== 'undefined' && window.location.pathname.includes('/posts/');
+  const isDetail = fullView || isPostDetailPage;
+  const [isExpanded, setIsExpanded] = useState(isDetail);
+
+  useEffect(() => {
+    if (isDetail) {
+      setIsExpanded(true);
+    }
+  }, [isDetail]);
   
   const postId = post.id || post._id;
   const myName = getUserFullName(profile, "You");
@@ -257,13 +348,30 @@ const PostCard = ({ post }) => {
   const displayHeadline = authorSource?.authorHeadline || authorSource?.userId?.headline || 'Member';
   const displayIsVerified = authorSource?.authorIsVerified ?? authorSource?.userId?.isVerified ?? false;
   const displayInstitute = authorSource?.authorInstitute ?? authorSource?.userId?.institute ?? null;
-  const displayContent = (isRepost ? post.repostedFrom.content : post.content) || "";
-  const displayImage = isRepost ? post.repostedFrom.image : post.image;
+  const displayContent = (isRepost ? post.repostedFrom?.content : post.content) || "";
+  const displayImage = isRepost ? post.repostedFrom?.image : post.image;
+
+  const { text: renderedContentText, isTruncated: isContentTruncated } = isExpanded
+    ? { text: displayContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n'), isTruncated: false }
+    : getTruncatedContent(displayContent);
 
   const handlePostBodyClick = () => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) return;
+    if (window.location.pathname.includes(`/posts/${postId}`)) return;
     if (!displayUsername) return;
     trackActivity('view');
     navigate(`/${displayUsername}/posts/${postId}`);
+  };
+
+  const handleSeeMore = (e) => {
+    e.stopPropagation();
+    setIsExpanded(true);
+  };
+
+  const handleHashtagClick = (e, tag) => {
+    e.stopPropagation();
+    navigate(`/search?q=${encodeURIComponent(tag)}`);
   };
 
   const handleSendClick = () => {
@@ -398,13 +506,32 @@ const PostCard = ({ post }) => {
           )}
         </div>
       </div>
-      <div className="postBody" onClick={handlePostBodyClick} style={{ cursor: "pointer" }}>
-        <p>
-          {displayContent.split(/(#\w+)/g).map((part, index) => 
-            part.startsWith("#") ? <span key={index} className="hashtag">{part}</span> : part
-          )}
-        </p>
-      </div>
+      {displayContent && (
+        <div className="postBody" onClick={handlePostBodyClick}>
+          <p className="postContentText">
+            {renderFormattedContent(renderedContentText, handleHashtagClick)}
+            {isContentTruncated && (
+              <>
+                <span className="seeMoreEllipsis">... </span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className="seeMoreBtn"
+                  onClick={handleSeeMore}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSeeMore(e);
+                    }
+                  }}
+                >
+                  see more
+                </span>
+              </>
+            )}
+          </p>
+        </div>
+      )}
       {displayImage && (
         displayImage.match(/\.(mp4|webm|mov)$/i) || post.media?.[0]?.resource_type === 'video' ? (
           <video className="postImage postVideo" src={displayImage} controls />

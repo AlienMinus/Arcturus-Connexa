@@ -207,28 +207,77 @@
 
 .postBody {
   font-size: 14.5px;
-  line-height: 1.55;
+  line-height: 1.6;
   color: #191919;
-  margin-bottom: 8px;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
+  margin-bottom: 10px;
+  text-align: left;
   word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  user-select: text;
 }
 
-.postBody p {
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-  line-height: 1.55;
+.postBody p,
+.postContentText {
+  text-align: left;
+  line-height: 1.6;
   color: inherit;
   margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .hashtag {
+  display: inline;
   color: #0a66c2;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.hashtag:hover {
+  color: #004182;
+  text-decoration: underline;
+}
+
+.postLink {
+  color: #0a66c2;
+  font-weight: 500;
+  text-decoration: none;
+  word-break: break-all;
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.postLink:hover {
+  color: #004182;
+  text-decoration: underline;
+}
+
+.seeMoreEllipsis {
+  color: #666666;
+  font-weight: 400;
+}
+
+.seeMoreBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline;
+  font-family: inherit;
+  transition: color 0.15s ease;
+}
+
+.seeMoreBtn:hover {
+  color: #0a66c2;
+  text-decoration: underline;
 }
 
 .postImage {
@@ -1076,16 +1125,6 @@
 
 .scheduledPostBtn {
   background-color: #0284c7;
-}
-
-.hashtag {
-  display: block;
-  color: #0a66c2;
-  cursor: pointer;
-}
-
-.hashtag:hover {
-  text-decoration: underline;
 }
 
 /* Progressive Scroll Loading Sentinel & End of Feed */

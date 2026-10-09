@@ -454,6 +454,28 @@ body.dark-mode .hashtag {
   color: var(--accent-blue) !important;
 }
 
+[data-theme="dark"] .postLink,
+body.dark-mode .postLink {
+  color: var(--accent-blue, #38bdf8) !important;
+}
+
+[data-theme="dark"] .postLink:hover,
+body.dark-mode .postLink:hover {
+  color: #7dd3fc !important;
+}
+
+[data-theme="dark"] .seeMoreEllipsis,
+body.dark-mode .seeMoreEllipsis,
+[data-theme="dark"] .seeMoreBtn,
+body.dark-mode .seeMoreBtn {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .seeMoreBtn:hover,
+body.dark-mode .seeMoreBtn:hover {
+  color: var(--accent-blue, #38bdf8) !important;
+}
+
 [data-theme="dark"] .postInfo h2,
 body.dark-mode .postInfo h2 {
   color: var(--text-primary) !important;
