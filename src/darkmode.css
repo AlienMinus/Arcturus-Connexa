@@ -2460,6 +2460,54 @@ body.dark-mode .customFileInputLabel svg {
   fill: #ffffff !important;
 }
 
+[data-theme="dark"] .multiOrgSelectBanner,
+body.dark-mode .multiOrgSelectBanner {
+  background: var(--bg-card, #1e293b) !important;
+  border-color: var(--border-color, #334155) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .multiOrgSelectBanner label,
+body.dark-mode .multiOrgSelectBanner label {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .multiOrgSelectBanner select,
+body.dark-mode .multiOrgSelectBanner select {
+  background: var(--bg-input, #0f172a) !important;
+  border-color: var(--border-color, #334155) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .viewPublicCompanyBtn,
+body.dark-mode .viewPublicCompanyBtn {
+  background: rgba(56, 189, 248, 0.1) !important;
+  color: var(--accent-blue, #38bdf8) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+[data-theme="dark"] .registerNewOrgToggleBtn,
+body.dark-mode .registerNewOrgToggleBtn,
+[data-theme="dark"] .backToManageOrgBtn,
+body.dark-mode .backToManageOrgBtn {
+  background: var(--bg-input, #0f172a) !important;
+  color: #cbd5e1 !important;
+  border-color: var(--border-color, #334155) !important;
+}
+
+[data-theme="dark"] .existingDocsList,
+body.dark-mode .existingDocsList {
+  background: var(--bg-input, #0f172a) !important;
+  border-color: var(--border-color, #334155) !important;
+}
+
+[data-theme="dark"] .existingDocBadge,
+body.dark-mode .existingDocBadge {
+  background: var(--bg-card, #1e293b) !important;
+  border-color: var(--border-color, #334155) !important;
+  color: #cbd5e1 !important;
+}
+
 /* PostModal Enhanced Dark Mode */
 [data-theme="dark"] .postModal,
 body.dark-mode .postModal {

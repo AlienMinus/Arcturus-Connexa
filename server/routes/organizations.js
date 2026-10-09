@@ -254,25 +254,107 @@ router.get('/:idOrSlug', async (req, res) => {
 });
 
 // PATCH /api/organizations/:id - Update organization profile details
-router.patch('/:id', authMiddleware, async (req, res) => {
-  try {
-    const organization = await Organization.findOne({
-      _id: req.params.id,
-      $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
-    });
-    if (!organization) return res.status(403).json({ error: 'You are not authorized to edit this organization.' });
+router.patch(
+  '/:id',
+  authMiddleware,
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'documents', maxCount: 5 },
+  ]),
+  async (req, res) => {
+    try {
+      const organization = await Organization.findOne({
+        _id: req.params.id,
+        $or: [{ adminId: req.userId }, { 'members.userId': req.userId }],
+      });
+      if (!organization) return res.status(403).json({ error: 'You are not authorized to edit this organization.' });
 
-    const editableFields = ['name', 'tagline', 'description', 'industry', 'website', 'location'];
-    editableFields.forEach((field) => {
-      if (typeof req.body[field] === 'string') organization[field] = req.body[field].trim();
-    });
-    await organization.save();
-    res.json({ organization });
-  } catch (err) {
-    console.error('Failed to update organization:', err);
-    res.status(500).json({ error: 'Failed to update organization profile' });
+      // Name change and slug update
+      if (typeof req.body.name === 'string' && req.body.name.trim() && req.body.name.trim() !== organization.name) {
+        const newName = req.body.name.trim();
+        const existingOther = await Organization.findOne({
+          _id: { $ne: organization._id },
+          name: { $regex: new RegExp(`^${newName}$`, 'i') },
+        });
+        if (existingOther) {
+          return res.status(400).json({ error: `An organization with the name "${newName}" already exists.` });
+        }
+        organization.name = newName;
+        let newSlug = generateSlug(newName);
+        let count = 1;
+        while (await Organization.findOne({ _id: { $ne: organization._id }, slug: newSlug })) {
+          newSlug = `${generateSlug(newName)}-${count++}`;
+        }
+        organization.slug = newSlug;
+      }
+
+      const editableFields = [
+        'tagline',
+        'description',
+        'industry',
+        'organizationSize',
+        'organizationType',
+        'website',
+        'location',
+      ];
+      editableFields.forEach((field) => {
+        if (typeof req.body[field] === 'string') {
+          organization[field] = req.body[field].trim();
+        }
+      });
+
+      // Handle Logo update
+      if (req.files?.logo?.[0]) {
+        try {
+          const logoResult = await streamUpload(req.files.logo[0].buffer, {
+            folder: 'arcturus/organizations/logos',
+            transformation: [{ width: 400, height: 400, crop: 'limit' }],
+          });
+          organization.logo = {
+            url: logoResult.secure_url,
+            public_id: logoResult.public_id,
+          };
+        } catch (uploadErr) {
+          console.warn('Logo upload to Cloudinary failed during patch:', uploadErr);
+        }
+      } else if (req.body.customLogoUrl || req.body.logoUrl) {
+        const lUrl = (req.body.customLogoUrl || req.body.logoUrl).trim();
+        if (lUrl) {
+          organization.logo = {
+            url: lUrl,
+            public_id: organization.logo?.public_id || '',
+          };
+        }
+      }
+
+      // Handle additional documents
+      if (req.files?.documents && req.files.documents.length > 0) {
+        for (const file of req.files.documents) {
+          try {
+            const docResult = await streamUpload(file.buffer, {
+              folder: 'arcturus/organizations/documents',
+            });
+            organization.documents.push({
+              url: docResult.secure_url,
+              public_id: docResult.public_id,
+              documentType: req.body.documentType || 'Certificate of Incorporation',
+              originalName: file.originalname || 'document.png',
+              uploadedAt: new Date(),
+            });
+          } catch (docErr) {
+            console.error('Document upload to Cloudinary failed during patch:', docErr);
+          }
+        }
+      }
+
+      await organization.save();
+      res.json({ message: 'Organization updated successfully', organization });
+    } catch (err) {
+      console.error('Failed to update organization:', err);
+      res.status(500).json({ error: 'Failed to update organization profile' });
+    }
   }
-});
+);
 
 // POST /api/organizations/:id/follow - Follow an organization
 router.post('/:id/follow', authMiddleware, async (req, res) => {

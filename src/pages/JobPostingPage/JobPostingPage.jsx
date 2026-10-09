@@ -108,7 +108,7 @@ const DOCUMENT_TYPES = [
 ];
 
 const JobPostingPage = () => {
-  const { user, token, activeAccount } = useAuth();
+  const { user, token, activeAccount, switchAccount, refreshOrganizations } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -128,6 +128,7 @@ const JobPostingPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [isCreatingNewOrg, setIsCreatingNewOrg] = useState(false);
 
   // Recruiter Dashboard Filter States
   const [candidateSearch, setCandidateSearch] = useState('');
@@ -135,6 +136,16 @@ const JobPostingPage = () => {
   const [candidateJobFilter, setCandidateJobFilter] = useState('');
   const [updatingApplicantId, setUpdatingApplicantId] = useState(null);
   const isOrganizationAccount = activeAccount?.type === 'organization';
+  const activeOrgId = isOrganizationAccount ? (activeAccount.id || activeAccount.orgId) : null;
+
+  const existingOrg =
+    (activeOrgId ? organizations.find((o) => o._id === activeOrgId) : null) ||
+    organizations.find((o) => o._id === selectedOrgId) ||
+    organizations[0] ||
+    (isOrganizationAccount ? activeAccount : null) ||
+    null;
+
+  const isExistingOrg = Boolean(existingOrg && (existingOrg._id || existingOrg.id));
   const isRegistrationPage = location.pathname === '/company/create' || searchParams.get('tab') === 'register_org';
 
   useEffect(() => {
@@ -270,6 +281,14 @@ const JobPostingPage = () => {
         const list = data.organizations || [];
         setOrganizations(list);
         
+        if (activeOrgId) {
+          const matching = list.find((o) => o._id === activeOrgId);
+          if (matching) {
+            setSelectedOrgId(matching._id);
+            return;
+          }
+        }
+
         const approved = list.find((o) => o.status === 'approved');
         if (approved) {
           setSelectedOrgId(approved._id);
@@ -281,6 +300,59 @@ const JobPostingPage = () => {
       console.error('Failed to fetch user organizations:', err);
     }
   };
+
+  // Pre-fill form when existing organization data is available
+  useEffect(() => {
+    if (isExistingOrg && existingOrg && !isCreatingNewOrg) {
+      setOrgForm({
+        name: existingOrg.name || '',
+        tagline: existingOrg.tagline || '',
+        description: existingOrg.description || '',
+        industry: existingOrg.industry || 'Software Development',
+        organizationSize: existingOrg.organizationSize || '11-50',
+        organizationType: existingOrg.organizationType || 'Privately Held',
+        website: existingOrg.website || '',
+        location: existingOrg.location || '',
+        logoUrl: existingOrg.logo?.url || existingOrg.logoUrl || (typeof existingOrg.logo === 'string' ? existingOrg.logo : LOGO_PRESETS[0].url),
+        documentType: existingOrg.documents?.[0]?.documentType || 'Certificate of Incorporation',
+      });
+      const existingLogo = existingOrg.logo?.url || existingOrg.logoUrl || (typeof existingOrg.logo === 'string' ? existingOrg.logo : null);
+      if (existingLogo) {
+        setLogoPreview(existingLogo);
+        if (!existingLogo.startsWith('data:')) {
+          setLogoMode('url');
+        }
+      }
+    } else if (isCreatingNewOrg) {
+      setOrgForm({
+        name: '',
+        tagline: '',
+        description: '',
+        industry: 'Software Development',
+        organizationSize: '11-50',
+        organizationType: 'Privately Held',
+        website: '',
+        location: '',
+        logoUrl: LOGO_PRESETS[0].url,
+        documentType: 'Certificate of Incorporation',
+      });
+      setLogoFile(null);
+      setLogoPreview(null);
+      setLogoMode('presets');
+    }
+  }, [
+    existingOrg?._id,
+    existingOrg?.id,
+    existingOrg?.name,
+    existingOrg?.description,
+    existingOrg?.location,
+    existingOrg?.website,
+    existingOrg?.tagline,
+    existingOrg?.industry,
+    existingOrg?.organizationSize,
+    existingOrg?.organizationType,
+    isCreatingNewOrg,
+  ]);
 
   const fetchMyListings = async () => {
     if (!token) {
@@ -324,11 +396,11 @@ const JobPostingPage = () => {
     setDocumentPreviews(previews);
   };
 
-  // Submit Organization Registration (Multipart form upload to Cloudinary & MongoDB Atlas)
+  // Submit Organization Registration or Save Company Page Changes
   const handleRegisterOrgSubmit = async (e) => {
     e.preventDefault();
     if (!token) {
-      showToast('Please sign in to register an organization');
+      showToast('Please sign in to manage your company page');
       return;
     }
 
@@ -342,7 +414,8 @@ const JobPostingPage = () => {
       return;
     }
 
-    if (documentFiles.length === 0) {
+    // Documents are required only when registering a new organization
+    if ((!isExistingOrg || isCreatingNewOrg) && documentFiles.length === 0) {
       showToast('Please attach at least one business verification document image (e.g. Certificate of Incorporation).');
       return;
     }
@@ -359,7 +432,7 @@ const JobPostingPage = () => {
       formData.append('website', orgForm.website.trim());
       formData.append('location', orgForm.location.trim());
       formData.append('documentType', orgForm.documentType);
-      formData.append('customLogoUrl', orgForm.logoUrl);
+      formData.append('customLogoUrl', orgForm.logoUrl || '');
 
       if (logoFile) {
         formData.append('logo', logoFile);
@@ -369,26 +442,68 @@ const JobPostingPage = () => {
         formData.append('documents', file);
       }
 
-      const res = await fetch(buildApiUrl('/organizations'), {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      if (isExistingOrg && !isCreatingNewOrg) {
+        // UPDATE EXISTING COMPANY PAGE
+        const orgIdToUpdate = existingOrg._id || existingOrg.id;
+        const res = await fetch(buildApiUrl(`/organizations/${orgIdToUpdate}`), {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        showToast('🏢 Organization submitted successfully! Pending Arcturus Admin review.');
-        await fetchOrganizations();
-        setActiveTab('manage');
+        if (res.ok) {
+          showToast('🏢 Company page updated successfully!');
+          await fetchOrganizations();
+          if (refreshOrganizations) {
+            await refreshOrganizations(token);
+          }
+          if (
+            activeAccount?.type === 'organization' &&
+            (activeAccount.id === orgIdToUpdate || activeAccount.orgId === orgIdToUpdate) &&
+            switchAccount
+          ) {
+            switchAccount(data.organization || { ...existingOrg, ...orgForm });
+          }
+          setLogoFile(null);
+          setDocumentFiles([]);
+          setDocumentPreviews([]);
+        } else {
+          showToast(data.error || 'Failed to update company page');
+        }
       } else {
-        showToast(data.error || 'Failed to submit organization registration');
+        // REGISTER NEW ORGANIZATION
+        const res = await fetch(buildApiUrl('/organizations'), {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast('🏢 Organization submitted successfully! Pending Arcturus Admin review.');
+          await fetchOrganizations();
+          if (refreshOrganizations) {
+            await refreshOrganizations(token);
+          }
+          setActiveTab('manage');
+          setIsCreatingNewOrg(false);
+          setLogoFile(null);
+          setDocumentFiles([]);
+          setDocumentPreviews([]);
+        } else {
+          showToast(data.error || 'Failed to submit organization registration');
+        }
       }
     } catch (err) {
-      console.error('Error registering organization:', err);
-      showToast('Network error while uploading organization documents');
+      console.error('Error saving organization:', err);
+      showToast('Network error while saving company page');
     } finally {
       setSubmitting(false);
     }
@@ -559,11 +674,14 @@ const JobPostingPage = () => {
           <button
             type="button"
             className={`tabBtn ${activeTab === 'register_org' ? 'active' : ''}`}
-            onClick={() => setActiveTab('register_org')}
-            title="Create Company Page"
-            aria-label="Create Company Page"
+            onClick={() => {
+              setActiveTab('register_org');
+              setIsCreatingNewOrg(false);
+            }}
+            title={isExistingOrg && !isCreatingNewOrg ? "Manage Company Page" : "Create Company Page"}
+            aria-label={isExistingOrg && !isCreatingNewOrg ? "Manage Company Page" : "Create Company Page"}
           >
-            <FaBuilding size={12} /> <span className="tabLabel">Create Company Page</span>
+            <FaBuilding size={12} /> <span className="tabLabel">{isExistingOrg && !isCreatingNewOrg ? "Manage Company Page" : "Create Company Page"}</span>
           </button>
         </div>
       </div>
@@ -1146,11 +1264,82 @@ const JobPostingPage = () => {
                   <div className="orgTitleBadge">
                     <FaBuilding size={20} />
                   </div>
-                  <div>
-                    <h3>Create Organization Page</h3>
-                    <p>Register your company, business, or agency with verification documents for Arcturus Admin review.</p>
+                  <div style={{ flex: 1 }}>
+                    <h3>{isExistingOrg && !isCreatingNewOrg ? 'Manage Company Page' : 'Create Organization Page'}</h3>
+                    <p>
+                      {isExistingOrg && !isCreatingNewOrg
+                        ? `Update company details, branding, and public presence for ${existingOrg?.name || 'your organization'}.`
+                        : 'Register your company, business, or agency with verification documents for Arcturus Admin review.'}
+                    </p>
                   </div>
+
+                  {isExistingOrg && !isCreatingNewOrg && (
+                    <div className="orgManageHeaderActions">
+                      {existingOrg?.status === 'approved' ? (
+                        <span className="orgVerifiedBadge">
+                          <FaCheckCircle size={13} /> Verified Company
+                        </span>
+                      ) : (
+                        <span className="orgPendingBadge">
+                          <FaHourglassHalf size={13} /> Pending Admin Review
+                        </span>
+                      )}
+
+                      <Link
+                        to={existingOrg?.slug ? `/company/${existingOrg.slug}` : `/organization/${existingOrg?._id || existingOrg?.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="viewPublicCompanyBtn"
+                        title="View Public Company Page"
+                      >
+                        <FaExternalLinkAlt size={12} /> <span>View Public Page</span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        className="registerNewOrgToggleBtn"
+                        onClick={() => setIsCreatingNewOrg(true)}
+                        title="Register another organization"
+                      >
+                        <FaPlus size={11} /> <span>New Company</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {isExistingOrg && isCreatingNewOrg && (
+                    <button
+                      type="button"
+                      className="backToManageOrgBtn"
+                      onClick={() => setIsCreatingNewOrg(false)}
+                    >
+                      <FaArrowLeft size={12} /> <span>Back to Manage {existingOrg?.name}</span>
+                    </button>
+                  )}
                 </div>
+
+                {organizations.length > 1 && !isCreatingNewOrg && (
+                  <div className="multiOrgSelectBanner">
+                    <label htmlFor="selectCompanyToManage">
+                      <FaBuilding size={13} /> <strong>Select Company to Manage:</strong>
+                    </label>
+                    <select
+                      id="selectCompanyToManage"
+                      value={existingOrg?._id || ''}
+                      onChange={(e) => {
+                        const found = organizations.find((o) => o._id === e.target.value);
+                        if (found) {
+                          setSelectedOrgId(found._id);
+                        }
+                      }}
+                    >
+                      {organizations.map((org) => (
+                        <option key={org._id} value={org._id}>
+                          {org.name} ({org.status === 'approved' ? 'Verified' : 'Pending'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div className="jobFormGrid">
                   <div className="formGroup">
@@ -1381,21 +1570,53 @@ const JobPostingPage = () => {
                     )}
                   </div>
 
-                  {/* REQUIRED DOCUMENT SUBMISSION AREA */}
+                  {/* VERIFICATION DOCUMENT SECTION */}
                   <div className="formGroup fullWidth verificationUploadBox">
                     <div className="verificationUploadHeader">
                       <FaFileInvoice size={18} color="#0a66c2" />
                       <div>
-                        <h4>Business Verification Document Proof (Required) *</h4>
+                        <h4>
+                          {isExistingOrg && !isCreatingNewOrg
+                            ? 'Business Verification Documents'
+                            : 'Business Verification Document Proof (Required) *'}
+                        </h4>
                         <p>
-                          Attach official documentation (Certificate of Incorporation, Tax Registration, Business License). Files are securely stored on MongoDB Atlas & Cloudinary and reviewed by Arcturus Admin.
+                          {isExistingOrg && !isCreatingNewOrg
+                            ? `Verification documents associated with ${existingOrg?.name || 'this organization'}. You may optionally attach additional proof below.`
+                            : 'Attach official documentation (Certificate of Incorporation, Tax Registration, Business License). Files are securely stored on MongoDB Atlas & Cloudinary and reviewed by Arcturus Admin.'}
                         </p>
                       </div>
                     </div>
 
+                    {isExistingOrg && !isCreatingNewOrg && existingOrg?.documents?.length > 0 && (
+                      <div className="existingDocsList">
+                        <span className="existingDocsLabel">Current Documents on File:</span>
+                        <div className="existingDocsTags">
+                          {existingOrg.documents.map((doc, idx) => (
+                            <span key={idx} className="existingDocBadge">
+                              <FaCheckCircle size={11} color="#15803d" />
+                              <span>{doc.documentType || 'Verification Document'}</span>
+                              {doc.originalName && <span className="docNameSub">({doc.originalName})</span>}
+                              {doc.url && (
+                                <a
+                                  href={doc.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="existingDocViewLink"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  View <FaExternalLinkAlt size={10} />
+                                </a>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="docUploadInputsRow">
                       <div className="formGroup docTypeSelectGroup">
-                        <label htmlFor="docType">Document Type *</label>
+                        <label htmlFor="docType">Document Type</label>
                         <select
                           id="docType"
                           value={orgForm.documentType}
@@ -1408,7 +1629,11 @@ const JobPostingPage = () => {
                       </div>
 
                       <div className="formGroup fileUploadInputWrap">
-                        <label htmlFor="docFiles">Attach Verification Proof *</label>
+                        <label htmlFor="docFiles">
+                          {isExistingOrg && !isCreatingNewOrg
+                            ? 'Attach Additional Proof (Optional)'
+                            : 'Attach Verification Proof *'}
+                        </label>
                         <label htmlFor="docFiles" className="customFileInputLabel">
                           <FaFileUpload size={15} /> <span>Choose Image Files (PNG, JPG, WebP)</span>
                         </label>
@@ -1417,7 +1642,7 @@ const JobPostingPage = () => {
                           type="file"
                           accept="image/*"
                           multiple
-                          required
+                          required={!isExistingOrg || isCreatingNewOrg}
                           onChange={handleDocFileChange}
                           style={{ display: 'none' }}
                         />
@@ -1447,8 +1672,17 @@ const JobPostingPage = () => {
                     className="postPrimaryActionBtn large"
                     disabled={submitting}
                   >
-                    <FaShieldAlt size={14} />
-                    <span>{submitting ? 'Uploading Documents to Cloudinary...' : 'Submit Organization for Admin Approval'}</span>
+                    {isExistingOrg && !isCreatingNewOrg ? (
+                      <>
+                        <FaCheck size={14} />
+                        <span>{submitting ? 'Saving Changes...' : 'Save Company Page Changes'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaShieldAlt size={14} />
+                        <span>{submitting ? 'Uploading Documents to Cloudinary...' : 'Submit Organization for Admin Approval'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
