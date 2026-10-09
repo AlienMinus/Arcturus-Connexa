@@ -61,8 +61,19 @@ const CampusLinkPage = () => {
     branch: 'Computer Science & Engineering',
     graduationYear: 2026,
     cgpa: '',
+    tenthPercentage: '',
+    twelfthPercentage: '',
     activeBacklogs: 0,
+    totalBacklogs: 0,
     skills: '',
+    targetRoles: '',
+    placementStatus: 'unplaced',
+    mockInterviewsTaken: 0,
+    assignedMentor: '',
+    technicalScore: 70,
+    aptitudeScore: 65,
+    communicationScore: 75,
+    projectScore: 60,
   });
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
@@ -163,8 +174,19 @@ const CampusLinkPage = () => {
               branch: profData.profile.branch || 'Computer Science & Engineering',
               graduationYear: profData.profile.graduationYear || 2026,
               cgpa: profData.profile.cgpa ?? '',
+              tenthPercentage: profData.profile.tenthPercentage ?? '',
+              twelfthPercentage: profData.profile.twelfthPercentage ?? '',
               activeBacklogs: profData.profile.activeBacklogs ?? 0,
+              totalBacklogs: profData.profile.totalBacklogs ?? profData.profile.activeBacklogs ?? 0,
               skills: Array.isArray(profData.profile.skills) ? profData.profile.skills.join(', ') : '',
+              targetRoles: Array.isArray(profData.profile.targetRoles) ? profData.profile.targetRoles.join(', ') : '',
+              placementStatus: profData.profile.placementStatus || 'unplaced',
+              mockInterviewsTaken: profData.profile.mockInterviewsTaken ?? 0,
+              assignedMentor: profData.profile.assignedMentor || '',
+              technicalScore: profData.profile.technicalScore ?? 70,
+              aptitudeScore: profData.profile.aptitudeScore ?? 65,
+              communicationScore: profData.profile.communicationScore ?? 75,
+              projectScore: profData.profile.projectScore ?? 60,
             });
           }
         }

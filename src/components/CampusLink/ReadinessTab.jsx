@@ -10,7 +10,12 @@ import {
   FaExclamationTriangle, 
   FaSyncAlt, 
   FaChartLine, 
-  FaLightbulb 
+  FaLightbulb,
+  FaGraduationCap,
+  FaUniversity,
+  FaIdCard,
+  FaUserTie,
+  FaClipboardList
 } from 'react-icons/fa';
 
 export const ReadinessTab = ({
@@ -55,21 +60,21 @@ export const ReadinessTab = ({
       </div>
 
       {!studentProfile || isEditingProfile ? (
-        <div className="campusSubCard" style={{ maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div className="campusProfileFormCard">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
             <div>
-              <h3 style={{ margin: 0, color: '#0f172a' }}>
-                {studentProfile ? '✏️ Update Placement Profile' : '🎓 Setup Your Placement Profile'}
+              <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.25rem' }}>
+                {studentProfile ? '✏️ Edit Placement Profile' : '🎓 Setup Your Placement Profile'}
               </h3>
-              <p style={{ margin: '4px 0 0', fontSize: '0.84rem', color: '#64748b' }}>
-                Enter your academic records and technical skills to compute your real employability readiness score and match with campus recruitment drives.
+              <p style={{ margin: '4px 0 0', fontSize: '0.86rem', color: '#64748b' }}>
+                Complete your full academic records, test scores, and career preferences to calculate your exact employability readiness score.
               </p>
             </div>
             {studentProfile && (
               <button
                 type="button"
                 className="escalateBtn"
-                style={{ background: '#64748b' }}
+                style={{ background: '#64748b', cursor: 'pointer' }}
                 onClick={() => setIsEditingProfile(false)}
               >
                 Cancel
@@ -77,117 +82,349 @@ export const ReadinessTab = ({
             )}
           </div>
 
-          <form onSubmit={handleSaveProfile} className="campusProfileForm">
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                College / University Name *
-              </label>
-              <input
-                type="text"
-                className="chatInput"
-                placeholder="Enter your college or university"
-                value={profileForm.collegeName}
-                onChange={(e) => setProfileForm({ ...profileForm, collegeName: e.target.value })}
-                required
-              />
+          <form onSubmit={handleSaveProfile} className="campusPlacementForm">
+            {/* Section 1: Academic & University Records */}
+            <div className="campusFormSection">
+              <div className="campusFormSectionTitle">
+                <FaUniversity color="#0a66c2" /> 1. Academic & University Information
+              </div>
+              <p className="campusFormSectionDesc">
+                Core institutional and degree credentials verified for campus recruitment eligibility.
+              </p>
+
+              <div className="campusFormGrid">
+                <div className="campusFormGroup fullWidth">
+                  <label className="campusFormLabel">
+                    <span>College / University Name *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="campusFormInput"
+                    placeholder="e.g. National Institute of Technology, Rourkela"
+                    value={profileForm.collegeName}
+                    onChange={(e) => setProfileForm({ ...profileForm, collegeName: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Roll Number / Student ID *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="campusFormInput"
+                    placeholder="e.g. 21CS084"
+                    value={profileForm.rollNumber}
+                    onChange={(e) => setProfileForm({ ...profileForm, rollNumber: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Branch / Department *</span>
+                  </label>
+                  <select
+                    className="campusFormSelect"
+                    value={profileForm.branch}
+                    onChange={(e) => setProfileForm({ ...profileForm, branch: e.target.value })}
+                    required
+                  >
+                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Communication">Electronics & Communication</option>
+                    <option value="Electrical & Electronics">Electrical & Electronics</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                  </select>
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Graduation Year *</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="campusFormInput"
+                    placeholder="2026"
+                    value={profileForm.graduationYear}
+                    onChange={(e) => setProfileForm({ ...profileForm, graduationYear: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Current CGPA (out of 10) *</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    className="campusFormInput"
+                    placeholder="e.g. 8.45"
+                    value={profileForm.cgpa}
+                    onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
+                    required
+                  />
+                  <span className="campusFormHelper">Recruiter benchmark cutoff is typically 7.00+</span>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Roll Number / Student ID *
-              </label>
-              <input
-                type="text"
-                className="chatInput"
-                placeholder="Enter your student roll number"
-                value={profileForm.rollNumber}
-                onChange={(e) => setProfileForm({ ...profileForm, rollNumber: e.target.value })}
-                required
-              />
+            {/* Section 2: Board Exam Percentages & Backlogs */}
+            <div className="campusFormSection">
+              <div className="campusFormSectionTitle">
+                <FaGraduationCap color="#0a66c2" /> 2. Secondary Examinations & Backlog History
+              </div>
+              <p className="campusFormSectionDesc">
+                10th / 12th board percentages and backlog records required for company criteria filtering.
+              </p>
+
+              <div className="campusFormGrid">
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>10th Board Percentage (%)</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    className="campusFormInput"
+                    placeholder="e.g. 88.5"
+                    value={profileForm.tenthPercentage}
+                    onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
+                  />
+                  <span className="campusFormHelper">Used for shortlisting in Tier-1 mass & core drives</span>
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>12th / Diploma Percentage (%)</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    className="campusFormInput"
+                    placeholder="e.g. 91.2"
+                    value={profileForm.twelfthPercentage}
+                    onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
+                  />
+                  <span className="campusFormHelper">Minimum 60% or 70% required by most campus recruiters</span>
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Active Backlogs (Current)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="campusFormInput"
+                    placeholder="0"
+                    value={profileForm.activeBacklogs}
+                    onChange={(e) => setProfileForm({ ...profileForm, activeBacklogs: Number(e.target.value) })}
+                  />
+                  <span className="campusFormHelper">Must be 0 for most product & top tier drives</span>
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Total Backlogs Ever (Active + Cleared)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="campusFormInput"
+                    placeholder="0"
+                    value={profileForm.totalBacklogs}
+                    onChange={(e) => setProfileForm({ ...profileForm, totalBacklogs: Number(e.target.value) })}
+                  />
+                  <span className="campusFormHelper">Historical backlog tracking for audit verification</span>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Branch / Department *
-              </label>
-              <select
-                className="chatInput"
-                value={profileForm.branch}
-                onChange={(e) => setProfileForm({ ...profileForm, branch: e.target.value })}
-                required
-              >
-                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-                <option value="Information Technology">Information Technology</option>
-                <option value="Electronics & Communication">Electronics & Communication</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-              </select>
+            {/* Section 3: Technical Skills & Career Aspirations */}
+            <div className="campusFormSection">
+              <div className="campusFormSectionTitle">
+                <FaClipboardList color="#0a66c2" /> 3. Skills & Target Recruiter Roles
+              </div>
+              <p className="campusFormSectionDesc">
+                Used to dynamically compute skill gaps against upcoming recruitment drives.
+              </p>
+
+              <div className="campusFormGrid">
+                <div className="campusFormGroup fullWidth">
+                  <label className="campusFormLabel">
+                    <span>Key Technical Skills (comma separated)</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="campusFormInput"
+                    placeholder="e.g. React, Node.js, Python, DSA, System Design, SQL, Docker, AWS"
+                    value={profileForm.skills}
+                    onChange={(e) => setProfileForm({ ...profileForm, skills: e.target.value })}
+                  />
+                  <span className="campusFormHelper">Separate skills with commas. These match with drive requirements.</span>
+                </div>
+
+                <div className="campusFormGroup fullWidth">
+                  <label className="campusFormLabel">
+                    <span>Target Job Roles (comma separated)</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="campusFormInput"
+                    placeholder="e.g. Software Development Engineer, Full Stack Developer, Data Analyst, Cloud Engineer"
+                    value={profileForm.targetRoles}
+                    onChange={(e) => setProfileForm({ ...profileForm, targetRoles: e.target.value })}
+                  />
+                  <span className="campusFormHelper">Roles you wish to be evaluated for in skill-gap analysis.</span>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Graduation Year *
-              </label>
-              <input
-                type="number"
-                className="chatInput"
-                placeholder="2026"
-                value={profileForm.graduationYear}
-                onChange={(e) => setProfileForm({ ...profileForm, graduationYear: Number(e.target.value) })}
-                required
-              />
+            {/* Section 4: Placement Status & Mentorship */}
+            <div className="campusFormSection">
+              <div className="campusFormSectionTitle">
+                <FaUserTie color="#0a66c2" /> 4. Placement Status & Mentorship Support
+              </div>
+              <p className="campusFormSectionDesc">
+                Track your active campus placement standing and assigned faculty advisor.
+              </p>
+
+              <div className="campusFormGrid">
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Current Placement Status</span>
+                  </label>
+                  <select
+                    className="campusFormSelect"
+                    value={profileForm.placementStatus}
+                    onChange={(e) => setProfileForm({ ...profileForm, placementStatus: e.target.value })}
+                  >
+                    <option value="unplaced">Unplaced (Actively Seeking)</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="interviewing">In Interview Process</option>
+                    <option value="placed">Placed (Offer Accepted)</option>
+                    <option value="opted_out">Opted Out (Higher Studies / Entrepreneurship)</option>
+                  </select>
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Mock Interviews Completed</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="campusFormInput"
+                    placeholder="0"
+                    value={profileForm.mockInterviewsTaken}
+                    onChange={(e) => setProfileForm({ ...profileForm, mockInterviewsTaken: Number(e.target.value) })}
+                  />
+                  <span className="campusFormHelper">Practice interview sessions attended on CampusLink</span>
+                </div>
+
+                <div className="campusFormGroup fullWidth">
+                  <label className="campusFormLabel">
+                    <span>Assigned Faculty Mentor / Placement Advisor</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="campusFormInput"
+                    placeholder="e.g. Dr. A. Sharma (Head of Placement Cell)"
+                    value={profileForm.assignedMentor}
+                    onChange={(e) => setProfileForm({ ...profileForm, assignedMentor: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Current CGPA (out of 10) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="10"
-                className="chatInput"
-                placeholder="e.g. 8.2"
-                value={profileForm.cgpa}
-                onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
-                required
-              />
+            {/* Section 5: Dimension Self-Rating Benchmarks */}
+            <div className="campusFormSection">
+              <div className="campusFormSectionTitle">
+                <FaChartLine color="#0a66c2" /> 5. Readiness Dimension Benchmarks (0 - 100)
+              </div>
+              <p className="campusFormSectionDesc">
+                Self-assessed or diagnostic baseline competencies across the 4 key evaluation pillars.
+              </p>
+
+              <div className="campusFormGrid">
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Technical Competency (DSA & Web)</span>
+                    <strong style={{ color: '#0a66c2' }}>{profileForm.technicalScore || 50}%</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    className="campusFormRange"
+                    value={profileForm.technicalScore || 50}
+                    onChange={(e) => setProfileForm({ ...profileForm, technicalScore: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Aptitude & Quantitative Problem Solving</span>
+                    <strong style={{ color: '#16a34a' }}>{profileForm.aptitudeScore || 50}%</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    className="campusFormRange"
+                    value={profileForm.aptitudeScore || 50}
+                    onChange={(e) => setProfileForm({ ...profileForm, aptitudeScore: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Communication & Behavioral Skills</span>
+                    <strong style={{ color: '#7e22ce' }}>{profileForm.communicationScore || 50}%</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    className="campusFormRange"
+                    value={profileForm.communicationScore || 50}
+                    onChange={(e) => setProfileForm({ ...profileForm, communicationScore: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div className="campusFormGroup">
+                  <label className="campusFormLabel">
+                    <span>Projects & Practical Experience Depth</span>
+                    <strong style={{ color: '#ea580c' }}>{profileForm.projectScore || 50}%</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    className="campusFormRange"
+                    value={profileForm.projectScore || 50}
+                    onChange={(e) => setProfileForm({ ...profileForm, projectScore: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Active Backlogs
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="chatInput"
-                value={profileForm.activeBacklogs}
-                onChange={(e) => setProfileForm({ ...profileForm, activeBacklogs: Number(e.target.value) })}
-              />
-            </div>
-
-            <div style={{ gridColumn: '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
-                Key Technical Skills (comma separated)
-              </label>
-              <input
-                type="text"
-                className="chatInput"
-                placeholder="e.g. React, Node.js, Python, DSA, SQL, System Design"
-                value={profileForm.skills}
-                onChange={(e) => setProfileForm({ ...profileForm, skills: e.target.value })}
-              />
-            </div>
-
-            <div style={{ gridColumn: '1 / -1', marginTop: 10 }}>
+            <div style={{ marginTop: 24 }}>
               <button
                 type="submit"
-                className="campusTabBtn active"
-                style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
+                className="campusSubmitBtn"
               >
-                <FaCheckCircle size={14} /> Save Profile & Calculate Employability Score
+                <FaCheckCircle size={15} /> Save Placement Profile & Run Employability Diagnostics
               </button>
             </div>
           </form>
@@ -204,15 +441,44 @@ export const ReadinessTab = ({
               <span className={`readinessLevelBadge ${(studentProfile.readinessLevel || 'ready').toLowerCase().replace(' ', '-')}`}>
                 {studentProfile.readinessLevel}
               </span>
+
+              <span className={`placementStatusBadge status-${studentProfile.placementStatus || 'unplaced'}`}>
+                Status: {(studentProfile.placementStatus || 'unplaced').replace('_', ' ').toUpperCase()}
+              </span>
+
               <h4 style={{ margin: '12px 0 4px', color: '#0f172a' }}>
                 {studentProfile.collegeName}
               </h4>
               <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
-                Branch: {studentProfile.branch} · Roll: {studentProfile.rollNumber}
+                Branch: {studentProfile.branch} · Roll: {studentProfile.rollNumber} (Grad {studentProfile.graduationYear})
               </p>
-              <p style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600, marginTop: 8 }}>
-                CGPA: {studentProfile.cgpa} · Active Backlogs: {studentProfile.activeBacklogs || 0}
-              </p>
+              <div className="dialAcademicMeta">
+                <span>CGPA: <strong>{studentProfile.cgpa}</strong></span>
+                <span>•</span>
+                <span>Backlogs: <strong>{studentProfile.activeBacklogs || 0} active</strong> (Total: {studentProfile.totalBacklogs ?? studentProfile.activeBacklogs ?? 0})</span>
+              </div>
+
+              {(studentProfile.tenthPercentage || studentProfile.twelfthPercentage) && (
+                <div className="dialBoardMeta">
+                  {studentProfile.tenthPercentage && <span>10th: <strong>{studentProfile.tenthPercentage}%</strong></span>}
+                  {studentProfile.tenthPercentage && studentProfile.twelfthPercentage && <span>•</span>}
+                  {studentProfile.twelfthPercentage && <span>12th: <strong>{studentProfile.twelfthPercentage}%</strong></span>}
+                </div>
+              )}
+
+              {studentProfile.assignedMentor && (
+                <div className="dialMentorMeta">
+                  <FaUserTie size={12} color="#0a66c2" /> Mentor: {studentProfile.assignedMentor}
+                </div>
+              )}
+
+              {studentProfile.targetRoles?.length > 0 && (
+                <div className="dialTargetRoles">
+                  {studentProfile.targetRoles.map((role, idx) => (
+                    <span key={idx} className="dialRoleChip">🎯 {role}</span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* 4-Dimension Scores Breakdown */}

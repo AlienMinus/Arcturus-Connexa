@@ -40,8 +40,18 @@ router.post('/', authMiddleware, async (req, res) => {
       graduationYear,
       cgpa,
       activeBacklogs,
+      totalBacklogs,
+      tenthPercentage,
+      twelfthPercentage,
       skills,
       targetRoles,
+      placementStatus,
+      mockInterviewsTaken,
+      assignedMentor,
+      technicalScore: customTechScore,
+      aptitudeScore: customAptScore,
+      communicationScore: customCommScore,
+      projectScore: customProjScore,
     } = req.body;
 
     if (!rollNumber || !collegeName || !branch || cgpa === undefined) {
@@ -54,9 +64,41 @@ router.post('/', authMiddleware, async (req, res) => {
       ? skills.split(',').map((s) => s.trim()).filter(Boolean)
       : [];
 
-    const numCgpa = Number(cgpa) || 0;
-    const numBacklogs = Number(activeBacklogs) || 0;
+    const studentTargetRoles = Array.isArray(targetRoles)
+      ? targetRoles
+      : typeof targetRoles === 'string'
+      ? targetRoles.split(',').map((s) => s.trim()).filter(Boolean)
+      : ['Campus Placement Candidate'];
+
+    const numCgpa = Math.min(10, Math.max(0, Number(cgpa) || 0));
+    const numActiveBacklogs = Math.max(0, Number(activeBacklogs) || 0);
+    const numTotalBacklogs = totalBacklogs !== undefined && totalBacklogs !== ''
+      ? Math.max(numActiveBacklogs, Number(totalBacklogs) || 0)
+      : numActiveBacklogs;
     const numGradYear = Number(graduationYear) || new Date().getFullYear();
+    const numTenth = tenthPercentage !== undefined && tenthPercentage !== '' ? Number(tenthPercentage) : undefined;
+    const numTwelfth = twelfthPercentage !== undefined && twelfthPercentage !== '' ? Number(twelfthPercentage) : undefined;
+    const numMockInterviews = Math.max(0, Number(mockInterviewsTaken) || 0);
+
+    const validBranches = [
+      'Computer Science & Engineering',
+      'Information Technology',
+      'Electronics & Communication',
+      'Electrical & Electronics',
+      'Mechanical Engineering',
+      'Civil Engineering',
+    ];
+    let sanitizedBranch = branch.trim();
+    if (sanitizedBranch === 'Electrical Engineering') {
+      sanitizedBranch = 'Electrical & Electronics';
+    } else if (!validBranches.includes(sanitizedBranch)) {
+      sanitizedBranch = 'Computer Science & Engineering';
+    }
+
+    const validPlacementStatuses = ['unplaced', 'shortlisted', 'interviewing', 'placed', 'opted_out'];
+    const sanitizedPlacementStatus = validPlacementStatuses.includes(placementStatus)
+      ? placementStatus
+      : 'unplaced';
 
     // Import complete candidate profile data from Arcturus Profile page
     const candidateProfile = await getFullCandidateProfile(req.userId);
@@ -69,13 +111,29 @@ router.post('/', authMiddleware, async (req, res) => {
     const certificationsCount = candidateProfile?.certifications?.length || 0;
 
     // Compute realistic score dimensions incorporating applicant's real projects, descriptions & background
-    const technicalScore = Math.min(100, Math.max(30, combinedSkills.length * 8 + Math.round(numCgpa * 4) + certificationsCount * 5));
-    const aptitudeScore = Math.min(100, Math.max(35, Math.round(numCgpa * 9) - numBacklogs * 5));
-    const communicationScore = 75; // Baseline behavioral score
-    const projectScore = Math.min(100, Math.max(40, projectCount * 18 + combinedSkills.length * 5 + (experienceCount > 0 ? 15 : 0)));
+    const defaultTech = Math.min(100, Math.max(30, combinedSkills.length * 8 + Math.round(numCgpa * 4) + certificationsCount * 5));
+    const defaultApt = Math.min(100, Math.max(35, Math.round(numCgpa * 9) - numActiveBacklogs * 5));
+    const defaultComm = 75; // Baseline behavioral score
+    const defaultProj = Math.min(100, Math.max(40, projectCount * 18 + combinedSkills.length * 5 + (experienceCount > 0 ? 15 : 0)));
+
+    const technicalScore = customTechScore !== undefined && customTechScore !== ''
+      ? Math.min(100, Math.max(0, Number(customTechScore)))
+      : defaultTech;
+
+    const aptitudeScore = customAptScore !== undefined && customAptScore !== ''
+      ? Math.min(100, Math.max(0, Number(customAptScore)))
+      : defaultApt;
+
+    const communicationScore = customCommScore !== undefined && customCommScore !== ''
+      ? Math.min(100, Math.max(0, Number(customCommScore)))
+      : defaultComm;
+
+    const projectScore = customProjScore !== undefined && customProjScore !== ''
+      ? Math.min(100, Math.max(0, Number(customProjScore)))
+      : defaultProj;
 
     const overallReadiness = Math.round(
-      technicalScore * 0.4 + aptitudeScore * 0.25 + communicationScore * 0.15 + projectScore * 0.2
+      technicalScore * 0.35 + aptitudeScore * 0.25 + communicationScore * 0.2 + projectScore * 0.2
     );
 
     let readinessLevel = 'Developing';
@@ -91,10 +149,10 @@ router.post('/', authMiddleware, async (req, res) => {
     const gemmaAnalysis = await analyzePlacementRiskAndGuidance({
       rollNumber,
       collegeName,
-      branch,
+      branch: sanitizedBranch,
       graduationYear: numGradYear,
       cgpa: numCgpa,
-      activeBacklogs: numBacklogs,
+      activeBacklogs: numActiveBacklogs,
       skills: combinedSkills,
       technicalScore,
       aptitudeScore,
@@ -102,7 +160,7 @@ router.post('/', authMiddleware, async (req, res) => {
       projectScore,
       overallReadiness,
       readinessLevel,
-      targetRoles,
+      targetRoles: studentTargetRoles,
       // Full candidate profile portfolio imported from Arcturus Profile page
       headline: candidateProfile?.headline || '',
       summary: candidateProfile?.summary || '',
@@ -121,12 +179,18 @@ router.post('/', authMiddleware, async (req, res) => {
     if (profile) {
       profile.rollNumber = rollNumber.trim();
       profile.collegeName = collegeName.trim();
-      profile.branch = branch.trim();
+      profile.branch = sanitizedBranch;
       profile.graduationYear = numGradYear;
       profile.cgpa = numCgpa;
-      profile.activeBacklogs = numBacklogs;
+      profile.activeBacklogs = numActiveBacklogs;
+      profile.totalBacklogs = numTotalBacklogs;
+      if (numTenth !== undefined) profile.tenthPercentage = numTenth;
+      if (numTwelfth !== undefined) profile.twelfthPercentage = numTwelfth;
       profile.skills = combinedSkills;
-      profile.targetRoles = targetRoles || profile.targetRoles;
+      profile.targetRoles = studentTargetRoles;
+      profile.placementStatus = sanitizedPlacementStatus;
+      profile.mockInterviewsTaken = numMockInterviews;
+      if (assignedMentor !== undefined) profile.assignedMentor = assignedMentor.trim();
       profile.technicalScore = technicalScore;
       profile.aptitudeScore = aptitudeScore;
       profile.communicationScore = communicationScore;
@@ -147,13 +211,18 @@ router.post('/', authMiddleware, async (req, res) => {
         userId: req.userId,
         rollNumber: rollNumber.trim(),
         collegeName: collegeName.trim(),
-        branch: branch.trim(),
+        branch: sanitizedBranch,
         graduationYear: numGradYear,
         cgpa: numCgpa,
-        activeBacklogs: numBacklogs,
-        totalBacklogs: numBacklogs,
+        activeBacklogs: numActiveBacklogs,
+        totalBacklogs: numTotalBacklogs,
+        tenthPercentage: numTenth,
+        twelfthPercentage: numTwelfth,
         skills: combinedSkills,
-        targetRoles: targetRoles || ['Campus Placement Candidate'],
+        targetRoles: studentTargetRoles,
+        placementStatus: sanitizedPlacementStatus,
+        mockInterviewsTaken: numMockInterviews,
+        assignedMentor: (assignedMentor || '').trim(),
         technicalScore,
         aptitudeScore,
         communicationScore,

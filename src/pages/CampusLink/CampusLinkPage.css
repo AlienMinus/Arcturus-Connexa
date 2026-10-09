@@ -1539,6 +1539,234 @@ body.dark-mode .typingDots span {
 }
 
 /* ==========================================================================
+   PLACEMENT PROFILE COMPREHENSIVE FORM & DISPLAY STYLES
+   ========================================================================== */
+.campusProfileFormCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 32px 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  max-width: 880px;
+  margin: 0 auto 30px;
+}
+
+.campusPlacementForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.campusFormSection {
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.campusFormSection:last-of-type {
+  border-bottom: none;
+  margin-bottom: 8px;
+  padding-bottom: 0;
+}
+
+.campusFormSectionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 4px 0;
+}
+
+.campusFormSectionDesc {
+  font-size: 0.84rem;
+  color: #64748b;
+  margin: 0 0 18px 0;
+  line-height: 1.45;
+}
+
+.campusFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+}
+
+.campusFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campusFormGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.campusFormLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.campusFormInput,
+.campusFormSelect {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.campusFormInput:focus,
+.campusFormSelect:focus {
+  border-color: #0a66c2;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
+}
+
+.campusFormInput::placeholder {
+  color: #94a3b8;
+}
+
+.campusFormRange {
+  width: 100%;
+  accent-color: #0a66c2;
+  cursor: pointer;
+  height: 6px;
+  border-radius: 4px;
+  margin: 8px 0 4px;
+}
+
+.campusFormHelper {
+  font-size: 0.77rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.campusSubmitBtn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #0a66c2;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 102, 194, 0.25);
+  transition: all 0.2s ease;
+}
+
+.campusSubmitBtn:hover {
+  background: #004182;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(10, 102, 194, 0.35);
+}
+
+/* Placement Status Badges */
+.placementStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.placementStatusBadge.status-unplaced {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.placementStatusBadge.status-shortlisted {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.placementStatusBadge.status-interviewing {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.placementStatusBadge.status-placed {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.placementStatusBadge.status-opted_out {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.dialAcademicMeta,
+.dialBoardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+  margin-top: 6px;
+}
+
+.dialBoardMeta {
+  font-size: 0.78rem;
+  color: #0a66c2;
+  font-weight: 600;
+}
+
+.dialMentorMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.dialTargetRoles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.dialRoleChip {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+/* ==========================================================================
    CAMPUSLINK MOBILE RESPONSIVENESS (max-width: 768px & max-width: 480px)
    ========================================================================== */
 .campusProfileForm {
@@ -1729,6 +1957,16 @@ body.dark-mode .typingDots span {
     width: 80px;
     height: 80px;
     font-size: 1.5rem;
+  }
+
+  .campusProfileFormCard {
+    padding: 18px 14px;
+    margin-bottom: 20px;
+  }
+
+  .campusFormGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .campusProfileForm {
