@@ -147,7 +147,23 @@ const TaleViewerModal = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (showCommentsModal || showViewersModal) return;
+      // Never intercept keystrokes if the user is typing in an input, textarea, or contentEditable element
+      const targetTag = e.target?.tagName?.toUpperCase();
+      if (targetTag === 'INPUT' || targetTag === 'TEXTAREA' || e.target?.isContentEditable) {
+        if (e.key === 'Escape') {
+          e.target.blur();
+        }
+        return;
+      }
+
+      if (showCommentsModal || showViewersModal) {
+        if (e.key === 'Escape') {
+          if (showCommentsModal) setShowCommentsModal(false);
+          if (showViewersModal) setShowViewersModal(false);
+        }
+        return;
+      }
+
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
       if (e.key === 'Escape') onClose();
@@ -436,6 +452,9 @@ const TaleViewerModal = ({
               placeholder={`Comment on ${currentGroup.userName}'s Tale...`}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => e.stopPropagation()}
+              onFocus={() => setIsPaused(true)}
+              onBlur={() => setIsPaused(false)}
             />
             <button
               type="submit"
@@ -611,6 +630,9 @@ const TaleViewerModal = ({
                   placeholder="Write a comment..."
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  onFocus={() => setIsPaused(true)}
+                  onBlur={() => setIsPaused(false)}
                   autoFocus
                 />
                 <button
