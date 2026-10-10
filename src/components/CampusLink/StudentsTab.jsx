@@ -527,3 +527,4 @@ export const StudentsTab = ({
 };
 
 export default StudentsTab;
+
