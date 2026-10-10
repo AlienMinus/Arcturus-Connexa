@@ -1,7 +1,7 @@
-/* Company Profile Page Styles */
+/* Company Profile Page Modern Styles */
 .companyPageWrapper {
-  max-width: 1040px;
-  margin: 24px auto 80px;
+  max-width: 1080px;
+  margin: 20px auto 80px;
   padding: 0 16px;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -13,57 +13,68 @@
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
   margin-bottom: 20px;
 }
 
+/* Modern Gradient Banner with Mesh Accents */
 .companyBanner {
   height: 180px;
-  background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+  background: linear-gradient(135deg, #091e3a 0%, #0a4379 50%, #0284c7 100%);
   position: relative;
+  overflow: hidden;
+}
+
+.companyBannerMesh {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 18% 30%, rgba(56, 189, 248, 0.28) 0%, transparent 45%),
+    radial-gradient(circle at 82% 70%, rgba(99, 102, 241, 0.22) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
 }
 
 .companyHeaderContent {
-  padding: 0 24px 24px;
+  padding: 0 24px 20px;
   position: relative;
 }
 
 .companyLogoWrapper {
   margin-top: -50px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   display: inline-block;
 }
 
 .companyHeroLogo {
-  width: 100px;
-  height: 100px;
+  width: 104px;
+  height: 104px;
   border-radius: 16px;
   object-fit: contain;
   background: #ffffff;
-  border: 3px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
   padding: 6px;
   box-sizing: border-box;
 }
 
 .companyHeroLogoFallback {
-  width: 100px;
-  height: 100px;
+  width: 104px;
+  height: 104px;
   border-radius: 16px;
   background: #e0f2fe;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
 }
 
-.companyTitleRow {
+.companyHeaderDetails {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 14px;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .companyMainTitle {
@@ -73,12 +84,14 @@
   color: #0f172a;
   display: flex;
   align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .companyHeroTagline {
-  margin: 6px 0 12px;
+  margin: 0;
   font-size: 1rem;
+  line-height: 1.5;
   color: #475569;
 }
 
@@ -89,61 +102,173 @@
   font-size: 0.88rem;
   color: #64748b;
   flex-wrap: wrap;
+  margin-top: 4px;
 }
 
 .companyHeroMetaItem {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
-/* Action Buttons Bar */
+.companyHeroMetaItem svg {
+  color: #94a3b8;
+}
+
+/* Action Buttons Row */
 .companyActionRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 14px;
   flex-wrap: wrap;
 }
 
 .companyFollowBtn {
-  padding: 8px 20px;
-  border-radius: 20px;
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 18px;
   background: #0a66c2;
   color: #ffffff;
   border: none;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 3px rgba(10, 102, 194, 0.2);
 }
 
 .companyFollowBtn:hover {
-  background: #084e96;
+  background: #004182;
+  box-shadow: 0 2px 6px rgba(10, 102, 194, 0.3);
 }
 
 .companyFollowBtn.following {
   background: #f1f5f9;
-  color: #0f172a;
+  color: #1e293b;
   border: 1px solid #cbd5e1;
+  box-shadow: none;
+}
+
+.companyFollowBtn.following:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.companyWebsiteBtn,
+.companyPostJobBtn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
+}
+
+.companyWebsiteBtn {
+  border: 1.5px solid #0a66c2;
+  color: #0a66c2;
+  background: transparent;
+}
+
+.companyWebsiteBtn:hover {
+  background: #f0f7ff;
+}
+
+.companyPostJobBtn {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background: #ffffff;
+}
+
+.companyPostJobBtn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 .companyEditBtn {
-  padding: 8px 16px;
+  height: 36px;
+  padding: 0 16px;
   color: #0a66c2;
   background: #eff6ff;
-  border: 1px solid #93c5fd;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 18px;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.companyEditBtn:hover { background: #dbeafe; }
+.companyEditBtn:hover {
+  background: #dbeafe;
+}
 
+/* Attached Navigation Tabs inside Hero Card */
+.companyTabsCard.attachedTabs {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0 0 12px 12px;
+  padding: 0 20px;
+  margin-bottom: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.companyTabsCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 4px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.companyProfileTab {
+  padding: 13px 16px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.companyProfileTab:hover {
+  color: #0f172a;
+}
+
+.companyProfileTab.active {
+  color: #0a66c2;
+  border-bottom-color: #0a66c2;
+  font-weight: 700;
+}
+
+/* Edit Form Panel */
 .companyEditPanel {
   padding: 22px 24px;
   margin-bottom: 20px;
@@ -173,73 +298,25 @@
 .companyEditSaveBtn:hover:not(:disabled) { background: #004182; }
 .companyEditSaveBtn:disabled { cursor: wait; opacity: 0.65; }
 
-.companyWebsiteBtn,
-.companyPostJobBtn {
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+/* 2-Column Desktop Grid Layout */
+.companyMainLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
 }
 
-.companyWebsiteBtn {
-  border: 1px solid #0a66c2;
-  color: #0a66c2;
-  background: transparent;
-}
-
-.companyWebsiteBtn:hover {
-  background: rgba(10, 102, 194, 0.08);
-}
-
-.companyPostJobBtn {
-  border: 1px solid #e2e8f0;
-  color: #334155;
-  background: #f8fafc;
-}
-
-.companyPostJobBtn:hover {
-  background: #e2e8f0;
-}
-
-/* Company Profile Navigation Tabs */
-.companyTabsCard {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  padding: 4px 16px;
-  margin-bottom: 20px;
+.companyContentCol {
+  min-width: 0;
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.companyProfileTab {
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.companyProfileTab:hover {
-  color: #0f172a;
-}
-
-.companyProfileTab.active {
-  color: #0a66c2;
-  border-bottom-color: #0a66c2;
+.companySidebarCol {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* Tab Content Sections */
@@ -248,35 +325,133 @@
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   padding: 24px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .companySectionHeading {
   margin: 0 0 16px 0;
-  font-size: 1.15rem;
+  font-size: 1.18rem;
   font-weight: 700;
   color: #0f172a;
 }
 
 .companyDescriptionText {
   font-size: 0.95rem;
-  line-height: 1.65;
+  line-height: 1.7;
   color: #334155;
   white-space: pre-line;
 }
 
+/* Sidebar Organization Details Card */
+.companySidebarCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.companySidebarTitle {
+  margin: 0 0 14px 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.companySidebarFactList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.companySidebarFact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.companySidebarFact .factLabel {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.companySidebarFact .factValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.sidebarWebsiteLink {
+  color: #0a66c2;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  word-break: break-all;
+}
+
+.sidebarWebsiteLink:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar Page Admin */
+.companySidebarAdmin {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebarAdminName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+  display: block;
+}
+
+.sidebarAdminName:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.sidebarAdminRole {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #0a66c2;
+  font-weight: 600;
+}
+
+.sidebarAdminHeadline {
+  font-size: 0.74rem;
+  color: #64748b;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Detail Grid for mobile fallbacks */
 .companyDetailGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
   margin-top: 24px;
   border-top: 1px solid #f1f5f9;
   padding-top: 20px;
 }
 
+.mobileOnlyDetailGrid {
+  display: none;
+}
+
 .companyDetailItem h5 {
   margin: 0 0 4px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -293,29 +468,30 @@
 .companyJobsList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .companyJobItemCard {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 18px 20px;
+  padding: 16px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s;
   flex-wrap: wrap;
   gap: 14px;
+  background: #ffffff;
 }
 
 .companyJobItemCard:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .companyJobItemTitle {
   margin: 0 0 4px;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #0f172a;
 }
@@ -323,7 +499,7 @@
 .companyJobItemMeta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-size: 0.84rem;
   color: #64748b;
   flex-wrap: wrap;
@@ -337,17 +513,17 @@
   font-size: 0.86rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: background 0.18s;
 }
 
 .companyJobApplyBtn:hover {
-  background: #084e96;
+  background: #004182;
 }
 
 /* Members Grid */
 .companyMembersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
@@ -358,6 +534,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  background: #ffffff;
 }
 
 .companyMemberAvatar {
@@ -368,9 +545,65 @@
   border: 1px solid #e2e8f0;
 }
 
-@media (max-width: 640px) {
-  .companyEditPanel { padding: 18px 16px; }
-  .companyEditGrid { grid-template-columns: 1fr; }
-  .companyEditFullWidth { grid-column: auto; }
+/* Responsive adjustments */
+@media (max-width: 880px) {
+  .companyMainLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .mobileOnlyDetailGrid {
+    display: grid;
+  }
+
+  .companySidebarCol {
+    display: none;
+  }
 }
 
+@media (max-width: 640px) {
+  .companyBanner {
+    height: 140px;
+  }
+
+  .companyHeaderContent {
+    padding: 0 16px 16px;
+  }
+
+  .companyLogoWrapper {
+    margin-top: -40px;
+  }
+
+  .companyHeroLogo,
+  .companyHeroLogoFallback {
+    width: 80px;
+    height: 80px;
+  }
+
+  .companyMainTitle {
+    font-size: 1.35rem;
+  }
+
+  .companyActionRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .companyFollowBtn,
+  .companyWebsiteBtn,
+  .companyPostJobBtn,
+  .companyEditBtn {
+    width: 100%;
+  }
+
+  .companyEditPanel {
+    padding: 18px 16px;
+  }
+
+  .companyEditGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .companyEditFullWidth {
+    grid-column: auto;
+  }
+}

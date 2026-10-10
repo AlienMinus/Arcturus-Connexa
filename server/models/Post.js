@@ -61,6 +61,11 @@ const PostSchema = new mongoose.Schema(
       default: 'Anyone',
     },
     media: [MediaSchema],
+    videoType: {
+      type: String,
+      enum: ['post', 'minute', null],
+      default: null,
+    },
     poll: PollSchema,
     event: EventSchema,
     celebration: CelebrationSchema,

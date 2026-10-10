@@ -52,6 +52,9 @@ const Feed = () => {
             avatar: post.userId?.profilePicture?.url || null,
             content: post.content || '',
             image: post.media?.[0]?.url,
+            media: post.media,
+            videoType: post.videoType || null,
+            document: post.document || null,
             likesCount: post.likes?.length || 0,
             hasLiked: !!myReaction,
             userReactionType: myReaction?.reactionType || 'Like',
@@ -68,6 +71,9 @@ const Feed = () => {
               authorHeadline: post.repostedFrom.userId?.headline || 'Member',
               content: post.repostedFrom.content || '',
               image: post.repostedFrom.media?.[0]?.url,
+              media: post.repostedFrom.media,
+              videoType: post.repostedFrom.videoType || null,
+              document: post.repostedFrom.document || null,
               authorAvatar: post.repostedFrom.userId?.profilePicture?.url || null
             } : null
           };

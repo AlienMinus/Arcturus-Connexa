@@ -350,6 +350,15 @@ const PostCard = ({ post, fullView = false }) => {
   const displayInstitute = authorSource?.authorInstitute ?? authorSource?.userId?.institute ?? null;
   const displayContent = (isRepost ? post.repostedFrom?.content : post.content) || "";
   const displayImage = isRepost ? post.repostedFrom?.image : post.image;
+  const displayVideoType = isRepost ? (post.repostedFrom?.videoType || null) : (post.videoType || null);
+  const isVideo = Boolean(
+    displayImage && (
+      displayVideoType ||
+      post.media?.[0]?.resource_type === 'video' ||
+      (isRepost && post.repostedFrom?.media?.[0]?.resource_type === 'video') ||
+      /\.(mp4|webm|mov|ogg)$/i.test(displayImage)
+    )
+  );
 
   const { text: renderedContentText, isTruncated: isContentTruncated } = isExpanded
     ? { text: displayContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n'), isTruncated: false }
@@ -533,8 +542,30 @@ const PostCard = ({ post, fullView = false }) => {
         </div>
       )}
       {displayImage && (
-        displayImage.match(/\.(mp4|webm|mov)$/i) || post.media?.[0]?.resource_type === 'video' ? (
-          <video className="postImage postVideo" src={displayImage} controls />
+        isVideo ? (
+          displayVideoType === 'minute' ? (
+            <div className="postMinuteVideoContainer">
+              <div className="postMinuteBadge">
+                <span>⚡ Minute</span>
+              </div>
+              <video
+                className="postMinuteVideo"
+                src={displayImage}
+                controls
+                playsInline
+                loop
+              />
+            </div>
+          ) : (
+            <div className="postVideoContainer">
+              {displayVideoType === 'post' && (
+                <div className="postVideoBadge">
+                  <span>🎬 Video Post</span>
+                </div>
+              )}
+              <video className="postImage postVideo" src={displayImage} controls playsInline />
+            </div>
+          )
         ) : (
           <img 
             className="postImage" 

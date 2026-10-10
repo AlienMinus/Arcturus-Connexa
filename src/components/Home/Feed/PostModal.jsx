@@ -56,6 +56,7 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const docInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   // Audience State
   const [isAudienceMenuOpen, setIsAudienceMenuOpen] = useState(false);
@@ -67,6 +68,7 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
   const [mediaFile, setMediaFile] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
   const [mediaType, setMediaType] = useState(null); // 'image' | 'video' | 'document'
+  const [videoFormat, setVideoFormat] = useState("post"); // 'post' (Long-form) | 'minute' (Short-form Reel)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -122,7 +124,11 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
 
   // Trigger quick access tool if specified from CreatePost bar
   useEffect(() => {
-    if (initialTool === 'media' || initialTool === 'video') {
+    if (initialTool === 'video') {
+      setTimeout(() => {
+        videoInputRef.current?.click();
+      }, 100);
+    } else if (initialTool === 'media') {
       setTimeout(() => {
         fileInputRef.current?.click();
       }, 100);
@@ -173,16 +179,25 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 25 * 1024 * 1024) {
-      setError("File size exceeds 25MB limit.");
+    if (file.size > 50 * 1024 * 1024) {
+      setError("File size exceeds 50MB limit.");
       return;
     }
 
+    const detectedType = file.type?.startsWith("video/")
+      ? "video"
+      : file.type?.startsWith("image/")
+      ? "image"
+      : type;
+
     setMediaFile(file);
-    setMediaType(type);
+    setMediaType(detectedType);
+    if (detectedType === "video" && !videoFormat) {
+      setVideoFormat("post");
+    }
     setError("");
 
-    if (type === "document") {
+    if (detectedType === "document") {
       setMediaPreview(file.name);
     } else {
       setMediaPreview(URL.createObjectURL(file));
@@ -193,7 +208,9 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
     setMediaFile(null);
     setMediaPreview(null);
     setMediaType(null);
+    setVideoFormat("post");
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (videoInputRef.current) videoInputRef.current.value = "";
     if (cameraInputRef.current) cameraInputRef.current.value = "";
     if (docInputRef.current) docInputRef.current.value = "";
   };
@@ -344,6 +361,9 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
 
       if (mediaFile) {
         formData.append("media", mediaFile);
+        if (mediaType === "video") {
+          formData.append("videoType", videoFormat);
+        }
       }
 
       const response = await fetch(buildApiUrl('/posts'), {
@@ -449,7 +469,17 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
         {mediaFile && (
           <div className="mediaPreviewCard">
             {mediaType === "video" ? (
-              <video src={mediaPreview} controls className="mediaPreviewMedia" />
+              <div className={`videoPreviewWrapper ${videoFormat === 'minute' ? 'minutePreviewWrapper' : ''}`}>
+                <div className="previewVideoBadge">
+                  {videoFormat === 'minute' ? '⚡ Minute (Short-form Reel)' : '🎬 Post (Long-form Video)'}
+                </div>
+                <video
+                  src={mediaPreview}
+                  controls
+                  playsInline
+                  className={videoFormat === 'minute' ? 'mediaPreviewMinute' : 'mediaPreviewMedia'}
+                />
+              </div>
             ) : mediaType === "document" ? (
               <div className="docPreviewBadge">
                 <FaFileAlt size={28} color="#0a66c2" />
@@ -469,6 +499,39 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
             >
               <FaTimes />
             </button>
+          </div>
+        )}
+
+        {/* VIDEO FORMAT SELECTOR: POST (LONG FORM) OR MINUTE (REELS) */}
+        {mediaFile && mediaType === "video" && (
+          <div className="videoFormatSelector">
+            <div className="videoFormatHeader">
+              <span>Choose Video Format</span>
+            </div>
+            <div className="videoFormatOptions">
+              <button
+                type="button"
+                className={`videoFormatBtn ${videoFormat === 'post' ? 'active' : ''}`}
+                onClick={() => setVideoFormat('post')}
+              >
+                <span className="formatIcon">🎬</span>
+                <div className="formatMeta">
+                  <strong>Post (Long-form Video)</strong>
+                  <small>Standard landscape or wide feed format for deep dives & tutorials</small>
+                </div>
+              </button>
+              <button
+                type="button"
+                className={`videoFormatBtn ${videoFormat === 'minute' ? 'active' : ''}`}
+                onClick={() => setVideoFormat('minute')}
+              >
+                <span className="formatIcon">⚡</span>
+                <div className="formatMeta">
+                  <strong>Minute (Short-form Reel)</strong>
+                  <small>Vertical 9:16 reels format for quick tips, hacks & highlights</small>
+                </div>
+              </button>
+            </div>
           </div>
         )}
 
@@ -823,7 +886,7 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
             <FaMagic /> <span>Rewrite with AI</span>
           </button>
 
-          {/* Media File Upload (Images & Videos) */}
+          {/* Media File Upload (Images) */}
           <label className="mediaInputLabel" title="Add photo / image">
             <FaImage />
             <input
@@ -831,6 +894,17 @@ const PostModal = ({ closeModal, onPostCreated, profile, initialTool = null }) =
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e, "image")}
+            />
+          </label>
+
+          {/* Video Upload (Post or Minute) */}
+          <label className="mediaInputLabel" title="Add video (Post or Minute)">
+            <FaVideo />
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept="video/*"
+              onChange={(e) => handleFileChange(e, "video")}
             />
           </label>
 

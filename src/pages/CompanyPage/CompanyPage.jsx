@@ -149,7 +149,9 @@ const CompanyPage = () => {
     <div className="companyPageWrapper">
       {/* Top Hero Banner & Info */}
       <div className="companyHeroCard">
-        <div className="companyBanner" />
+        <div className="companyBanner">
+          <div className="companyBannerMesh" />
+        </div>
 
         <div className="companyHeaderContent">
           <div className="companyLogoWrapper">
@@ -162,28 +164,44 @@ const CompanyPage = () => {
             )}
           </div>
 
-          <div className="companyTitleRow">
-            <div>
-              <h1 className="companyMainTitle">
-                {org.name}
-                {isVerified && (
-                  <span className="searchVerifiedBadge" title="Verified Organization Account">
-                    <FaCheckCircle size={13} /> Verified
-                  </span>
-                )}
-                {isPending && (
-                  <span
-                    className="searchVerifiedBadge"
-                    style={{ background: '#fef3c7', color: '#b45309' }}
-                    title="Under Review"
-                  >
-                    <FaClock size={13} /> Under Review
-                  </span>
-                )}
-              </h1>
-              <p className="companyHeroTagline">
-                {org.tagline || `${org.industry} company based in ${org.location}`}
-              </p>
+          <div className="companyHeaderDetails">
+            <h1 className="companyMainTitle">
+              {org.name}
+              {isVerified && (
+                <span className="searchVerifiedBadge" title="Verified Organization Account">
+                  <FaCheckCircle size={13} /> Verified
+                </span>
+              )}
+              {isPending && (
+                <span
+                  className="searchVerifiedBadge"
+                  style={{ background: '#fef3c7', color: '#b45309' }}
+                  title="Under Review"
+                >
+                  <FaClock size={13} /> Under Review
+                </span>
+              )}
+            </h1>
+
+            <p className="companyHeroTagline">
+              {org.tagline || `${org.industry || 'Leading'} company based in ${org.location}`}
+            </p>
+
+            <div className="companyHeroMetaList">
+              <div className="companyHeroMetaItem">
+                <FaBuilding size={13} />
+                <span>{org.industry || 'Software & Technology'}</span>
+              </div>
+
+              <div className="companyHeroMetaItem">
+                <FaMapMarkerAlt size={13} />
+                <span>{org.location}</span>
+              </div>
+
+              <div className="companyHeroMetaItem">
+                <FaUsers size={13} />
+                <span>{org.organizationSize || '11-50'} employees · {followersCount} {followersCount === 1 ? 'follower' : 'followers'}</span>
+              </div>
             </div>
 
             <div className="companyActionRow">
@@ -214,12 +232,6 @@ const CompanyPage = () => {
                 </a>
               )}
 
-              {isUserAdminOrMember && (
-                <button type="button" className="companyEditBtn" onClick={() => setIsEditing((current) => !current)}>
-                  {isEditing ? 'Close Editor' : 'Edit Company Page'}
-                </button>
-              )}
-
               {isUserAdminOrMember ? (
                 <Link to="/jobs/manage" className="companyPostJobBtn">
                   <FaPlus size={12} /> Post a Job
@@ -229,25 +241,41 @@ const CompanyPage = () => {
                   <FaBriefcase size={12} /> View All Jobs
                 </Link>
               )}
+
+              {isUserAdminOrMember && (
+                <button type="button" className="companyEditBtn" onClick={() => setIsEditing((current) => !current)}>
+                  {isEditing ? 'Close Editor' : 'Edit Company Page'}
+                </button>
+              )}
             </div>
           </div>
+        </div>
 
-          <div className="companyHeroMetaList">
-            <div className="companyHeroMetaItem">
-              <FaBuilding size={13} />
-              <span>{org.industry || 'Software & Technology'}</span>
-            </div>
+        {/* Attached Cohesive Tabs Bar */}
+        <div className="companyTabsCard attachedTabs">
+          <button
+            type="button"
+            className={`companyProfileTab ${activeTab === 'about' ? 'active' : ''}`}
+            onClick={() => setActiveTab('about')}
+          >
+            About
+          </button>
 
-            <div className="companyHeroMetaItem">
-              <FaMapMarkerAlt size={13} />
-              <span>{org.location}</span>
-            </div>
+          <button
+            type="button"
+            className={`companyProfileTab ${activeTab === 'jobs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('jobs')}
+          >
+            Jobs ({jobs.length})
+          </button>
 
-            <div className="companyHeroMetaItem">
-              <FaUsers size={13} />
-              <span>{org.organizationSize || '11-50'} employees · {followersCount} followers</span>
-            </div>
-          </div>
+          <button
+            type="button"
+            className={`companyProfileTab ${activeTab === 'people' ? 'active' : ''}`}
+            onClick={() => setActiveTab('people')}
+          >
+            People ({org.members?.length || 1})
+          </button>
         </div>
       </div>
 
@@ -283,146 +311,199 @@ const CompanyPage = () => {
         </form>
       )}
 
-      {/* Navigation Tabs */}
-      <div className="companyTabsCard">
-        <button
-          type="button"
-          className={`companyProfileTab ${activeTab === 'about' ? 'active' : ''}`}
-          onClick={() => setActiveTab('about')}
-        >
-          About
-        </button>
+      {/* Main 2-Column Content Layout */}
+      <div className="companyMainLayout">
+        <div className="companyContentCol">
+          {/* Tab 1: About */}
+          {activeTab === 'about' && (
+            <div className="companyTabSection">
+              <h3 className="companySectionHeading">Overview</h3>
+              <p className="companyDescriptionText">
+                {org.description ||
+                  `${org.name} is an active organization registered on Arcturus Connexa specializing in ${org.industry || 'technology'}. We are committed to engineering next-generation collaborative workflows and connecting top talent.`}
+              </p>
 
-        <button
-          type="button"
-          className={`companyProfileTab ${activeTab === 'jobs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('jobs')}
-        >
-          Jobs ({jobs.length})
-        </button>
+              <div className="companyDetailGrid mobileOnlyDetailGrid">
+                <div className="companyDetailItem">
+                  <h5>Website</h5>
+                  <p>
+                    {org.website ? (
+                      <a
+                        href={org.website.startsWith('http') ? org.website : `https://${org.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#0a66c2', textDecoration: 'none' }}
+                      >
+                        {org.website}
+                      </a>
+                    ) : (
+                      'Not specified'
+                    )}
+                  </p>
+                </div>
 
-        <button
-          type="button"
-          className={`companyProfileTab ${activeTab === 'people' ? 'active' : ''}`}
-          onClick={() => setActiveTab('people')}
-        >
-          People ({org.members?.length || 1})
-        </button>
-      </div>
+                <div className="companyDetailItem">
+                  <h5>Industry</h5>
+                  <p>{org.industry || 'Software Development'}</p>
+                </div>
 
-      {/* Tab 1: About */}
-      {activeTab === 'about' && (
-        <div className="companyTabSection">
-          <h3 className="companySectionHeading">Overview</h3>
-          <p className="companyDescriptionText">
-            {org.description ||
-              `${org.name} is an active organization registered on Arcturus Connexa specializing in ${org.industry}. We are committed to engineering next-generation collaborative workflows and connecting top talent.`}
-          </p>
+                <div className="companyDetailItem">
+                  <h5>Company Size</h5>
+                  <p>{org.organizationSize || '11-50'} employees</p>
+                </div>
 
-          <div className="companyDetailGrid">
-            <div className="companyDetailItem">
-              <h5>Website</h5>
-              <p>
-                {org.website ? (
-                  <a
-                    href={org.website.startsWith('http') ? org.website : `https://${org.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#0a66c2', textDecoration: 'none' }}
-                  >
-                    {org.website}
-                  </a>
-                ) : (
-                  'Not specified'
+                <div className="companyDetailItem">
+                  <h5>Headquarters</h5>
+                  <p>{org.location}</p>
+                </div>
+
+                <div className="companyDetailItem">
+                  <h5>Type</h5>
+                  <p>{org.organizationType || 'Privately Held'}</p>
+                </div>
+
+                <div className="companyDetailItem">
+                  <h5>Account Status</h5>
+                  <p style={{ textTransform: 'capitalize' }}>
+                    {org.status === 'approved' ? 'Verified Account' : org.status}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Jobs */}
+          {activeTab === 'jobs' && (
+            <div className="companyTabSection">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h3 className="companySectionHeading" style={{ margin: 0 }}>
+                  Open Positions at {org.name} ({jobs.length})
+                </h3>
+                {isUserAdminOrMember && (
+                  <Link to="/jobs/post" className="companyFollowBtn" style={{ textDecoration: 'none', fontSize: '0.84rem' }}>
+                    <FaPlus size={11} /> Post New Opening
+                  </Link>
                 )}
-              </p>
-            </div>
+              </div>
 
-            <div className="companyDetailItem">
-              <h5>Industry</h5>
-              <p>{org.industry || 'Software Development'}</p>
-            </div>
+              {jobs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                  <FaBriefcase size={36} color="#cbd5e1" style={{ marginBottom: 12 }} />
+                  <p style={{ margin: 0 }}>There are currently no active job postings for {org.name}.</p>
+                </div>
+              ) : (
+                <div className="companyJobsList">
+                  {jobs.map((job) => (
+                    <div key={job._id} className="companyJobItemCard">
+                      <div>
+                        <h4 className="companyJobItemTitle">{job.title}</h4>
+                        <div className="companyJobItemMeta">
+                          <span>
+                            <FaMapMarkerAlt size={11} style={{ marginRight: 4 }} />
+                            {job.location}
+                          </span>
+                          <span>· {job.type}</span>
+                          {job.salaryRange && <span>· {job.salaryRange}</span>}
+                        </div>
+                      </div>
 
-            <div className="companyDetailItem">
-              <h5>Company Size</h5>
-              <p>{org.organizationSize || '11-50'} employees</p>
+                      <Link
+                        to={`/jobs?q=${encodeURIComponent(job.title)}`}
+                        className="companyJobApplyBtn"
+                      >
+                        View & Apply
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+          )}
 
-            <div className="companyDetailItem">
-              <h5>Headquarters</h5>
-              <p>{org.location}</p>
-            </div>
-
-            <div className="companyDetailItem">
-              <h5>Type</h5>
-              <p>{org.organizationType || 'Privately Held'}</p>
-            </div>
-
-            <div className="companyDetailItem">
-              <h5>Account Status</h5>
-              <p style={{ textTransform: 'capitalize' }}>
-                {org.status === 'approved' ? 'Verified Account' : org.status}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2: Jobs */}
-      {activeTab === 'jobs' && (
-        <div className="companyTabSection">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h3 className="companySectionHeading" style={{ margin: 0 }}>
-              Open Positions at {org.name} ({jobs.length})
-            </h3>
-            {isUserAdminOrMember && (
-              <Link to="/jobs/post" className="companyFollowBtn" style={{ textDecoration: 'none', fontSize: '0.84rem' }}>
-                <FaPlus size={11} /> Post New Opening
-              </Link>
-            )}
-          </div>
-
-          {jobs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
-              <FaBriefcase size={36} color="#cbd5e1" style={{ marginBottom: 12 }} />
-              <p style={{ margin: 0 }}>There are currently no active job postings for {org.name}.</p>
-            </div>
-          ) : (
-            <div className="companyJobsList">
-              {jobs.map((job) => (
-                <div key={job._id} className="companyJobItemCard">
-                  <div>
-                    <h4 className="companyJobItemTitle">{job.title}</h4>
-                    <div className="companyJobItemMeta">
-                      <span>
-                        <FaMapMarkerAlt size={11} style={{ marginRight: 4 }} />
-                        {job.location}
-                      </span>
-                      <span>· {job.type}</span>
-                      {job.salaryRange && <span>· {job.salaryRange}</span>}
+          {/* Tab 3: People */}
+          {activeTab === 'people' && (
+            <div className="companyTabSection">
+              <h3 className="companySectionHeading">Leadership & Team Members</h3>
+              <div className="companyMembersGrid">
+                {org.adminId && (
+                  <div className="companyMemberCard">
+                    <img
+                      src={org.adminId.profilePicture?.url || '/favicon.png'}
+                      alt={org.adminId.firstName}
+                      className="companyMemberAvatar"
+                    />
+                    <div>
+                      <Link
+                        to={`/profile/${encodeURIComponent(org.adminId.username || '')}`}
+                        style={{ fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}
+                      >
+                        {getUserFullName(org.adminId)}
+                      </Link>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#0a66c2', fontWeight: 600 }}>
+                        Founder & Administrator
+                      </p>
+                      <small style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                        {org.adminId.headline || 'Arcturus Member'}
+                      </small>
                     </div>
                   </div>
-
-                  <Link
-                    to={`/jobs?q=${encodeURIComponent(job.title)}`}
-                    className="companyJobApplyBtn"
-                  >
-                    View & Apply
-                  </Link>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           )}
         </div>
-      )}
 
-      {/* Tab 3: People */}
-      {activeTab === 'people' && (
-        <div className="companyTabSection">
-          <h3 className="companySectionHeading">Leadership & Team Members</h3>
-          <div className="companyMembersGrid">
-            {org.adminId && (
-              <div className="companyMemberCard">
+        {/* Sidebar: Quick Facts & Organization Snapshot */}
+        <aside className="companySidebarCol">
+          <div className="companySidebarCard">
+            <h4 className="companySidebarTitle">Organization Details</h4>
+            <div className="companySidebarFactList">
+              <div className="companySidebarFact">
+                <span className="factLabel">Website</span>
+                <span className="factValue">
+                  {org.website ? (
+                    <a
+                      href={org.website.startsWith('http') ? org.website : `https://${org.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sidebarWebsiteLink"
+                    >
+                      {org.website.replace(/^https?:\/\//i, '')} <FaExternalLinkAlt size={10} />
+                    </a>
+                  ) : (
+                    'Not specified'
+                  )}
+                </span>
+              </div>
+              <div className="companySidebarFact">
+                <span className="factLabel">Industry</span>
+                <span className="factValue">{org.industry || 'Software & Technology'}</span>
+              </div>
+              <div className="companySidebarFact">
+                <span className="factLabel">Company Size</span>
+                <span className="factValue">{org.organizationSize || '11-50'} employees</span>
+              </div>
+              <div className="companySidebarFact">
+                <span className="factLabel">Headquarters</span>
+                <span className="factValue">{org.location}</span>
+              </div>
+              <div className="companySidebarFact">
+                <span className="factLabel">Type</span>
+                <span className="factValue">{org.organizationType || 'Privately Held'}</span>
+              </div>
+              <div className="companySidebarFact">
+                <span className="factLabel">Status</span>
+                <span className="factValue" style={{ textTransform: 'capitalize' }}>
+                  {org.status === 'approved' ? 'Verified Account' : org.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {org.adminId && (
+            <div className="companySidebarCard">
+              <h4 className="companySidebarTitle">Page Admin</h4>
+              <div className="companySidebarAdmin">
                 <img
                   src={org.adminId.profilePicture?.url || '/favicon.png'}
                   alt={org.adminId.firstName}
@@ -431,22 +512,20 @@ const CompanyPage = () => {
                 <div>
                   <Link
                     to={`/profile/${encodeURIComponent(org.adminId.username || '')}`}
-                    style={{ fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}
+                    className="sidebarAdminName"
                   >
                     {getUserFullName(org.adminId)}
                   </Link>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#0a66c2', fontWeight: 600 }}>
-                    Founder & Administrator
-                  </p>
-                  <small style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                  <p className="sidebarAdminRole">Founder & Administrator</p>
+                  <small className="sidebarAdminHeadline">
                     {org.adminId.headline || 'Arcturus Member'}
                   </small>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
+        </aside>
+      </div>
     </div>
   );
 };

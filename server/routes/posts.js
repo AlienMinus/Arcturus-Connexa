@@ -79,6 +79,7 @@ router.post(
       const {
         content,
         audience = 'Anyone',
+        videoType,
         poll,
         event,
         celebration,
@@ -173,6 +174,7 @@ router.post(
         content,
         audience,
         media,
+        videoType: videoType === 'minute' ? 'minute' : (videoType === 'post' || media[0]?.resource_type === 'video' ? 'post' : null),
         document: documentData,
         poll: parsedPoll,
         event: parsedEvent,

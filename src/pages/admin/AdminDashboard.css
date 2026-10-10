@@ -702,48 +702,66 @@
 
 /* Tables Layout (Jobs & Users) */
 .adminTableContainer {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow-x: auto;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .adminDataTable {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  font-size: 0.86rem;
 }
 
 .adminDataTable th {
   background: #f8fafc;
-  padding: 12px 14px;
-  font-size: 0.8rem;
+  padding: 13px 16px;
+  font-size: 0.74rem;
   font-weight: 700;
-  color: #64748b;
-  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+  border-bottom: 1.5px solid #e2e8f0;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .adminDataTable td {
-  padding: 14px;
+  padding: 14px 16px;
   border-bottom: 1px solid #f1f5f9;
   font-size: 0.88rem;
   color: #1e293b;
   vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+.adminDataTable tr:hover td {
+  background: #f8fafc;
+}
+
+.adminDataTable tr:last-child td {
+  border-bottom: none;
 }
 
 .tableCompanyCol,
 .tableUserCol {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .tableLogo,
 .tableAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   object-fit: contain;
   background: #ffffff;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
 }
 
 .tableAvatar {
@@ -752,8 +770,8 @@
 }
 
 .tableAvatarFallback {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #e0f2fe;
   color: #0369a1;
@@ -761,83 +779,120 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
 .tableSubtext,
 .tableUserHeadline {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: #64748b;
   margin: 2px 0 0;
 }
 
 .jobSalaryTag {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: #16a34a;
   font-weight: 600;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .applicantsCountBadge {
   display: inline-flex;
-  padding: 2px 8px;
-  border-radius: 12px;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
   background: #f1f5f9;
   color: #334155;
   font-size: 0.78rem;
   font-weight: 600;
+  border: 1px solid #e2e8f0;
 }
 
 .tableDeleteBtn,
 .tableActionBtn {
-  background: #fee2e2;
-  color: #ef4444;
+  width: 32px;
+  height: 32px;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
 }
 
-.tableActionBtn {
-  background: #e0f2fe;
-  color: #0284c7;
+.tableDeleteBtn {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
 }
 
 .tableDeleteBtn:hover {
-  background: #fca5a5;
+  background: #fee2e2;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.tableActionBtn {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #e0f2fe;
 }
 
 .tableActionBtn:hover {
-  background: #bae6fd;
+  background: #e0f2fe;
+  color: #0369a1;
+  transform: translateY(-1px);
 }
 
 .roleTag,
 .verifiedBadgeTag {
-  padding: 3px 8px;
-  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
+  letter-spacing: 0.2px;
 }
 
 .roleTag.admin {
   background: #ede9fe;
   color: #6d28d9;
+  border: 1px solid #ddd6fe;
 }
 
 .roleTag.user {
   background: #f1f5f9;
   color: #475569;
+  border: 1px solid #e2e8f0;
 }
 
 .verifiedBadgeTag.verified {
-  background: #dcfce7;
-  color: #15803d;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
 }
 
 .verifiedBadgeTag.unverified {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.orgCountPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid #dbeafe;
 }
 
 .orgCountPill {
