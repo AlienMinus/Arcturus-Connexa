@@ -113,49 +113,91 @@ async function computeMetricsForScope({ profileFilter = {}, driveFilter = {}, of
 }
 
 // Helper to query and format at-risk students for a specific scope
-async function getAtRiskStudentsForScope(profileFilter = {}) {
-  const atRiskProfiles = await PlacementProfile.find({
-    ...profileFilter,
-    $or: [
-      { isAtRisk: true },
-      { activeBacklogs: { $gt: 0 } },
-      { cgpa: { $lt: 6.5 } },
-      { overallReadiness: { $lt: 50 } },
+async function getAtRiskStudentsForScope(profileFilter = {}, targetOrg = null) {
+  const targetOrgId = targetOrg?._id?.toString();
+  const targetOrgName = targetOrg?.name;
+
+  const atRiskQuery = {
+    $and: [
+      profileFilter,
+      {
+        $or: [
+          { isAtRisk: true },
+          { activeBacklogs: { $gt: 0 } },
+          { cgpa: { $lt: 6.5 } },
+          { overallReadiness: { $lt: 50 } },
+        ],
+      },
     ],
-  })
-    .populate('userId', 'firstName lastName email username profilePicture')
+  };
+
+  const atRiskProfiles = await PlacementProfile.find(atRiskQuery)
+    .populate('userId', 'firstName lastName email username profilePicture role placementOfficer institute')
     .limit(30)
     .lean();
 
-  return atRiskProfiles.map((p) => {
-    const studentName = p.userId ? `${p.userId.firstName} ${p.userId.lastName}`.trim() : `Student ${p.rollNumber}`;
-    let riskReason = p.riskReason || 'Readiness score below benchmark';
-    if (!p.riskReason) {
-      if (p.activeBacklogs > 0 && p.cgpa < 6.5) {
-        riskReason = `Active backlogs (${p.activeBacklogs}) & CGPA below 6.5`;
-      } else if (p.activeBacklogs > 0) {
-        riskReason = `${p.activeBacklogs} active backlog(s) flagged`;
-      } else if (p.cgpa < 6.5) {
-        riskReason = `CGPA (${p.cgpa}) below institutional benchmark (6.5)`;
+  return atRiskProfiles
+    .filter((p) => {
+      const u = p.userId;
+      if (!u) return false;
+      // Exclude platform admins
+      if (u.role === 'admin') return false;
+      // Exclude placement officers
+      if (u.placementOfficer?.status === 'approved') return false;
+
+      // Exclude students with no organization
+      const userOrgId = u.institute?.organizationId?.toString();
+      const profileOrgId = p.organizationId?.toString();
+      const userInstName = u.institute?.name?.trim();
+      const profileColName = p.collegeName?.trim();
+
+      if (!userOrgId && !profileOrgId && !userInstName && !profileColName) {
+        return false;
       }
-    }
-    return {
-      id: p._id.toString(),
-      name: studentName,
-      rollNumber: p.rollNumber,
-      collegeName: p.collegeName,
-      branch: p.branch,
-      cgpa: p.cgpa,
-      activeBacklogs: p.activeBacklogs,
-      readiness: p.overallReadiness,
-      readinessLevel: p.readinessLevel,
-      riskReason,
-      mentor: p.assignedMentor || 'Department Faculty Advisor',
-      mentorRecommendation:
-        p.mentorActionRecommendation || 'Schedule 1-on-1 counseling session to review academic progress.',
-      aiReadinessSummary: p.aiReadinessSummary || '',
-    };
-  });
+
+      // If scoped to a specific institute, verify they strictly belong to it
+      if (targetOrgId) {
+        const matchesOrgId = userOrgId === targetOrgId || profileOrgId === targetOrgId;
+        const matchesOrgName =
+          (userInstName && targetOrgName && new RegExp(`^${escapeRegex(targetOrgName)}$`, 'i').test(userInstName)) ||
+          (profileColName && targetOrgName && new RegExp(`^${escapeRegex(targetOrgName)}$`, 'i').test(profileColName));
+
+        if (!matchesOrgId && !matchesOrgName) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .map((p) => {
+      const studentName = p.userId ? `${p.userId.firstName} ${p.userId.lastName}`.trim() : `Student ${p.rollNumber}`;
+      let riskReason = p.riskReason || 'Readiness score below benchmark';
+      if (!p.riskReason) {
+        if (p.activeBacklogs > 0 && p.cgpa < 6.5) {
+          riskReason = `Active backlogs (${p.activeBacklogs}) & CGPA below 6.5`;
+        } else if (p.activeBacklogs > 0) {
+          riskReason = `${p.activeBacklogs} active backlog(s) flagged`;
+        } else if (p.cgpa < 6.5) {
+          riskReason = `CGPA (${p.cgpa}) below institutional benchmark (6.5)`;
+        }
+      }
+      return {
+        id: p._id.toString(),
+        name: studentName,
+        rollNumber: p.rollNumber,
+        collegeName: p.collegeName,
+        branch: p.branch,
+        cgpa: p.cgpa,
+        activeBacklogs: p.activeBacklogs,
+        readiness: p.overallReadiness,
+        readinessLevel: p.readinessLevel,
+        riskReason,
+        mentor: p.assignedMentor || 'Department Faculty Advisor',
+        mentorRecommendation:
+          p.mentorActionRecommendation || 'Schedule 1-on-1 counseling session to review academic progress.',
+        aiReadinessSummary: p.aiReadinessSummary || '',
+      };
+    });
 }
 
 // Build query filters rigorously isolated to an institution
@@ -163,22 +205,42 @@ async function buildFiltersForInstitute(targetOrg) {
   const orgId = targetOrg._id;
   const orgName = targetOrg.name;
 
-  // Find users enrolled with this institute
+  // 1. Find all pure student users enrolled with this institute (strictly excluding admins and placement officers)
   const studentUsers = await User.find({
-    $or: [
-      { 'institute.organizationId': orgId },
-      { 'institute.name': { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+    $and: [
+      {
+        $or: [
+          { 'institute.organizationId': orgId },
+          { 'institute.name': { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+        ],
+      },
+      { role: { $ne: 'admin' } },
+      { 'placementOfficer.status': { $ne: 'approved' } },
     ],
   })
     .select('_id')
     .lean();
   const studentUserIds = studentUsers.map((u) => u._id);
 
-  const profileFilter = {
+  // 2. Query any users who are admins or approved placement officers to strictly exclude
+  const excludedUsers = await User.find({
     $or: [
-      { organizationId: orgId },
-      { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
-      ...(studentUserIds.length > 0 ? [{ userId: { $in: studentUserIds } }] : []),
+      { role: 'admin' },
+      { 'placementOfficer.status': 'approved' },
+    ],
+  }).select('_id').lean();
+  const excludedUserIds = excludedUsers.map((u) => u._id);
+
+  const profileFilter = {
+    $and: [
+      {
+        $or: [
+          { organizationId: orgId },
+          { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+          ...(studentUserIds.length > 0 ? [{ userId: { $in: studentUserIds } }] : []),
+        ],
+      },
+      ...(excludedUserIds.length > 0 ? [{ userId: { $nin: excludedUserIds } }] : []),
     ],
   };
 
@@ -189,11 +251,16 @@ async function buildFiltersForInstitute(targetOrg) {
   const driveFilter = { organizationId: orgId };
 
   const offerFilter = {
-    $or: [
-      { organizationId: orgId },
-      { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
-      ...(scopedProfileUserIds.length > 0 ? [{ studentId: { $in: scopedProfileUserIds } }] : []),
-      ...(scopedRollNumbers.length > 0 ? [{ rollNumber: { $in: scopedRollNumbers } }] : []),
+    $and: [
+      {
+        $or: [
+          { organizationId: orgId },
+          { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+          ...(scopedProfileUserIds.length > 0 ? [{ studentId: { $in: scopedProfileUserIds } }] : []),
+          ...(scopedRollNumbers.length > 0 ? [{ rollNumber: { $in: scopedRollNumbers } }] : []),
+        ],
+      },
+      ...(excludedUserIds.length > 0 ? [{ studentId: { $nin: excludedUserIds } }] : []),
     ],
   };
 
@@ -217,12 +284,16 @@ async function buildInstitutesSummary() {
     const filters = await buildFiltersForInstitute(org);
     const metrics = await computeMetricsForScope(filters);
     const atRiskCount = await PlacementProfile.countDocuments({
-      ...filters.profileFilter,
-      $or: [
-        { isAtRisk: true },
-        { activeBacklogs: { $gt: 0 } },
-        { cgpa: { $lt: 6.5 } },
-        { overallReadiness: { $lt: 50 } },
+      $and: [
+        filters.profileFilter,
+        {
+          $or: [
+            { isAtRisk: true },
+            { activeBacklogs: { $gt: 0 } },
+            { cgpa: { $lt: 6.5 } },
+            { overallReadiness: { $lt: 50 } },
+          ],
+        },
       ],
     });
 
@@ -335,7 +406,7 @@ router.get('/', async (req, res) => {
       const targetOrg = authorizedOfficerOrg;
       const filters = await buildFiltersForInstitute(targetOrg);
       const metrics = await computeMetricsForScope(filters);
-      const atRiskStudents = await getAtRiskStudentsForScope(filters.profileFilter);
+      const atRiskStudents = await getAtRiskStudentsForScope(filters.profileFilter, targetOrg);
 
       return res.json({
         role: 'placement_officer',

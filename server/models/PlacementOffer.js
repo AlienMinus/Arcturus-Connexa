@@ -12,6 +12,10 @@ const PlacementOfferSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Organization',
     },
+    driveId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PlacementDrive',
+    },
     studentName: { type: String, required: true },
     rollNumber: { type: String, required: true },
     collegeName: { type: String },

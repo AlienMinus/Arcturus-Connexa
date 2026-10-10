@@ -20,6 +20,7 @@ export const OffersTab = ({
   isPlacementOfficer,
   offers = [],
   students = [],
+  drives = [],
   handleOfferResponse,
   onPushOffer,
   onUploadDocument,
@@ -29,6 +30,7 @@ export const OffersTab = ({
   const [showPushModal, setShowPushModal] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [pushForm, setPushForm] = useState({
+    driveId: '',
     companyName: '',
     companyLogo: '',
     role: 'Associate Software Engineer',
@@ -55,12 +57,28 @@ export const OffersTab = ({
     if (students.length > 0) {
       setSelectedStudentId(students[0].userId || students[0].profileId || '');
     }
+    const initialDrive = drives?.[0] || null;
+    setPushForm({
+      driveId: initialDrive?._id || '',
+      companyName: initialDrive?.companyName || '',
+      companyLogo: initialDrive?.companyLogo || '',
+      role: initialDrive?.roleTitle || 'Associate Software Engineer',
+      ctcLpa: initialDrive?.ctcLpa != null ? String(initialDrive.ctcLpa) : '8.5',
+      offerType: 'Full-Time',
+      acceptanceDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      joiningDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      bondDetails: 'None / No Service Agreement Bond',
+    });
     setShowPushModal(true);
   };
 
   const handlePushSubmit = async (e) => {
     e.preventDefault();
     if (!selectedStudentId || !onPushOffer) return;
+    if (!pushForm.driveId) {
+      alert('Please select an existing scheduled recruitment drive.');
+      return;
+    }
     const targetStudent = students.find(
       (s) => s.userId === selectedStudentId || s.profileId === selectedStudentId
     );
@@ -69,6 +87,7 @@ export const OffersTab = ({
     setIsPushing(true);
     try {
       const ok = await onPushOffer({
+        driveId: pushForm.driveId,
         studentId: targetStudent.userId,
         profileId: targetStudent.profileId,
         companyName: pushForm.companyName.trim(),
@@ -482,6 +501,63 @@ export const OffersTab = ({
                 </select>
               </div>
 
+              {/* Recruitment Drive Selector */}
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 5 }}>
+                  Recruitment Drive (from Scheduled Drives) *
+                </label>
+                {drives && drives.length > 0 ? (
+                  <select
+                    className="chatInput"
+                    value={pushForm.driveId}
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      const driveMatch = drives.find((d) => d._id === selectedId);
+                      if (driveMatch) {
+                        setPushForm({
+                          ...pushForm,
+                          driveId: driveMatch._id,
+                          companyName: driveMatch.companyName,
+                          companyLogo: driveMatch.companyLogo || '',
+                          role: driveMatch.roleTitle,
+                          ctcLpa: driveMatch.ctcLpa != null ? String(driveMatch.ctcLpa) : pushForm.ctcLpa,
+                        });
+                      } else {
+                        setPushForm({
+                          ...pushForm,
+                          driveId: '',
+                          companyName: '',
+                          companyLogo: '',
+                          role: '',
+                        });
+                      }
+                    }}
+                    required
+                  >
+                    <option value="">-- Choose from scheduled recruitment drives --</option>
+                    {drives.map((d) => (
+                      <option key={d._id} value={d._id}>
+                        {d.companyName} · {d.roleTitle} ({d.ctcLpa} LPA) [{d.status?.toUpperCase() || 'SCHEDULED'}]
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div
+                    style={{
+                      padding: '10px 12px',
+                      background: '#fffbeb',
+                      border: '1px solid #fde68a',
+                      borderRadius: 8,
+                      fontSize: '0.82rem',
+                      color: '#92400e',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    ⚠️ <strong>No scheduled drives found:</strong> Corporate offers must be extended from existing recruitment drives scheduled for your institution. Please schedule a drive under the <strong>Recruitment Drives</strong> tab first.
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 5 }}>
@@ -490,7 +566,7 @@ export const OffersTab = ({
                   <input
                     type="text"
                     className="chatInput"
-                    placeholder="e.g. Google / Microsoft"
+                    placeholder="Auto-filled from drive"
                     value={pushForm.companyName}
                     onChange={(e) => setPushForm({ ...pushForm, companyName: e.target.value })}
                     required
@@ -504,7 +580,7 @@ export const OffersTab = ({
                   <input
                     type="text"
                     className="chatInput"
-                    placeholder="e.g. Software Engineer"
+                    placeholder="Auto-filled from drive"
                     value={pushForm.role}
                     onChange={(e) => setPushForm({ ...pushForm, role: e.target.value })}
                     required
@@ -586,7 +662,7 @@ export const OffersTab = ({
                 <button type="button" className="campusTabBtn" onClick={() => setShowPushModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="campusTabBtn active" disabled={isPushing}>
+                <button type="submit" className="campusTabBtn active" disabled={isPushing || !pushForm.driveId}>
                   {isPushing ? 'Pushing Offer...' : 'Push Offer'}
                 </button>
               </div>

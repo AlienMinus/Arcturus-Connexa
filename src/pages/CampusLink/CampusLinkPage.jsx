@@ -913,6 +913,7 @@ const CampusLinkPage = () => {
               offers={offers}
               onVerifyOffer={handleVerifyOffer}
               setActiveTab={setActiveTab}
+              drives={drives}
             />
           )}
           {canManageDrives && activeTab === 'matching' && (
@@ -1010,6 +1011,7 @@ const CampusLinkPage = () => {
           offers={offers}
           onVerifyOffer={handleVerifyOffer}
           setActiveTab={setActiveTab}
+          drives={drives}
         />
       )}
 
@@ -1052,6 +1054,7 @@ const CampusLinkPage = () => {
           isPlacementOfficer={isPlacementOfficer}
           offers={offers}
           students={students}
+          drives={drives}
           handleOfferResponse={handleOfferResponse}
           onPushOffer={handlePushOffer}
           onUploadDocument={handleUploadOfferDocument}

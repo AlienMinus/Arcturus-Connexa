@@ -61,28 +61,48 @@ router.get('/', async (req, res) => {
     const orgId = targetOrg._id;
     const orgName = targetOrg.name;
 
-    // 1. Find all users registered with this organization
+    // 1. Find all pure student users registered with this organization (excluding admins & placement officers)
     const enrolledUsers = await User.find({
-      $or: [
-        { 'institute.organizationId': orgId },
-        { 'institute.name': { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+      $and: [
+        {
+          $or: [
+            { 'institute.organizationId': orgId },
+            { 'institute.name': { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+          ],
+        },
+        { role: { $ne: 'admin' } },
+        { 'placementOfficer.status': { $ne: 'approved' } },
       ],
     })
-      .select('firstName lastName username email profilePicture isVerified institute')
+      .select('firstName lastName username email profilePicture isVerified institute role placementOfficer')
       .lean();
 
     const enrolledUserIds = enrolledUsers.map((u) => u._id);
     const enrolledUserMap = new Map(enrolledUsers.map((u) => [u._id.toString(), u]));
 
+    // Query excluded users (admins and placement officers) to strictly prevent leaking into student roster
+    const excludedUsers = await User.find({
+      $or: [
+        { role: 'admin' },
+        { 'placementOfficer.status': 'approved' },
+      ],
+    }).select('_id').lean();
+    const excludedUserIds = excludedUsers.map((u) => u._id);
+
     // 2. Find all placement profiles linked to this organization
     const placementProfiles = await PlacementProfile.find({
-      $or: [
-        { organizationId: orgId },
-        { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
-        ...(enrolledUserIds.length > 0 ? [{ userId: { $in: enrolledUserIds } }] : []),
+      $and: [
+        {
+          $or: [
+            { organizationId: orgId },
+            { collegeName: { $regex: new RegExp(`^${escapeRegex(orgName)}$`, 'i') } },
+            ...(enrolledUserIds.length > 0 ? [{ userId: { $in: enrolledUserIds } }] : []),
+          ],
+        },
+        ...(excludedUserIds.length > 0 ? [{ userId: { $nin: excludedUserIds } }] : []),
       ],
     })
-      .populate('userId', 'firstName lastName username email profilePicture isVerified institute')
+      .populate('userId', 'firstName lastName username email profilePicture isVerified institute role placementOfficer')
       .lean();
 
     const profileUserIdSet = new Set();
@@ -91,6 +111,29 @@ router.get('/', async (req, res) => {
     // Format profiles
     for (const p of placementProfiles) {
       const u = p.userId;
+      if (!u) continue;
+      // Exclude platform admins
+      if (u.role === 'admin') continue;
+      // Exclude placement officers
+      if (u.placementOfficer?.status === 'approved') continue;
+
+      // Exclude students with no organization / belonging to a different org
+      const userOrgId = u.institute?.organizationId?.toString();
+      const profileOrgId = p.organizationId?.toString();
+      const userInstName = u.institute?.name?.trim();
+      const profileColName = p.collegeName?.trim();
+
+      if (!userOrgId && !profileOrgId && !userInstName && !profileColName) {
+        continue;
+      }
+
+      const matchesOrg =
+        userOrgId === orgId.toString() ||
+        profileOrgId === orgId.toString() ||
+        (userInstName && new RegExp(`^${escapeRegex(orgName)}$`, 'i').test(userInstName)) ||
+        (profileColName && new RegExp(`^${escapeRegex(orgName)}$`, 'i').test(profileColName));
+
+      if (!matchesOrg) continue;
       if (u?._id) {
         profileUserIdSet.add(u._id.toString());
       }

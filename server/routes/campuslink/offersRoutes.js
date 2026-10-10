@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import PlacementOffer from '../../models/PlacementOffer.js';
 import PlacementProfile from '../../models/PlacementProfile.js';
+import PlacementDrive from '../../models/PlacementDrive.js';
 import Organization from '../../models/Organization.js';
 import User from '../../models/User.js';
 import authMiddleware from '../../middleware/auth.js';
@@ -132,6 +133,7 @@ router.get('/', async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const {
+      driveId,
       studentId,
       profileId,
       companyName,
@@ -145,8 +147,18 @@ router.post('/', authMiddleware, async (req, res) => {
       organizationId,
     } = req.body;
 
-    if (!companyName?.trim() || !role?.trim() || !ctcLpa) {
-      return res.status(400).json({ error: 'Company name, job role, and CTC package are required.' });
+    let existingDrive = null;
+    if (driveId && mongoose.Types.ObjectId.isValid(driveId)) {
+      existingDrive = await PlacementDrive.findById(driveId);
+    }
+
+    const resolvedCompanyName = existingDrive?.companyName || companyName?.trim();
+    const resolvedCompanyLogo = existingDrive?.companyLogo || companyLogo?.trim() || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+    const resolvedRole = existingDrive?.roleTitle || role?.trim();
+    const resolvedCtcLpa = Number(ctcLpa) || existingDrive?.ctcLpa;
+
+    if (!resolvedCompanyName || !resolvedRole || !resolvedCtcLpa) {
+      return res.status(400).json({ error: 'Please select an existing scheduled recruitment drive with valid role and CTC.' });
     }
 
     const adminAccess = await isCampusLinkAdmin(req.userId);
@@ -192,16 +204,17 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Create the placement offer document
     const newOffer = new PlacementOffer({
+      driveId: existingDrive?._id || null,
       studentId: studentUser._id,
       organizationId: authorizedOrg?._id || studentUser.institute?.organizationId,
       studentName: fullName,
       rollNumber,
       collegeName,
       branch,
-      companyName: companyName.trim(),
-      companyLogo: companyLogo?.trim() || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-      role: role.trim(),
-      ctcLpa: Number(ctcLpa),
+      companyName: resolvedCompanyName,
+      companyLogo: resolvedCompanyLogo,
+      role: resolvedRole,
+      ctcLpa: Number(resolvedCtcLpa),
       offerType: offerType || 'Full-Time',
       acceptanceDeadline: acceptanceDeadline ? new Date(acceptanceDeadline) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       joiningDate: joiningDate ? new Date(joiningDate) : new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
@@ -211,6 +224,20 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 
     await newOffer.save();
+
+    // If linked to an existing drive, update student's status within drive candidates
+    if (existingDrive) {
+      const candidateIdx = (existingDrive.candidates || []).findIndex(
+        (c) =>
+          c.userId?.toString() === studentUser._id.toString() ||
+          (c.rollNumber && c.rollNumber.toLowerCase() === rollNumber.toLowerCase())
+      );
+      if (candidateIdx !== -1) {
+        existingDrive.candidates[candidateIdx].status = 'selected';
+        existingDrive.candidates[candidateIdx].currentStage = 'Offer Extended';
+        await existingDrive.save();
+      }
+    }
 
     // Update student's placement profile status to 'offer_pushed'
     if (targetProfile) {

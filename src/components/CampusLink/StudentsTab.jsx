@@ -31,6 +31,7 @@ export const StudentsTab = ({
   offers = [],
   onVerifyOffer,
   setActiveTab,
+  drives = [],
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -117,11 +118,13 @@ export const StudentsTab = ({
 
   const handleOpenPushOffer = (student) => {
     setPushOfferStudent(student);
+    const initialDrive = drives?.[0] || null;
     setOfferForm({
-      companyName: '',
-      companyLogo: '',
-      role: 'Associate Software Engineer',
-      ctcLpa: '8.5',
+      driveId: initialDrive?._id || '',
+      companyName: initialDrive?.companyName || '',
+      companyLogo: initialDrive?.companyLogo || '',
+      role: initialDrive?.roleTitle || 'Associate Software Engineer',
+      ctcLpa: initialDrive?.ctcLpa != null ? String(initialDrive.ctcLpa) : '8.5',
       offerType: 'Full-Time',
       acceptanceDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       joiningDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -132,11 +135,16 @@ export const StudentsTab = ({
   const handleSubmitPushOffer = async (e) => {
     e.preventDefault();
     if (!pushOfferStudent || !onPushOffer) return;
+    if (!offerForm.driveId) {
+      alert('Please select an existing scheduled recruitment drive.');
+      return;
+    }
     if (!offerForm.companyName.trim() || !offerForm.role.trim() || !offerForm.ctcLpa) return;
 
     setIsPushing(true);
     try {
       const ok = await onPushOffer({
+        driveId: offerForm.driveId,
         studentId: pushOfferStudent.userId,
         profileId: pushOfferStudent.profileId,
         companyName: offerForm.companyName.trim(),
@@ -890,6 +898,63 @@ export const StudentsTab = ({
             </p>
 
             <form onSubmit={handleSubmitPushOffer}>
+              {/* Existing Recruitment Drive Selector */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 5 }}>
+                  Select Recruitment Drive (from Scheduled Drives) *
+                </label>
+                {drives && drives.length > 0 ? (
+                  <select
+                    className="chatInput"
+                    value={offerForm.driveId}
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      const driveMatch = drives.find((d) => d._id === selectedId);
+                      if (driveMatch) {
+                        setOfferForm({
+                          ...offerForm,
+                          driveId: driveMatch._id,
+                          companyName: driveMatch.companyName,
+                          companyLogo: driveMatch.companyLogo || '',
+                          role: driveMatch.roleTitle,
+                          ctcLpa: driveMatch.ctcLpa != null ? String(driveMatch.ctcLpa) : offerForm.ctcLpa,
+                        });
+                      } else {
+                        setOfferForm({
+                          ...offerForm,
+                          driveId: '',
+                          companyName: '',
+                          companyLogo: '',
+                          role: '',
+                        });
+                      }
+                    }}
+                    required
+                  >
+                    <option value="">-- Choose from scheduled recruitment drives --</option>
+                    {drives.map((d) => (
+                      <option key={d._id} value={d._id}>
+                        {d.companyName} · {d.roleTitle} ({d.ctcLpa} LPA) [{d.status?.toUpperCase() || 'SCHEDULED'}]
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div
+                    style={{
+                      padding: '10px 12px',
+                      background: '#fffbeb',
+                      border: '1px solid #fde68a',
+                      borderRadius: 8,
+                      fontSize: '0.82rem',
+                      color: '#92400e',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    ⚠️ <strong>No scheduled drives found:</strong> Corporate offers must be extended from existing recruitment drives scheduled for your institution. Please schedule a drive under the <strong>Recruitment Drives</strong> tab first.
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 5 }}>
@@ -898,7 +963,7 @@ export const StudentsTab = ({
                   <input
                     type="text"
                     className="chatInput"
-                    placeholder="e.g. Microsoft / TCS Digital"
+                    placeholder="Auto-filled from drive"
                     value={offerForm.companyName}
                     onChange={(e) => setOfferForm({ ...offerForm, companyName: e.target.value })}
                     required
@@ -912,7 +977,7 @@ export const StudentsTab = ({
                   <input
                     type="text"
                     className="chatInput"
-                    placeholder="e.g. SDE - 1"
+                    placeholder="Auto-filled from drive"
                     value={offerForm.role}
                     onChange={(e) => setOfferForm({ ...offerForm, role: e.target.value })}
                     required
@@ -1002,7 +1067,7 @@ export const StudentsTab = ({
                 <button
                   type="submit"
                   className="campusTabBtn active"
-                  disabled={isPushing}
+                  disabled={isPushing || !offerForm.driveId}
                 >
                   {isPushing ? 'Pushing Offer...' : 'Push Offer to Student'}
                 </button>
