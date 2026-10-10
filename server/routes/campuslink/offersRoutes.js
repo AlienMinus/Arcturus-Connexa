@@ -9,6 +9,7 @@ import {
   isCampusLinkAdmin,
   getPlacementOfficerOrganization,
   getManagedOrganization,
+  getOrganizationByIdOrSlug,
   escapeRegex,
 } from './helpers.js';
 
@@ -32,11 +33,12 @@ router.get('/', async (req, res) => {
       return res.json({ offers: [] });
     }
 
+    const requestedOrgParam = req.query.organizationId || req.query.idOrSlug || req.query.instituteId;
     const adminAccess = await isCampusLinkAdmin(currentUserId);
-    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(currentUserId);
+    const officerOrganization = await getPlacementOfficerOrganization(currentUserId);
     const managedOrganization =
-      !adminAccess && !officerOrganization && req.query.organizationId
-        ? await getManagedOrganization(currentUserId, req.query.organizationId)
+      requestedOrgParam
+        ? await getManagedOrganization(currentUserId, requestedOrgParam)
         : null;
 
     const authorizedOfficerOrg = officerOrganization || managedOrganization;

@@ -9,6 +9,7 @@ import {
   isCampusLinkAdmin,
   getPlacementOfficerOrganization,
   getManagedOrganization,
+  getOrganizationByIdOrSlug,
   escapeRegex,
 } from './helpers.js';
 
@@ -185,12 +186,7 @@ async function buildFiltersForInstitute(targetOrg) {
   const scopedProfileUserIds = scopedProfiles.map((p) => p.userId).filter(Boolean);
   const scopedRollNumbers = scopedProfiles.map((p) => p.rollNumber).filter(Boolean);
 
-  const driveFilter = {
-    $or: [
-      { organizationId: orgId },
-      { 'schedule.venue': { $regex: new RegExp(escapeRegex(orgName), 'i') } },
-    ],
-  };
+  const driveFilter = { organizationId: orgId };
 
   const offerFilter = {
     $or: [
@@ -322,10 +318,11 @@ router.get('/', async (req, res) => {
     }
 
     const adminAccess = await isCampusLinkAdmin(currentUserId);
+    const requestedOrgParam = req.query.organizationId || req.query.idOrSlug || req.query.instituteId;
     const officerOrganization = await getPlacementOfficerOrganization(currentUserId);
     const managedOrganization =
-      !officerOrganization && req.query.organizationId
-        ? await getManagedOrganization(currentUserId, req.query.organizationId)
+      requestedOrgParam
+        ? await getManagedOrganization(currentUserId, requestedOrgParam)
         : null;
 
     const authorizedOfficerOrg = officerOrganization || managedOrganization;
@@ -427,10 +424,22 @@ router.get('/', async (req, res) => {
     // CASE 3: REGULAR USER / STUDENT (RESTRICTED PREVIEW FOR HERO BADGES ONLY)
     // =========================================================================
     let studentOrg = null;
-    if (currentUserId) {
+    if (requestedOrgParam) {
+      studentOrg = await getOrganizationByIdOrSlug(requestedOrgParam);
+    }
+    if (!studentOrg && currentUserId) {
       const studentUser = await User.findById(currentUserId).select('institute').lean();
       if (studentUser?.institute?.organizationId) {
-        studentOrg = await Organization.findById(studentUser.institute.organizationId).lean();
+        studentOrg = await getOrganizationByIdOrSlug(studentUser.institute.organizationId);
+      } else if (studentUser?.institute?.name) {
+        studentOrg = await getOrganizationByIdOrSlug(studentUser.institute.name);
+      } else {
+        const pProfile = await PlacementProfile.findOne({ userId: currentUserId }).select('organizationId collegeName').lean();
+        if (pProfile?.organizationId) {
+          studentOrg = await getOrganizationByIdOrSlug(pProfile.organizationId);
+        } else if (pProfile?.collegeName) {
+          studentOrg = await getOrganizationByIdOrSlug(pProfile.collegeName);
+        }
       }
     }
 

@@ -8,6 +8,7 @@ export const ScheduleDriveModal = ({
   driveForm,
   setDriveForm,
   handleScheduleDrive,
+  editingDriveId = null,
 }) => {
   if (!showDriveModal) return null;
 
@@ -43,13 +44,15 @@ export const ScheduleDriveModal = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FaCalendarAlt color="#0a66c2" /> Schedule Campus Recruitment Drive
+            <FaCalendarAlt color="#0a66c2" /> {editingDriveId ? 'Edit Campus Recruitment Drive' : 'Schedule Campus Recruitment Drive'}
           </h3>
           <FaTimes style={{ cursor: 'pointer' }} onClick={() => setShowDriveModal(false)} />
         </div>
 
         <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 16px 0' }}>
-          Define company details, CTC package, eligibility criteria, date, and venue. Our Conflict Engine will automatically audit schedule clashes.
+          {editingDriveId
+            ? 'Update company details, CTC package, eligibility criteria, date, and venue. Conflict engine will re-audit schedule clashes.'
+            : 'Define company details, CTC package, eligibility criteria, date, and venue. Our Conflict Engine will automatically audit schedule clashes.'}
         </p>
 
         <form noValidate onSubmit={handleScheduleDrive} className="scheduleDriveForm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
@@ -318,7 +321,11 @@ export const ScheduleDriveModal = ({
               type="submit"
               className="campusTabBtn active scheduleSubmitBtn"
             >
-              <FaPlus size={12} /> Schedule Drive & Check Conflicts
+              {editingDriveId ? (
+                <>💾 Save Changes & Update Audit</>
+              ) : (
+                <><FaPlus size={12} /> Schedule Drive & Check Conflicts</>
+              )}
             </button>
           </div>
         </form>

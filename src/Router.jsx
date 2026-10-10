@@ -41,6 +41,8 @@ function AppRouter() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/campuslink" element={<CampusLinkPage />} />
+                <Route path="/campuslink/:idOrSlug" element={<CampusLinkPage />} />
+                <Route path="/campuslink/organization/:idOrSlug" element={<CampusLinkPage />} />
                 <Route path="/company/create" element={<JobPostingPage />} />
                 <Route path="/company/:idOrSlug" element={<CompanyPage />} />
                 <Route path="/organization/:idOrSlug" element={<CompanyPage />} />

@@ -5,6 +5,7 @@ import profileRoutes from './profileRoutes.js';
 import offersRoutes from './offersRoutes.js';
 import assistantRoutes from './assistantRoutes.js';
 import officerRoutes from './officerRoutes.js';
+import studentsRoutes from './studentsRoutes.js';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.use('/profile', profileRoutes);
 router.use('/offers', offersRoutes);
 router.use('/ai-assistant', assistantRoutes);
 router.use('/officers', officerRoutes);
+router.use('/students', studentsRoutes);
 
 export default router;
 

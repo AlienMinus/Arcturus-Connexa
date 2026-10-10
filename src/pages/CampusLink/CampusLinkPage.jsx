@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { buildApiUrl } from '../../utils/api';
@@ -14,10 +14,12 @@ import {
   FloatingAIAssistant,
   MockAssessmentModal,
   ScheduleDriveModal,
+  StudentsTab,
 } from '../../components/CampusLink';
 import './CampusLinkPage.css';
 
 const CampusLinkPage = () => {
+  const { idOrSlug } = useParams();
   const { token, user, activeAccount } = useAuth();
   const isArcturusAdmin = user?.role === 'admin' || user?.isAdmin === true || user?.username === 'arcturus_admin';
   const isOrganizationAccount = activeAccount?.type === 'organization';
@@ -78,18 +80,22 @@ const CampusLinkPage = () => {
 
   // Guard non-privileged users against administrative tabs
   useEffect(() => {
-    if (isOrganizationAccount && canManageDrives && activeTab === 'matching') {
+    if (isPureAdmin) {
+      if (activeTab !== 'analytics') setActiveTab('analytics');
       return;
-    } else if (isOrganizationAccount && activeTab !== 'organization') {
+    }
+    if (isOrganizationAccount && canManageDrives && (activeTab === 'matching' || activeTab === 'drives' || activeTab === 'students')) {
+      return;
+    } else if (isOrganizationAccount && activeTab !== 'organization' && !canManageDrives) {
       setActiveTab('organization');
     } else if (!isOrganizationAccount && activeTab === 'organization') {
       setActiveTab(canAccessCommandCenter ? 'analytics' : 'readiness');
     } else if (!canAccessCommandCenter && activeTab === 'analytics') {
       setActiveTab('readiness');
-    } else if (!canManageDrives && activeTab === 'matching') {
+    } else if (!canManageDrives && (activeTab === 'matching' || activeTab === 'students')) {
       setActiveTab('readiness');
     }
-  }, [isArcturusAdmin, isPlacementOfficer, isOrganizationAccount, canManageDrives, canAccessCommandCenter, activeTab]);
+  }, [isArcturusAdmin, isPureAdmin, isPlacementOfficer, isOrganizationAccount, canManageDrives, canAccessCommandCenter, activeTab]);
 
   const [drives, setDrives] = useState([]);
   const [conflicts, setConflicts] = useState([]);
@@ -99,6 +105,14 @@ const CampusLinkPage = () => {
   const [matchingPool, setMatchingPool] = useState(null);
   const [selectedDriveForMatch, setSelectedDriveForMatch] = useState('');
   
+  // Organization Students State
+  const [students, setStudents] = useState([]);
+  const [studentsStats, setStudentsStats] = useState(null);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+
+  // Drive Edit State
+  const [editingDriveId, setEditingDriveId] = useState(null);
+
   // UI & Loading States
   const [, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
@@ -180,16 +194,40 @@ const CampusLinkPage = () => {
     setTimeout(() => setToastMessage(''), 3800);
   };
 
+  const loadStudents = async (scopeParam = (idOrSlug || selectedAdminInstituteId)) => {
+    if (!token) return;
+    setStudentsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (scopeParam) params.set('organizationId', scopeParam);
+      else if (isOrganizationAccount && activeAccount?.id) params.set('organizationId', activeAccount.id);
+
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      const res = await fetch(buildApiUrl(`/campuslink/students${qs}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStudents(data.students || []);
+        setStudentsStats(data.stats || {});
+      }
+    } catch (err) {
+      console.error('Failed to load students roster:', err);
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
+
   // Fetch initial data
-  const loadCampusData = async (adminInstituteId = selectedAdminInstituteId) => {
+  const loadCampusData = async (adminInstituteId = (idOrSlug || selectedAdminInstituteId)) => {
     setLoading(true);
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       // 1. Fetch Analytics
       const queryParams = new URLSearchParams();
-      if (adminInstituteId) queryParams.set('instituteId', adminInstituteId);
-      if (isOrganizationAccount && activeAccount?.id) queryParams.set('organizationId', activeAccount.id);
+      if (adminInstituteId) queryParams.set('organizationId', adminInstituteId);
+      else if (isOrganizationAccount && activeAccount?.id) queryParams.set('organizationId', activeAccount.id);
 
       const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
       const analRes = await fetch(buildApiUrl(`/campuslink/analytics${queryString}`), { headers });
@@ -199,7 +237,7 @@ const CampusLinkPage = () => {
         setAnalyticsPayload(analData);
       }
 
-      // 2. Fetch Drives & Conflicts
+      // 2. Fetch Drives & Conflicts (Strictly scoped!)
       const driveParams = new URLSearchParams();
       if (adminInstituteId) driveParams.set('organizationId', adminInstituteId);
       else if (isOrganizationAccount && activeAccount?.id) driveParams.set('organizationId', activeAccount.id);
@@ -216,14 +254,21 @@ const CampusLinkPage = () => {
       }
 
       // 3. Fetch Offers
-      const offerQuery = adminInstituteId ? `?instituteId=${encodeURIComponent(adminInstituteId)}` : '';
+      const offerParams = new URLSearchParams();
+      if (adminInstituteId) offerParams.set('organizationId', adminInstituteId);
+      const offerQuery = offerParams.toString() ? `?${offerParams.toString()}` : '';
       const offersRes = await fetch(buildApiUrl(`/campuslink/offers${offerQuery}`), { headers });
       if (offersRes.ok) {
         const offersData = await offersRes.json();
         setOffers(offersData.offers || []);
       }
 
-      // 4. Fetch Student Placement Profile (if authenticated)
+      // 4. Fetch Organization Students Roster
+      if (token) {
+        loadStudents(adminInstituteId);
+      }
+
+      // 5. Fetch Student Placement Profile (if authenticated)
       if (token) {
         const profRes = await fetch(buildApiUrl('/campuslink/profile/me'), { headers });
         if (profRes.ok) {
@@ -264,8 +309,8 @@ const CampusLinkPage = () => {
   };
 
   useEffect(() => {
-    loadCampusData();
-  }, [token]);
+    loadCampusData(idOrSlug || selectedAdminInstituteId);
+  }, [token, idOrSlug, selectedAdminInstituteId]);
 
   // Fetch matching pool when drive changes in tab 4
   const fetchMatchingPool = async (driveId) => {
@@ -314,11 +359,73 @@ const CampusLinkPage = () => {
     }
   };
 
-  // Schedule a new recruitment drive
+  // Open modal to schedule a new drive
+  const handleOpenCreateDrive = () => {
+    setEditingDriveId(null);
+    setDriveForm({
+      companyName: '',
+      companyLogo: '',
+      roleTitle: '',
+      description: '',
+      jobCategory: 'Core Software',
+      ctcLpa: '',
+      baseStipend: '',
+      minCgpa: 7.0,
+      maxBacklogs: 0,
+      allowedBranches: [
+        'Computer Science & Engineering',
+        'Information Technology',
+        'Electronics & Communication',
+      ],
+      otherBranch: '',
+      requiredSkills: '',
+      driveDate: '',
+      startTime: '09:30 AM',
+      endTime: '01:30 PM',
+      venue: 'Campus Auditorium - Hall A',
+      totalOpenings: 10,
+    });
+    setShowDriveModal(true);
+  };
+
+  // Open modal to edit an existing drive
+  const handleEditDrive = (drive) => {
+    setEditingDriveId(drive._id);
+    setDriveForm({
+      companyName: drive.companyName || '',
+      companyLogo: drive.companyLogo || '',
+      roleTitle: drive.roleTitle || '',
+      description: drive.description || '',
+      jobCategory: drive.jobCategory || 'Core Software',
+      ctcLpa: drive.ctcLpa || '',
+      baseStipend: drive.baseStipend || '',
+      minCgpa: drive.eligibility?.minCgpa ?? 7.0,
+      maxBacklogs: drive.eligibility?.maxBacklogs ?? 0,
+      allowedBranches: drive.eligibility?.allowedBranches || [
+        'Computer Science & Engineering',
+        'Information Technology',
+        'Electronics & Communication',
+      ],
+      otherBranch: '',
+      requiredSkills: Array.isArray(drive.eligibility?.requiredSkills)
+        ? drive.eligibility.requiredSkills.join(', ')
+        : '',
+      driveDate: drive.schedule?.driveDate
+        ? new Date(drive.schedule.driveDate).toISOString().split('T')[0]
+        : '',
+      startTime: drive.schedule?.startTime || '09:30 AM',
+      endTime: drive.schedule?.endTime || '01:30 PM',
+      venue: drive.schedule?.venue || 'Campus Auditorium - Hall A',
+      totalOpenings: drive.totalOpenings || 10,
+    });
+    setShowDriveModal(true);
+  };
+
+  // Schedule or Edit a recruitment drive
   const handleScheduleDrive = async (e) => {
     e?.preventDefault();
     if (!token) {
-      showToast('Please sign in to schedule a placement drive');
+      showToast('Please sign in to schedule or edit a placement drive');
       return;
     }
     if (!driveForm.companyName.trim() || !driveForm.roleTitle.trim() || !driveForm.description.trim() || !driveForm.ctcLpa || !driveForm.driveDate) {
@@ -355,11 +462,16 @@ const CampusLinkPage = () => {
         endTime: driveForm.endTime || '01:30 PM',
         venue: driveForm.venue || 'Campus Auditorium - Hall A',
         totalOpenings: Number(driveForm.totalOpenings) || 10,
-        organizationId: isOrganizationAccount ? activeAccount?.id : undefined,
+        organizationId: idOrSlug || (isOrganizationAccount ? activeAccount?.id : undefined),
       };
 
-      const res = await fetch(buildApiUrl('/campuslink/drives'), {
-        method: 'POST',
+      const url = editingDriveId
+        ? buildApiUrl(`/campuslink/drives/${editingDriveId}`)
+        : buildApiUrl('/campuslink/drives');
+      const method = editingDriveId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -368,8 +480,9 @@ const CampusLinkPage = () => {
       });
 
       if (res.ok) {
-        showToast('🎯 Recruitment drive scheduled successfully!');
+        showToast(editingDriveId ? '🎯 Recruitment drive updated successfully!' : '🎯 Recruitment drive scheduled successfully!');
         setShowDriveModal(false);
+        setEditingDriveId(null);
         setDriveForm({
           companyName: '',
           companyLogo: '',
@@ -396,11 +509,39 @@ const CampusLinkPage = () => {
         loadCampusData();
       } else {
         const err = await res.json();
-        showToast(err.error || 'Failed to schedule drive');
+        showToast(err.error || 'Failed to save drive');
       }
     } catch (err) {
-      console.error('Drive scheduling error:', err);
-      showToast('Network error scheduling placement drive');
+      console.error('Drive scheduling/editing error:', err);
+      showToast('Network error processing placement drive');
+    }
+  };
+
+  // Update a student's placement status
+  const handleUpdateStudentStatus = async (studentId, statusData) => {
+    try {
+      const res = await fetch(buildApiUrl(`/campuslink/students/${studentId}/status`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...statusData,
+          organizationId: idOrSlug || officerInstitute?.id || activeAccount?.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to update student status');
+        return;
+      }
+      showToast('Student placement record updated!');
+      loadStudents();
+    } catch (err) {
+      console.error('Failed to update student:', err);
+      showToast('Server error updating student record');
     }
   };
 
@@ -643,7 +784,7 @@ const CampusLinkPage = () => {
           <div className="campusOrganizationActions">
             <Link to="/jobs/manage" className="campusOrganizationPrimary">Manage jobs & applicants</Link>
             <Link to={activeAccount.slug ? `/company/${activeAccount.slug}` : `/organization/${activeAccount.id}`} className="campusOrganizationSecondary">View company page</Link>
-            {canManageDrives && <button type="button" className="campusOrganizationSecondary" onClick={() => setShowDriveModal(true)}>Schedule placement drive</button>}
+            {canManageDrives && <button type="button" className="campusOrganizationSecondary" onClick={handleOpenCreateDrive}>Schedule placement drive</button>}
           </div>
 
           <div className="campusOrganizationNotice">
@@ -657,11 +798,22 @@ const CampusLinkPage = () => {
               drives={drives}
               conflicts={conflicts}
               studentProfile={studentProfile}
-              setShowDriveModal={setShowDriveModal}
+              setShowDriveModal={handleOpenCreateDrive}
               handleAutoResolveConflict={handleAutoResolveConflict}
               handleDeleteDrive={handleDeleteDrive}
+              handleEditDrive={handleEditDrive}
               setSelectedDriveForMatch={setSelectedDriveForMatch}
               setActiveTab={setActiveTab}
+            />
+          )}
+          {canManageDrives && activeTab === 'students' && (
+            <StudentsTab
+              organization={activeAccount}
+              students={students}
+              stats={studentsStats}
+              loading={studentsLoading}
+              onRefresh={() => loadStudents()}
+              onUpdateStudentStatus={handleUpdateStudentStatus}
             />
           )}
           {canManageDrives && activeTab === 'matching' && (
@@ -706,6 +858,7 @@ const CampusLinkPage = () => {
         conflictsCount={conflicts.length}
         drivesCount={drives.length}
         offersCount={offers.length}
+        studentsCount={students.length}
         isChatFloatingOpen={isChatFloatingOpen}
         setIsChatFloatingOpen={setIsChatFloatingOpen}
       />
@@ -734,15 +887,28 @@ const CampusLinkPage = () => {
           drives={drives}
           conflicts={conflicts}
           studentProfile={studentProfile}
-          setShowDriveModal={setShowDriveModal}
+          setShowDriveModal={handleOpenCreateDrive}
           handleAutoResolveConflict={handleAutoResolveConflict}
           handleDeleteDrive={handleDeleteDrive}
+          handleEditDrive={handleEditDrive}
           setSelectedDriveForMatch={setSelectedDriveForMatch}
           setActiveTab={setActiveTab}
         />
       )}
 
-      {/* TAB 3: STUDENT READINESS & SKILL-GAP PORTAL */}
+      {/* TAB 3: ORGANIZATION STUDENTS MANAGEMENT */}
+      {activeTab === 'students' && (
+        <StudentsTab
+          organization={officerInstitute || analyticsPayload?.institute}
+          students={students}
+          stats={studentsStats}
+          loading={studentsLoading}
+          onRefresh={() => loadStudents()}
+          onUpdateStudentStatus={handleUpdateStudentStatus}
+        />
+      )}
+
+      {/* TAB 4: STUDENT READINESS & SKILL-GAP PORTAL */}
       {activeTab === 'readiness' && (
         <ReadinessTab
           user={user}
@@ -759,7 +925,7 @@ const CampusLinkPage = () => {
         />
       )}
 
-      {/* TAB 4: RECRUITER MATCHING & EXPLAINABLE AI */}
+      {/* TAB 5: RECRUITER MATCHING & EXPLAINABLE AI */}
       {activeTab === 'matching' && (
         <MatchingTab
           isArcturusAdmin={isArcturusAdmin}
@@ -772,7 +938,7 @@ const CampusLinkPage = () => {
         />
       )}
 
-      {/* TAB 5: OFFERS & DOCUMENT TRACKING */}
+      {/* TAB 6: OFFERS & DOCUMENT TRACKING */}
       {activeTab === 'offers' && (
         <OffersTab
           isArcturusAdmin={isArcturusAdmin}
@@ -803,13 +969,14 @@ const CampusLinkPage = () => {
         handleAssessmentSubmit={handleAssessmentSubmit}
       />
 
-      {/* Schedule Recruitment Drive Modal */}
+      {/* Schedule / Edit Recruitment Drive Modal */}
       <ScheduleDriveModal
         showDriveModal={showDriveModal}
         setShowDriveModal={setShowDriveModal}
         driveForm={driveForm}
         setDriveForm={setDriveForm}
         handleScheduleDrive={handleScheduleDrive}
+        editingDriveId={editingDriveId}
       />
       </>
       )}
@@ -821,6 +988,7 @@ const CampusLinkPage = () => {
           driveForm={driveForm}
           setDriveForm={setDriveForm}
           handleScheduleDrive={handleScheduleDrive}
+          editingDriveId={editingDriveId}
         />
       )}
     </div>

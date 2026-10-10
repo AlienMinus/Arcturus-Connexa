@@ -9,4 +9,5 @@ export { default as OffersTab } from './OffersTab';
 export { default as FloatingAIAssistant } from './FloatingAIAssistant';
 export { default as MockAssessmentModal } from './MockAssessmentModal';
 export { default as ScheduleDriveModal } from './ScheduleDriveModal';
+export { default as StudentsTab } from './StudentsTab';
 

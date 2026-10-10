@@ -4,6 +4,7 @@ import {
   FaPlus, 
   FaExclamationTriangle, 
   FaTrash, 
+  FaEdit,
   FaCheckCircle, 
   FaTimes, 
   FaUserCheck 
@@ -18,6 +19,7 @@ export const DrivesTab = ({
   setShowDriveModal,
   handleAutoResolveConflict,
   handleDeleteDrive,
+  handleEditDrive,
   setSelectedDriveForMatch,
   setActiveTab,
 }) => {
@@ -119,14 +121,36 @@ export const DrivesTab = ({
                     <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>{d.jobCategory} · {d.packageTier}</div>
                   </div>
                   {canManageDrives && (
-                    <button
-                      type="button"
-                      className="driveCancelBtn"
-                      title={`Cancel ${d.companyName} recruitment drive`}
-                      onClick={() => handleDeleteDrive(d._id, d.companyName)}
-                    >
-                      <FaTrash size={12} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <button
+                        type="button"
+                        className="driveCancelBtn"
+                        style={{
+                          background: '#f1f5f9',
+                          borderColor: '#cbd5e1',
+                          color: '#0a66c2',
+                          width: 'auto',
+                          padding: '0 8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                        }}
+                        title={`Edit ${d.companyName} recruitment drive`}
+                        onClick={() => handleEditDrive && handleEditDrive(d)}
+                      >
+                        <FaEdit size={12} /> Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="driveCancelBtn"
+                        title={`Cancel ${d.companyName} recruitment drive`}
+                        onClick={() => handleDeleteDrive(d._id, d.companyName)}
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
                   )}
                 </div>
 

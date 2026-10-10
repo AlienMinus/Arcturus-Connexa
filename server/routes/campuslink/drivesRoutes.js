@@ -2,14 +2,20 @@ import express from 'express';
 import PlacementDrive from '../../models/PlacementDrive.js';
 import PlacementProfile from '../../models/PlacementProfile.js';
 import Profile from '../../models/Profile.js';
+import User from '../../models/User.js';
 import authMiddleware from '../../middleware/auth.js';
 import { verifyAccessToken } from '../../utils/jwtUtils.js';
 import { detectDriveConflicts } from '../../utils/conflictDetector.js';
-import { isCampusLinkAdmin, getPlacementOfficerOrganization, getManagedOrganization } from './helpers.js';
+import {
+  isCampusLinkAdmin,
+  getPlacementOfficerOrganization,
+  getManagedOrganization,
+  getOrganizationByIdOrSlug,
+} from './helpers.js';
 
 const router = express.Router();
 
-// GET /api/campuslink/drives - Get all drives and real-time conflicts (Scoped by institute for placement officers)
+// GET /api/campuslink/drives - Get all drives and real-time conflicts (Strictly scoped by organization)
 router.get('/', async (req, res) => {
   try {
     let currentUserId = null;
@@ -21,21 +27,58 @@ router.get('/', async (req, res) => {
       } catch (e) {}
     }
 
-    const adminAccess = await isCampusLinkAdmin(currentUserId);
-    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(currentUserId);
+    const { organizationId, idOrSlug } = req.query;
+    let targetOrg = null;
 
-    let filter = {};
-    if (officerOrganization) {
-      // Placement Officer strictly sees drives for their institute
-      filter = { organizationId: officerOrganization._id };
-    } else if (req.query.organizationId) {
-      filter = { organizationId: req.query.organizationId };
+    if (organizationId || idOrSlug) {
+      targetOrg = await getOrganizationByIdOrSlug(organizationId || idOrSlug);
+    }
+
+    const adminAccess = await isCampusLinkAdmin(currentUserId);
+    const officerOrganization = await getPlacementOfficerOrganization(currentUserId);
+
+    // If target organization not explicitly requested in query:
+    if (!targetOrg && currentUserId) {
+      if (officerOrganization) {
+        targetOrg = officerOrganization;
+      } else {
+        // Resolve student's registered institute
+        const studentUser = await User.findById(currentUserId).select('institute').lean();
+        if (studentUser?.institute?.organizationId) {
+          targetOrg = await getOrganizationByIdOrSlug(studentUser.institute.organizationId);
+        } else if (studentUser?.institute?.name) {
+          targetOrg = await getOrganizationByIdOrSlug(studentUser.institute.name);
+        } else {
+          const pProfile = await PlacementProfile.findOne({ userId: currentUserId }).select('organizationId collegeName').lean();
+          if (pProfile?.organizationId) {
+            targetOrg = await getOrganizationByIdOrSlug(pProfile.organizationId);
+          } else if (pProfile?.collegeName) {
+            targetOrg = await getOrganizationByIdOrSlug(pProfile.collegeName);
+          }
+        }
+      }
+    }
+
+    let filter;
+    if (targetOrg) {
+      filter = { organizationId: targetOrg._id };
+    } else if (adminAccess) {
+      // Pure platform admin in global operations hub
+      return res.json({
+        drives: [],
+        conflicts: [],
+        isPlatformAdmin: true,
+        message: 'Admin operations hub view active. Individual drives are scoped to their respective organizations.',
+      });
+    } else {
+      // Unregistered / unaffiliated user
+      return res.json({ drives: [], conflicts: [] });
     }
 
     const drives = await PlacementDrive.find(filter).sort({ 'schedule.driveDate': 1 }).lean();
     const conflicts = detectDriveConflicts(drives);
 
-    res.json({ drives, conflicts });
+    res.json({ drives, conflicts, organizationId: targetOrg?._id });
   } catch (err) {
     console.error('Failed to fetch placement drives:', err);
     res.status(500).json({ error: 'Failed to retrieve drives' });
@@ -114,6 +157,89 @@ router.post('/', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Failed to create drive:', err);
     res.status(500).json({ error: 'Failed to schedule drive' });
+  }
+});
+
+// PUT /api/campuslink/drives/:id - Edit an existing placement drive
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const drive = await PlacementDrive.findById(req.params.id);
+    if (!drive) {
+      return res.status(404).json({ error: 'Placement drive not found' });
+    }
+
+    const officerOrganization = await getPlacementOfficerOrganization(req.userId);
+    const managedOrganization = drive.organizationId ? await getManagedOrganization(req.userId, drive.organizationId) : null;
+    const authorized = (officerOrganization && drive.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
+
+    if (!authorized) {
+      return res.status(403).json({
+        error: 'Access denied: You are not authorized to edit drives for this organization.',
+      });
+    }
+
+    const {
+      companyName,
+      companyLogo,
+      roleTitle,
+      description,
+      jobCategory,
+      ctcLpa,
+      baseStipend,
+      minCgpa,
+      maxBacklogs,
+      allowedBranches,
+      requiredSkills,
+      minReadinessScore,
+      driveDate,
+      startTime,
+      endTime,
+      venue,
+      totalOpenings,
+      status,
+    } = req.body;
+
+    if (companyName) drive.companyName = companyName.trim();
+    if (companyLogo !== undefined) drive.companyLogo = companyLogo;
+    if (roleTitle) drive.roleTitle = roleTitle.trim();
+    if (description) drive.description = description.trim();
+    if (jobCategory) drive.jobCategory = jobCategory;
+    if (ctcLpa !== undefined && ctcLpa !== '') drive.ctcLpa = Number(ctcLpa);
+    if (baseStipend !== undefined && baseStipend !== '') drive.baseStipend = Number(baseStipend);
+    if (totalOpenings !== undefined && totalOpenings !== '') drive.totalOpenings = Number(totalOpenings);
+    if (status) drive.status = status;
+
+    if (!drive.eligibility) drive.eligibility = {};
+    if (minCgpa !== undefined && minCgpa !== '') drive.eligibility.minCgpa = Number(minCgpa);
+    if (maxBacklogs !== undefined && maxBacklogs !== '') drive.eligibility.maxBacklogs = Number(maxBacklogs);
+    if (allowedBranches) drive.eligibility.allowedBranches = allowedBranches;
+    if (requiredSkills) {
+      drive.eligibility.requiredSkills = Array.isArray(requiredSkills)
+        ? requiredSkills
+        : String(requiredSkills).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    if (minReadinessScore !== undefined && minReadinessScore !== '') drive.eligibility.minReadinessScore = Number(minReadinessScore);
+
+    if (!drive.schedule) drive.schedule = {};
+    if (driveDate) drive.schedule.driveDate = new Date(driveDate);
+    if (startTime) drive.schedule.startTime = startTime;
+    if (endTime) drive.schedule.endTime = endTime;
+    if (venue) drive.schedule.venue = venue;
+
+    await drive.save();
+
+    // Re-check conflicts for the organization
+    const orgDrives = await PlacementDrive.find({ organizationId: drive.organizationId }).sort({ 'schedule.driveDate': 1 }).lean();
+    const conflicts = detectDriveConflicts(orgDrives);
+
+    res.json({
+      message: 'Placement drive updated successfully!',
+      drive,
+      conflicts,
+    });
+  } catch (err) {
+    console.error('Failed to update placement drive:', err);
+    res.status(500).json({ error: 'Failed to update placement drive' });
   }
 });
 

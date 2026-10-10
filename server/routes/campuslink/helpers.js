@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
 import Organization from '../../models/Organization.js';
@@ -62,6 +63,23 @@ export const isCampusLinkAdmin = async (userId) => {
 
 export const escapeRegex = (str = '') => String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+export const getOrganizationByIdOrSlug = async (idOrSlug) => {
+  if (!idOrSlug) return null;
+  const raw = String(idOrSlug).trim();
+  const isObjectId = mongoose.Types.ObjectId.isValid(raw) && raw.length === 24;
+  const conditions = [
+    { slug: raw.toLowerCase() },
+    { name: { $regex: new RegExp(`^${escapeRegex(raw)}$`, 'i') } },
+  ];
+  if (isObjectId) {
+    conditions.unshift({ _id: raw });
+  }
+  return Organization.findOne({
+    $or: conditions,
+    status: 'approved',
+  });
+};
+
 export const getPlacementOfficerOrganization = async (userId) => {
   if (!userId) return null;
   const user = await User.findById(userId).select('placementOfficer accountType').lean();
@@ -81,11 +99,14 @@ export const getPlacementOfficerOrganization = async (userId) => {
 
 export const getManagedOrganization = async (userId, organizationId) => {
   if (!userId || !organizationId) return null;
-  return Organization.findOne({
-    _id: organizationId,
-    status: 'approved',
-    $or: [{ adminId: userId }, { 'members.userId': userId }],
-  });
+  const org = await getOrganizationByIdOrSlug(organizationId);
+  if (!org) return null;
+  const isAdminOrMember =
+    String(org.adminId) === String(userId) ||
+    (org.members || []).some(
+      (m) => String(m.userId) === String(userId) && (m.role === 'Admin' || m.role === 'Placement Officer')
+    );
+  return isAdminOrMember ? org : null;
 };
 
 // Extract and import all candidate individual profile data from Arcturus Profile & User models
