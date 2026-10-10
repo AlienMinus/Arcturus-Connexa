@@ -410,9 +410,15 @@ const CampusLinkPage = () => {
       requiredSkills: Array.isArray(drive.eligibility?.requiredSkills)
         ? drive.eligibility.requiredSkills.join(', ')
         : '',
-      driveDate: drive.schedule?.driveDate
-        ? new Date(drive.schedule.driveDate).toISOString().split('T')[0]
-        : '',
+      driveDate: (() => {
+        if (!drive.schedule?.driveDate) return '';
+        try {
+          const d = new Date(drive.schedule.driveDate);
+          return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+        } catch {
+          return '';
+        }
+      })(),
       startTime: drive.schedule?.startTime || '09:30 AM',
       endTime: drive.schedule?.endTime || '01:30 PM',
       venue: drive.schedule?.venue || 'Campus Auditorium - Hall A',
@@ -818,7 +824,9 @@ const CampusLinkPage = () => {
           )}
           {canManageDrives && activeTab === 'matching' && (
             <MatchingTab
-              isArcturusAdmin={false}
+              canManageDrives={canManageDrives}
+              isPlacementOfficer={isPlacementOfficer}
+              isArcturusAdmin={isArcturusAdmin}
               drives={drives}
               selectedDriveForMatch={selectedDriveForMatch}
               setSelectedDriveForMatch={setSelectedDriveForMatch}
@@ -928,6 +936,8 @@ const CampusLinkPage = () => {
       {/* TAB 5: RECRUITER MATCHING & EXPLAINABLE AI */}
       {activeTab === 'matching' && (
         <MatchingTab
+          canManageDrives={canManageDrives}
+          isPlacementOfficer={isPlacementOfficer}
           isArcturusAdmin={isArcturusAdmin}
           drives={drives}
           selectedDriveForMatch={selectedDriveForMatch}

@@ -1,23 +1,28 @@
 import React from 'react';
-import { FaShieldAlt, FaUserCheck, FaUsers } from 'react-icons/fa';
+import { FaShieldAlt, FaUserCheck, FaUsers, FaCalendarAlt } from 'react-icons/fa';
 
 export const MatchingTab = ({
-  isArcturusAdmin,
-  drives,
+  canManageDrives = false,
+  isPlacementOfficer = false,
+  isArcturusAdmin = false,
+  drives = [],
   selectedDriveForMatch,
   setSelectedDriveForMatch,
   handleAutoShortlist,
   matchingPool,
   setActiveTab,
 }) => {
-  if (!isArcturusAdmin) {
+  // Placement Officers, recruiters with drive management, and platform admins have access
+  const canAccess = canManageDrives || isPlacementOfficer || isArcturusAdmin;
+
+  if (!canAccess) {
     return (
       <div className="campusPanel">
         <div className="campusSubCard" style={{ textAlign: 'center', padding: '60px 24px', borderColor: '#fde68a', background: '#fffbeb', margin: '20px auto', maxWidth: 680 }}>
           <FaShieldAlt size={52} color="#d97706" style={{ marginBottom: 16 }} />
-          <h2 style={{ color: '#92400e', margin: '0 0 10px', fontSize: '1.4rem' }}>Recruiter Candidate Matching Restricted</h2>
+          <h2 style={{ color: '#92400e', margin: '0 0 10px', fontSize: '1.4rem' }}>Candidate Matching Restricted</h2>
           <p style={{ color: '#78350f', margin: '0 auto 24px', fontSize: '0.94rem', lineHeight: 1.6 }}>
-            Candidate pool ranking, automated shortlisting, and candidate fit rationales are restricted exclusively to authorized <strong>Arcturus Administrators</strong> and corporate hiring partners.
+            Candidate pool ranking, automated shortlisting, and candidate fit rationales are restricted exclusively to authorized <strong>Placement Officers</strong> and corporate hiring partners.
           </p>
           <button
             type="button"
@@ -36,7 +41,7 @@ export const MatchingTab = ({
     <div className="campusPanel">
       <div className="campusPanelHeader">
         <div>
-          <h2><FaUsers color="#0a66c2" /> Recruiter Candidate Matching & Explainable AI</h2>
+          <h2><FaUsers color="#0a66c2" /> Multi-Campus Candidate Matching & Explainable AI</h2>
           <p>Rank and evaluate candidate pools with transparent, natural-language shortlisting rationale.</p>
         </div>
 
@@ -68,9 +73,19 @@ export const MatchingTab = ({
 
       {drives.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-          <FaUsers size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
+          <FaUsers size={48} color="#cbd5e1" style={{ marginBottom: 12 }} />
           <h3 style={{ color: '#1e293b' }}>No Active Drives Available for Candidate Matching</h3>
-          <p style={{ margin: '6px 0 0', fontSize: '0.9rem' }}>Recruiter matching evaluates candidates once placement drives are created.</p>
+          <p style={{ margin: '6px 0 20px', fontSize: '0.9rem', color: '#64748b' }}>
+            Multi-Campus matching and Explainable AI candidate ranking evaluate students once placement drives are scheduled for this organization.
+          </p>
+          <button
+            type="button"
+            className="campusTabBtn active"
+            style={{ margin: '0 auto', display: 'inline-flex' }}
+            onClick={() => setActiveTab('drives')}
+          >
+            <FaCalendarAlt size={13} /> View & Schedule Placement Drives
+          </button>
         </div>
       ) : (
         <>
@@ -148,4 +163,3 @@ export const MatchingTab = ({
 };
 
 export default MatchingTab;
-

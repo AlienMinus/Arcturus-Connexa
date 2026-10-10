@@ -114,7 +114,15 @@ export const DrivesTab = ({
             <div key={d._id} className="driveCard">
               <div>
                 <div className="driveCardTop">
-                  <img src={d.companyLogo} alt={d.companyName} className="driveLogo" />
+                  <img
+                    src={d.companyLogo || 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png'}
+                    alt={d.companyName}
+                    className="driveLogo"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png';
+                    }}
+                  />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <strong style={{ fontSize: '1.05rem', color: '#0f172a', display: 'block' }}>{d.companyName}</strong>
                     <span style={{ fontSize: '0.85rem', color: '#0a66c2', fontWeight: 600 }}>{d.roleTitle}</span>
@@ -124,19 +132,7 @@ export const DrivesTab = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <button
                         type="button"
-                        className="driveCancelBtn"
-                        style={{
-                          background: '#f1f5f9',
-                          borderColor: '#cbd5e1',
-                          color: '#0a66c2',
-                          width: 'auto',
-                          padding: '0 8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          fontSize: '0.78rem',
-                          fontWeight: 600,
-                        }}
+                        className="driveActionBtn driveEditBtn"
                         title={`Edit ${d.companyName} recruitment drive`}
                         onClick={() => handleEditDrive && handleEditDrive(d)}
                       >
@@ -144,7 +140,7 @@ export const DrivesTab = ({
                       </button>
                       <button
                         type="button"
-                        className="driveCancelBtn"
+                        className="driveActionBtn driveDeleteBtn"
                         title={`Cancel ${d.companyName} recruitment drive`}
                         onClick={() => handleDeleteDrive(d._id, d.companyName)}
                       >
@@ -193,17 +189,27 @@ export const DrivesTab = ({
 
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                 {canManageDrives ? (
-                  <button
-                    type="button"
-                    className="campusTabBtn active"
-                    style={{ flex: 1, justifyContent: 'center' }}
-                    onClick={() => {
-                      setSelectedDriveForMatch(d._id);
-                      setActiveTab('matching');
-                    }}
-                  >
-                    View Ranked Candidates
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="campusTabBtn driveFooterEditBtn"
+                      onClick={() => handleEditDrive && handleEditDrive(d)}
+                      title={`Edit parameters for ${d.companyName} drive`}
+                    >
+                      <FaEdit size={13} /> Edit Drive
+                    </button>
+                    <button
+                      type="button"
+                      className="campusTabBtn active"
+                      style={{ flex: 1.3, justifyContent: 'center' }}
+                      onClick={() => {
+                        setSelectedDriveForMatch(d._id);
+                        setActiveTab('matching');
+                      }}
+                    >
+                      <FaUserCheck size={13} /> View Candidates
+                    </button>
+                  </>
                 ) : (
                   <button
                     type="button"
