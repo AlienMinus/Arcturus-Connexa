@@ -11,6 +11,9 @@ import {
   getPlacementOfficerOrganization,
   getManagedOrganization,
   getOrganizationByIdOrSlug,
+  escapeRegex,
+  sendCampusLinkNotification,
+  getOrganizationOfficerUserIds,
 } from './helpers.js';
 
 const router = express.Router();
@@ -152,6 +155,46 @@ router.post('/', authMiddleware, async (req, res) => {
       ],
       totalOpenings: Number(totalOpenings) || 10,
     });
+
+    // 1. Notify all enrolled students of this organization about the upcoming drive
+    try {
+      const orgId = targetOrg._id;
+      const enrolledStudents = await User.find({
+        $or: [
+          { 'institute.organizationId': orgId },
+          { 'institute.name': { $regex: new RegExp(`^${escapeRegex(targetOrg.name)}$`, 'i') } },
+        ],
+      }).select('_id').lean();
+
+      const studentIds = enrolledStudents.map((s) => s._id);
+      if (studentIds.length > 0) {
+        const formattedDate = new Date(driveDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        await sendCampusLinkNotification(studentIds, {
+          message: `🚀 Upcoming Campus Drive: ${companyName.trim()} scheduled for ${roleTitle.trim()} (CTC: ₹${ctcLpa} LPA) on ${formattedDate}. Check eligibility and prepare!`,
+          fromUserId: req.userId,
+          type: 'campuslink',
+        });
+      }
+    } catch (notifErr) {
+      console.error('Failed to notify students of drive:', notifErr);
+    }
+
+    // 2. Check for scheduling conflicts and notify placement officers
+    try {
+      const orgDrives = await PlacementDrive.find({ organizationId: targetOrg._id }).sort({ 'schedule.driveDate': 1 }).lean();
+      const conflicts = detectDriveConflicts(orgDrives);
+      if (conflicts && conflicts.length > 0) {
+        const officerIds = await getOrganizationOfficerUserIds(targetOrg._id);
+        const conflictTitles = conflicts.map((c) => `${c.companyA} & ${c.companyB}`).join(', ');
+        await sendCampusLinkNotification(officerIds, {
+          message: `⚠️ Drive Schedule Conflict Detected: Overlapping recruitment drive schedule for ${conflictTitles} at ${venue || 'Campus Auditorium'}.`,
+          fromUserId: req.userId,
+          type: 'campuslink',
+        });
+      }
+    } catch (conflictNotifErr) {
+      console.error('Failed to notify officers of drive conflict:', conflictNotifErr);
+    }
 
     res.status(201).json({ message: 'Placement drive scheduled successfully!', drive });
   } catch (err) {
@@ -460,8 +503,19 @@ router.post('/:id/auto-shortlist', authMiddleware, async (req, res) => {
       filter.branch = { $in: drive.eligibility.allowedBranches };
     }
 
+    const eligibleProfiles = await PlacementProfile.find(filter).select('userId').lean();
     const result = await PlacementProfile.updateMany(filter, { $set: { placementStatus: 'shortlisted' } });
     const count = result.modifiedCount || 0;
+
+    // Notify all shortlisted students
+    const shortlistedUserIds = eligibleProfiles.map((p) => p.userId).filter(Boolean);
+    if (shortlistedUserIds.length > 0) {
+      await sendCampusLinkNotification(shortlistedUserIds, {
+        message: `🌟 Shortlist Notification: You have been shortlisted for ${drive.companyName} (${drive.roleTitle}). Review interview schedules and prepare!`,
+        fromUserId: req.userId,
+        type: 'campuslink',
+      });
+    }
 
     res.json({
       message: `Successfully auto-shortlisted ${count} candidate(s) meeting CGPA & branch criteria for ${drive.companyName}!`,

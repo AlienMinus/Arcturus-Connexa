@@ -409,3 +409,60 @@ export const generateDiagnosticReport = ({ profile, candidateProfile, activeDriv
   };
 };
 
+// Dispatch CampusLink notifications to specified users
+export const sendCampusLinkNotification = async (recipientUserIds, { message, fromUserId, type = 'campuslink' }) => {
+  if (!recipientUserIds) return;
+  const rawList = Array.isArray(recipientUserIds) ? recipientUserIds : [recipientUserIds];
+  const ids = rawList
+    .filter(Boolean)
+    .map((id) => (id._id ? id._id.toString() : id.toString()));
+
+  const uniqueIds = Array.from(new Set(ids));
+  if (uniqueIds.length === 0) return;
+
+  try {
+    await User.updateMany(
+      { _id: { $in: uniqueIds } },
+      {
+        $push: {
+          notifications: {
+            type,
+            message,
+            fromUserId: fromUserId || null,
+            read: false,
+            createdAt: new Date(),
+          },
+        },
+      }
+    );
+  } catch (err) {
+    console.error('Failed to send campuslink notification:', err);
+  }
+};
+
+// Retrieve all user IDs for placement officers and admins of an organization
+export const getOrganizationOfficerUserIds = async (organizationId) => {
+  if (!organizationId) return [];
+  try {
+    const org = await getOrganizationByIdOrSlug(organizationId);
+    if (!org) return [];
+    const officerUsers = await User.find({
+      'placementOfficer.organizationId': org._id,
+      'placementOfficer.status': 'approved',
+    }).select('_id').lean();
+
+    const ids = new Set(officerUsers.map((u) => u._id.toString()));
+    if (org.adminId) ids.add(org.adminId.toString());
+    (org.members || []).forEach((m) => {
+      if (m.userId && (m.role === 'Admin' || m.role === 'Placement Officer')) {
+        ids.add(m.userId.toString());
+      }
+    });
+    return Array.from(ids);
+  } catch (err) {
+    console.error('Failed to get organization officer user ids:', err);
+    return [];
+  }
+};
+
+

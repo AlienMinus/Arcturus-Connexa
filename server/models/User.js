@@ -99,7 +99,7 @@ const UserSchema = new mongoose.Schema(
       {
         type: {
           type: String,
-          enum: ['post', 'repost', 'reaction', 'follow', 'connection', 'request', 'profile_view', 'view', 'other'],
+          enum: ['post', 'repost', 'reaction', 'follow', 'connection', 'request', 'profile_view', 'view', 'other', 'campuslink'],
           default: 'other',
         },
         message: { type: String, required: true },

@@ -10,6 +10,7 @@ import {
   getManagedOrganization,
   getOrganizationByIdOrSlug,
   escapeRegex,
+  sendCampusLinkNotification,
 } from './helpers.js';
 
 const router = express.Router();
@@ -239,30 +240,52 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     const { id } = req.params; // Can be PlacementProfile ID or User ID
     const { placementStatus, assignedMentor, mentorRecommendation } = req.body;
 
+    const adminAccess = await isCampusLinkAdmin(req.userId);
     const officerOrg = await getPlacementOfficerOrganization(req.userId);
-    const managedOrg = req.body.organizationId
+    let managedOrg = req.body.organizationId
       ? await getManagedOrganization(req.userId, req.body.organizationId)
       : null;
-    const authorizedOrg = officerOrg || managedOrg;
 
+    if (!managedOrg && req.body.organizationId && adminAccess) {
+      managedOrg = await getOrganizationByIdOrSlug(req.body.organizationId);
+    }
+
+    let authorizedOrg = officerOrg || managedOrg;
+
+    // Check if user has placement officer role / accountType
     if (!authorizedOrg) {
+      const officerUser = await User.findById(req.userId).select('role accountType institute placementOfficer').lean();
+      if (officerUser?.placementOfficer?.organizationId) {
+        authorizedOrg = await Organization.findById(officerUser.placementOfficer.organizationId);
+      } else if (officerUser?.institute?.organizationId) {
+        authorizedOrg = await Organization.findById(officerUser.institute.organizationId);
+      }
+    }
+
+    if (!authorizedOrg && !adminAccess) {
       return res.status(403).json({
         error: 'Access denied: Only authorized placement officers can update student placement records.',
       });
     }
 
-    // Try finding by PlacementProfile _id, then by userId
-    let profile = await PlacementProfile.findById(id);
-    if (!profile) {
-      profile = await PlacementProfile.findOne({ userId: id });
+    let profile = null;
+    if (id && id.length === 24) {
+      profile = await PlacementProfile.findById(id);
+      if (!profile) {
+        profile = await PlacementProfile.findOne({ userId: id });
+      }
     }
 
     if (!profile) {
-      // If student has no profile yet, create one
+      // Find the student user to confirm exists
+      const studentUser = await User.findById(id).lean();
+      if (!studentUser) {
+        return res.status(404).json({ error: 'Student record not found.' });
+      }
       profile = new PlacementProfile({
-        userId: id,
-        organizationId: authorizedOrg._id,
-        collegeName: authorizedOrg.name,
+        userId: studentUser._id,
+        organizationId: authorizedOrg?._id || studentUser.institute?.organizationId,
+        collegeName: authorizedOrg?.name || studentUser.institute?.name || '',
         placementStatus: placementStatus || 'unplaced',
         assignedMentor: assignedMentor || '',
         mentorActionRecommendation: mentorRecommendation || '',
@@ -271,10 +294,27 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
       if (placementStatus) profile.placementStatus = placementStatus;
       if (assignedMentor !== undefined) profile.assignedMentor = assignedMentor;
       if (mentorRecommendation !== undefined) profile.mentorActionRecommendation = mentorRecommendation;
-      if (!profile.organizationId) profile.organizationId = authorizedOrg._id;
+      if (!profile.organizationId && authorizedOrg?._id) profile.organizationId = authorizedOrg._id;
     }
 
     await profile.save();
+
+    // Instant Notification to the Student
+    const studentUserId = profile.userId;
+    if (studentUserId) {
+      const statusLabel = (placementStatus || profile.placementStatus || 'unplaced')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      let noteText = '';
+      if (mentorRecommendation) noteText += ` Recommendation: "${mentorRecommendation}".`;
+      if (assignedMentor) noteText += ` Assigned Faculty Mentor: ${assignedMentor}.`;
+
+      await sendCampusLinkNotification(studentUserId, {
+        message: `📌 Placement Status Update: Your status has been updated to "${statusLabel}" by your institutional Placement Cell.${noteText}`,
+        fromUserId: req.userId,
+        type: 'campuslink',
+      });
+    }
 
     res.json({
       message: 'Student placement status updated successfully!',

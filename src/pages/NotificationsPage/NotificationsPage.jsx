@@ -24,6 +24,7 @@ const NOTIFICATION_LABELS = {
   connection: 'accepted your connection request',
   request: 'sent you a connection request',
   profile_view: 'viewed your profile',
+  campuslink: 'CampusLink update',
   other: '',
 };
 
@@ -108,6 +109,12 @@ const NotificationsPage = () => {
       return;
     }
 
+    // If campuslink notification
+    if (notification.type === 'campuslink') {
+      navigate('/campuslink');
+      return;
+    }
+
     // If author exists, view their profile
     if (notification.author?.username) {
       navigate(`/profile/${encodeURIComponent(notification.author.username)}`);
@@ -133,7 +140,7 @@ const NotificationsPage = () => {
         <div className="notificationsList">
           {notifications.map((notification) => {
             const author = notification.author;
-            const authorName = author?.name || 'Arcturus Member';
+            const authorName = author?.name || (notification.type === 'campuslink' ? 'CampusLink' : 'Arcturus Member');
             const label = NOTIFICATION_LABELS[notification.type] || '';
             const profileUrl = author?.username ? `/profile/${encodeURIComponent(author.username)}` : '#';
 

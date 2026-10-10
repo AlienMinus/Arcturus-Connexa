@@ -62,7 +62,17 @@ const PlacementProfileSchema = new mongoose.Schema(
 
     placementStatus: {
       type: String,
-      enum: ['unplaced', 'shortlisted', 'interviewing', 'placed', 'opted_out'],
+      enum: [
+        'unplaced',
+        'shortlisted',
+        'in_interview',
+        'interviewing',
+        'offer_pushed',
+        'offer_accepted',
+        'verification_pending',
+        'placed',
+        'opted_out',
+      ],
       default: 'unplaced',
     },
 

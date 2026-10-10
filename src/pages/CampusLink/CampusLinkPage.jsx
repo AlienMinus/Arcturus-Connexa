@@ -534,7 +534,7 @@ const CampusLinkPage = () => {
         },
         body: JSON.stringify({
           ...statusData,
-          organizationId: idOrSlug || officerInstitute?.id || activeAccount?.id,
+          organizationId: idOrSlug || officerInstitute?._id || officerInstitute?.id || activeAccount?.id,
         }),
       });
 
@@ -703,12 +703,101 @@ const CampusLinkPage = () => {
         headers,
         body: JSON.stringify({ action }),
       });
+      const data = await res.json();
       if (res.ok) {
-        showToast(`🎉 Offer marked as ${action}! Document verified.`);
+        showToast(`🎉 Offer ${action}! Notification dispatched.`);
         loadCampusData();
+        loadStudents(); // Update placement officer's table of student data!
+      } else {
+        showToast(data.error || 'Failed to update offer');
       }
     } catch (err) {
       console.error('Failed to respond to offer:', err);
+      showToast('Network error processing offer decision');
+    }
+  };
+
+  // Push Corporate Offer Handler (Placement Officer End)
+  const handlePushOffer = async (offerData) => {
+    try {
+      const res = await fetch(buildApiUrl('/campuslink/offers'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...offerData,
+          organizationId: idOrSlug || officerInstitute?._id || officerInstitute?.id || activeAccount?.id,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to push offer');
+        return false;
+      }
+      showToast(data.message || '🎉 Offer pushed to student successfully!');
+      loadCampusData();
+      loadStudents();
+      return true;
+    } catch (err) {
+      console.error('Failed to push offer:', err);
+      showToast('Network error pushing offer');
+      return false;
+    }
+  };
+
+  // Upload Offer Verification Document Handler (Student End)
+  const handleUploadOfferDocument = async (offerId, docData) => {
+    try {
+      const res = await fetch(buildApiUrl(`/campuslink/offers/${offerId}/documents`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(docData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to upload document');
+        return false;
+      }
+      showToast(data.message || '📄 Document uploaded! Awaiting placement officer verification.');
+      loadCampusData();
+      loadStudents();
+      return true;
+    } catch (err) {
+      console.error('Failed to upload document:', err);
+      showToast('Network error uploading document');
+      return false;
+    }
+  };
+
+  // Verify Offer Documents Handler (Placement Officer End)
+  const handleVerifyOffer = async (offerId, verifyData) => {
+    try {
+      const res = await fetch(buildApiUrl(`/campuslink/offers/${offerId}/verify`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(verifyData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to verify offer');
+        return false;
+      }
+      showToast(data.message || 'Verification complete! Student status updated.');
+      loadCampusData();
+      loadStudents();
+      return true;
+    } catch (err) {
+      console.error('Failed to verify offer:', err);
+      showToast('Network error verifying offer');
+      return false;
     }
   };
 
@@ -820,6 +909,10 @@ const CampusLinkPage = () => {
               loading={studentsLoading}
               onRefresh={() => loadStudents()}
               onUpdateStudentStatus={handleUpdateStudentStatus}
+              onPushOffer={handlePushOffer}
+              offers={offers}
+              onVerifyOffer={handleVerifyOffer}
+              setActiveTab={setActiveTab}
             />
           )}
           {canManageDrives && activeTab === 'matching' && (
@@ -913,6 +1006,10 @@ const CampusLinkPage = () => {
           loading={studentsLoading}
           onRefresh={() => loadStudents()}
           onUpdateStudentStatus={handleUpdateStudentStatus}
+          onPushOffer={handlePushOffer}
+          offers={offers}
+          onVerifyOffer={handleVerifyOffer}
+          setActiveTab={setActiveTab}
         />
       )}
 
@@ -954,7 +1051,11 @@ const CampusLinkPage = () => {
           isArcturusAdmin={isArcturusAdmin}
           isPlacementOfficer={isPlacementOfficer}
           offers={offers}
+          students={students}
           handleOfferResponse={handleOfferResponse}
+          onPushOffer={handlePushOffer}
+          onUploadDocument={handleUploadOfferDocument}
+          onVerifyOffer={handleVerifyOffer}
         />
       )}
 
