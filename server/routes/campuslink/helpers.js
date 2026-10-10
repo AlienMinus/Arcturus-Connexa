@@ -131,62 +131,74 @@ export const getFullCandidateProfile = async (userId) => {
 
 // Auto-derive placement academic & readiness credentials directly from user profile data
 export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
+  const primaryEdu = candidateProfile?.education?.[0];
+
+  // College / University: prioritize candidate's primary education record
   const collegeName =
-    userDoc?.institute?.name?.trim() ||
-    candidateProfile?.education?.[0]?.title?.trim() ||
-    'Arcturus Affiliated University';
+    primaryEdu?.title?.trim() ||
+    (userDoc?.institute?.name && !userDoc.institute.name.toLowerCase().includes('arcturus') ? userDoc.institute.name.trim() : '') ||
+    'Biju Patnaik University of Technology';
 
   const rollNumber =
     userDoc?.institute?.studentId?.trim() ||
     userDoc?.username?.toUpperCase() ||
     `ARCT-${userDoc?._id ? userDoc._id.toString().slice(-6).toUpperCase() : 'STUDENT'}`;
 
-  // Department / branch mapping
-  const deptCandidate = (
-    userDoc?.institute?.department ||
-    candidateProfile?.education?.[0]?.subtitle ||
-    candidateProfile?.headline ||
-    ''
-  ).toLowerCase();
+  // Department / branch mapping from primary education subtitle or user department
+  const branch =
+    primaryEdu?.subtitle?.trim() ||
+    userDoc?.institute?.department?.trim() ||
+    'Electrical & Computer Engineering';
 
-  let branch = 'Computer Science & Engineering';
-  if (deptCandidate.includes('info') || deptCandidate.includes('it')) {
-    branch = 'Information Technology';
-  } else if (deptCandidate.includes('elec') && deptCandidate.includes('comm')) {
-    branch = 'Electronics & Communication';
-  } else if (deptCandidate.includes('elec')) {
-    branch = 'Electrical & Electronics';
-  } else if (deptCandidate.includes('mech')) {
-    branch = 'Mechanical Engineering';
-  } else if (deptCandidate.includes('civil')) {
-    branch = 'Civil Engineering';
-  }
-
-  // Graduation year
+  // Graduation year from dateRange (e.g. "2023 - 2027" -> 2027)
   let graduationYear = userDoc?.institute?.graduationYear;
-  if (!graduationYear && candidateProfile?.education?.[0]?.dateRange) {
-    const match = candidateProfile.education[0].dateRange.match(/\b(20\d{2})\b/g);
+  if (primaryEdu?.dateRange) {
+    const match = primaryEdu.dateRange.match(/\b(20\d{2})\b/g);
     if (match && match.length > 0) {
       graduationYear = Number(match[match.length - 1]);
     }
   }
-  if (!graduationYear) graduationYear = 2026;
+  if (!graduationYear) graduationYear = 2027;
 
-  // Current CGPA: try parsing numeric grade from education description or subtitle
-  let cgpa = 8.2;
-  const eduDesc = `${candidateProfile?.education?.[0]?.description || ''} ${candidateProfile?.education?.[0]?.subtitle || ''}`;
+  // Current CGPA: parse numeric grade from education description or subtitle
+  let cgpa = 8.88;
+  const eduDesc = `${primaryEdu?.description || ''} ${primaryEdu?.subtitle || ''}`;
   const gpaMatch = eduDesc.match(/(?:cgpa|gpa|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i);
   if (gpaMatch && gpaMatch[1]) {
     const parsedGpa = parseFloat(gpaMatch[1]);
     if (parsedGpa > 0 && parsedGpa <= 10) cgpa = parsedGpa;
   }
 
+  // Parse 10th and 12th board percentages from education history
+  let tenthPercentage = undefined;
+  let twelfthPercentage = undefined;
+  if (Array.isArray(candidateProfile?.education)) {
+    for (const edu of candidateProfile.education) {
+      const text = `${edu.title || ''} ${edu.subtitle || ''} ${edu.description || ''}`;
+      if (/10th|secondary|matric/i.test(text) && !tenthPercentage) {
+        const m = (edu.description || text).match(/(?:percentage|percent|score|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i)
+          || (edu.description || text).match(/\b([5-9][0-9](?:\.[0-9]+)?)\b/);
+        if (m && m[1]) tenthPercentage = parseFloat(m[1]);
+      }
+      if (/12th|higher\s*secondary|intermediate|\+2|diploma/i.test(text) && !twelfthPercentage) {
+        const m = (edu.description || text).match(/(?:percentage|percent|score|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i)
+          || (edu.description || text).match(/\b([5-9][0-9](?:\.[0-9]+)?)\b/);
+        if (m && m[1]) twelfthPercentage = parseFloat(m[1]);
+      }
+    }
+  }
+  if (!tenthPercentage) tenthPercentage = 86.33;
+  if (!twelfthPercentage) twelfthPercentage = 87.5;
+
   const skills = Array.isArray(candidateProfile?.skills) ? candidateProfile.skills : [];
 
   // Target roles derived from headline
   let targetRoles = ['Software Development Engineer', 'Full Stack Developer', 'Cloud Engineer'];
   if (candidateProfile?.headline) {
-    const parts = candidateProfile.headline.split(/[,|•/]/).map((p) => p.trim()).filter(Boolean);
+    const parts = candidateProfile.headline
+      .split(/[,|•/]/)
+      .map((p) => p.trim())
+      .filter((p) => p && !p.toLowerCase().includes('student') && !p.toLowerCase().includes('participant') && !p.toLowerCase().includes('former'));
     if (parts.length > 0) targetRoles = parts.slice(0, 3);
   }
 
@@ -195,10 +207,10 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
   const experienceCount = candidateProfile?.experience?.length || 0;
   const certificationsCount = candidateProfile?.certifications?.length || 0;
 
-  const technicalScore = Math.min(98, Math.max(45, (skills.length * 6) + Math.round(cgpa * 4.5) + (certificationsCount * 5) + 20));
+  const technicalScore = Math.min(98, Math.max(45, (skills.length * 5) + Math.round(cgpa * 4.5) + (certificationsCount * 6) + 20));
   const aptitudeScore = Math.min(96, Math.max(45, Math.round(cgpa * 9.5) + (skills.some((s) => /dsa|algo|structure|math|python|c\+\+|java/i.test(s)) ? 8 : 0)));
   const communicationScore = Math.min(95, Math.max(50, 70 + (candidateProfile?.summary?.length > 40 ? 10 : 0) + (experienceCount > 0 ? 10 : 0)));
-  const projectScore = Math.min(98, Math.max(45, (projectsCount * 18) + (skills.length * 3) + (experienceCount * 10) + 25));
+  const projectScore = Math.min(98, Math.max(45, (projectsCount * 18) + (skills.length * 3) + (experienceCount * 10) + 20));
 
   const overallReadiness = Math.round(
     technicalScore * 0.35 + aptitudeScore * 0.25 + communicationScore * 0.2 + projectScore * 0.2
@@ -217,8 +229,8 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
     cgpa,
     activeBacklogs: 0,
     totalBacklogs: 0,
-    tenthPercentage: 88.0,
-    twelfthPercentage: 90.0,
+    tenthPercentage,
+    twelfthPercentage,
     skills,
     targetRoles,
     technicalScore,

@@ -55,10 +55,23 @@ router.get('/me', authMiddleware, async (req, res) => {
       return res.json({ profile: null, candidateProfile, diagnosticReport: null });
     }
 
-    // Refresh dynamic skill gap recommendations against actual scheduled drives
-    const profileSkills = Array.from(new Set([...(profile.skills || []), ...(candidateProfile?.skills || [])]));
-    profile.skills = profileSkills;
-    profile.skillGaps = computeSkillGaps(profileSkills, activeDrives);
+    // Synchronize latest profile credentials directly from candidate's Arcturus profile
+    const derived = derivePlacementDataFromProfile(userDoc, candidateProfile);
+    profile.collegeName = derived.collegeName;
+    profile.branch = derived.branch;
+    profile.graduationYear = derived.graduationYear;
+    profile.cgpa = derived.cgpa;
+    if (derived.tenthPercentage !== undefined) profile.tenthPercentage = derived.tenthPercentage;
+    if (derived.twelfthPercentage !== undefined) profile.twelfthPercentage = derived.twelfthPercentage;
+    profile.skills = derived.skills;
+    profile.targetRoles = derived.targetRoles;
+    profile.technicalScore = derived.technicalScore;
+    profile.aptitudeScore = derived.aptitudeScore;
+    profile.communicationScore = derived.communicationScore;
+    profile.projectScore = derived.projectScore;
+    profile.overallReadiness = derived.overallReadiness;
+    profile.readinessLevel = derived.readinessLevel;
+    profile.skillGaps = computeSkillGaps(derived.skills, activeDrives);
     await profile.save();
 
     const profileObj = profile.toObject ? profile.toObject() : profile;

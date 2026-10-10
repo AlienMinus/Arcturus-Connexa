@@ -28,15 +28,8 @@ const PlacementProfileSchema = new mongoose.Schema(
     collegeName: { type: String, required: true, trim: true },
     branch: {
       type: String,
-      enum: [
-        'Computer Science & Engineering',
-        'Information Technology',
-        'Electronics & Communication',
-        'Electrical & Electronics',
-        'Mechanical Engineering',
-        'Civil Engineering',
-      ],
       default: 'Computer Science & Engineering',
+      trim: true,
     },
     graduationYear: { type: Number, default: () => new Date().getFullYear() },
     cgpa: { type: Number, required: true, min: 0, max: 10 },
