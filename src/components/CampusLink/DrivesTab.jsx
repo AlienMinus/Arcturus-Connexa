@@ -11,7 +11,7 @@ import {
 
 export const DrivesTab = ({
   isArcturusAdmin,
-  canManageDrives = isArcturusAdmin,
+  canManageDrives = false,
   drives,
   conflicts,
   studentProfile,
@@ -46,8 +46,8 @@ export const DrivesTab = ({
         )}
       </div>
 
-      {/* Real-time Conflict Alert Banner - ADMIN EXCLUSIVE */}
-      {isArcturusAdmin && conflicts.length > 0 && (
+      {/* Real-time Conflict Alert Banner - PLACEMENT OFFICER EXCLUSIVE */}
+      {canManageDrives && conflicts.length > 0 && (
         <div className="conflictAlertBanner">
           <div className="conflictAlertHeader">
             <FaExclamationTriangle size={18} />

@@ -97,17 +97,20 @@ export const generatePlacementPdf = (report, user) => {
   doc.setFont('helvetica', 'bold');
   doc.text('Current CGPA:', col1X, metaY2);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${cand.cgpa ?? '8.88'} / 10.0`, col1X + 23, metaY2);
+  doc.text(cand.cgpa ? `${cand.cgpa} / 10.0` : 'Not specified', col1X + 23, metaY2);
 
   doc.setFont('helvetica', 'bold');
   doc.text('Graduation Year:', col2X, metaY2);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${cand.graduationYear || 2027}`, col2X + 26, metaY2);
+  doc.text(`${cand.graduationYear || '—'}`, col2X + 26, metaY2);
 
   doc.setFont('helvetica', 'bold');
   doc.text('Academic History:', col3X, metaY2);
   doc.setFont('helvetica', 'normal');
-  doc.text(`12th: ${cand.twelfthPercentage ?? 87.5}% · 10th: ${cand.tenthPercentage ?? 86.33}%`, col3X + 27, metaY2);
+  const priorAcadText = (cand.twelfthPercentage != null || cand.tenthPercentage != null)
+    ? `12th: ${cand.twelfthPercentage != null ? `${cand.twelfthPercentage}%` : '—'} · 10th: ${cand.tenthPercentage != null ? `${cand.tenthPercentage}%` : '—'}`
+    : 'Not specified';
+  doc.text(priorAcadText, col3X + 27, metaY2);
 
   y += 44;
 

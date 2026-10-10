@@ -22,7 +22,7 @@ export const CampusTabsNav = ({
   setIsChatFloatingOpen,
 }) => {
   const canAccessCommandCenter = isArcturusAdmin || isPlacementOfficer;
-  const canAccessMatching = isArcturusAdmin || isPlacementOfficer;
+  const canAccessMatching = isPlacementOfficer;
 
   return (
     <div className="campusTabsCard">
@@ -33,9 +33,9 @@ export const CampusTabsNav = ({
           className={`campusTabBtn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
-          {isArcturusAdmin ? (
+          {isArcturusAdmin && !isPlacementOfficer ? (
             <>
-              <FaShieldAlt size={14} /> Global Operations Hub
+              <FaShieldAlt size={14} /> Operations & System Hub
             </>
           ) : (
             <>
@@ -63,14 +63,14 @@ export const CampusTabsNav = ({
         onClick={() => setActiveTab('drives')}
       >
         <FaCalendarAlt size={14} />{' '}
-        {isArcturusAdmin ? (
-          'Platform Drives & Collisions'
-        ) : isPlacementOfficer ? (
+        {isPlacementOfficer ? (
           'Campus Drives & Schedules'
+        ) : isArcturusAdmin ? (
+          'Scheduled Placement Drives'
         ) : (
           `Eligible Drives (${drivesCount})`
         )}
-        {isArcturusAdmin && conflictsCount > 0 && (
+        {isPlacementOfficer && conflictsCount > 0 && (
           <span
             style={{
               background: '#ef4444',

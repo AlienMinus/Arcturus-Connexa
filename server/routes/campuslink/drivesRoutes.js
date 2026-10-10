@@ -65,16 +65,15 @@ router.post('/', authMiddleware, async (req, res) => {
       venue,
       totalOpenings,
     } = req.body;
-    const adminAccess = await isCampusLinkAdmin(req.userId);
-    const officerOrganization = adminAccess ? null : await getPlacementOfficerOrganization(req.userId);
+    const officerOrganization = await getPlacementOfficerOrganization(req.userId);
     const requestedOrganization = requestedOrganizationId ? await getManagedOrganization(req.userId, requestedOrganizationId) : null;
-    if (!adminAccess && !officerOrganization && !requestedOrganization) {
+    const authorizedOrg = officerOrganization || requestedOrganization;
+    if (!authorizedOrg) {
       return res.status(403).json({
-        error: 'Access denied: an approved linked organization is required to schedule this drive.',
+        error: 'Access denied: only verified placement officers of an organization can schedule placement drives.',
       });
     }
-    const organizationId = adminAccess ? requestedOrganizationId : officerOrganization?._id || requestedOrganization?._id;
-    if (!organizationId) return res.status(400).json({ error: 'An organization is required for this placement drive.' });
+    const organizationId = authorizedOrg._id;
 
     if (!companyName || !roleTitle || !description || !ctcLpa || !driveDate) {
       return res.status(400).json({ error: 'Company name, role, job description, CTC, and drive date are required.' });
@@ -124,10 +123,10 @@ router.patch('/:id/resolve-conflict', authMiddleware, async (req, res) => {
     const drive = await PlacementDrive.findById(req.params.id);
     const officerOrganization = await getPlacementOfficerOrganization(req.userId);
     const managedOrganization = drive?.organizationId ? await getManagedOrganization(req.userId, drive.organizationId) : null;
-    const authorized = (await isCampusLinkAdmin(req.userId)) || (officerOrganization && drive?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
+    const authorized = (officerOrganization && drive?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
     if (!authorized) {
       return res.status(403).json({
-        error: 'Access denied: Resolving drive conflicts is restricted strictly to Arcturus Administrators.',
+        error: 'Access denied: Resolving drive conflicts is restricted strictly to authorized Placement Officers.',
       });
     }
 
@@ -158,10 +157,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const drive = await PlacementDrive.findById(req.params.id);
     const officerOrganization = await getPlacementOfficerOrganization(req.userId);
     const managedOrganization = drive?.organizationId ? await getManagedOrganization(req.userId, drive.organizationId) : null;
-    const authorized = (await isCampusLinkAdmin(req.userId)) || (officerOrganization && drive?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
+    const authorized = (officerOrganization && drive?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
     if (!authorized) {
       return res.status(403).json({
-        error: 'Access denied: Deleting recruitment drives is restricted strictly to Arcturus Administrators.',
+        error: 'Access denied: Deleting recruitment drives is restricted strictly to authorized Placement Officers.',
       });
     }
 
@@ -184,12 +183,11 @@ router.get('/:id/match', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Drive not found' });
     }
 
-    const adminAccess = await isCampusLinkAdmin(req.userId);
     const officerOrganization = await getPlacementOfficerOrganization(req.userId);
     const managedOrganization = drive.organizationId ? await getManagedOrganization(req.userId, drive.organizationId) : null;
-    const officerAccess = officerOrganization && drive.organizationId?.toString() === officerOrganization._id.toString();
-    if (!adminAccess && !officerAccess && !managedOrganization) {
-      return res.status(403).json({ error: 'Only Arcturus Admin or the linked Placement Officer can view candidate matching.' });
+    const officerAccess = (officerOrganization && drive.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
+    if (!officerAccess) {
+      return res.status(403).json({ error: 'Only the linked Placement Officer can view candidate matching for this drive.' });
     }
 
     // Evaluate all registered student profiles
@@ -322,8 +320,8 @@ router.post('/:id/auto-shortlist', authMiddleware, async (req, res) => {
     const driveForAuthorization = await PlacementDrive.findById(req.params.id);
     const officerOrganization = await getPlacementOfficerOrganization(req.userId);
     const managedOrganization = driveForAuthorization?.organizationId ? await getManagedOrganization(req.userId, driveForAuthorization.organizationId) : null;
-    const authorized = (await isCampusLinkAdmin(req.userId)) || (officerOrganization && driveForAuthorization?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
-    if (!authorized) return res.status(403).json({ error: 'Only the linked Placement Officer or Arcturus Admin can shortlist candidates.' });
+    const authorized = (officerOrganization && driveForAuthorization?.organizationId?.toString() === officerOrganization._id.toString()) || managedOrganization;
+    if (!authorized) return res.status(403).json({ error: 'Only the linked Placement Officer can shortlist candidates.' });
     const drive = driveForAuthorization;
     if (!drive) return res.status(404).json({ error: 'Drive not found' });
 

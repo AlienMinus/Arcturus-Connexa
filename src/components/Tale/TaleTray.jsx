@@ -28,7 +28,8 @@ const TaleTray = () => {
 
   const fetchTales = useCallback(async () => {
     try {
-      const response = await fetch(buildApiUrl('/tales'));
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await fetch(buildApiUrl('/tales'), { headers });
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -45,7 +46,7 @@ const TaleTray = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchTales();

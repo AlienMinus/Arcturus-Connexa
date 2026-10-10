@@ -137,18 +137,17 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
   const collegeName =
     primaryEdu?.title?.trim() ||
     (userDoc?.institute?.name && !userDoc.institute.name.toLowerCase().includes('arcturus') ? userDoc.institute.name.trim() : '') ||
-    'Biju Patnaik University of Technology';
+    '';
 
   const rollNumber =
     userDoc?.institute?.studentId?.trim() ||
-    userDoc?.username?.toUpperCase() ||
-    `ARCT-${userDoc?._id ? userDoc._id.toString().slice(-6).toUpperCase() : 'STUDENT'}`;
+    (userDoc?.username ? `ARCT-${userDoc.username.toUpperCase()}` : '');
 
   // Department / branch mapping from primary education subtitle or user department
   const branch =
     primaryEdu?.subtitle?.trim() ||
     userDoc?.institute?.department?.trim() ||
-    'Electrical & Computer Engineering';
+    '';
 
   // Graduation year from dateRange (e.g. "2023 - 2027" -> 2027)
   let graduationYear = userDoc?.institute?.graduationYear;
@@ -158,10 +157,10 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
       graduationYear = Number(match[match.length - 1]);
     }
   }
-  if (!graduationYear) graduationYear = 2027;
+  if (!graduationYear) graduationYear = new Date().getFullYear();
 
   // Current CGPA: parse numeric grade from education description or subtitle
-  let cgpa = 8.88;
+  let cgpa = 0;
   const eduDesc = `${primaryEdu?.description || ''} ${primaryEdu?.subtitle || ''}`;
   const gpaMatch = eduDesc.match(/(?:cgpa|gpa|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i);
   if (gpaMatch && gpaMatch[1]) {
@@ -175,25 +174,23 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
   if (Array.isArray(candidateProfile?.education)) {
     for (const edu of candidateProfile.education) {
       const text = `${edu.title || ''} ${edu.subtitle || ''} ${edu.description || ''}`;
-      if (/10th|secondary|matric/i.test(text) && !tenthPercentage) {
+      if (/10th|secondary|matric/i.test(text) && tenthPercentage === undefined) {
         const m = (edu.description || text).match(/(?:percentage|percent|score|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i)
           || (edu.description || text).match(/\b([5-9][0-9](?:\.[0-9]+)?)\b/);
         if (m && m[1]) tenthPercentage = parseFloat(m[1]);
       }
-      if (/12th|higher\s*secondary|intermediate|\+2|diploma/i.test(text) && !twelfthPercentage) {
+      if (/12th|higher\s*secondary|intermediate|\+2|diploma/i.test(text) && twelfthPercentage === undefined) {
         const m = (edu.description || text).match(/(?:percentage|percent|score|grade)[:\s]*([0-9]+(?:\.[0-9]+)?)/i)
           || (edu.description || text).match(/\b([5-9][0-9](?:\.[0-9]+)?)\b/);
         if (m && m[1]) twelfthPercentage = parseFloat(m[1]);
       }
     }
   }
-  if (!tenthPercentage) tenthPercentage = 86.33;
-  if (!twelfthPercentage) twelfthPercentage = 87.5;
 
   const skills = Array.isArray(candidateProfile?.skills) ? candidateProfile.skills : [];
 
   // Target roles derived from headline
-  let targetRoles = ['Software Development Engineer', 'Full Stack Developer', 'Cloud Engineer'];
+  let targetRoles = [];
   if (candidateProfile?.headline) {
     const parts = candidateProfile.headline
       .split(/[,|•/]/)
@@ -201,25 +198,38 @@ export const derivePlacementDataFromProfile = (userDoc, candidateProfile) => {
       .filter((p) => p && !p.toLowerCase().includes('student') && !p.toLowerCase().includes('participant') && !p.toLowerCase().includes('former'));
     if (parts.length > 0) targetRoles = parts.slice(0, 3);
   }
+  if (targetRoles.length === 0) {
+    targetRoles = ['Software Development Engineer', 'Full Stack Developer'];
+  }
 
   // Dimension scores computed directly from applicant's real projects, background, and skills
   const projectsCount = candidateProfile?.projects?.length || 0;
   const experienceCount = candidateProfile?.experience?.length || 0;
   const certificationsCount = candidateProfile?.certifications?.length || 0;
 
-  const technicalScore = Math.min(98, Math.max(45, (skills.length * 5) + Math.round(cgpa * 4.5) + (certificationsCount * 6) + 20));
-  const aptitudeScore = Math.min(96, Math.max(45, Math.round(cgpa * 9.5) + (skills.some((s) => /dsa|algo|structure|math|python|c\+\+|java/i.test(s)) ? 8 : 0)));
-  const communicationScore = Math.min(95, Math.max(50, 70 + (candidateProfile?.summary?.length > 40 ? 10 : 0) + (experienceCount > 0 ? 10 : 0)));
-  const projectScore = Math.min(98, Math.max(45, (projectsCount * 18) + (skills.length * 3) + (experienceCount * 10) + 20));
+  const hasCredentials = projectsCount > 0 || skills.length > 0 || cgpa > 0 || experienceCount > 0;
+
+  const technicalScore = hasCredentials
+    ? Math.min(98, Math.max(30, (skills.length * 4) + Math.round(cgpa * 4.5) + (certificationsCount * 6) + 15))
+    : 15;
+  const aptitudeScore = hasCredentials
+    ? Math.min(96, Math.max(30, Math.round(cgpa * 9.5) + (skills.some((s) => /dsa|algo|structure|math|python|c\+\+|java/i.test(s)) ? 8 : 0)))
+    : 15;
+  const communicationScore = hasCredentials
+    ? Math.min(95, Math.max(40, 60 + (candidateProfile?.summary?.length > 40 ? 15 : 0) + (experienceCount > 0 ? 10 : 0)))
+    : 20;
+  const projectScore = hasCredentials
+    ? Math.min(98, Math.max(30, (projectsCount * 20) + (skills.length * 2) + (experienceCount * 10) + 10))
+    : 10;
 
   const overallReadiness = Math.round(
     technicalScore * 0.35 + aptitudeScore * 0.25 + communicationScore * 0.2 + projectScore * 0.2
   );
 
-  let readinessLevel = 'Developing';
+  let readinessLevel = 'Not Ready';
   if (overallReadiness >= 85) readinessLevel = 'Highly Employable';
   else if (overallReadiness >= 70) readinessLevel = 'Ready';
-  else if (overallReadiness < 50) readinessLevel = 'Not Ready';
+  else if (overallReadiness >= 50) readinessLevel = 'Developing';
 
   return {
     collegeName,
@@ -282,7 +292,7 @@ export const generateDiagnosticReport = ({ profile, candidateProfile, activeDriv
     },
   ];
 
-  const overall = profile.overallReadiness || 75;
+  const overall = profile.overallReadiness ?? 20;
 
   return {
     reportId: `ACT-DIAG-${profile._id ? profile._id.toString().slice(-6).toUpperCase() : Date.now()}`,
@@ -294,13 +304,15 @@ export const generateDiagnosticReport = ({ profile, candidateProfile, activeDriv
       username: candidateProfile?.username || '',
       email: candidateProfile?.email || '',
       headline: candidateProfile?.headline || '',
-      collegeName: profile.collegeName || 'Arcturus Affiliated University',
-      department: profile.branch || 'Computer Science & Engineering',
-      rollNumber: profile.rollNumber || 'CANDIDATE-01',
+      collegeName: profile.collegeName || '',
+      department: profile.branch || '',
+      rollNumber: profile.rollNumber || (candidateProfile?.username ? `ARCT-${candidateProfile.username.toUpperCase()}` : ''),
       graduationYear: profile.graduationYear || new Date().getFullYear(),
-      cgpa: profile.cgpa || 8.0,
+      cgpa: profile.cgpa ?? 0,
       activeBacklogs: profile.activeBacklogs || 0,
       totalBacklogs: profile.totalBacklogs || 0,
+      tenthPercentage: profile.tenthPercentage,
+      twelfthPercentage: profile.twelfthPercentage,
       skills,
       targetRoles: profile.targetRoles?.length ? profile.targetRoles : ['Software Development Engineer', 'Full Stack Developer'],
       portfolioSummary: {
@@ -312,11 +324,11 @@ export const generateDiagnosticReport = ({ profile, candidateProfile, activeDriv
     },
     predictiveReadiness: {
       overallScore: overall,
-      readinessLevel: profile.readinessLevel || 'Ready',
+      readinessLevel: profile.readinessLevel || 'Not Ready',
       status: (profile.placementStatus || 'unplaced').replace('_', ' ').toUpperCase(),
       dimensions: {
         technicalCompetency: {
-          score: profile.technicalScore || 70,
+          score: profile.technicalScore ?? 15,
           benchmark: 75,
           status: (profile.technicalScore || 70) >= 75 ? 'Strong' : 'Needs Practice',
         },

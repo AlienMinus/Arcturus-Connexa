@@ -36,35 +36,35 @@ export const ReadinessTab = ({
   const [showDetails, setShowDetails] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  // Fallback diagnostic report generator if backend hasn't populated one yet
+  // Dynamic diagnostic report extractor from authenticated user profile
   const getActiveReport = () => {
     if (diagnosticReport) return diagnosticReport;
 
     const candProfile = studentProfile?.candidateProfile;
-    const fullName = candProfile?.fullName || user?.name || (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.username) || 'Manas Ranjan Das';
-    const college = studentProfile?.collegeName || candProfile?.education?.[0]?.title || 'Biju Patnaik University of Technology';
-    const branch = studentProfile?.branch || candProfile?.education?.[0]?.subtitle || 'Electrical & Computer Engineering';
-    const gradYear = studentProfile?.graduationYear || 2027;
-    const cgpa = studentProfile?.cgpa ?? 8.88;
-    const tenth = studentProfile?.tenthPercentage ?? 86.33;
-    const twelfth = studentProfile?.twelfthPercentage ?? 87.5;
+    const fullName = candProfile?.fullName || (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.name || user?.username) || 'Student Candidate';
+    const college = studentProfile?.collegeName || user?.institute?.name || candProfile?.education?.[0]?.title || '';
+    const branch = studentProfile?.branch || user?.institute?.department || candProfile?.education?.[0]?.subtitle || '';
+    const gradYear = studentProfile?.graduationYear || user?.institute?.graduationYear || new Date().getFullYear();
+    const cgpa = studentProfile?.cgpa ?? 0;
+    const tenth = studentProfile?.tenthPercentage ?? null;
+    const twelfth = studentProfile?.twelfthPercentage ?? null;
     const skills = studentProfile?.skills?.length ? studentProfile.skills : (candProfile?.skills || []);
-    const projectsCount = candProfile?.projects?.length || 4;
-    const experienceCount = candProfile?.experience?.length || 2;
-    const certificationsCount = candProfile?.certifications?.length || 1;
+    const projectsCount = candProfile?.projects?.length || 0;
+    const experienceCount = candProfile?.experience?.length || 0;
+    const certificationsCount = candProfile?.certifications?.length || 0;
 
     return {
-      reportId: `ACT-DIAG-${studentProfile?._id ? studentProfile._id.slice(-6).toUpperCase() : '9D4DED'}`,
+      reportId: `ACT-DIAG-${studentProfile?._id ? studentProfile._id.slice(-6).toUpperCase() : 'PENDING'}`,
       generatedAt: studentProfile?.gemmaDiagnosticTimestamp || new Date().toISOString(),
       status: 'COMPLETED',
       candidate: {
         fullName,
-        username: user?.username || 'manas_ranjan_das',
+        username: user?.username || '',
         email: user?.email || '',
-        headline: candProfile?.headline || user?.headline || 'Soft-Edge-Cloud-Quantum Computing | Cybersecurity | MERN | Mechatronics | Student @BPUT',
+        headline: candProfile?.headline || user?.headline || '',
         collegeName: college,
         department: branch,
-        rollNumber: studentProfile?.rollNumber || user?.institute?.studentId || '2301206189',
+        rollNumber: studentProfile?.rollNumber || user?.institute?.studentId || (user?.username ? `ARCT-${user.username.toUpperCase()}` : ''),
         graduationYear: gradYear,
         cgpa,
         tenthPercentage: tenth,
@@ -72,26 +72,26 @@ export const ReadinessTab = ({
         activeBacklogs: studentProfile?.activeBacklogs || 0,
         totalBacklogs: studentProfile?.totalBacklogs || 0,
         skills,
-        targetRoles: studentProfile?.targetRoles || ['Soft-Edge-Cloud-Quantum Computing', 'Cybersecurity', 'MERN Full Stack'],
+        targetRoles: studentProfile?.targetRoles?.length ? studentProfile.targetRoles : ['Software Development Engineer', 'Full Stack Developer'],
         portfolioSummary: {
           projectsCount,
           experienceCount,
           certificationsCount,
-          skillsCount: skills.length || 24,
+          skillsCount: skills.length,
         },
       },
       predictiveReadiness: {
-        overallScore: studentProfile?.overallReadiness || 95,
-        readinessLevel: studentProfile?.readinessLevel || 'Highly Employable',
+        overallScore: studentProfile?.overallReadiness ?? 20,
+        readinessLevel: studentProfile?.readinessLevel || 'Not Ready',
         status: (studentProfile?.placementStatus || 'unplaced').replace('_', ' ').toUpperCase(),
         dimensions: {
-          technicalCompetency: { score: studentProfile?.technicalScore || 98, benchmark: 75, status: 'Strong' },
-          aptitudeAndProblemSolving: { score: studentProfile?.aptitudeScore || 92, benchmark: 70, status: 'Above Average' },
-          communicationAndBehavioral: { score: studentProfile?.communicationScore || 90, benchmark: 75, status: 'Competent' },
-          projectAndPracticalExperience: { score: studentProfile?.projectScore || 98, benchmark: 65, status: 'Strong' },
+          technicalCompetency: { score: studentProfile?.technicalScore ?? 20, benchmark: 75, status: (studentProfile?.technicalScore || 20) >= 75 ? 'Strong' : 'Needs Practice' },
+          aptitudeAndProblemSolving: { score: studentProfile?.aptitudeScore ?? 20, benchmark: 70, status: (studentProfile?.aptitudeScore || 20) >= 70 ? 'Above Average' : 'Needs Practice' },
+          communicationAndBehavioral: { score: studentProfile?.communicationScore ?? 25, benchmark: 75, status: (studentProfile?.communicationScore || 25) >= 75 ? 'Competent' : 'Developing' },
+          projectAndPracticalExperience: { score: studentProfile?.projectScore ?? 15, benchmark: 65, status: (studentProfile?.projectScore || 15) >= 65 ? 'Strong' : 'Needs Practice' },
         },
-        percentileRank: 'Top 5% in University Batch',
-        placementProbability: '99%',
+        percentileRank: (studentProfile?.overallReadiness || 0) >= 80 ? 'Top Tier' : 'Developing',
+        placementProbability: studentProfile?.overallReadiness ? `${studentProfile.overallReadiness}%` : '20%',
       },
       skillGapAnalysis: (studentProfile?.skillGaps || []).map((gap) => ({
         companyAndRole: gap.targetRole,
@@ -170,16 +170,16 @@ export const ReadinessTab = ({
 
   // Profile display field extraction
   const cand = activeReport?.candidate || {};
-  const displayName = cand.fullName || studentProfile?.candidateProfile?.fullName || user?.name || (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.username) || 'Manas Ranjan Das';
-  const displayCollege = studentProfile?.collegeName || cand.collegeName || 'Biju Patnaik University of Technology';
-  const displayBranch = studentProfile?.branch || cand.department || 'Electrical & Computer Engineering';
-  const displayGradYear = studentProfile?.graduationYear || cand.graduationYear || 2027;
-  const displayRoll = studentProfile?.rollNumber || cand.rollNumber || user?.institute?.studentId || '2301206189';
-  const displayCgpa = studentProfile?.cgpa ?? cand.cgpa ?? 8.88;
-  const displayProjectsCount = studentProfile?.candidateProfile?.projects?.length ?? cand.portfolioSummary?.projectsCount ?? 4;
-  const displayExpCount = studentProfile?.candidateProfile?.experience?.length ?? cand.portfolioSummary?.experienceCount ?? 2;
-  const displayCertsCount = studentProfile?.candidateProfile?.certifications?.length ?? cand.portfolioSummary?.certificationsCount ?? 1;
-  const displaySkillsCount = studentProfile?.skills?.length ?? cand.portfolioSummary?.skillsCount ?? 24;
+  const displayName = cand.fullName || studentProfile?.candidateProfile?.fullName || (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.name || user?.username) || 'Student Candidate';
+  const displayCollege = studentProfile?.collegeName || cand.collegeName || user?.institute?.name || '';
+  const displayBranch = studentProfile?.branch || cand.department || user?.institute?.department || '';
+  const displayGradYear = studentProfile?.graduationYear || cand.graduationYear || user?.institute?.graduationYear || new Date().getFullYear();
+  const displayRoll = studentProfile?.rollNumber || cand.rollNumber || user?.institute?.studentId || (user?.username ? `ARCT-${user.username.toUpperCase()}` : '');
+  const displayCgpa = studentProfile?.cgpa ?? cand.cgpa ?? 0;
+  const displayProjectsCount = studentProfile?.candidateProfile?.projects?.length ?? cand.portfolioSummary?.projectsCount ?? 0;
+  const displayExpCount = studentProfile?.candidateProfile?.experience?.length ?? cand.portfolioSummary?.experienceCount ?? 0;
+  const displayCertsCount = studentProfile?.candidateProfile?.certifications?.length ?? cand.portfolioSummary?.certificationsCount ?? 0;
+  const displaySkillsCount = studentProfile?.skills?.length ?? cand.portfolioSummary?.skillsCount ?? (candProfile?.skills?.length || 0);
   const displayHeadline = studentProfile?.candidateProfile?.headline || cand.headline || user?.headline;
 
   return (
@@ -235,19 +235,19 @@ export const ReadinessTab = ({
             <div className="profileCredentialsMetaGrid">
               <div className="metaGridItem">
                 <FaUniversity color="#0a66c2" size={13} />
-                <span><strong>{displayCollege}</strong></span>
+                <span><strong>{displayCollege || 'University not specified'}</strong></span>
               </div>
               <div className="metaGridItem">
                 <FaGraduationCap color="#16a34a" size={13} />
-                <span>{displayBranch} (Grad {displayGradYear})</span>
+                <span>{displayBranch || 'Department not specified'} (Grad {displayGradYear})</span>
               </div>
               <div className="metaGridItem">
                 <FaIdCard color="#7e22ce" size={13} />
-                <span>ID: {displayRoll}</span>
+                <span>ID: {displayRoll || 'Pending'}</span>
               </div>
               <div className="metaGridItem">
                 <FaChartLine color="#ea580c" size={13} />
-                <span>CGPA: <strong>{displayCgpa}</strong> / 10.0</span>
+                <span>CGPA: <strong>{displayCgpa > 0 ? displayCgpa : 'Not set'}</strong> / 10.0</span>
               </div>
             </div>
 

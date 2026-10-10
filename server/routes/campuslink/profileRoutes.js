@@ -140,20 +140,7 @@ router.post('/', authMiddleware, async (req, res) => {
     const numTwelfth = twelfthPercentage !== undefined && twelfthPercentage !== '' ? Number(twelfthPercentage) : undefined;
     const numMockInterviews = Math.max(0, Number(mockInterviewsTaken) || 0);
 
-    const validBranches = [
-      'Computer Science & Engineering',
-      'Information Technology',
-      'Electronics & Communication',
-      'Electrical & Electronics',
-      'Mechanical Engineering',
-      'Civil Engineering',
-    ];
-    let sanitizedBranch = branch.trim();
-    if (sanitizedBranch === 'Electrical Engineering') {
-      sanitizedBranch = 'Electrical & Electronics';
-    } else if (!validBranches.includes(sanitizedBranch)) {
-      sanitizedBranch = 'Computer Science & Engineering';
-    }
+    const sanitizedBranch = (branch || '').trim();
 
     const validPlacementStatuses = ['unplaced', 'shortlisted', 'interviewing', 'placed', 'opted_out'];
     const sanitizedPlacementStatus = validPlacementStatuses.includes(placementStatus)

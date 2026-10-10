@@ -33,8 +33,11 @@ const CampusLinkPage = () => {
   const isOrgOfficer =
     isOrganizationAccount && (activeAccount?.role === 'Placement Officer' || activeAccount?.role === 'Admin');
 
+  // If admin is an approved placement officer of their organization, they have placement officer rights for that org
+  const isAdminPlacementOfficer =
+    isArcturusAdmin && Boolean(analyticsPayload?.isPlacementOfficer || isApprovedOfficer || isOrgOfficer);
+
   const isPlacementOfficer =
-    !isArcturusAdmin &&
     Boolean(
       analyticsPayload?.isPlacementOfficer ||
         isApprovedOfficer ||
@@ -42,8 +45,13 @@ const CampusLinkPage = () => {
         isOrgOfficer
     );
 
+  // Pure Admin: Platform Administrator who is NOT a placement officer of any organization
+  const isPureAdmin = isArcturusAdmin && !isAdminPlacementOfficer;
+
+  // Manage drives: allowed ONLY for placement officers (or an admin who is a placement officer of their org)
+  const canManageDrives = !isPureAdmin && (isPlacementOfficer || isOrgOfficer);
+
   const canAccessCommandCenter = isArcturusAdmin || isPlacementOfficer;
-  const canManageDrives = isArcturusAdmin || isPlacementOfficer || isOrganizationAccount;
 
   const officerInstitute =
     analyticsPayload?.institute ||
@@ -101,7 +109,7 @@ const CampusLinkPage = () => {
   const [profileForm, setProfileForm] = useState({
     collegeName: '',
     rollNumber: '',
-    branch: 'Computer Science & Engineering',
+    branch: '',
     graduationYear: 2026,
     cgpa: '',
     tenthPercentage: '',
@@ -228,7 +236,7 @@ const CampusLinkPage = () => {
             setProfileForm({
               collegeName: profData.profile.collegeName || '',
               rollNumber: profData.profile.rollNumber || '',
-              branch: profData.profile.branch || 'Computer Science & Engineering',
+              branch: profData.profile.branch || '',
               graduationYear: profData.profile.graduationYear || 2026,
               cgpa: profData.profile.cgpa ?? '',
               tenthPercentage: profData.profile.tenthPercentage ?? '',
@@ -722,6 +730,7 @@ const CampusLinkPage = () => {
       {activeTab === 'drives' && (
         <DrivesTab
           isArcturusAdmin={isArcturusAdmin}
+          canManageDrives={canManageDrives}
           drives={drives}
           conflicts={conflicts}
           studentProfile={studentProfile}

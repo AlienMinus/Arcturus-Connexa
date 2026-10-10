@@ -5,6 +5,7 @@ import Tale from '../models/Tale.js';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
 import authMiddleware from '../middleware/auth.js';
+import { verifyAccessToken } from '../utils/jwtUtils.js';
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -25,11 +26,54 @@ const getFullName = (u) => {
   return parts.length > 0 ? parts.join(' ') : (u.name || u.username || 'Anonymous');
 };
 
-// GET /api/tales - List active (unexpired) tales grouped by user
+const canUserAccessTale = async (viewerId, taleAuthorId) => {
+  if (!viewerId || !taleAuthorId) return false;
+  if (viewerId.toString() === taleAuthorId.toString()) return true;
+  const author = await User.findById(taleAuthorId).select('followers following connections').lean();
+  if (!author) return false;
+  const vIdStr = viewerId.toString();
+  return (
+    (author.followers || []).some((id) => id.toString() === vIdStr) ||
+    (author.following || []).some((id) => id.toString() === vIdStr) ||
+    (author.connections || []).some((id) => id.toString() === vIdStr)
+  );
+};
+
+// GET /api/tales - List active tales visible ONLY to author's followers & connections (and own tales)
 router.get('/', async (req, res) => {
   try {
+    let currentUserId = null;
+    if (req.headers.authorization?.startsWith('Bearer ')) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = verifyAccessToken(token);
+        currentUserId = decoded?.userId;
+      } catch (e) {}
+    }
+
+    if (!currentUserId) {
+      return res.json([]);
+    }
+
+    const currentUser = await User.findById(currentUserId)
+      .select('followers following connections')
+      .lean();
+
+    if (!currentUser) {
+      return res.json([]);
+    }
+
+    // Allowed tale authors: own tales, following, mutual connections, and followers
+    const allowedAuthorIds = new Set([
+      currentUserId.toString(),
+      ...(currentUser.following || []).map((id) => id.toString()),
+      ...(currentUser.connections || []).map((id) => id.toString()),
+      ...(currentUser.followers || []).map((id) => id.toString()),
+    ]);
+
     const activeTales = await Tale.find({
       expiresAt: { $gt: new Date() },
+      userId: { $in: Array.from(allowedAuthorIds) },
     })
       .populate('userId', 'firstName middleName lastName name profilePicture username headline')
       .populate('viewers.userId', 'firstName middleName lastName name profilePicture username')
@@ -130,6 +174,11 @@ router.post('/:id/view', authMiddleware, async (req, res) => {
     }
 
     const userId = req.userId;
+    const authorId = tale.userId?._id || tale.userId;
+    if (!(await canUserAccessTale(userId, authorId))) {
+      return res.status(403).json({ error: 'This tale is private to followers and connections only.' });
+    }
+
     const alreadyViewed = tale.viewers.some((v) => v.userId.toString() === userId.toString());
 
     if (!alreadyViewed && tale.userId.toString() !== userId.toString()) {
@@ -158,6 +207,11 @@ router.post('/:id/react', authMiddleware, async (req, res) => {
     }
 
     const userId = req.userId;
+    const authorId = tale.userId?._id || tale.userId;
+    if (!(await canUserAccessTale(userId, authorId))) {
+      return res.status(403).json({ error: 'This tale is private to followers and connections only.' });
+    }
+
     tale.reactions = (tale.reactions || []).filter((r) => r.userId.toString() !== userId.toString());
     tale.reactions.push({ userId, reaction, createdAt: new Date() });
     await tale.save();
@@ -184,7 +238,10 @@ router.post('/:id/comment', authMiddleware, async (req, res) => {
     }
 
     const senderId = req.userId;
-    const authorId = tale.userId._id;
+    const authorId = tale.userId._id || tale.userId;
+    if (!(await canUserAccessTale(senderId, authorId))) {
+      return res.status(403).json({ error: 'This tale is private to followers and connections only.' });
+    }
 
     // 1. Save public comment on the Tale
     tale.comments = tale.comments || [];

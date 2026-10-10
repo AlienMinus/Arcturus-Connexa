@@ -67,6 +67,156 @@ export const CommandCenterTab = ({
     );
   }
 
+  const isPureAdmin = isArcturusAdmin && !isPlacementOfficer;
+
+  // Platform Operations Hub for Pure Administrators (No individual student placement data)
+  if (isPureAdmin) {
+    const platformAnalytics = analyticsPayload?.platformAnalytics || {};
+    const platformDirectory = analyticsPayload?.platformDirectory || [];
+
+    return (
+      <div className="campusPanel">
+        {/* Header */}
+        <div className="campusPanelHeader">
+          <div>
+            <h2>
+              <FaShieldAlt color="#0a66c2" /> Platform Operations & Infrastructure Hub
+            </h2>
+            <p>
+              Arcturus Enterprise Platform Administration. System telemetry, verified organization directory, and infrastructure operations.
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="isolationSecurityBadge" style={{ background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}>
+              <FaShieldAlt size={11} /> Platform Admin Mode
+            </span>
+            <button type="button" className="campusTabBtn active" onClick={() => loadCampusData()}>
+              <FaSyncAlt size={12} /> Refresh Data
+            </button>
+          </div>
+        </div>
+
+        {/* Isolation Policy Banner */}
+        <div
+          className="campusSubCard"
+          style={{
+            background: '#f8fafc',
+            border: '1px solid #cbd5e1',
+            borderRadius: 10,
+            padding: '16px 20px',
+            marginBottom: 20,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <FaLock color="#0a66c2" size={16} />
+            <strong style={{ color: '#0f172a', fontSize: '0.94rem' }}>
+              Institutional Student Placement Data Isolated
+            </strong>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
+            Under Arcturus Institutional Privacy Architecture, individual candidate profiles, academic CGPAs, at-risk rosters, and recruitment drive scheduling are strictly isolated to verified Institutional Placement Officers. Platform Administrators view platform-wide telemetry and partner organization status.
+          </p>
+        </div>
+
+        {/* Platform Telemetry KPI Grid */}
+        <div className="campusKpiGrid">
+          <div className="campusKpiCard">
+            <div className="campusKpiIconBox" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+              <FaUsers size={22} />
+            </div>
+            <div className="campusKpiMeta">
+              <h5>Total Platform Users</h5>
+              <p>{platformAnalytics.totalPlatformUsers || analytics?.totalRegisteredStudents || 0}</p>
+            </div>
+          </div>
+
+          <div className="campusKpiCard">
+            <div className="campusKpiIconBox" style={{ background: '#dcfce7', color: '#166534' }}>
+              <FaAward size={22} />
+            </div>
+            <div className="campusKpiMeta">
+              <h5>Verified Compliance</h5>
+              <p>{platformAnalytics.verificationRate != null ? `${platformAnalytics.verificationRate}%` : '100%'}</p>
+            </div>
+          </div>
+
+          <div className="campusKpiCard">
+            <div className="campusKpiIconBox" style={{ background: '#fef3c7', color: '#b45309' }}>
+              <FaBuilding size={22} />
+            </div>
+            <div className="campusKpiMeta">
+              <h5>Partner Organizations</h5>
+              <p>{platformAnalytics.totalOrganizations || platformDirectory.length || 0}</p>
+            </div>
+          </div>
+
+          <div className="campusKpiCard">
+            <div className="campusKpiIconBox" style={{ background: '#f3e8ff', color: '#7e22ce' }}>
+              <FaChartLine size={22} />
+            </div>
+            <div className="campusKpiMeta">
+              <h5>System Health & Uptime</h5>
+              <p>{platformAnalytics.apiUptime || '99.98%'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Verified Organizations Directory Table */}
+        <div className="institutesTableCard">
+          <div className="institutesTableCardHeader">
+            <h3>
+              <FaUniversity color="#0a66c2" /> Verified Partner Organizations & Institutions ({platformDirectory.length})
+            </h3>
+            <small style={{ color: '#64748b' }}>Platform Network Directory</small>
+          </div>
+
+          <div className="institutesTableWrapper">
+            <table className="institutesTable">
+              <thead>
+                <tr>
+                  <th>Organization / Institution</th>
+                  <th>Industry / Domain</th>
+                  <th>Location</th>
+                  <th>Network Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {platformDirectory.length > 0 ? (
+                  platformDirectory.map((org) => (
+                    <tr key={org.id}>
+                      <td>
+                        <div className="instituteMetaCell">
+                          <img src={org.logo} alt={org.name} className="instituteMetaLogo" />
+                          <div>
+                            <p className="instituteMetaName">{org.name}</p>
+                            <p className="instituteMetaLocation">@{org.slug}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td><strong>{org.industry || 'Higher Education'}</strong></td>
+                      <td>📍 {org.location || 'Network Member'}</td>
+                      <td>
+                        <span className="ratePill ratePillHigh">
+                          ✅ {org.status || 'Verified'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '24px 16px', color: '#64748b' }}>
+                      No partner organizations currently registered.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const inspectingInstitute = analyticsPayload?.inspectingInstitute;
   const isInspectingSingleInstitute = Boolean(selectedAdminInstituteId && inspectingInstitute);
   const instituteName =
