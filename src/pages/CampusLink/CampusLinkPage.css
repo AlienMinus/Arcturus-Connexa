@@ -2761,5 +2761,105 @@ body.dark-mode .typingDots span {
   }
 }
 
+/* Students Management Section */
+.studentsFilterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+}
 
+.studentsSearchBox {
+  position: relative;
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+}
 
+.studentsSearchIcon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.studentsSearchInput {
+  width: 100%;
+  padding: 10px 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.studentsSearchInput:focus {
+  border-color: #0a66c2;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
+}
+
+.studentsClearSearch {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studentsClearSearch:hover {
+  color: #475569;
+}
+
+.studentsSelectGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 2 1 auto;
+}
+
+.studentsSelect {
+  flex: 1 1 180px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  background: #f8fafc;
+  color: #334155;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.studentsSelect:focus {
+  border-color: #0a66c2;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.12);
+}
+
+@media (max-width: 768px) {
+  .studentsFilterBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .studentsSelectGroup {
+    flex-direction: column;
+  }
+  .studentsSelect {
+    width: 100%;
+  }
+}

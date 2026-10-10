@@ -3,11 +3,14 @@ import {
   FaGraduationCap,
   FaSearch,
   FaDownload,
+  FaSyncAlt,
   FaCheckCircle,
   FaClock,
   FaEdit,
   FaTimes,
   FaUserGraduate,
+  FaUsers,
+  FaAward,
   FaChartLine,
 } from 'react-icons/fa';
 
@@ -85,7 +88,20 @@ export const StudentsTab = ({
 
   const exportCsv = () => {
     if (!students || students.length === 0) return;
-    const headers = ['Name', 'Username', 'Email', 'Roll Number', 'Branch', 'Graduation Year', 'CGPA', 'Backlogs', 'Readiness Score', 'Readiness Tier', 'Placement Status', 'Assigned Mentor'];
+    const headers = [
+      'Name',
+      'Username',
+      'Email',
+      'Roll Number',
+      'Branch',
+      'Graduation Year',
+      'CGPA',
+      'Backlogs',
+      'Readiness Score',
+      'Readiness Tier',
+      'Placement Status',
+      'Assigned Mentor',
+    ];
     const rows = students.map((s) => [
       `"${s.name || ''}"`,
       `"${s.username || ''}"`,
@@ -101,11 +117,16 @@ export const StudentsTab = ({
       `"${s.assignedMentor || ''}"`,
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${organization?.name || 'institute'}_students_roster.csv`);
+    link.setAttribute(
+      'download',
+      `${(organization?.name || 'institute').replace(/[^a-zA-Z0-9_-]/g, '_')}_students_roster.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -114,308 +135,366 @@ export const StudentsTab = ({
   return (
     <div className="campusPanel">
       {/* Panel Header */}
-      <div className="campusPanelHeader" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+      <div className="campusPanelHeader">
         <div>
           <h2>
             <FaGraduationCap color="#0a66c2" /> Manage Organization Students
           </h2>
           <p>
-            Track and support all students enrolled under <strong>{organization?.name || 'your institution'}</strong>.
-            Audit academic benchmarks, readiness tiers, and placement conversions.
+            Track and support all students enrolled under{' '}
+            <strong>{organization?.name || 'your institution'}</strong>. Audit academic benchmarks,
+            readiness tiers, and placement conversions.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <button
             type="button"
             className="campusTabBtn"
             onClick={exportCsv}
             disabled={students.length === 0}
             title="Export CSV roster"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
             <FaDownload size={12} /> Export CSV Roster
           </button>
           {onRefresh && (
-            <button type="button" className="campusTabBtn active" onClick={onRefresh}>
-              Refresh Roster
+            <button
+              type="button"
+              className="campusTabBtn active"
+              onClick={onRefresh}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            >
+              <FaSyncAlt size={12} /> Refresh Roster
             </button>
           )}
         </div>
       </div>
 
       {/* KPI Stats Cards */}
-      <div className="kpiGrid" style={{ marginBottom: 20 }}>
-        <div className="kpiCard">
-          <div className="kpiLabel">Total Enrolled Students</div>
-          <div className="kpiValue">{stats?.totalStudents ?? students.length}</div>
-          <div className="kpiSubtext">Registered under {organization?.name || 'Organization'}</div>
-        </div>
-        <div className="kpiCard">
-          <div className="kpiLabel">Placed Students</div>
-          <div className="kpiValue" style={{ color: '#16a34a' }}>
-            {stats?.placedCount ?? 0}
+      <div className="campusKpiGrid">
+        <div className="campusKpiCard">
+          <div className="campusKpiIconBox" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+            <FaUsers size={22} />
           </div>
-          <div className="kpiSubtext">
-            {stats?.placementRatePercentage ?? 0}% Placement Conversion
+          <div className="campusKpiMeta">
+            <h5>Total Enrolled Students</h5>
+            <p>{stats?.totalStudents ?? students.length}</p>
+            <small style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 3, display: 'block' }}>
+              Enrolled in {organization?.name || 'Institution'}
+            </small>
           </div>
         </div>
-        <div className="kpiCard">
-          <div className="kpiLabel">Unplaced / In-Process</div>
-          <div className="kpiValue" style={{ color: '#d97706' }}>
-            {stats?.unplacedCount ?? 0}
+
+        <div className="campusKpiCard">
+          <div className="campusKpiIconBox" style={{ background: '#dcfce7', color: '#166534' }}>
+            <FaAward size={22} />
           </div>
-          <div className="kpiSubtext">Eligible for upcoming recruitment drives</div>
+          <div className="campusKpiMeta">
+            <h5>Placed Students</h5>
+            <p style={{ color: '#16a34a' }}>{stats?.placedCount ?? 0}</p>
+            <small style={{ color: '#166534', fontWeight: 600, fontSize: '0.75rem', marginTop: 3, display: 'block' }}>
+              {stats?.placementRatePercentage ?? 0}% Placement Conversion
+            </small>
+          </div>
         </div>
-        <div className="kpiCard">
-          <div className="kpiLabel">Average Readiness</div>
-          <div className="kpiValue" style={{ color: '#0a66c2' }}>
-            {stats?.averageReadiness ?? 50}%
+
+        <div className="campusKpiCard">
+          <div className="campusKpiIconBox" style={{ background: '#fef3c7', color: '#b45309' }}>
+            <FaClock size={22} />
           </div>
-          <div className="kpiSubtext">
-            {stats?.readyCount ?? 0} students meet recruiter ready benchmarks
+          <div className="campusKpiMeta">
+            <h5>Unplaced / In-Process</h5>
+            <p style={{ color: '#d97706' }}>{stats?.unplacedCount ?? 0}</p>
+            <small style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 3, display: 'block' }}>
+              Eligible for upcoming recruitment drives
+            </small>
+          </div>
+        </div>
+
+        <div className="campusKpiCard">
+          <div className="campusKpiIconBox" style={{ background: '#f3e8ff', color: '#7e22ce' }}>
+            <FaChartLine size={22} />
+          </div>
+          <div className="campusKpiMeta">
+            <h5>Average Readiness</h5>
+            <p style={{ color: '#7e22ce' }}>{stats?.averageReadiness ?? 50}%</p>
+            <small style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 3, display: 'block' }}>
+              {stats?.readyCount ?? 0} students meet ready benchmarks
+            </small>
           </div>
         </div>
       </div>
 
       {/* Search & Filter Controls */}
-      <div
-        style={{
-          background: '#f8fafc',
-          padding: '14px',
-          borderRadius: '10px',
-          border: '1px solid #e2e8f0',
-          marginBottom: 16,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 12,
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ position: 'relative' }}>
-          <FaSearch
-            size={13}
-            color="#94a3b8"
-            style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
-          />
+      <div className="studentsFilterBar">
+        <div className="studentsSearchBox">
+          <FaSearch size={14} className="studentsSearchIcon" />
           <input
             type="text"
-            className="chatInput"
-            style={{ paddingLeft: 30 }}
-            placeholder="Search name, roll, branch, or email..."
+            className="studentsSearchInput"
+            placeholder="Search student by name, roll number, branch, or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              type="button"
+              className="studentsClearSearch"
+              onClick={() => setSearchTerm('')}
+              title="Clear search"
+            >
+              <FaTimes size={12} />
+            </button>
+          )}
         </div>
 
-        <select
-          className="chatInput"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="all">All Placement Statuses</option>
-          <option value="unplaced">Unplaced</option>
-          <option value="placed">Placed</option>
-          <option value="offer_accepted">Offer Accepted</option>
-          <option value="in_interview">In Interview</option>
-        </select>
+        <div className="studentsSelectGroup">
+          <select
+            className="studentsSelect"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Placement Statuses</option>
+            <option value="unplaced">Unplaced</option>
+            <option value="placed">Placed</option>
+            <option value="offer_accepted">Offer Accepted</option>
+            <option value="in_interview">In Interview</option>
+          </select>
 
-        <select
-          className="chatInput"
-          value={readinessFilter}
-          onChange={(e) => setReadinessFilter(e.target.value)}
-        >
-          <option value="all">All Readiness Tiers</option>
-          <option value="Highly Employable">Highly Employable (≥ 85%)</option>
-          <option value="Ready">Ready (70 - 84%)</option>
-          <option value="Developing">Developing (50 - 69%)</option>
-          <option value="Not Ready">Not Ready (&lt; 50%)</option>
-        </select>
+          <select
+            className="studentsSelect"
+            value={readinessFilter}
+            onChange={(e) => setReadinessFilter(e.target.value)}
+          >
+            <option value="all">All Readiness Tiers</option>
+            <option value="Highly Employable">Highly Employable (≥ 85%)</option>
+            <option value="Ready">Ready (70 - 84%)</option>
+            <option value="Developing">Developing (50 - 69%)</option>
+            <option value="Not Ready">Not Ready (&lt; 50%)</option>
+          </select>
 
-        <select
-          className="chatInput"
-          value={branchFilter}
-          onChange={(e) => setBranchFilter(e.target.value)}
-        >
-          <option value="all">All Departments / Branches</option>
-          {branches.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
+          <select
+            className="studentsSelect"
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+          >
+            <option value="all">All Departments / Branches</option>
+            {branches.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Students List / Table */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-          Loading students roster...
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
+          <FaUserGraduate size={38} color="#0a66c2" style={{ marginBottom: 12, animation: 'pulse 1.5s infinite' }} />
+          <h3 style={{ color: '#1e293b' }}>Loading Students Roster...</h3>
         </div>
       ) : filteredStudents.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-          <FaUserGraduate size={38} color="#cbd5e1" style={{ marginBottom: 12 }} />
+        <div className="campusSubCard" style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
+          <FaUserGraduate size={42} color="#cbd5e1" style={{ marginBottom: 12 }} />
           <h3 style={{ color: '#1e293b' }}>No Students Found</h3>
-          <p style={{ fontSize: '0.9rem' }}>
-            {searchTerm || statusFilter !== 'all' || readinessFilter !== 'all'
-              ? 'No enrolled students match your active search filters.'
+          <p style={{ fontSize: '0.9rem', maxWidth: 460, margin: '6px auto 0' }}>
+            {searchTerm || statusFilter !== 'all' || readinessFilter !== 'all' || branchFilter !== 'all'
+              ? 'No enrolled students match your active search or filter criteria. Try clearing filters.'
               : `No students are currently affiliated with ${organization?.name || 'this organization'}.`}
           </p>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: '0.86rem',
-              background: '#fff',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            }}
-          >
-            <thead>
-              <tr style={{ background: '#f1f5f9', color: '#475569', textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '12px 14px' }}>Student</th>
-                <th style={{ padding: '12px 14px' }}>Roll Number</th>
-                <th style={{ padding: '12px 14px' }}>Branch</th>
-                <th style={{ padding: '12px 14px' }}>CGPA / Backlogs</th>
-                <th style={{ padding: '12px 14px' }}>Readiness</th>
-                <th style={{ padding: '12px 14px' }}>Placement Status</th>
-                <th style={{ padding: '12px 14px', textAlign: 'center' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map((st) => (
-                <tr
-                  key={st.profileId || st.userId || st.rollNumber}
-                  style={{ borderBottom: '1px solid #f1f5f9' }}
-                >
-                  <td style={{ padding: '12px 14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div
+        <div className="institutesTableCard">
+          <div className="institutesTableCardHeader">
+            <h3>
+              <FaUserGraduate color="#0a66c2" /> Enrolled Students Directory ({filteredStudents.length})
+            </h3>
+            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+              Showing {filteredStudents.length} of {students.length} students
+            </span>
+          </div>
+
+          <div className="institutesTableWrapper">
+            <table className="institutesTable">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Roll Number</th>
+                  <th>Branch & Degree</th>
+                  <th>CGPA / Backlogs</th>
+                  <th>AI Readiness</th>
+                  <th>Placement Status</th>
+                  <th style={{ textAlign: 'center' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredStudents.map((st) => (
+                  <tr key={st.profileId || st.userId || st.rollNumber}>
+                    <td>
+                      <div className="instituteMetaCell">
+                        {st.avatar ? (
+                          <img
+                            src={st.avatar}
+                            alt={st.name}
+                            className="instituteMetaLogo"
+                            style={{ borderRadius: '50%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: '50%',
+                              background: '#e0f2fe',
+                              color: '#0284c7',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              fontSize: '0.95rem',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {st.name?.[0]?.toUpperCase() || 'S'}
+                          </div>
+                        )}
+                        <div>
+                          <strong style={{ color: '#0f172a', fontSize: '0.92rem', display: 'block' }}>
+                            {st.name}
+                          </strong>
+                          <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                            {st.email || `@${st.username}`}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span
                         style={{
-                          width: 34,
-                          height: 34,
-                          borderRadius: '50%',
-                          background: '#e2e8f0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          overflow: 'hidden',
                           fontWeight: 700,
-                          color: '#0a66c2',
+                          color: '#1e293b',
+                          fontFamily: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                          fontSize: '0.88rem',
+                          background: '#f1f5f9',
+                          padding: '3px 7px',
+                          borderRadius: '5px',
                         }}
                       >
-                        {st.avatar ? (
-                          <img src={st.avatar} alt={st.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          st.name?.[0]?.toUpperCase() || 'S'
-                        )}
+                        {st.rollNumber}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div style={{ color: '#1e293b', fontWeight: 600, fontSize: '0.86rem' }}>
+                        {st.branch}
                       </div>
+                      <small style={{ color: '#64748b', fontSize: '0.76rem' }}>
+                        Graduation {st.graduationYear}
+                      </small>
+                    </td>
+
+                    <td>
                       <div>
-                        <strong style={{ color: '#0f172a', display: 'block' }}>{st.name}</strong>
-                        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                          {st.email || `@${st.username}`}
-                        </span>
+                        <strong style={{ fontSize: '0.94rem', color: '#0f172a' }}>
+                          {st.cgpa > 0 ? st.cgpa.toFixed(2) : '—'}
+                        </strong>
                       </div>
-                    </div>
-                  </td>
-
-                  <td style={{ padding: '12px 14px', fontWeight: 600, color: '#334155' }}>
-                    {st.rollNumber}
-                  </td>
-
-                  <td style={{ padding: '12px 14px', color: '#334155' }}>
-                    {st.branch}
-                  </td>
-
-                  <td style={{ padding: '12px 14px' }}>
-                    <strong>{st.cgpa > 0 ? st.cgpa : '—'}</strong>
-                    <span style={{ fontSize: '0.78rem', color: st.activeBacklogs > 0 ? '#dc2626' : '#64748b', display: 'block' }}>
-                      {st.activeBacklogs > 0 ? `${st.activeBacklogs} Backlogs` : '0 Backlogs'}
-                    </span>
-                  </td>
-
-                  <td style={{ padding: '12px 14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span
                         style={{
                           fontSize: '0.75rem',
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: '12px',
-                          background:
-                            st.overallReadiness >= 80
-                              ? '#dcfce7'
-                              : st.overallReadiness >= 65
-                              ? '#e0f2fe'
-                              : '#fef3c7',
-                          color:
-                            st.overallReadiness >= 80
-                              ? '#15803d'
-                              : st.overallReadiness >= 65
-                              ? '#0369a1'
-                              : '#b45309',
+                          fontWeight: 600,
+                          color: st.activeBacklogs > 0 ? '#dc2626' : '#16a34a',
                         }}
                       >
-                        {st.overallReadiness}%
+                        {st.activeBacklogs > 0 ? `⚠️ ${st.activeBacklogs} Backlogs` : '0 Backlogs'}
                       </span>
-                      <span style={{ fontSize: '0.76rem', color: '#64748b' }}>
-                        {st.readinessLevel}
-                      </span>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td style={{ padding: '12px 14px' }}>
-                    <span
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        padding: '3px 9px',
-                        borderRadius: '6px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        background:
-                          ['placed', 'offer_accepted'].includes(st.placementStatus)
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span
+                          className={`ratePill ${
+                            st.overallReadiness >= 80
+                              ? 'ratePillHigh'
+                              : st.overallReadiness >= 65
+                              ? 'ratePillMid'
+                              : 'ratePillLow'
+                          }`}
+                        >
+                          {st.overallReadiness}%
+                        </span>
+                        <span style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 500 }}>
+                          {st.readinessLevel}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span
+                        style={{
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          background: ['placed', 'offer_accepted'].includes(st.placementStatus)
                             ? '#dcfce7'
                             : st.placementStatus === 'in_interview'
                             ? '#e0f2fe'
                             : '#f1f5f9',
-                        color:
-                          ['placed', 'offer_accepted'].includes(st.placementStatus)
+                          color: ['placed', 'offer_accepted'].includes(st.placementStatus)
                             ? '#15803d'
                             : st.placementStatus === 'in_interview'
                             ? '#0369a1'
                             : '#475569',
-                      }}
-                    >
-                      {['placed', 'offer_accepted'].includes(st.placementStatus) && <FaCheckCircle size={10} />}
-                      {st.placementStatus === 'in_interview' && <FaClock size={10} />}
-                      {st.placementStatus === 'offer_accepted'
-                        ? 'Offer Accepted'
-                        : st.placementStatus === 'placed'
-                        ? 'Placed'
-                        : st.placementStatus === 'in_interview'
-                        ? 'In Interview'
-                        : 'Unplaced'}
-                    </span>
-                  </td>
+                        }}
+                      >
+                        {['placed', 'offer_accepted'].includes(st.placementStatus) && (
+                          <FaCheckCircle size={10} />
+                        )}
+                        {st.placementStatus === 'in_interview' && <FaClock size={10} />}
+                        {st.placementStatus === 'offer_accepted'
+                          ? 'Offer Accepted'
+                          : st.placementStatus === 'placed'
+                          ? 'Placed'
+                          : st.placementStatus === 'in_interview'
+                          ? 'In Interview'
+                          : 'Unplaced'}
+                      </span>
+                    </td>
 
-                  <td style={{ padding: '12px 14px', textAlign: 'center' }}>
-                    <button
-                      type="button"
-                      className="campusTabBtn"
-                      style={{ padding: '4px 10px', fontSize: '0.78rem' }}
-                      title="Update placement status"
-                      onClick={() => handleOpenEdit(st)}
-                    >
-                      <FaEdit size={11} /> Update
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <td style={{ textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        className="campusTabBtn"
+                        style={{
+                          padding: '5px 12px',
+                          fontSize: '0.78rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          borderRadius: 6,
+                          border: '1px solid #cbd5e1',
+                          background: '#ffffff',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          color: '#0a66c2',
+                        }}
+                        title="Update placement status"
+                        onClick={() => handleOpenEdit(st)}
+                      >
+                        <FaEdit size={11} /> Update
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -440,27 +519,55 @@ export const StudentsTab = ({
           <div
             style={{
               background: '#fff',
-              borderRadius: '12px',
+              borderRadius: '14px',
               padding: '24px',
               maxWidth: '480px',
               width: '100%',
-              boxShadow: '0 12px 30px rgba(0,0,0,0.2)',
+              boxShadow: '0 16px 36px rgba(0,0,0,0.22)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 14,
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: '1.1rem',
+                }}
+              >
                 <FaEdit color="#0a66c2" /> Update Student Status
               </h3>
-              <FaTimes style={{ cursor: 'pointer' }} onClick={() => setSelectedStudent(null)} />
+              <FaTimes
+                style={{ cursor: 'pointer', color: '#64748b' }}
+                onClick={() => setSelectedStudent(null)}
+              />
             </div>
 
-            <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 16px' }}>
-              Update corporate placement progress and faculty mentor allocation for <strong>{selectedStudent.name}</strong> ({selectedStudent.rollNumber}).
+            <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
+              Update corporate placement progress and faculty mentor allocation for{' '}
+              <strong>{selectedStudent.name}</strong> ({selectedStudent.rollNumber}).
             </p>
 
             <form onSubmit={handleSaveStatus}>
               <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: '#334155',
+                    marginBottom: 5,
+                  }}
+                >
                   Placement Status *
                 </label>
                 <select
@@ -477,7 +584,15 @@ export const StudentsTab = ({
               </div>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: '#334155',
+                    marginBottom: 5,
+                  }}
+                >
                   Assigned Faculty Mentor
                 </label>
                 <input
@@ -490,7 +605,15 @@ export const StudentsTab = ({
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: '#334155',
+                    marginBottom: 5,
+                  }}
+                >
                   Placement Cell Recommendation / Notes
                 </label>
                 <textarea
@@ -499,6 +622,7 @@ export const StudentsTab = ({
                   placeholder="e.g. Recommended for FinTech campus drives; needs DSA brush-up."
                   value={mentorRecommendation}
                   onChange={(e) => setMentorRecommendation(e.target.value)}
+                  style={{ resize: 'vertical' }}
                 />
               </div>
 
@@ -527,4 +651,3 @@ export const StudentsTab = ({
 };
 
 export default StudentsTab;
-
